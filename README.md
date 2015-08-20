@@ -19,36 +19,36 @@ XdmfHdf5Fortran is a library to read and write partitioned FEM meshes taking adv
 
 ### Exporters:
   * Mesh:
-    * [] Structured
-    * [] Unstructured
+    * [ ] Structured
+    * [ ] Unstructured
   * Element:
     * Linear
-      * [] Triangle
-      * [] Quadrangle
-      * [] Tretrahedron
-      * [] Hexahedron
-      * [] Mixed
+      * [ ] Triangle
+      * [ ] Quadrangle
+      * [ ] Tretrahedron
+      * [ ] Hexahedron
+      * [ ] Mixed
   * Field:
     * Center on: not defined yet...
     * Number of components: not defined yet...
   * XDMF:
-    * [] Temporal grid
-    * [] Spatial grid
-    * [] Grid
-      * [] Topology
-      * [] Geometry
-      * [] Attribute
-    * [] DataItem
-      * [] HyperSlab
+    * [ ] Temporal grid
+    * [ ] Spatial grid
+    * [ ] Grid
+      * [ ] Topology
+      * [ ] Geometry
+      * [ ] Attribute
+    * [ ] DataItem
+      * [ ] HyperSlab
   * HDF5:
-    * [] Manage Files
-    * [] Groups
-    * [] DataSpaces
-    * [] DataSets
-    * [] HyperSlabs
+    * [ ] Manage Files
+    * [ ] Groups
+    * [ ] DataSpaces
+    * [ ] DataSets
+    * [ ] HyperSlabs
 
 ### Importers
-  * (Future work)
+  * (Future work...)
 
 ## How to collaborate
 If you want to actively collaborate in the project, please feel free to fork and submit pull requests.
