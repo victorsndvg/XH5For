@@ -6,7 +6,7 @@ XdmfHdf5Fortran is a library to read and write partitioned FEM meshes taking adv
 
 ## Some concepts
 * [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format) is a standarized way to describe common scientific data. It separates the **Light data** *(XML description of the data model)* and the **Heavy data** *(raw values)* usually saved in HDF5 or binary Files.
-* [HDF5](https://www.hdfgroup.org/HDF5) is a model and data format designed for efficient I/O and write big amounts of data.
+* [HDF5](https://www.hdfgroup.org/HDF5) is a model and data format designed for efficient I/O and work with big amounts of data.
 
 ## Some considerations
 * XdmfHdf5Fortran will use [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format) to describe the **Light data** and [HDF5](https://www.hdfgroup.org/HDF5) for the **Heavy data**.
