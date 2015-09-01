@@ -10,10 +10,10 @@ XdmfHdf5Fortran is a library to read and write partitioned FEM meshes taking adv
 
 ## Some considerations
 * XdmfHdf5Fortran will use [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format) to describe the **Light data** and [HDF5](https://www.hdfgroup.org/HDF5) for the **Heavy data**.
-* HDF5 API need to be linked to write the **Heavy data**.
+* HDF5 API need to be linked to read/write the **Heavy data**.
 * The first approach to the HDF5 IO will be based on HyperSlabs in order to reduce metadata.
 * As starting point XML syntax will be based on XDMF v2.x.
-* As starting point the library will use an basic XML SAX parser for reading/writing XDMF files based on the previous work of [Francisco Pena](http://sourceforge.net/u/franpena/profile).
+* As starting point the library will use [FoX](https://github.com/andreww/fox) (Fortran XML library) for reading/writing XDMF files.
 
 ## Main features
 
