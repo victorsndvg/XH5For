@@ -10,6 +10,9 @@ use xdmf_grid
 use xdmf_geometry
 use xdmf_topology
 use xdmf_dataitem
+use xdmf_attribute
+use xdmf_time
+use xdmf_information
 
 implicit none
 private
@@ -20,5 +23,8 @@ public:: xdmf_grid_t
 public:: xdmf_geometry_t
 public:: xdmf_topology_t
 public:: xdmf_dataitem_t
+public:: xdmf_attribute_t
+public:: xdmf_time_t
+public:: xdmf_information_t
 
 end module fox_xdmf
