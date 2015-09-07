@@ -20,6 +20,13 @@ FOREACH(EXT_LIB ${EXT_LIBS})
 ENDFOREACH()
 
 #################################################################
+# MPI library
+#################################################################
+IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
+    TARGET_LINK_LIBRARIES(${LIB} ${MPI_Fortran_LIBRARIES})
+ENDIF()
+
+#################################################################
 # External projects
 #################################################################
 FOREACH(FOX_LIB ${FOX_LIBS})

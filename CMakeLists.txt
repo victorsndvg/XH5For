@@ -50,7 +50,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 # List of external libraries
 #################################################################
 
-SET(EXT_LIBS  )
+SET(EXT_LIBS  MPI)
 
 #################################################################
 # Find packages
@@ -93,6 +93,31 @@ FOREACH(EXT_LIB ${EXT_LIBS})
         ENDIF()
     ENDIF()
 ENDFOREACH ()
+
+
+#################################################################
+# FFLAGS depend on the compiler and the build type
+#################################################################
+IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
+
+
+    # Find mpi.mod
+    FIND_PATH(MPI_MOD_FOUND mpi.mod  PATHS ${MPI_Fortran_INCLUDE_PATH})
+    IF(MPI_MOD_FOUND)
+        ADD_DEFINITIONS(-DMPI_MOD)
+    ELSE()
+        ADD_DEFINITIONS(-DMPI_H)
+    ENDIF()
+
+    # Force MPI Fortran compiler
+    INCLUDE(CMakeForceCompiler)
+    CMAKE_FORCE_Fortran_COMPILER(${MPI_Fortran_COMPILER} ${CMAKE_Fortran_COMPILER_ID})
+
+    # Add MPI directories
+    ADD_DEFINITIONS(${MPI_Fortran_COMPILE_FLAGS})
+    INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
+    LINK_DIRECTORIES(${MPI_Fortran_LIBRARIES})
+ENDIF()
 
 
 #################################################################
