@@ -1,7 +1,7 @@
 program test_xdmf_dataitem
 
 use fox_xdmf
-use IR_Precision, only: I8P
+use IR_Precision, only: I4P, I8P
 
 implicit none
 
@@ -22,8 +22,8 @@ implicit none
     call dataitem%open(file%xml_handler, ItemType='Coordinates')
     call dataitem%open(file%xml_handler, ItemType='Function'); call dataitem%close(file%xml_handler)
     call dataitem%close(file%xml_handler)
-    call dataitem%open(file%xml_handler, Dimensions=(/2_I8P/)); call dataitem%close(file%xml_handler)
-    call dataitem%open(file%xml_handler, Dimensions=(/1_I8P,3_I8P/)); call dataitem%close(file%xml_handler)
+    call dataitem%open(file%xml_handler, Dimensions=2_I4P); call dataitem%close(file%xml_handler)
+    call dataitem%open(file%xml_handler, Dimensions=(/1_I4P,3_I4P/)); call dataitem%close(file%xml_handler)
     call dataitem%open(file%xml_handler, Dimensions=(/1_I8P,2_I8P,3_I8P/)); call dataitem%close(file%xml_handler)
     call dataitem%open(file%xml_handler, Dimensions=(/1_I8P,1_I8P,1_I8P,1_I8P,1_I8P,1_I8P/)); call dataitem%close(file%xml_handler)
     call dataitem%open(file%xml_handler, NumberType='DoublePrecision'); call dataitem%close(file%xml_handler)

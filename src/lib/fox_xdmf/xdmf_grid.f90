@@ -28,12 +28,13 @@ implicit none
         character(len=:), allocatable :: Section
     contains
     private
+        procedure         :: grid_open
         procedure         :: default_initialization => grid_default_initialization
         procedure         :: is_valid_GridType      => grid_is_valid_GridType
         procedure         :: is_valid_CollectionType=> grid_is_valid_CollectionType
         procedure         :: is_valid_Section       => grid_is_valid_Section
         procedure         :: free                   => grid_free
-        procedure, public :: open                   => grid_open
+        generic,   public :: open                   => grid_open
         procedure, public :: close                  => grid_close
     end type xdmf_grid_t
 

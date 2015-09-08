@@ -40,10 +40,19 @@ implicit none
         integer(I4P)                  :: BaseOffset
     contains
     private
+        procedure         :: topology_open_no_dimensions
+        procedure         :: topology_open_I4P_dimension
+        procedure         :: topology_open_I8P_dimension
+        procedure         :: topology_open_I4P_dimensions
+        procedure         :: topology_open_I8P_dimensions
         procedure         :: default_initialization => topology_default_initialization
         procedure         :: is_valid_TopologyType  => topology_is_valid_TopologyType
         procedure         :: free                   => topology_free
-        procedure, public :: open                   => topology_open
+        generic,   public :: open                   => topology_open_no_dimensions,  &
+                                                       topology_open_I4P_dimension,  &
+                                                       topology_open_I8P_dimension,  &
+                                                       topology_open_I4P_dimensions, &
+                                                       topology_open_I8P_dimensions
         procedure, public :: close                  => topology_close
     end type xdmf_topology_t
 
@@ -95,7 +104,7 @@ contains
     end subroutine topology_default_initialization
 
 
-    subroutine topology_open(this, xml_handler, Name, TopologyType, NodesPerElement, Dimensions, Order, BaseOffset)
+    subroutine topology_open_no_dimensions(this, xml_handler, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -104,7 +113,6 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF Topology Name attribute
         character(len=*), optional, intent(IN)    :: TopologyType     !< XDMF Topology TopologyType attribute
         integer(i4P)    , optional, intent(IN)    :: NodesPerElement  !< XDMF Topology NodesPerElement attribute
-        integer(i8P)    , optional, intent(IN)    :: Dimensions(:)    !< XDMF Topology Dimensions attribute
         integer(i4P)    , optional, intent(IN)    :: Order            !< XDMF Topology TopologyType attribute
         integer(i4P)    , optional, intent(IN)    :: BaseOffset       !< XDMF Topology TopologyType attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
@@ -123,29 +131,187 @@ contains
         if(PRESENT(NodesPerElement)) &
             call xml_AddAttribute(xml_handler, name="NodesPerElement", value=NodesPerElement)
 
-        if(PRESENT(Dimensions)) then
-            if(allocated(char_dims)) deallocate(char_dims)
-            i = size(Dimensions,dim=1)
-            allocate(character(len=64*i) :: char_dims)
-            write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
-            call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
-            deallocate(char_dims)
+        if(PRESENT(Order)) &
+            call xml_AddAttribute(xml_handler, name="Order", value=Order)
+
+        if(PRESENT(BaseOffset)) &
+            call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
+    end subroutine topology_open_no_dimensions
+
+
+    subroutine topology_open_I4P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    !-----------------------------------------------------------------
+    !< Open a new topology XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t),     intent(INOUT) :: this             !< XDMF Topology type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(i4P)    ,           intent(IN)    :: Dimensions       !< XDMF Topology I4P Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF Topology Name attribute
+        character(len=*), optional, intent(IN)    :: TopologyType     !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: NodesPerElement  !< XDMF Topology NodesPerElement attribute
+        integer(i4P)    , optional, intent(IN)    :: Order            !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: BaseOffset       !< XDMF Topology TopologyType attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('Topology')
+
+        call xml_NewElement(xml_handler, 'Topology')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+
+        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+            call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
+
+        if(PRESENT(NodesPerElement)) &
+            call xml_AddAttribute(xml_handler, name="NodesPerElement", value=NodesPerElement)
+
+        char_dims = trim(adjustl(str(no_sign=.true., n=Dimensions)))
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
 
         if(PRESENT(Order)) &
             call xml_AddAttribute(xml_handler, name="Order", value=Order)
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open
+    end subroutine topology_open_I4P_dimension
+
+
+    subroutine topology_open_I8P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    !-----------------------------------------------------------------
+    !< Open a new topology XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t),     intent(INOUT) :: this             !< XDMF Topology type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(i8P)    ,           intent(IN)    :: Dimensions       !< XDMF Topology I8P Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF Topology Name attribute
+        character(len=*), optional, intent(IN)    :: TopologyType     !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: NodesPerElement  !< XDMF Topology NodesPerElement attribute
+        integer(i4P)    , optional, intent(IN)    :: Order            !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: BaseOffset       !< XDMF Topology TopologyType attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('Topology')
+
+        call xml_NewElement(xml_handler, 'Topology')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+
+        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+            call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
+        endif
+
+        if(PRESENT(NodesPerElement)) &
+            call xml_AddAttribute(xml_handler, name="NodesPerElement", value=NodesPerElement)
+
+        char_dims = trim(adjustl(str(no_sign=.true., n=Dimensions)))
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(Order)) &
+            call xml_AddAttribute(xml_handler, name="Order", value=Order)
+
+        if(PRESENT(BaseOffset)) &
+            call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
+    end subroutine topology_open_I8P_dimension
+
+
+
+    subroutine topology_open_I4P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    !-----------------------------------------------------------------
+    !< Open a new topology XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t),     intent(INOUT) :: this             !< XDMF Topology type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(i4P)    ,           intent(IN)    :: Dimensions(:)    !< XDMF Topology I4P array Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF Topology Name attribute
+        character(len=*), optional, intent(IN)    :: TopologyType     !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: NodesPerElement  !< XDMF Topology NodesPerElement attribute
+        integer(i4P)    , optional, intent(IN)    :: Order            !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: BaseOffset       !< XDMF Topology TopologyType attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('Topology')
+
+        call xml_NewElement(xml_handler, 'Topology')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+
+        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+            call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
+        endif
+
+        if(PRESENT(NodesPerElement)) &
+            call xml_AddAttribute(xml_handler, name="NodesPerElement", value=NodesPerElement)
+
+        if(allocated(char_dims)) deallocate(char_dims)
+        i = size(Dimensions,dim=1)
+        allocate(character(len=64*i) :: char_dims)
+        write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(Order)) &
+            call xml_AddAttribute(xml_handler, name="Order", value=Order)
+
+        if(PRESENT(BaseOffset)) &
+            call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
+    end subroutine topology_open_I4P_dimensions
+
+
+    subroutine topology_open_I8P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    !-----------------------------------------------------------------
+    !< Open a new topology XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t),     intent(INOUT) :: this             !< XDMF Topology type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(i8P)    ,           intent(IN)    :: Dimensions(:)    !< XDMF Topology I8P array Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF Topology Name attribute
+        character(len=*), optional, intent(IN)    :: TopologyType     !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: NodesPerElement  !< XDMF Topology NodesPerElement attribute
+        integer(i4P)    , optional, intent(IN)    :: Order            !< XDMF Topology TopologyType attribute
+        integer(i4P)    , optional, intent(IN)    :: BaseOffset       !< XDMF Topology TopologyType attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('Topology')
+
+        call xml_NewElement(xml_handler, 'Topology')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+
+        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+            call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
+        endif
+
+        if(PRESENT(NodesPerElement)) &
+            call xml_AddAttribute(xml_handler, name="NodesPerElement", value=NodesPerElement)
+
+        if(allocated(char_dims)) deallocate(char_dims)
+        i = size(Dimensions,dim=1)
+        allocate(character(len=64*i) :: char_dims)
+        write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(Order)) &
+            call xml_AddAttribute(xml_handler, name="Order", value=Order)
+
+        if(PRESENT(BaseOffset)) &
+            call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
+    end subroutine topology_open_I8P_dimensions
 
 
     subroutine topology_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new topology XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_topology_t), intent(IN)    :: this                     !< XDMF topology type
-        type(xmlf_t),       intent(INOUT) :: xml_handler              !< FoX XML File handler
+        class(xdmf_topology_t), intent(IN)    :: this                 !< XDMF topology type
+        type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Topology')
     end subroutine topology_close

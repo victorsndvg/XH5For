@@ -22,10 +22,11 @@ implicit none
         character(len=:), allocatable :: GeometryType
     contains
     private
+        procedure         :: geometry_open 
         procedure         :: default_initialization => geometry_default_initialization
         procedure         :: is_valid_GeometryType  => geometry_is_valid_GeometryType
         procedure         :: free                   => geometry_free
-        procedure, public :: open                   => geometry_open
+        generic,   public :: open                   => geometry_open
         procedure, public :: close                  => geometry_close
     end type xdmf_geometry_t
 

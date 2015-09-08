@@ -21,9 +21,10 @@ implicit none
         character(len=:), allocatable :: Name
     contains
     private
+        procedure         :: domain_open
         procedure         :: default_initialization => domain_default_initialization
         procedure         :: free                   => domain_free
-        procedure, public :: open                   => domain_open
+        generic,   public :: open                   => domain_open
         procedure, public :: close                  => domain_close
     end type xdmf_domain_t
 

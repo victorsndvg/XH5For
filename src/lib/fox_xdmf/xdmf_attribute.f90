@@ -26,11 +26,12 @@ implicit none
         character(len=:), allocatable :: Center
     contains
     private
+        procedure         :: attribute_open
         procedure         :: default_initialization => attribute_default_initialization
         procedure         :: is_valid_AttributeType => attribute_is_valid_AttributeType
         procedure         :: is_valid_Center        => attribute_is_valid_Center
         procedure         :: free                   => attribute_free
-        procedure, public :: open                   => attribute_open
+        generic,   public :: open                   => attribute_open
         procedure, public :: close                  => attribute_close
     end type xdmf_attribute_t
 

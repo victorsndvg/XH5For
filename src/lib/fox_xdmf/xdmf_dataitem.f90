@@ -40,13 +40,21 @@ implicit none
 !        integer(I8P)                  :: Seek
     contains
     private
+        procedure         :: dataitem_open_no_dimensions
+        procedure         :: dataitem_open_I4P_dimension
+        procedure         :: dataitem_open_I4P_dimensions
+        procedure         :: dataitem_open_I8P_dimensions
         procedure         :: is_valid_ItemType      => dataitem_is_valid_ItemType
         procedure         :: is_valid_NumberType    => dataitem_is_valid_NumberType
         procedure         :: is_valid_Precision     => dataitem_is_valid_Precision
         procedure         :: is_valid_Format        => dataitem_is_valid_Format
         procedure         :: default_initialization => dataitem_default_initialization
         procedure         :: free                   => dataitem_free
-        procedure, public :: open                   => dataitem_open
+        generic,   public :: open                   => dataitem_open_no_dimensions,  &
+                                                       dataitem_open_I4P_dimension,  &
+                                                       dataitem_open_I4P_dimensions, &
+                                                       dataitem_open_I8P_dimensions
+
         procedure, public :: close                  => dataitem_close
     end type xdmf_dataitem_t
 
@@ -152,7 +160,7 @@ contains
     end subroutine dataitem_default_initialization
 
 
-    subroutine dataitem_open(this, xml_handler, Name, ItemType, Dimensions, NumberType, Precision, Format)
+    subroutine dataitem_open_no_dimensions(this, xml_handler, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -160,9 +168,8 @@ contains
         type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
-        integer(I8P),     optional, intent(IN)    :: Dimensions(:)    !< XDMF DataItem Dimensions attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(i4P)    , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
         integer(I4P)                              :: i                !< Aux index variable
@@ -174,14 +181,6 @@ contains
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
         if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
-        endif
-        if(PRESENT(Dimensions)) then
-            if(allocated(char_dims)) deallocate(char_dims)
-            i = size(Dimensions,dim=1)
-            allocate(character(len=64*i) :: char_dims)
-            write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
-            call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
-            deallocate(char_dims)
         endif
 
         if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
@@ -196,7 +195,181 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open
+    end subroutine dataitem_open_no_dimensions
+
+
+    subroutine dataitem_open_I4P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    !-----------------------------------------------------------------
+    !< Open a new dataitem XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t),     intent(INOUT) :: this             !< XDMF DataItemp type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(I4P),               intent(IN)    :: Dimensions       !< XDMF DataItem I4P Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
+        character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
+        character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
+        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+    !----------------------------------------------------------------- 
+        call this%set_tag('DataItem')
+
+        call xml_NewElement(xml_handler, 'DataItem')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+            call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
+        endif
+
+        char_dims = trim(adjustl(str(no_sign=.true., n=Dimensions)))
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+            call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
+        endif
+
+        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+            call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
+        endif
+
+        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+            call xml_AddAttribute(xml_handler, name="Format", value=Format)
+        endif
+
+    end subroutine dataitem_open_I4P_dimension
+
+
+    subroutine dataitem_open_I8P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    !-----------------------------------------------------------------
+    !< Open a new dataitem XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t),     intent(INOUT) :: this             !< XDMF DataItemp type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(I8P),               intent(IN)    :: Dimensions       !< XDMF DataItem I8P Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
+        character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
+        character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
+        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+    !----------------------------------------------------------------- 
+        call this%set_tag('DataItem')
+
+        call xml_NewElement(xml_handler, 'DataItem')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+            call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
+        endif
+
+        char_dims = trim(adjustl(str(no_sign=.true., n=Dimensions)))
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+            call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
+        endif
+
+        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+            call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
+        endif
+
+        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+            call xml_AddAttribute(xml_handler, name="Format", value=Format)
+        endif
+
+    end subroutine dataitem_open_I8P_dimension
+
+    subroutine dataitem_open_I4P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    !-----------------------------------------------------------------
+    !< Open a new dataitem XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t),     intent(INOUT) :: this             !< XDMF DataItemp type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(I4P),               intent(IN)    :: Dimensions(:)    !< XDMF DataItem I4P array Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
+        character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
+        character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
+        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('DataItem')
+
+        call xml_NewElement(xml_handler, 'DataItem')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+            call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
+        endif
+
+        if(allocated(char_dims)) deallocate(char_dims)
+        i = size(Dimensions,dim=1)
+        allocate(character(len=64*i) :: char_dims)
+        write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+            call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
+        endif
+
+        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+            call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
+        endif
+
+        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+            call xml_AddAttribute(xml_handler, name="Format", value=Format)
+        endif
+
+    end subroutine dataitem_open_I4P_dimensions
+
+    subroutine dataitem_open_I8P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    !-----------------------------------------------------------------
+    !< Open a new dataitem XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t),     intent(INOUT) :: this             !< XDMF DataItemp type
+        type(xmlf_t),               intent(INOUT) :: xml_handler      !< FoX XML File handler
+        integer(I8P),               intent(IN)    :: Dimensions(:)    !< XDMF DataItem I8P array Dimensions attribute
+        character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
+        character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
+        character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
+        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
+        character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
+        integer(I4P)                              :: i                !< Aux index variable
+    !----------------------------------------------------------------- 
+        call this%set_tag('DataItem')
+
+        call xml_NewElement(xml_handler, 'DataItem')
+        if(PRESENT(Name))                                                      &
+            call xml_AddAttribute(xml_handler, name="Name", value=Name)
+        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+            call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
+        endif
+
+        if(allocated(char_dims)) deallocate(char_dims)
+        i = size(Dimensions,dim=1)
+        allocate(character(len=64*i) :: char_dims)
+        write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
+        call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
+        deallocate(char_dims)
+
+        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+            call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
+        endif
+
+        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+            call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
+        endif
+
+        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+            call xml_AddAttribute(xml_handler, name="Format", value=Format)
+        endif
+
+    end subroutine dataitem_open_I8P_dimensions
 
 
     subroutine dataitem_close(this, xml_handler)

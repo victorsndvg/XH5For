@@ -22,9 +22,10 @@ implicit none
         character(len=:), allocatable :: Value
     contains
     private
+        procedure         :: information_open
         procedure         :: default_initialization => information_default_initialization
         procedure         :: free                   => information_free
-        procedure, public :: open                   => information_open
+        generic,   public :: open                   => information_open
         procedure, public :: close                  => information_close
     end type xdmf_information_t
 

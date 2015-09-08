@@ -1,7 +1,7 @@
 program test_xdmf_topology
 
 use fox_xdmf
-use IR_Precision, only: I8P
+use IR_Precision, only: I4P, I8P
 
 implicit none
 
@@ -51,7 +51,9 @@ implicit none
     call topology%open(file%xml_handler,TopologyType='3DCoRectMesh'); call topology%close(file%xml_handler)
     call topology%open(file%xml_handler,TopologyType='Unknown'); call topology%close(file%xml_handler)
     call topology%open(file%xml_handler,NodesPerElement=3); call topology%close(file%xml_handler)
-    call topology%open(file%xml_handler,Dimensions=(/1_I8P/)); call topology%close(file%xml_handler)
+    call topology%open(file%xml_handler,Dimensions=1_I4P); call topology%close(file%xml_handler)
+    call topology%open(file%xml_handler,Dimensions=1_I8P); call topology%close(file%xml_handler)
+    call topology%open(file%xml_handler,Dimensions=(/1_I4P,1_I4P,1_I4P/)); call topology%close(file%xml_handler)
     call topology%open(file%xml_handler,Dimensions=(/1_I8P,1_I8P,1_I8P/)); call topology%close(file%xml_handler)
     call topology%open(file%xml_handler,Order=1); call topology%close(file%xml_handler)
     call topology%open(file%xml_handler,BaseOffset=0); call topology%close(file%xml_handler)
