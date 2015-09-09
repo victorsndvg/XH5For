@@ -7,10 +7,10 @@ module mpi_environment
 use IR_Precision, only : I4P, I8P, R4P, R8P
 
 #ifdef MPI_MOD
-  use mpi
+    use mpi
 #endif
 #ifdef MPI_H
-  include 'mpif.h'
+    include 'mpif.h'
 #endif
 
     type mpi_env_t
@@ -30,6 +30,7 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
         procedure, public :: get_root                     => mpi_get_root
         procedure, public :: get_rank                     => mpi_get_rank
         procedure, public :: get_comm_size                => mpi_get_comm_size
+        procedure, public :: is_root                      => mpi_is_root
         generic, public :: mpi_allgather_single_int_value => mpi_allgather_single_int_value_I4P, &
                                                         mpi_allgather_single_int_value_I8P
     end type mpi_env_t
@@ -161,6 +162,17 @@ contains
 #endif
         if(present(mpierror)) mpierror = mpierr
     end subroutine mpi_allgather_single_int_value_I8P
+
+
+    function mpi_is_root(this)
+    !-----------------------------------------------------------------
+    !< Is the current task the root processor?
+    !----------------------------------------------------------------- 
+        class(mpi_env_t), intent(IN)  :: this                         !< MPI environment
+        logical                       :: mpi_is_root                  !< Boolean variable, True if is root task   
+    !----------------------------------------------------------------- 
+        mpi_is_root = this%get_rank() == this%get_root()
+    end function mpi_is_root
 
 
 

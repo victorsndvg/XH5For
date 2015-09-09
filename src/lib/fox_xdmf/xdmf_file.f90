@@ -21,6 +21,7 @@ implicit none
         procedure, public :: closefile            => xdmf_closefile
         procedure, public :: set_filename         => xdmf_set_filename
         procedure, public :: get_filename         => xdmf_get_filename
+        procedure, public :: get_xml_handler      => xdmf_get_xml_handler
     end type xdmf_file_t
 
     public :: xdmf_file_t
@@ -38,15 +39,29 @@ contains
     end subroutine xdmf_set_filename
 
 
-    subroutine xdmf_get_filename(xdmf_file, filename)
+    function xdmf_get_filename(xdmf_file) result(filename)
     !-----------------------------------------------------------------
     !< Get the filename of xdmf_file type
     !----------------------------------------------------------------- 
         class(xdmf_file_t),             intent(IN)  :: xdmf_file      !< XDMF file handler
-        character(len=:), allocatable,  intent(OUT) :: filename       !< File name
+        character(len=:), allocatable               :: filename       !< File name
     !----------------------------------------------------------------- 
-        if(allocated(xdmf_file%filename)) filename = xdmf_file%filename
-    end subroutine xdmf_get_filename
+        if(allocated(xdmf_file%filename)) then
+            filename = xdmf_file%filename
+        else
+            filename = ''
+        endif
+    end function xdmf_get_filename
+
+    function xdmf_get_xml_handler(xdmf_file) result(xml_handler)
+    !-----------------------------------------------------------------
+    !< Set the filename of xdmf_file type
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
+        type(xmlf_t)                      :: xml_handler              !< Fox XML file handler
+    !----------------------------------------------------------------- 
+         xml_handler = xdmf_file%xml_handler
+    end function xdmf_get_xml_handler
 
 
     subroutine xdmf_openfile(xdmf_file, IO_error)
@@ -67,7 +82,7 @@ contains
         ! warning            : Print warning messages on screen
         ! validate           : Validate XML format
         ! namespace          : Allow the use of namespaces
-        call xml_OpenFile(filename=xdmf_file%filename, xf=xdmf_file%xml_handler, &
+        call xml_OpenFile(filename=xdmf_file%get_filename(), xf=xdmf_file%xml_handler, &
             iostat=IO_error, preserve_whitespace=.false., pretty_print=.true., &
             minimize_overrun=.true., canonical=.false., replace=.true., addDecl=.true., &
             warning=.false., validate=.false., namespace=.true.)
