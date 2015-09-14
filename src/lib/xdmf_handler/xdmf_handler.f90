@@ -8,7 +8,7 @@ use xh5for_parameters
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xdmf_utils,   only : warning_message
 use fox_xdmf
-use mpi_environment
+use distributed_data_handler
 
 implicit none
 
@@ -30,55 +30,72 @@ private
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
         character(len=:),            allocatable :: prefix         !< Name prefix of the XDMF file
+        type(distributed_data_handler_t), pointer:: DistributedDataHandler
         type(xdmf_local_grid_info_t)             :: grid_info      !< Local grid info
-        type(mpi_env_t)                          :: mpi_env        !< MPI environment 
         type(xdmf_file_t)                        :: file           !< XDMF file handler
         logical                                  :: warn = .true.  !< Flag to show warnings on screen
     contains
     private
-        procedure         :: is_valid_TopologyType => handler_is_valid_TopologyType
-        procedure         :: is_valid_GeometryType => handler_is_valid_GeometryType
-        procedure, public :: SetNumberOfNodes      => handler_SetNumberOfNodes
-        procedure, public :: SetNumberOfElements   => handler_SetNumberOfElements
-        procedure, public :: SetTopologyType       => handler_SetTopologyType
-        procedure, public :: SetGeometryType       => handler_SetGeometryType
-        procedure, public :: GetNumberOfNodes      => handler_GetNumberOfNodes
-        procedure, public :: GetNumberOfElements   => handler_GetNumberOfElements
-        procedure, public :: GetTopologyType       => handler_GetTopologyType
-        procedure, public :: GetGeometryType       => handler_GetGeometryType
-        procedure, public :: OpenFile              => handler_OpenFile
-        procedure, public :: CloseFile             => handler_CloseFile
+        procedure         :: is_valid_TopologyType => xdmf_handler_is_valid_TopologyType
+        procedure         :: is_valid_GeometryType => xdmf_handler_is_valid_GeometryType
+        procedure, public :: initialize            => xdmf_handler_initialize
+        procedure, public :: SetNumberOfNodes      => xdmf_handler_SetNumberOfNodes
+        procedure, public :: SetNumberOfElements   => xdmf_handler_SetNumberOfElements
+        procedure, public :: SetTopologyType       => xdmf_handler_SetTopologyType
+        procedure, public :: SetGeometryType       => xdmf_handler_SetGeometryType
+        procedure, public :: GetNumberOfNodes      => xdmf_handler_GetNumberOfNodes
+        procedure, public :: GetNumberOfElements   => xdmf_handler_GetNumberOfElements
+        procedure, public :: GetTopologyType       => xdmf_handler_GetTopologyType
+        procedure, public :: GetGeometryType       => xdmf_handler_GetGeometryType
+        procedure, public :: OpenFile              => xdmf_handler_OpenFile
+        procedure, public :: CloseFile             => xdmf_handler_CloseFile
+        procedure, public :: is_root               => xdmf_handler_is_root
     end type xdmf_handler_t
 
 public :: xdmf_handler_t
 
 contains
 
-    subroutine handler_SetNumberOfNodes(this, NumberOfNodes)
+    subroutine xdmf_handler_initialize(this, DistributedDataHandler, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
+        class(xdmf_handler_t), intent(INOUT) :: this
+        type(distributed_data_handler_t), target, intent(IN) :: DistributedDataHandler
+        integer(I8P),  intent(IN)    :: NumberOfNodes
+        integer(I8P),  intent(IN)    :: NumberOfElements
+        integer(I4P),  intent(IN)    :: TopologyType
+        integer(I4P),  intent(IN)    :: GeometryType
+
+        this%DistributedDataHandler => DistributedDataHandler
+        call this%SetNumberOfNodes(NumberOfNodes)
+        call this%SetNumberOfElements(NumberOfelements)
+        call this%SetTopologyType(TopologyType)
+        call this%SetGeometryType(GeometryType)
+    end subroutine xdmf_handler_initialize
+
+    subroutine xdmf_handler_SetNumberOfNodes(this, NumberOfNodes)
         class(xdmf_handler_t), intent(INOUT) :: this
         integer(I8P),          intent(IN)    :: NumberOfNodes
         this%grid_info%NumberOfNodes = NumberOfNodes
-    end subroutine handler_SetNumberOfNodes
+    end subroutine xdmf_handler_SetNumberOfNodes
 
-    subroutine handler_SetNumberOfElements(this, NumberOfElements)
+    subroutine xdmf_handler_SetNumberOfElements(this, NumberOfElements)
         class(xdmf_handler_t), intent(INOUT) :: this
         integer(I8P),          intent(IN)    :: NumberOfElements
         this%grid_info%NumberOfElements = NumberOfElements
-    end subroutine handler_SetNumberOfElements
+    end subroutine xdmf_handler_SetNumberOfElements
 
-    function handler_GetNumberOfNodes(this)
+    function xdmf_handler_GetNumberOfNodes(this)
         class(xdmf_handler_t), intent(INOUT) :: this
-        integer(I8P)                         :: handler_getNumberOfNodes
-        handler_GetNumberOfNodes = this%grid_info%NumberOfNodes
-    end function handler_GetNumberOfNodes
+        integer(I8P)                         :: xdmf_handler_getNumberOfNodes
+        xdmf_handler_GetNumberOfNodes = this%grid_info%NumberOfNodes
+    end function xdmf_handler_GetNumberOfNodes
 
-    function handler_GetNumberOfElements(this)
+    function xdmf_handler_GetNumberOfElements(this)
         class(xdmf_handler_t), intent(INOUT) :: this
-        integer(I8P)                         :: handler_GetNumberOfElements
-        handler_GetNumberOfElements = this%grid_info%NumberOfElements
-    end function handler_GetNumberOfElements
+        integer(I8P)                         :: xdmf_handler_GetNumberOfElements
+        xdmf_handler_GetNumberOfElements = this%grid_info%NumberOfElements
+    end function xdmf_handler_GetNumberOfElements
 
-    function handler_is_valid_TopologyType(this, TopologyType) result(is_valid)
+    function xdmf_handler_is_valid_TopologyType(this, TopologyType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
@@ -123,9 +140,9 @@ contains
                                 /)
         is_valid = MINVAL(ABS(allowed_TopologyTypes - TopologyType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
-    end function handler_is_valid_TopologyType
+    end function xdmf_handler_is_valid_TopologyType
 
-    subroutine handler_SetTopologyType(this, TopologyType)
+    subroutine xdmf_handler_SetTopologyType(this, TopologyType)
         class(xdmf_handler_t), intent(INOUT) :: this
         integer(I4P),          intent(IN)    :: TopologyType
 
@@ -134,15 +151,15 @@ contains
         else
             this%grid_info%TopologyType = XDMF_NO_VALUE
         endif
-    end subroutine handler_SetTopologyType
+    end subroutine xdmf_handler_SetTopologyType
 
-    function handler_GetTopologyType(this)
+    function xdmf_handler_GetTopologyType(this)
         class(xdmf_handler_t), intent(INOUT) :: this
-        integer(I4P)                         :: handler_GetTopologyType
-        handler_GetTopologyType = this%grid_info%TopologyType
-    end function handler_GetTopologyType
+        integer(I4P)                         :: xdmf_handler_GetTopologyType
+        xdmf_handler_GetTopologyType = this%grid_info%TopologyType
+    end function xdmf_handler_GetTopologyType
 
-    function handler_is_valid_GeometryType(this, GeometryType) result(is_valid)
+    function xdmf_handler_is_valid_GeometryType(this, GeometryType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
@@ -160,9 +177,9 @@ contains
                                 /)
         is_valid = MINVAL(ABS(allowed_GeometryTypes - GeometryType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Geometry Type: "'//trim(str(no_sign=.true., n=GeometryType))//'"')
-    end function handler_is_valid_GeometryType
+    end function xdmf_handler_is_valid_GeometryType
 
-    subroutine handler_SetGeometryType(this, GeometryType)
+    subroutine xdmf_handler_SetGeometryType(this, GeometryType)
         class(xdmf_handler_t), intent(INOUT) :: this
         integer(I4P),          intent(IN)    :: GeometryType
 
@@ -171,29 +188,39 @@ contains
         else
             this%grid_info%GeometryType = XDMF_NO_VALUE
         endif
-    end subroutine handler_SetGeometryType
+    end subroutine xdmf_handler_SetGeometryType
 
-    function handler_GetGeometryType(this)
+    function xdmf_handler_GetGeometryType(this)
         class(xdmf_handler_t), intent(INOUT) :: this
-        integer(I4P)                         :: handler_GetGeometryType
-        handler_GetGeometryType = this%grid_info%GeometryType
-    end function handler_GetGeometryType
+        integer(I4P)                         :: xdmf_handler_GetGeometryType
+        xdmf_handler_GetGeometryType = this%grid_info%GeometryType
+    end function xdmf_handler_GetGeometryType
 
-    subroutine handler_OpenFile(this, filename)
+    subroutine xdmf_handler_OpenFile(this, filename)
         class(xdmf_handler_t), intent(INOUT) :: this
         character(len=*),      intent(IN)    :: filename
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             call this%file%set_filename(filename)
             call this%file%openfile()
         endif
-    end subroutine
+    end subroutine xdmf_handler_OpenFile
 
-    subroutine handler_CloseFile(this)
+    subroutine xdmf_handler_CloseFile(this)
         class(xdmf_handler_t), intent(INOUT)    :: this
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             call this%file%closefile()
         endif
-    end subroutine
+    end subroutine xdmf_handler_CloseFile
 
+
+    function xdmf_handler_is_root(this)
+    !-----------------------------------------------------------------
+    !< Is the current task the root processor?
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(IN)  :: this                !< Distributed data type
+        logical                            :: xdmf_handler_is_root !< Boolean variable, True if is root task   
+    !----------------------------------------------------------------- 
+        xdmf_handler_is_root = this%DistributedDataHandler%is_root()
+    end function xdmf_handler_is_root
 
 end module xdmf_handler

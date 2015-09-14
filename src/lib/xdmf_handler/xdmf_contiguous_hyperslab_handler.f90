@@ -17,19 +17,8 @@ private
     !-----------------------------------------------------------------
     !< XDMF contiguous HyperSlab handler implementation
     !----------------------------------------------------------------- 
-        integer(I8P)                             :: GlobalNumberOfNodes
-        integer(I8P)                             :: GlobalNumberOfElements
-        integer(I8P), allocatable                :: AllNumberOfNodes(:)
-        integer(I8P), allocatable                :: AllNumberOfElements(:)
-        integer(I4P), allocatable                :: AllTopologyTypes(:)
-        integer(I4P), allocatable                :: AllGeometryTypes(:)
     contains
     private
-        procedure         :: SetGlobalNumberOfNodes
-        procedure         :: SetGlobalNumberOfElements
-        procedure         :: GetGlobalNumberOfNodes
-        procedure         :: GetGlobalNumberOfElements
-        procedure, public :: initialize     => contiguous_hyperslab_initialize
 !        procedure, public :: WriteMesh => hyperslab_WriteMesh
         procedure, public :: OpenFile       => contiguous_hyperslab_OpenFile
         procedure, public :: CloseFile      => contiguous_hyperslab_CloseFile
@@ -42,59 +31,6 @@ public :: xdmf_contiguous_hyperslab_handler_t
 
 contains
 
-    subroutine SetGlobalNumberOfNodes(this, GlobalNumberOfNodes)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I8P)                              , intent(IN)    :: GlobalNumberOfNodes
-
-        this%GlobalNumberOfNodes = GlobalNumberOfNodes
-    end subroutine SetGlobalNumberOfNodes
-
-    Function GetGlobalNumberOfNodes(this)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I8P)                         :: GetGlobalNumberOfNodes
-
-        GetGlobalNumberOfNodes = this%GlobalNumberOfNodes
-    end function GetGlobalNumberOfNodes
-
-    subroutine SetGlobalNumberOfElements(this, GlobalNumberOfElements)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I8P)                              , intent(IN)    :: GlobalNumberOfElements
-
-        this%GlobalNumberOfElements = GlobalNumberOfelements
-    end subroutine SetGlobalNumberOfElements
-
-    Function GetGlobalNumberOfElements(this)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I8P)                         :: GetGlobalNumberOfElements
-
-        GetGlobalNumberOfelements = this%GlobalNumberOfElements
-    end function GetGlobalNumberOfElements
-
-    subroutine contiguous_hyperslab_initialize(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I8P),  intent(IN)    :: NumberOfNodes
-        integer(I8P),  intent(IN)    :: NumberOfElements
-        integer(I4P),  intent(IN)    :: TopologyType
-        integer(I4P),  intent(IN)    :: GeometryType
-
-        call this%mpi_env%initialize()
-        call this%SetNumberOfNodes(NumberOfNodes)
-        call this%SetNumberOfElements(NumberOfelements)
-        call this%SetTopologyType(TopologyType)
-        call this%SetGeometryType(GeometryType)
-        call this%mpi_env%mpi_allgather_single_int_value(this%GetNumberOfNodes(), this%AllNumberOfNodes)
-        call this%mpi_env%mpi_allgather_single_int_value(this%GetNumberOfElements(), this%AllNumberOfElements)
-        call this%mpi_env%mpi_allgather_single_int_value(this%GetTopologyType(), this%AllTopologyTypes)
-        call this%mpi_env%mpi_allgather_single_int_value(this%GetGeometryType(), this%AllGeometryTypes)
-
-        if(this%mpi_env%is_root()) then
-            call this%SetGlobalNumberOfElements(sum(this%AllNumberOfElements))
-            call this%SetGlobalNumberOfNodes(sum(this%AllNumberOfNodes))
-        endif
-
-
-    end subroutine contiguous_hyperslab_initialize
-
     subroutine hyperslab_WriteMesh(this)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
 
@@ -104,7 +40,7 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
         character(len=*),      intent(IN)    :: filename
         type(xdmf_grid_t)                    :: grid
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             call this%file%set_filename(filename)
             call this%file%openfile()
             call grid%open(xml_handler = this%file%xml_handler, &
@@ -116,7 +52,7 @@ contains
     subroutine contiguous_hyperslab_CloseFile(this)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT)    :: this
         type(xdmf_grid_t)                    :: grid
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             call grid%close(xml_handler=this%file%xml_handler)
             call this%file%closefile()
         endif
@@ -133,10 +69,10 @@ contains
         character(len=:), allocatable                  :: XMDFTopologyTypeName
 
 !< @Note: allow different Topology or Geometry for each part of the spatial grid?
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             if(present(GridNumber)) then
-                localNumberOfElements = this%AllNumberOfElements(GridNumber)
-                localNumberOfNodes = this%AllNumberOfNodes(GridNumber)
+                localNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
+                localNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
             else
                 localNumberOfElements = this%GetNumberOfElements()
                 localNumberOfNodes = this%GetNumberOfNodes()
@@ -145,7 +81,7 @@ contains
             SpaceDimension = GetSpaceDimension(this%getGeometryType())
 
             call topology%open( xml_handler = this%file%xml_handler,&
-                    Dimensions  = (/This%GetGlobalNumberOfNodes()*int(SpaceDimension,I8P)/),&
+                    Dimensions  = (/This%DistributedDataHandler%GetGlobalNumberOfNodes()*int(SpaceDimension,I8P)/),&
                     TopologyType=XMDFTopologyTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/int(localNumberOfNodes,I8P)*int(SpaceDimension,I8P)/),&
@@ -178,11 +114,11 @@ contains
         integer(I4P)                                   :: NodesPerElement
         character(len=:), allocatable                  :: XDMFGeometryTypeName
 
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             if(present(GridNumber)) then
-                LocalNumberOfElements = this%AllNumberOfElements(GridNumber)
-                LocalNumberOfNodes = this%AllNumberOfNodes(GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%AllTopologyTypes(GridNumber))
+                LocalNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
+                LocalNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
+                NodesPerElement = GetNumberOfNodesPerElement(this%DistributedDataHandler%GetTopologyTypeFromTask(taskID=GridNumber))
             else
                 localNumberOfElements = this%GetNumberOfElements()
                 localNumberOfNodes = this%GetNumberOfNodes()
@@ -228,11 +164,11 @@ contains
         character(len=:), allocatable                  :: XDMFAttributeTypeName
         character(len=:), allocatable                  :: XDMFCenterTypeName
 
-        if(this%mpi_env%is_root()) then
+        if(this%is_root()) then
             if(present(GridNumber)) then
-                localNumberOfElements = this%AllNumberOfElements(GridNumber)
-                localNumberOfNodes = this%AllNumberOfNodes(GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%AllTopologyTypes(GridNumber))
+                localNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
+                localNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
+                NodesPerElement = GetNumberOfNodesPerElement(this%DistributedDataHandler%GetTopologyTypeFromTask(TaskID=GridNumber))
             else
                 localNumberOfElements = this%GetNumberOfElements()
                 localNumberOfNodes = this%GetNumberOfNodes()

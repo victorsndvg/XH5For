@@ -6,11 +6,13 @@ module mpi_environment
 
 use IR_Precision, only : I4P, I8P, R4P, R8P
 
+#ifdef ENABLE_MPI
 #ifdef MPI_MOD
     use mpi
 #endif
 #ifdef MPI_H
     include 'mpif.h'
+#endif
 #endif
 
     type mpi_env_t
@@ -56,7 +58,7 @@ contains
         this%rank = 0
         this%size = 1
 
-#if defined(MPI_MOD) || defined(MPI_H)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_Initialized(mpi_was_initialized, mpierr)
 
         if(mpi_was_initialized) then
@@ -133,7 +135,7 @@ contains
         if(present(mpierror)) mpierror = 0
         comm_size = this%get_comm_size()
         if(allocated(recv_data)) deallocate(recv_data); allocate(recv_data(comm_size))
-#if defined(MPI_MOD) || defined(MPI_H)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_ALLGATHER(send_data, 1, MPI_INTEGER, recv_data, 1, MPI_INTEGER, this%comm, mpierr) 
 #else
         recv_data(:comm_size) = send_data
@@ -155,7 +157,7 @@ contains
         if(present(mpierror)) mpierror = 0
         comm_size = this%get_comm_size()
         if(allocated(recv_data)) deallocate(recv_data); allocate(recv_data(comm_size))
-#if defined(MPI_MOD) || defined(MPI_H)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_ALLGATHER(send_data, 1, MPI_LONG, recv_data, 1, MPI_LONG, this%comm, mpierr) 
 #else
         recv_data(:comm_size) = send_data
