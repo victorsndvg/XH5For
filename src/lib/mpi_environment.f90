@@ -19,10 +19,10 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
     !-----------------------------------------------------------------
     !< MPI environment type
     !----------------------------------------------------------------- 
-        integer(I4P) :: comm = 0                                      !< MPI communicator
-        integer(I4P) :: root = 0                                      !< MPI root processor
-        integer(I4P) :: rank = 0                                      !< MPI rank
-        integer(I4P) :: size = 1                                      !< MPI communicator size
+        integer :: comm = 0                                      !< MPI communicator
+        integer :: root = 0                                      !< MPI root processor
+        integer :: rank = 0                                      !< MPI rank
+        integer :: size = 1                                      !< MPI communicator size
     contains
     private
         procedure         :: mpi_allgather_single_int_value_I4P

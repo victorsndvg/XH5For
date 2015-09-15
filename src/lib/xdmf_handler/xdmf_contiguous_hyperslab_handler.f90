@@ -20,11 +20,11 @@ private
     contains
     private
 !        procedure, public :: WriteMesh => hyperslab_WriteMesh
-        procedure, public :: OpenFile       => contiguous_hyperslab_OpenFile
-        procedure, public :: CloseFile      => contiguous_hyperslab_CloseFile
-        procedure, public :: WriteTopology  => contiguous_hyperslab_WriteTopology
-        procedure, public :: WriteGeometry  => contiguous_hyperslab_WriteGeometry
-        procedure, public :: WriteAttribute => contiguous_hyperslab_WriteAttribute
+        procedure, public :: OpenFile       => xdmf_contiguous_hyperslab_OpenFile
+        procedure, public :: CloseFile      => xdmf_contiguous_hyperslab_CloseFile
+        procedure, public :: WriteTopology  => xdmf_contiguous_hyperslab_WriteTopology
+        procedure, public :: WriteGeometry  => xdmf_contiguous_hyperslab_WriteGeometry
+        procedure, public :: WriteAttribute => xdmf_contiguous_hyperslab_WriteAttribute
     end type xdmf_contiguous_hyperslab_handler_t
 
 public :: xdmf_contiguous_hyperslab_handler_t
@@ -36,7 +36,7 @@ contains
 
     end subroutine
 
-    subroutine contiguous_hyperslab_OpenFile(this, filename)
+    subroutine xdmf_contiguous_hyperslab_OpenFile(this, filename)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
         character(len=*),      intent(IN)    :: filename
         type(xdmf_grid_t)                    :: grid
@@ -49,7 +49,7 @@ contains
         endif
     end subroutine
 
-    subroutine contiguous_hyperslab_CloseFile(this)
+    subroutine xdmf_contiguous_hyperslab_CloseFile(this)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT)    :: this
         type(xdmf_grid_t)                    :: grid
         if(this%is_root()) then
@@ -58,7 +58,7 @@ contains
         endif
     end subroutine
 
-    subroutine contiguous_hyperslab_WriteTopology(this, GridNumber)
+    subroutine xdmf_contiguous_hyperslab_WriteTopology(this, GridNumber)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
         integer(I4P), optional,          intent(IN)    :: GridNumber
         type(xdmf_topology_t)                          :: topology
@@ -71,17 +71,17 @@ contains
 !< @Note: allow different Topology or Geometry for each part of the spatial grid?
         if(this%is_root()) then
             if(present(GridNumber)) then
-                localNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
-                localNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
+                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
+                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
             else
-                localNumberOfElements = this%GetNumberOfElements()
-                localNumberOfNodes = this%GetNumberOfNodes()
+                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
+                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
             endif
-            XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%getTopologyType())
-            SpaceDimension = GetSpaceDimension(this%getGeometryType())
+            XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
+            SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
 
             call topology%open( xml_handler = this%file%xml_handler,&
-                    Dimensions  = (/This%DistributedDataHandler%GetGlobalNumberOfNodes()*int(SpaceDimension,I8P)/),&
+                    Dimensions  = (/This%SpatialGridDescriptor%GetGlobalNumberOfNodes()*int(SpaceDimension,I8P)/),&
                     TopologyType=XMDFTopologyTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/int(localNumberOfNodes,I8P)*int(SpaceDimension,I8P)/),&
@@ -102,9 +102,9 @@ contains
             call dataitem%close(xml_handler=this%file%xml_handler)
             call topology%close(xml_handler=this%file%xml_handler)
         endif                    
-    end subroutine contiguous_hyperslab_WriteTopology
+    end subroutine xdmf_contiguous_hyperslab_WriteTopology
 
-    subroutine contiguous_hyperslab_WriteGeometry(this, GridNumber)
+    subroutine xdmf_contiguous_hyperslab_WriteGeometry(this, GridNumber)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
         integer(I4P), optional,          intent(IN)    :: GridNumber
         type(xdmf_geometry_t)                          :: geometry
@@ -116,15 +116,15 @@ contains
 
         if(this%is_root()) then
             if(present(GridNumber)) then
-                LocalNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
-                LocalNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%DistributedDataHandler%GetTopologyTypeFromTask(taskID=GridNumber))
+                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
+                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
+                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridNumber))
             else
-                localNumberOfElements = this%GetNumberOfElements()
-                localNumberOfNodes = this%GetNumberOfNodes()
-                NodesPerElement = GetNumberOfNodesPerElement(this%GetTopologyType())
+                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
+                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
+                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
             endif
-            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%GetGeometryType())
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
 
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
@@ -147,10 +147,10 @@ contains
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
         endif                    
-    end subroutine contiguous_hyperslab_WriteGeometry
+    end subroutine xdmf_contiguous_hyperslab_WriteGeometry
 
 
-    subroutine contiguous_hyperslab_WriteAttribute(this, Name, Center, Type, GridNumber)
+    subroutine xdmf_contiguous_hyperslab_WriteAttribute(this, Name, Center, Type, GridNumber)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
         character(len=*),                intent(IN)    :: Name
         integer(I4P),                    intent(IN)    :: Center
@@ -166,13 +166,13 @@ contains
 
         if(this%is_root()) then
             if(present(GridNumber)) then
-                localNumberOfElements = this%DistributedDataHandler%GetNumberOfElementsFromTask(TaskID=GridNumber)
-                localNumberOfNodes = this%DistributedDataHandler%GetNumberOfNodesFromTask(TaskID=GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%DistributedDataHandler%GetTopologyTypeFromTask(TaskID=GridNumber))
+                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
+                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
+                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridNumber))
             else
-                localNumberOfElements = this%GetNumberOfElements()
-                localNumberOfNodes = this%GetNumberOfNodes()
-                NodesPerElement = GetNumberOfNodesPerElement(this%GetTopologyType())
+                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
+                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
+                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
             endif
             XDMFAttributeTypeName = GetXDMFAttributeTypeName(Type)
             XDMFCenterTypeName = GetXDMFCenterTypeName(Type)
@@ -199,7 +199,7 @@ contains
             call dataitem%close(xml_handler = this%file%xml_handler)
             call attribute%close(xml_handler = this%file%xml_handler)
         endif                    
-    end subroutine contiguous_hyperslab_WriteAttribute
+    end subroutine xdmf_contiguous_hyperslab_WriteAttribute
 
 
 
