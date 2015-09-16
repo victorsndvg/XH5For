@@ -1,6 +1,8 @@
 # XdmfHdf5Fortran
 The Fortran way to easy write partitioned XDMF/HDF5 meshes
 
+[![Build Status](https://travis-ci.org/victorsndvg/XdmfHdf5Fortran.svg?branch=master)](https://travis-ci.org/victorsndvg/XdmfHdf5Fortran)
+
 ## What is XdmfHdf5Fortran?
 Is a library to read and write partitioned FEM meshes taking advantage of the collective/independent IO provided by the HDF5 library. 
 
@@ -31,17 +33,15 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
   * Field:
     * Center on: not defined yet...
     * Number of components: not defined yet...
-  * XDMF tags:
+  * XDMF tags ([FoX wxml](https://github.com/andreww/fox)  wrapper):
     * [x] Xdmf
     * [x] Domain
     * [x] Grid
-      * [ ] Temporal grid
-      * [ ] Spatial grid
-    * [ ] Topology
+    * [x] Topology
     * [x] Geometry
-    * [ ] Attribute
+    * [x] Attribute
     * [x] DataItem
-      * [] HyperSlab
+    * [x] Character data
   * HDF5:
     * [ ] Manage Files
     * [ ] Groups
