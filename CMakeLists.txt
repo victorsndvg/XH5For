@@ -50,7 +50,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 # List of external libraries
 #################################################################
 
-SET(EXT_LIBS  MPI)
+SET(EXT_LIBS  MPI HDF5)
 
 #################################################################
 # Find packages
