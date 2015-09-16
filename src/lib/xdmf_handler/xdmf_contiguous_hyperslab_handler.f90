@@ -36,11 +36,16 @@ contains
 
     end subroutine
 
+
     subroutine xdmf_contiguous_hyperslab_OpenFile(this, filename)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        character(len=*),      intent(IN)    :: filename
-        type(xdmf_grid_t)                    :: grid
-        if(this%is_root()) then
+    !-----------------------------------------------------------------
+    !< Open a XDMF file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this     !< XDMF contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: filename !< XDMF filename
+        type(xdmf_grid_t)                                         :: grid     !< XDMF Grid type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
             call this%file%set_filename(filename)
             call this%file%openfile()
             call grid%open(xml_handler = this%file%xml_handler, &
@@ -49,30 +54,40 @@ contains
         endif
     end subroutine
 
+
     subroutine xdmf_contiguous_hyperslab_CloseFile(this)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT)    :: this
-        type(xdmf_grid_t)                    :: grid
-        if(this%is_root()) then
+    !-----------------------------------------------------------------
+    !< Close a XDMF file for the contiguous HyperSlab strategy
+    !< @TODO: inherited procedure
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler
+        type(xdmf_grid_t)                                         :: grid !< XDMF Grid type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
             call grid%close(xml_handler=this%file%xml_handler)
             call this%file%closefile()
         endif
     end subroutine
 
-    subroutine xdmf_contiguous_hyperslab_WriteTopology(this, GridNumber)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I4P), optional,          intent(IN)    :: GridNumber
-        type(xdmf_topology_t)                          :: topology
-        type(xdmf_dataitem_t)                          :: dataitem
-        integer(I8P)                                   :: LocalNumberOfNodes
-        integer(I8P)                                   :: LocalNumberOfElements
-        integer(I8P)                                   :: SpaceDimension
-        character(len=:), allocatable                  :: XMDFTopologyTypeName
 
-!< @Note: allow different Topology or Geometry for each part of the spatial grid?
-        if(this%is_root()) then
-            if(present(GridNumber)) then
-                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
-                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
+    subroutine xdmf_contiguous_hyperslab_WriteTopology(this, GridID)
+    !-----------------------------------------------------------------
+    !< Write a XDMF Topology into a opened file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                    !< XDMF contiguous hyperslab handler
+        integer(I4P),          optional,            intent(IN)    :: GridID                  !< Grid ID number
+        type(xdmf_topology_t)                                     :: topology                !< XDMF Topology type
+        type(xdmf_dataitem_t)                                     :: dataitem                !< XDMF Dataitem type
+        integer(I8P)                                              :: LocalNumberOfNodes      !< Local number of nodes
+        integer(I8P)                                              :: LocalNumberOfElements   !< Local number of elements
+        integer(I8P)                                              :: SpaceDimension          !< Space dimension
+        character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
+    !-----------------------------------------------------------------
+    !< @Note: allow different Topology or Geometry for each part of the spatial grid?
+        if(this%MPIEnvironment%is_root()) then
+            if(present(GridID)) then
+                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
+                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
             else
                 localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
@@ -104,21 +119,25 @@ contains
         endif                    
     end subroutine xdmf_contiguous_hyperslab_WriteTopology
 
-    subroutine xdmf_contiguous_hyperslab_WriteGeometry(this, GridNumber)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        integer(I4P), optional,          intent(IN)    :: GridNumber
-        type(xdmf_geometry_t)                          :: geometry
-        type(xdmf_dataitem_t)                          :: dataitem
-        integer(I8P)                                   :: LocalNumberOfElements
-        integer(I8P)                                   :: LocalNumberOfNodes
-        integer(I4P)                                   :: NodesPerElement
-        character(len=:), allocatable                  :: XDMFGeometryTypeName
 
-        if(this%is_root()) then
-            if(present(GridNumber)) then
-                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
-                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridNumber))
+    subroutine xdmf_contiguous_hyperslab_WriteGeometry(this, GridID)
+    !-----------------------------------------------------------------
+    !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler
+        integer(I4P), optional,          intent(IN)    :: GridID                !< Grid ID number
+        type(xdmf_geometry_t)                          :: geometry              !< XDMF Geometry type
+        type(xdmf_dataitem_t)                          :: dataitem              !< XDMF Dataitem ttype
+        integer(I8P)                                   :: LocalNumberOfElements !< Local number of elements
+        integer(I8P)                                   :: LocalNumberOfNodes    !< Local number of nodes
+        integer(I4P)                                   :: NodesPerElement       !< Number of nodes per element
+        character(len=:), allocatable                  :: XDMFGeometryTypeName  !< String geometry type identifier
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            if(present(GridID)) then
+                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
+                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
+                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
             else
                 localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
@@ -150,25 +169,30 @@ contains
     end subroutine xdmf_contiguous_hyperslab_WriteGeometry
 
 
-    subroutine xdmf_contiguous_hyperslab_WriteAttribute(this, Name, Center, Type, GridNumber)
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        character(len=*),                intent(IN)    :: Name
-        integer(I4P),                    intent(IN)    :: Center
-        integer(I4P),                    intent(IN)    :: Type
-        integer(I4P), optional,          intent(IN)    :: GridNumber
-        type(xdmf_attribute_t)                         :: attribute
-        type(xdmf_dataitem_t)                          :: dataitem
-        integer(I8P)                                   :: LocalNumberOfElements
-        integer(I8P)                                   :: LocalNumberOfNodes
-        integer(I4P)                                   :: NodesPerElement
-        character(len=:), allocatable                  :: XDMFAttributeTypeName
-        character(len=:), allocatable                  :: XDMFCenterTypeName
-
-        if(this%is_root()) then
-            if(present(GridNumber)) then
-                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridNumber)
-                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridNumber)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridNumber))
+    subroutine xdmf_contiguous_hyperslab_WriteAttribute(this, Name, Center, Type, GridID)
+    !-----------------------------------------------------------------
+    !< Writes a XDMF Attribute into a opened file for the contiguous HyperSlab strategy
+    !< @NOTE: only nodal attributes
+    !< @TODO: add cell, face and grid centered attributes
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                   !< XDMF contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: Name                   !< Attribute name
+        integer(I4P),                               intent(IN)    :: Center                 !< XDMF Attribute center
+        integer(I4P),                               intent(IN)    :: Type                   !< XDMF Attribute type
+        integer(I4P), optional,                     intent(IN)    :: GridID                 !< Grid ID number
+        type(xdmf_attribute_t)                                    :: attribute              !< XDMF Attribute type
+        type(xdmf_dataitem_t)                                     :: dataitem               !< XDMF Dataitem type
+        integer(I8P)                                              :: LocalNumberOfElements  !< Local number of elements
+        integer(I8P)                                              :: LocalNumberOfNodes     !< Local number of nodes
+        integer(I4P)                                              :: NodesPerElement        !< Number of nodes per element
+        character(len=:), allocatable                             :: XDMFAttributeTypeName  !< String Attibute type identifier
+        character(len=:), allocatable                             :: XDMFCenterTypeName     !< String Attribute Center identifier
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            if(present(GridID)) then
+                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
+                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
+                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
             else
                 localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
@@ -200,8 +224,6 @@ contains
             call attribute%close(xml_handler = this%file%xml_handler)
         endif                    
     end subroutine xdmf_contiguous_hyperslab_WriteAttribute
-
-
 
 
 end module xdmf_contiguous_hyperslab_handler

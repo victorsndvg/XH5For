@@ -19,18 +19,20 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
     !-----------------------------------------------------------------
     !< MPI environment type
     !----------------------------------------------------------------- 
-        integer :: comm = 0                                      !< MPI communicator
-        integer :: root = 0                                      !< MPI root processor
-        integer :: rank = 0                                      !< MPI rank
-        integer :: size = 1                                      !< MPI communicator size
+        integer :: comm = 0                                           !< MPI communicator
+        integer :: root = 0                                           !< MPI root processor
+        integer :: rank = 0                                           !< MPI rank
+        integer :: info = 0                                           !< MPI info
+        integer :: size = 1                                           !< MPI communicator size
     contains
     private
         procedure         :: mpi_allgather_single_int_value_I4P
         procedure         :: mpi_allgather_single_int_value_I8P
-        procedure, public :: initialize => mpi_initialize
+        procedure, public :: Initialize                   => mpi_Initialize
         procedure, public :: get_comm                     => mpi_get_comm
         procedure, public :: get_root                     => mpi_get_root
         procedure, public :: get_rank                     => mpi_get_rank
+        procedure, public :: get_info                     => mpi_get_info
         procedure, public :: get_comm_size                => mpi_get_comm_size
         procedure, public :: is_root                      => mpi_is_root
         generic, public :: mpi_allgather_single_int_value => mpi_allgather_single_int_value_I4P, &
@@ -56,16 +58,19 @@ contains
         this%comm = 0
         this%root = 0
         this%rank = 0
+        this%info = 0
         this%size = 1
 
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_Initialized(mpi_was_initialized, mpierr)
 
+        this%info = MPI_INFO_NULL
+
         if(mpi_was_initialized) then
             if(present(comm)) then
                 this%comm = comm
             else
-                this%comm = MPI_COMM_WORLD
+                CALL MPI_COMM_DUP(MPI_COMM_WORLD, this%comm, mpierr)
             endif
     
             call MPI_COMM_RANK (this%comm, this%rank, mpierr)
@@ -110,6 +115,16 @@ contains
     !----------------------------------------------------------------- 
         mpi_get_rank = this%rank
     end function mpi_get_rank
+
+    function mpi_get_info(this)
+    !-----------------------------------------------------------------
+    !< Return MPI info
+    !----------------------------------------------------------------- 
+        class(mpi_env_t), intent(IN) :: this                          !< MPI environment
+        integer                      :: mpi_get_info                  !< MPI info
+    !----------------------------------------------------------------- 
+        mpi_get_info = this%info
+    end function mpi_get_info
 
     function mpi_get_comm_size(this)
     !----------------------------------------------------------------- 

@@ -22,7 +22,7 @@ private
         integer(I8P), allocatable                :: NumberOfElementsPerGrid(:)
         integer(I4P), allocatable                :: TopologyTypePerGrid(:)
         integer(I4P), allocatable                :: GeometryTypePerGrid(:)
-        type(mpi_env_t)                          :: mpi_env                 !< MPI environment 
+        type(mpi_env_t), pointer                 :: MPIEnvironment                 !< MPI environment 
     contains
     private
         procedure         :: SetGlobalNumberOfNodes         => spatial_grid_descriptor_SetGlobalNumberOfNodes
@@ -34,9 +34,6 @@ private
         procedure, public :: GetTopologyTypeFromGridID      => spatial_grid_descriptor_GetTopologyTypeFromGridID
         procedure, public :: GetGeometryTypeFromGridID      => spatial_grid_descriptor_GetGeometryTypeFromGridID
         procedure, public :: initialize                     => spatial_grid_descriptor_initialize
-        procedure, public :: is_root                        => spatial_grid_descriptor_is_root
-        procedure, public :: get_comm                       => spatial_grid_descriptor_get_comm
-        procedure, public :: get_comm_size                  => spatial_grid_descriptor_get_comm_size
     end type spatial_grid_descriptor_t
 
 public :: spatial_grid_descriptor_t
@@ -103,54 +100,25 @@ contains
         spatial_grid_descriptor_GetGeometryTypeFromGridID = this%GeometryTypePerGrid(ID)
     end function spatial_grid_descriptor_GetGeometryTypeFromGridID
 
-    subroutine spatial_grid_descriptor_initialize(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
+    subroutine spatial_grid_descriptor_initialize(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
         class(spatial_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P),  intent(IN)    :: NumberOfNodes
-        integer(I8P),  intent(IN)    :: NumberOfElements
-        integer(I4P),  intent(IN)    :: TopologyType
-        integer(I4P),  intent(IN)    :: GeometryType
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment
+        integer(I8P),                     intent(IN)    :: NumberOfNodes
+        integer(I8P),                     intent(IN)    :: NumberOfElements
+        integer(I4P),                     intent(IN)    :: TopologyType
+        integer(I4P),                     intent(IN)    :: GeometryType
 
-        call this%mpi_env%initialize()
-        call this%mpi_env%mpi_allgather_single_int_value(NumberOfNodes, this%NumberOfNodesPerGrid)
-        call this%mpi_env%mpi_allgather_single_int_value(NumberOfElements, this%NumberOfElementsPerGrid)
-        call this%mpi_env%mpi_allgather_single_int_value(TopologyType, this%TopologyTypePerGrid)
-        call this%mpi_env%mpi_allgather_single_int_value(GeometryType, this%GeometryTypePerGrid)
+        this%MPIEnvironment => MPIEnvironment
+        call this%MPIEnvironment%mpi_allgather_single_int_value(NumberOfNodes, this%NumberOfNodesPerGrid)
+        call this%MPIEnvironment%mpi_allgather_single_int_value(NumberOfElements, this%NumberOfElementsPerGrid)
+        call this%MPIEnvironment%mpi_allgather_single_int_value(TopologyType, this%TopologyTypePerGrid)
+        call this%MPIEnvironment%mpi_allgather_single_int_value(GeometryType, this%GeometryTypePerGrid)
 
-        if(this%mpi_env%is_root()) then
+        if(this%MPIEnvironment%is_root()) then
             call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
             call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         endif
 
     end subroutine spatial_grid_descriptor_initialize
-
-    function spatial_grid_descriptor_is_root(this)
-    !-----------------------------------------------------------------
-    !< Is the current task the root processor?
-    !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(IN)  :: this                !< Distributed data type
-        logical                                :: spatial_grid_descriptor_is_root !< Boolean variable, True if is root task   
-    !----------------------------------------------------------------- 
-        spatial_grid_descriptor_is_root = this%mpi_env%is_root()
-    end function spatial_grid_descriptor_is_root
-
-    function spatial_grid_descriptor_get_comm(this)
-    !-----------------------------------------------------------------
-    !< Is the current task the root processor?
-    !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(IN)  :: this                !< Distributed data type
-        integer(I4P)                      :: spatial_grid_descriptor_get_comm
-    !----------------------------------------------------------------- 
-        spatial_grid_descriptor_get_comm = this%mpi_env%get_comm()
-    end function spatial_grid_descriptor_get_comm
-
-    function spatial_grid_descriptor_get_comm_size(this)
-    !-----------------------------------------------------------------
-    !< Return communicator size
-    !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(IN)  :: this                !< Distributed data type
-        integer(I4P)                      :: spatial_grid_descriptor_get_comm_size
-    !----------------------------------------------------------------- 
-        spatial_grid_descriptor_get_comm_size = this%mpi_env%get_comm_size()
-    end function spatial_grid_descriptor_get_comm_size
 
 end module spatial_grid_descriptor
