@@ -1,7 +1,7 @@
 #################################################################
 # HEADER
 #################################################################
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
 PROJECT(XH5For Fortran C)
