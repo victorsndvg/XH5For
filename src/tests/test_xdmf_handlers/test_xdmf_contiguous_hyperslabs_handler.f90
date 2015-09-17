@@ -30,7 +30,7 @@ implicit none
     call uniformgrid%initialize(NumberOfNodes=100_I8P, NumberOfElements=50_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
     call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
     call lightdata%OpenFile('hyperslab.xmf')
-    do i=1, mpienv%get_comm_size()
+    do i=0, mpienv%get_comm_size()-1
         call lightdata%WriteTopology(GridID=i)
         call lightdata%WriteGeometry(GridID=i)
         call lightdata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, GridID=i)

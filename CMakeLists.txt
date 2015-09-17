@@ -84,6 +84,7 @@ FOREACH(EXT_LIB ${EXT_LIBS})
            IF(IS_DIRECTORY ${${EXT_LIB}_INCLUDE_DIR})
                INCLUDE_DIRECTORIES(${${EXT_LIB}_INCLUDE_DIR})
            ENDIF()
+            LINK_DIRECTORIES(${${EXT_LIB}_LIBRARIES})
         ELSE()
            OPTION(${PROJECT_NAME}_ENABLE_${EXT_LIB} "Enable/disable ${EXT_LIB} library" OFF)
            UNSET(${EXT_LIB}_INCLUDES CACHE)
@@ -94,13 +95,11 @@ FOREACH(EXT_LIB ${EXT_LIBS})
     ENDIF()
 ENDFOREACH ()
 
+#################################################################
+# MPI Fortran DEFINITIONS AND PATHS
+#################################################################
 
-#################################################################
-# FFLAGS depend on the compiler and the build type
-#################################################################
 IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
-
-
     # Find mpi.mod
     FIND_PATH(MPI_MOD_FOUND mpi.mod  PATHS ${MPI_Fortran_INCLUDE_PATH})
     IF(MPI_MOD_FOUND)
@@ -109,16 +108,11 @@ IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
         ADD_DEFINITIONS(-DMPI_H)
     ENDIF()
 
-    # Force MPI Fortran compiler
-    INCLUDE(CMakeForceCompiler)
-    CMAKE_FORCE_Fortran_COMPILER(${MPI_Fortran_COMPILER} ${CMAKE_Fortran_COMPILER_ID})
-
     # Add MPI directories
     ADD_DEFINITIONS(${MPI_Fortran_COMPILE_FLAGS})
     INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
     LINK_DIRECTORIES(${MPI_Fortran_LIBRARIES})
 ENDIF()
-
 
 #################################################################
 # FFLAGS depend on the compiler and the build type

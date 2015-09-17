@@ -5,8 +5,26 @@
 FILE(GLOB_RECURSE TESTS_SRC *.f90 *.F90)
 SET(TESTS_SRC ${TESTS_SRC} PARENT_SCOPE)
 
+#################################################################
+# FoX LIBRARIES
+#################################################################
+
 LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
+
+#################################################################
+# FORCE MPI FORTRAN COMPILER IF EXISTS
+#################################################################
+
+IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
+    # Force MPI Fortran compiler
+    INCLUDE(CMakeForceCompiler)
+    CMAKE_FORCE_Fortran_COMPILER(${MPI_Fortran_COMPILER} ${CMAKE_Fortran_COMPILER_ID})
+ENDIF()
+
+#################################################################
+# EXTERNAL LIBRARIES
+#################################################################
 
 FOREACH(TEST_SRC ${TESTS_SRC})
     GET_FILENAME_COMPONENT(EXE_NAME ${TEST_SRC} NAME_WE)

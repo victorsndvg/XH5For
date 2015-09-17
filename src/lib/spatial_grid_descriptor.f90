@@ -94,7 +94,7 @@ contains
         integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetNumberOfNodesFromGridID !< Number of nodes of a grid
     !-----------------------------------------------------------------
-        spatial_grid_descriptor_GetNumberOfNodesFromGridID = this%NumberOfNodesPerGrid(ID)
+        spatial_grid_descriptor_GetNumberOfNodesFromGridID = this%NumberOfNodesPerGrid(ID+1)
     end function spatial_grid_descriptor_GetNumberOfNodesFromGridID
 
 
@@ -106,7 +106,7 @@ contains
         integer(I4P),                     intent(IN)    :: ID                 !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetNumberOfElementsFromGridID !< Number of elements of a grid
     !-----------------------------------------------------------------
-        spatial_grid_descriptor_GetNumberOfElementsFromGridID = this%NumberOfElementsPerGrid(ID)
+        spatial_grid_descriptor_GetNumberOfElementsFromGridID = this%NumberOfElementsPerGrid(ID+1)
     end function spatial_grid_descriptor_GetNumberOfElementsFromGridID
 
 
@@ -118,7 +118,7 @@ contains
         integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
         integer(I4P) :: spatial_grid_descriptor_GetTopologyTypeFromGridID !< Topology type of a grid
     !-----------------------------------------------------------------
-        spatial_grid_descriptor_GetTopologyTypeFromGridID = this%TopologyTypePerGrid(ID)
+        spatial_grid_descriptor_GetTopologyTypeFromGridID = this%TopologyTypePerGrid(ID+1)
     end function spatial_grid_descriptor_GetTopologyTypeFromGridID
 
 
@@ -130,7 +130,7 @@ contains
         integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
         integer(I4P) :: spatial_grid_descriptor_GetGeometrytypeFromGridID !< Geometry type of a grid
     !-----------------------------------------------------------------
-        spatial_grid_descriptor_GetGeometryTypeFromGridID = this%GeometryTypePerGrid(ID)
+        spatial_grid_descriptor_GetGeometryTypeFromGridID = this%GeometryTypePerGrid(ID+1)
     end function spatial_grid_descriptor_GetGeometryTypeFromGridID
 
 
