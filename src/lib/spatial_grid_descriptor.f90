@@ -174,11 +174,8 @@ contains
         call this%MPIEnvironment%mpi_allgather_single_int_value(NumberOfElements, this%NumberOfElementsPerGrid)
         call this%MPIEnvironment%mpi_allgather_single_int_value(TopologyType, this%TopologyTypePerGrid)
         call this%MPIEnvironment%mpi_allgather_single_int_value(GeometryType, this%GeometryTypePerGrid)
-
-        if(this%MPIEnvironment%is_root()) then
-            call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
-            call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
-        endif
+        call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
+        call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
     end subroutine spatial_grid_descriptor_initialize
 
 end module spatial_grid_descriptor

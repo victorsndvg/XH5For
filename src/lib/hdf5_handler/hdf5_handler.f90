@@ -58,13 +58,14 @@ contains
     end subroutine hdf5_handler_Initialize
 
 
-    subroutine hdf5_handler_OpenFile(this)
+    subroutine hdf5_handler_OpenFile(this, filename)
     !-----------------------------------------------------------------
     !< Open a HDF5 file
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
+        character(len=*),  intent(IN)        :: filename
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
         call H5open_f(error=hdferror) 
@@ -73,7 +74,7 @@ contains
                         comm   = this%MPIEnvironment%get_comm(), &
                         info   = this%MPIEnvironment%get_info(), &
                         hdferr = hdferror)
-        call H5fcreate_f(name = this%prefix//'.h5', &
+        call H5fcreate_f(name = filename, &
                         access_flags = H5F_ACC_TRUNC_F, &
                         file_id      = this%file_id, &
                         hdferr       = hdferror, &

@@ -44,10 +44,12 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this     !< XDMF contiguous hyperslab handler
         character(len=*),                           intent(IN)    :: filename !< XDMF filename
         type(xdmf_grid_t)                                         :: grid     !< XDMF Grid type
+        type(xdmf_domain_t)                                       :: domain   !< XDMF Domain type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             call this%file%set_filename(filename)
             call this%file%openfile()
+            call domain%open(xml_handler = this%file%xml_handler)
             call grid%open(xml_handler = this%file%xml_handler, &
                     GridType='Collection', &
                     CollectionType='Spatial')
@@ -62,9 +64,11 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler
         type(xdmf_grid_t)                                         :: grid !< XDMF Grid type
+        type(xdmf_domain_t)                                       :: domain   !< XDMF Domain type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             call grid%close(xml_handler=this%file%xml_handler)
+            call domain%close(xml_handler = this%file%xml_handler)
             call this%file%closefile()
         endif
     end subroutine
@@ -78,41 +82,50 @@ contains
         integer(I4P),          optional,            intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_topology_t)                                     :: topology                !< XDMF Topology type
         type(xdmf_dataitem_t)                                     :: dataitem                !< XDMF Dataitem type
-        integer(I8P)                                              :: LocalNumberOfNodes      !< Local number of nodes
+        type(xdmf_character_data_t)                               :: chardata                !< XDMF Character Data type
         integer(I8P)                                              :: LocalNumberOfElements   !< Local number of elements
-        integer(I8P)                                              :: SpaceDimension          !< Space dimension
+        integer(I8P)                                              :: GlobalNumberOfElements  !< Global number of elements
+        integer(I8P)                                              :: NodesPerElement         !< Number of nodes per element
+        integer(I8P)                                              :: Start                   !< Hyperslab start
+        integer(I8P)                                              :: Count                   !< Hyperslab count
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
     !-----------------------------------------------------------------
     !< @Note: allow different Topology or Geometry for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
-                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
+                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
+                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
+                Start = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)*NodesPerElement
             else
-                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
-                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
+                LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
+                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
+                Start = 0
             endif
+            GlobalNumberOfElements = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
-
-            call topology%open( xml_handler = this%file%xml_handler,&
-                    Dimensions  = (/This%SpatialGridDescriptor%GetGlobalNumberOfNodes()*int(SpaceDimension,I8P)/),&
+            Count = LocalNumberOfElements*NodesPerElement
+            call topology%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/LocalNumberOfelements/),         &
                     TopologyType=XMDFTopologyTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/int(localNumberOfNodes,I8P)*int(SpaceDimension,I8P)/),&
+                    Dimensions  = (/Count/),&
                     ItemType    = 'HyperSlab',&
                     Format      = 'HDF')
-            call dataitem%open( xml_handler = this%file%xml_handler,&
+            call dataitem%open( xml_handler = this%file%xml_handler, &
                     Dimensions     = (/3_I8P,1_I8P/),&
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
+            call chardata%open( xml_handler = this%file%xml_handler, &
+                    Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open( xml_handler = this%file%xml_handler,&
-                    Dimensions  = (/localNumberOfNodes/),&
+            call dataitem%open( xml_handler = this%file%xml_handler,         &
+                    Dimensions  = (/GlobalNumberOfElements*NodesPerElement/),&
                     NumberType  = 'Float',&
                     Format      = 'HDF',& 
                     Precision   = 8) 
+            call chardata%open( xml_handler = this%file%xml_handler, &
+                    Data = 'hyperslab.h5:Connectivities' )
             call dataitem%close(xml_handler=this%file%xml_handler)
             call dataitem%close(xml_handler=this%file%xml_handler)
             call topology%close(xml_handler=this%file%xml_handler)
@@ -128,27 +141,30 @@ contains
         integer(I4P), optional,          intent(IN)    :: GridID                !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry              !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem              !< XDMF Dataitem ttype
-        integer(I8P)                                   :: LocalNumberOfElements !< Local number of elements
+        type(xdmf_character_data_t)                    :: chardata              !< XDMF Character Data type
         integer(I8P)                                   :: LocalNumberOfNodes    !< Local number of nodes
-        integer(I4P)                                   :: NodesPerElement       !< Number of nodes per element
+        integer(I8P)                                   :: GlobalNumberOfNodes   !< Local number of elements
+        integer(I4P)                                   :: SpaceDimension        !< Space dimension
+        integer(I8P)                                   :: Start                 !< Hyperslab start
+        integer(I8P)                                   :: Count                 !< Hyperslab count
         character(len=:), allocatable                  :: XDMFGeometryTypeName  !< String geometry type identifier
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
+            SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
             if(present(GridID)) then
-                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
                 LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
+                Start = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)*SpaceDimension
             else
-                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
-                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
+                Start = 0
             endif
+            GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
-
+            Count = LocalNumberOfNodes*SpaceDimension
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/int(localNumberOfElements,I8P)*int(NodesPerElement,I8P)/), &   
+                    Dimensions  = (/localNumberOfNodes*SpaceDimension/), &   
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
@@ -156,12 +172,16 @@ contains
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
+            call chardata%open( xml_handler = this%file%xml_handler, &
+                    Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/int(localNumberOfElements,I8P)*int(NodesPerElement,I8P)/), &
+                    Dimensions = (/GlobalNumberOfNodes*SpaceDimension/), &
                     NumberType = 'Int', &
                     Format     = 'HDF', &
                     Precision  = 4) 
+            call chardata%open( xml_handler = this%file%xml_handler, &
+                    Data = 'hyperslab.h5:Coordinates' )
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
