@@ -18,6 +18,7 @@ SET(LIB ${PROJECT_NAME})
 
 SET(SRC_PATH ${CMAKE_SOURCE_DIR}/src)
 SET(LIB_PATH ${SRC_PATH}/lib)
+SET(EXAMPLES_PATH ${SRC_PATH}/examples)
 SET(TESTS_PATH ${SRC_PATH}/tests)
 
 #SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules/")
@@ -188,14 +189,13 @@ ENDIF()
 
 include(ExternalProject)
 SET(FOX_LIB FoX)
-# The order of the libraries reveals the right linking order
-SET(FOX_LIBS ${FOX_LIB}_dom ${FOX_LIB}_sax ${FOX_LIB}_wxml ${FOX_LIB}_utils ${FOX_LIB}_common ${FOX_LIB}_fsys)
 
 SET(${FOX_LIB}_SRC_PATH ${CMAKE_SOURCE_DIR}/thirdparty/fox)
+SET(${FOX_LIB}_BINARY_PATH ${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB})
 EXTERNALPROJECT_Add(${FOX_LIB}
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${${FOX_LIB}_SRC_PATH}
-    BINARY_DIR ${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}
+    BINARY_DIR ${${FOX_LIB}_BINARY_PATH}
     INSTALL_DIR ${INSTALL_PREFIX}
     # Fortran compiler must be forced in order to link external projects from the main project
     CONFIGURE_COMMAND cmake -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER} -D${FOX_LIB}_ENABLE_WXML=ON -D${FOX_LIB}_ENABLE_DOM=ON -D${FOX_LIB}_ENABLE_WCML=OFF -D${FOX_LIB}_ENABLE_WKML=OFF -D${FOX_LIB}_ENABLE_EXAMPLES=OFF ${${FOX_LIB}_SRC_PATH}
@@ -203,6 +203,12 @@ EXTERNALPROJECT_Add(${FOX_LIB}
     TEST_COMMAND ""
     INSTALL_COMMAND ""
 )
+
+# The order of the libraries reveals the right linking order
+SET(FOX_LIBS ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_dom.a ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_sax.a ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_wxml.a ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_utils.a ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_common.a ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_fsys.a)
+# Without the full path doesn't work properlly
+#SET(FOX_LIBS ${FOX_LIB}_dom ${FOX_LIB}_sax ${FOX_LIB}_wxml ${FOX_LIB}_utils ${FOX_LIB}_common ${FOX_LIB}_fsys)
+
 LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
 
@@ -212,4 +218,5 @@ INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
 
 ADD_SUBDIRECTORY(${LIB_PATH})
 ADD_SUBDIRECTORY(${TESTS_PATH})
+ADD_SUBDIRECTORY(${EXAMPLES_PATH})
 

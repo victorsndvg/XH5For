@@ -18,9 +18,11 @@ private
     contains
         procedure         :: hdf5_contiguous_hyperslab_WriteTopology_R4P
         procedure         :: hdf5_contiguous_hyperslab_WriteTopology_R8P
+        procedure         :: hdf5_contiguous_hyperslab_WriteGeometry_I4P
+!        procedure         :: hdf5_contiguous_hyperslab_WriteGeometry_I8P
         generic,   public :: WriteTopology  => hdf5_contiguous_hyperslab_WriteTopology_R4P, &
                                                hdf5_contiguous_hyperslab_WriteTopology_R8P
-        procedure, public :: WriteGeometry  => hdf5_contiguous_hyperslab_WriteGeometry_I4P
+        generic,   public :: WriteGeometry  => hdf5_contiguous_hyperslab_WriteGeometry_I4P
 !        procedure, public :: WriteAttribute => hdf5_contiguous_hyperslab_WriteAttribute
     end type hdf5_contiguous_hyperslab_handler_t
 
@@ -200,7 +202,7 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
-        ! Create Coordinates dataset 
+        ! Create Connectivities dataset 
         call H5Dcreate_f(loc_id = this%file_id,     &
                 name = '/Connectivities',  &
                 type_id = H5T_NATIVE_DOUBLE,        &

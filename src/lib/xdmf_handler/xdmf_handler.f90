@@ -20,6 +20,7 @@ private
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
         character(len=:),            allocatable :: prefix                !< Name prefix of the XDMF file
+        character(len=4)                         :: ext = '.xmf'          !< XDMF file extension
         type(mpi_env_t),                 pointer :: MPIEnvironment        !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Global grid info
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor !< Local grid info
@@ -39,14 +40,14 @@ public :: xdmf_handler_t
 
 contains
 
-    subroutine xdmf_handler_initialize(this, MPIEnvironment, SpatialGridDescriptor, UniformGridDescriptor)
+    subroutine xdmf_handler_initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
     !-----------------------------------------------------------------
     !< XDMF file handler initialization procedure
     !----------------------------------------------------------------- 
         class(xdmf_handler_t),                   intent(INOUT) :: this               !< XMDF handler
         type(mpi_env_t),                 target, intent(IN) :: MPIEnvironment        !< MPI environment
-        type(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
         type(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
+        type(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
         this%MPIEnvironment        => MPIEnvironment
         this%SpatialGridDescriptor => SpatialGridDescriptor
@@ -54,15 +55,15 @@ contains
     end subroutine xdmf_handler_initialize
 
 
-    subroutine xdmf_handler_OpenFile(this, filename)
+    subroutine xdmf_handler_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file
     !----------------------------------------------------------------- 
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
-        character(len=*),      intent(IN)    :: filename              !< XDMF filename
+        character(len=*),      intent(IN)    :: fileprefix            !< XDMF filename
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call this%file%set_filename(filename)
+            call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
             call this%file%openfile()
         endif
     end subroutine xdmf_handler_OpenFile

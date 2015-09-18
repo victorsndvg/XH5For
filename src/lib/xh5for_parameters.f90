@@ -78,6 +78,8 @@ implicit none
     integer(I4P), parameter :: XDMF_GRID_TYPE_REGULAR       = 703
     integer(I4P), parameter :: XDMF_GRID_TYPE_UNSTRUCTURED  = 704
 
+    integer(I4P), parameter :: XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB  = 801
+
     integer(I4P), parameter :: XDMF_NO_VALUE  = -1
 
 end module xh5for_parameters

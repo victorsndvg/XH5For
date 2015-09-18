@@ -9,8 +9,7 @@ use spatial_grid_descriptor
 use uniform_grid_descriptor
 #ifdef MPI_MOD
   use mpi
-#endif
-#ifdef MPI_H
+#else
   include 'mpif.h'
 #endif
 

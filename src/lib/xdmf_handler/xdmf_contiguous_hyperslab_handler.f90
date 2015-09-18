@@ -37,17 +37,17 @@ contains
     end subroutine
 
 
-    subroutine xdmf_contiguous_hyperslab_OpenFile(this, filename)
+    subroutine xdmf_contiguous_hyperslab_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this     !< XDMF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: filename !< XDMF filename
-        type(xdmf_grid_t)                                         :: grid     !< XDMF Grid type
-        type(xdmf_domain_t)                                       :: domain   !< XDMF Domain type
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: fileprefix !< XDMF filename prefix
+        type(xdmf_grid_t)                                         :: grid       !< XDMF Grid type
+        type(xdmf_domain_t)                                       :: domain     !< XDMF Domain type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call this%file%set_filename(filename)
+            call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
             call this%file%openfile()
             call domain%open(xml_handler = this%file%xml_handler)
             call grid%open(xml_handler = this%file%xml_handler, &

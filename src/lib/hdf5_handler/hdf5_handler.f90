@@ -23,6 +23,7 @@ private
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
         character(len=:),            allocatable :: prefix                !< Name prefix of the HDF5 file
+        character(len=3)                         :: ext = '.h5'           !< HDF5 file extension
         integer(HID_T)                           :: file_id               ! File identifier 
         type(mpi_env_t),                 pointer :: MPIEnvironment        !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Spatial grid descriptor
@@ -43,14 +44,14 @@ public :: HSIZE_T
 contains
 
 
-    subroutine hdf5_handler_Initialize(this, MPIEnvironment, SpatialGridDescriptor, UniformGridDescriptor)
+    subroutine hdf5_handler_Initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
     !-----------------------------------------------------------------
     !< Initialize the HDF5 handler
     !----------------------------------------------------------------- 
         class(hdf5_handler_t),                   intent(INOUT) :: this                  !< HDF5 handler type
-        type(mpi_env_t),                 target, intent(IN)    :: MPIEnvironment        !< MPI environment 
+        type(mpi_env_t),                 target, intent(IN)    :: MPIEnvironment        !< MPI environment
+        type(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor 
         type(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
-        type(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
     !-----------------------------------------------------------------
         this%MPIEnvironment        => MPIEnvironment
         this%SpatialGridDescriptor => SpatialGridDescriptor
@@ -58,14 +59,14 @@ contains
     end subroutine hdf5_handler_Initialize
 
 
-    subroutine hdf5_handler_OpenFile(this, filename)
+    subroutine hdf5_handler_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------
     !< Open a HDF5 file
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
-        character(len=*),  intent(IN)        :: filename
+        character(len=*),  intent(IN)        :: fileprefix
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
         call H5open_f(error=hdferror) 
@@ -74,11 +75,11 @@ contains
                         comm   = this%MPIEnvironment%get_comm(), &
                         info   = this%MPIEnvironment%get_info(), &
                         hdferr = hdferror)
-        call H5fcreate_f(name = filename, &
-                        access_flags = H5F_ACC_TRUNC_F, &
-                        file_id      = this%file_id, &
-                        hdferr       = hdferror, &
-                        creation_prp = H5P_DEFAULT_F, &
+        call H5fcreate_f(name = trim(adjustl(fileprefix))//this%ext, &
+                        access_flags = H5F_ACC_TRUNC_F,              &
+                        file_id      = this%file_id,                 &
+                        hdferr       = hdferror,                     &
+                        creation_prp = H5P_DEFAULT_F,                &
                         access_prp   = plist_id)
         call h5pclose_f(prp_id = plist_id, hdferr = hdferror)
 #endif
