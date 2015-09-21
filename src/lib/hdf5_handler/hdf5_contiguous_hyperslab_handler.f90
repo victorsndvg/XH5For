@@ -16,17 +16,17 @@ private
     !< HDF5 contiguous hyperslab handler
     !----------------------------------------------------------------- 
     contains
-        procedure :: WriteGeometry_I4P => hdf5_contiguous_hyperslab_handler_WriteGeometry_I4P
-        procedure :: WriteGeometry_I8P => hdf5_contiguous_hyperslab_handler_WriteGeometry_I8P
-        procedure :: WriteTopology_R4P => hdf5_contiguous_hyperslab_handler_WriteTopology_R4P
-        procedure :: WriteTopology_R8P => hdf5_contiguous_hyperslab_handler_WriteTopology_R8P
+        procedure :: WriteGeometry_R4P => hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P
+        procedure :: WriteGeometry_R8P => hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P
+        procedure :: WriteTopology_I4P => hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
+        procedure :: WriteTopology_I8P => hdf5_contiguous_hyperslab_handler_WriteTopology_I8P
     end type hdf5_contiguous_hyperslab_handler_t
 
 public :: hdf5_contiguous_hyperslab_handler_t
 
 contains
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_R4P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P(this, Coordinates)
     !-----------------------------------------------------------------
     !< Writes R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -93,11 +93,11 @@ print*, spacedim, globalnumberofnodes, localnumberofnodes,nodeoffset
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_R4P
+    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P
 
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_R8P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P(this, Coordinates)
     !-----------------------------------------------------------------
     !< Writes R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -163,10 +163,10 @@ print*, spacedim, globalnumberofnodes, localnumberofnodes,nodeoffset
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_R8P
+    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_I4P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P(this, Connectivities)
     !-----------------------------------------------------------------
     !< Writes I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -232,10 +232,10 @@ print*, spacedim, globalnumberofnodes, localnumberofnodes,nodeoffset
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_I4P
+    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_I8P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P(this, Connectivities)
     !-----------------------------------------------------------------
     !< Writes I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -303,7 +303,7 @@ print*, spacedim, globalnumberofnodes, localnumberofnodes,nodeoffset
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_I8P
+    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P
 
 
 end module hdf5_contiguous_hyperslab_handler

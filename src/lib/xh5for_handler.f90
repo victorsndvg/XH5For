@@ -14,17 +14,17 @@ private
     type, abstract :: xh5for_handler_t
     contains
     private
-        procedure(xh5for_handler_WriteGeometry_I4P),       deferred :: WriteGeometry_I4P
-        procedure(xh5for_handler_WriteGeometry_I8P),       deferred :: WriteGeometry_I8P
-        procedure(xh5for_handler_WriteTopology_R4P),       deferred :: WriteTopology_R4P
-        procedure(xh5for_handler_WriteTopology_R8P),       deferred :: WriteTopology_R8P
+        procedure(xh5for_handler_WriteGeometry_R4P),       deferred :: WriteGeometry_R4P
+        procedure(xh5for_handler_WriteGeometry_R8P),       deferred :: WriteGeometry_R8P
+        procedure(xh5for_handler_WriteTopology_I4P),       deferred :: WriteTopology_I4P
+        procedure(xh5for_handler_WriteTopology_I8P),       deferred :: WriteTopology_I8P
         procedure(xh5for_handler_Initialize),      public, deferred :: Initialize
         procedure(xh5for_handler_Open),            public, deferred :: Open
         procedure(xh5for_handler_Close),           public, deferred :: Close
-        generic,                                   public           :: WriteTopology => WriteTopology_R4P, &
-                                                                                        WriteTopology_R8P
-        generic,                                   public           :: WriteGeometry => WriteGeometry_I4P, &
-                                                                                        WriteGeometry_I8P
+        generic,                                   public           :: WriteTopology => WriteTopology_I4P, &
+                                                                                        WriteTopology_I8P
+        generic,                                   public           :: WriteGeometry => WriteGeometry_R4P, &
+                                                                                        WriteGeometry_R8P
 !        procedure(xh5for_handler_WriteAttribute), public, deferred :: WriteAttribute
 
     end type xh5for_handler_t
@@ -59,39 +59,39 @@ private
     end interface
 
     abstract interface
-        subroutine xh5for_handler_WriteGeometry_I4P(this, Connectivities)
-            import xh5for_handler_t
-            import I4P
-            class(xh5for_handler_t), intent(INOUT) :: this
-            integer(I4P),            intent(IN)    :: Connectivities(:)
-        end subroutine xh5for_handler_WriteGeometry_I4P
-    end interface
-
-    abstract interface
-        subroutine xh5for_handler_WriteGeometry_I8P(this, Connectivities)
-            import xh5for_handler_t
-            import I8P
-            class(xh5for_handler_t), intent(INOUT) :: this
-            integer(I8P),            intent(IN)    :: Connectivities(:)
-        end subroutine xh5for_handler_WriteGeometry_I8P
-    end interface
-
-    abstract interface
-        subroutine xh5for_handler_WriteTopology_R4P(this, Coordinates)
+        subroutine xh5for_handler_WriteGeometry_R4P(this, Coordinates)
             import xh5for_handler_t
             import R4P
             class(xh5for_handler_t), intent(INOUT) :: this
             real(R4P),               intent(IN)    :: Coordinates(:)
-        end subroutine xh5for_handler_WriteTopology_R4P
+        end subroutine xh5for_handler_WriteGeometry_R4P
     end interface
 
     abstract interface
-        subroutine xh5for_handler_WriteTopology_R8P(this, Coordinates)
+        subroutine xh5for_handler_WriteGeometry_R8P(this, Coordinates)
             import xh5for_handler_t
             import R8P
             class(xh5for_handler_t), intent(INOUT) :: this
             real(R8P),               intent(IN)    :: Coordinates(:)
-        end subroutine xh5for_handler_WriteTopology_R8P
+        end subroutine xh5for_handler_WriteGeometry_R8P
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_WriteTopology_I4P(this, Connectivities)
+            import xh5for_handler_t
+            import I4P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            integer(I4P),            intent(IN)    :: Connectivities(:)
+        end subroutine xh5for_handler_WriteTopology_I4P
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_WriteTopology_I8P(this, Connectivities)
+            import xh5for_handler_t
+            import I8P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            integer(I8P),            intent(IN)    :: Connectivities(:)
+        end subroutine xh5for_handler_WriteTopology_I8P
     end interface
 
     abstract interface

@@ -24,20 +24,20 @@ implicit none
     private
         procedure         :: xh5for_Initialize_I4P
         procedure         :: xh5for_Initialize_I8P
-        procedure         :: xh5for_WriteGeometry_I4P
-        procedure         :: xh5for_WriteGeometry_I8P
-        procedure         :: xh5for_WriteTopology_R4P
-        procedure         :: xh5for_WriteTopology_R8P
+        procedure         :: xh5for_WriteGeometry_R4P
+        procedure         :: xh5for_WriteGeometry_R8P
+        procedure         :: xh5for_WriteTopology_I4P
+        procedure         :: xh5for_WriteTopology_I8P
         procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_I4P, &
                                                       xh5for_Initialize_I8P
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Close                 => xh5for_Close
-        generic,   public :: WriteTopology         => xh5for_WriteTopology_R4P, &
-                                                      xh5for_WriteTopology_R8P
-        generic,   public :: WriteGeometry         => xh5for_WriteGeometry_I4P, &
-                                                      xh5for_WriteGeometry_I8P
+        generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
+                                                      xh5for_WriteTopology_I8P
+        generic,   public :: WriteGeometry         => xh5for_WriteGeometry_R4P, &
+                                                      xh5for_WriteGeometry_R8P
     end type xh5for_t
 
 contains
@@ -195,42 +195,42 @@ contains
     end subroutine xh5for_Close
 
 
-    subroutine xh5for_WriteGeometry_I4P(this, Connectivities)
-    !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
-    !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        integer(I4P),    intent(IN)    :: Connectivities(:)
-        call this%Handler%WriteGeometry(Connectivities = Connectivities)
-    end subroutine xh5for_WriteGeometry_I4P
-
-    subroutine xh5for_WriteGeometry_I8P(this, Connectivities)
-    !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
-    !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        integer(I8P),    intent(IN)    :: Connectivities(:)
-        call this%Handler%WriteGeometry(Connectivities = Connectivities)
-    end subroutine xh5for_WriteGeometry_I8P
-
-
-    subroutine xh5for_WriteTopology_R4P(this, Coordinates)
+    subroutine xh5for_WriteGeometry_R4P(this, Coordinates)
     !----------------------------------------------------------------- 
     !< Set the strategy of data handling
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this
         real(R4P),       intent(IN)    :: Coordinates(:)
-        call this%Handler%WriteTopology(Coordinates = Coordinates)
-    end subroutine xh5for_WriteTopology_R4P
+        call this%Handler%WriteGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_WriteGeometry_R4P
 
-
-    subroutine xh5for_WriteTopology_R8P(this, Coordinates)
+    subroutine xh5for_WriteGeometry_R8P(this, Coordinates)
     !----------------------------------------------------------------- 
     !< Set the strategy of data handling
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this
         real(R8P),       intent(IN)    :: Coordinates(:)
-        call this%Handler%WriteTopology(Coordinates = Coordinates)
-    end subroutine xh5for_WriteTopology_R8P
+        call this%Handler%WriteGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_WriteGeometry_R8P
+
+
+    subroutine xh5for_WriteTopology_I4P(this, Connectivities)
+    !----------------------------------------------------------------- 
+    !< Set the strategy of data handling
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this
+        integer(R4P),    intent(IN)    :: Connectivities(:)
+        call this%Handler%WriteTopology(Connectivities = Connectivities)
+    end subroutine xh5for_WriteTopology_I4P
+
+
+    subroutine xh5for_WriteTopology_I8P(this, Connectivities)
+    !----------------------------------------------------------------- 
+    !< Set the strategy of data handling
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this
+        integer(I8P),    intent(IN)    :: Connectivities(:)
+        call this%Handler%WriteTopology(Connectivities = Connectivities)
+    end subroutine xh5for_WriteTopology_I8P
 
 end module xh5for

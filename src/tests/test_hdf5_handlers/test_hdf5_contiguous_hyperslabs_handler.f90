@@ -21,8 +21,8 @@ implicit none
     type(spatial_grid_descriptor_t)           :: spatialgrid
     type(uniform_grid_descriptor_t)           :: uniformgrid
     type(hdf5_contiguous_hyperslab_handler_t) :: heavydata
-    real(R8P), dimension(8)                   :: triangletopology = (/0.0,0.0, 1.0,0.0, 0.0,1.0, 1.1,1.1/)
-    integer(I4P), dimension(6)                :: trianglegeometry = (/0,1,2,1,2,3/)
+    real(R8P), dimension(8)                   :: trianglegeometry = (/0.0,0.0, 1.0,0.0, 0.0,1.0, 1.1,1.1/)
+    integer(I4P), dimension(6)                :: triangletopology = (/0,1,2,1,2,3/)
     integer         :: mpierr, i
 
 #ifdef ENABLE_MPI

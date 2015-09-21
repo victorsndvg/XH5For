@@ -15,14 +15,14 @@ private
 
     type :: xdmf_geometry_info_t
         character(len=:), allocatable :: XPath
-        integer(I4P)                  :: ConnectivitiesPrecision
-        integer(I4P)                  :: ArrayDimensions
+        integer(I4P)                  :: CoordinatesPrecision
+        integer(I4P)                  :: CoordinatesDimension
     end type xdmf_geometry_info_t
 
     type :: xdmf_topology_info_t
         character(len=:), allocatable :: XPath
-        integer(I4P)                  :: CoordinatesPrecision
-        integer(I4P)                  :: ArrayDimensions
+        integer(I4P)                  :: ConnectivitiesPrecision
+        integer(I4P)                  :: ConnectivitiesDimension
     end type xdmf_topology_info_t
 
     type :: xdmf_attribute_info_t
@@ -40,16 +40,16 @@ private
     private
         procedure         :: SetGeometryInfo => xdmf_contiguous_hyperslab_handler_SetGeometryInfo
         procedure         :: SetTopologyInfo => xdmf_contiguous_hyperslab_handler_SetTopologyInfo
-        procedure         :: AddGeometry_I4P => xdmf_contiguous_hyperslab_handler_AddGeometry_I4P
-        procedure         :: AddGeometry_I8P => xdmf_contiguous_hyperslab_handler_AddGeometry_I8P
-        procedure         :: AddTopology_R4P => xdmf_contiguous_hyperslab_handler_AddTopology_R4P
-        procedure         :: AddTopology_R8P => xdmf_contiguous_hyperslab_handler_AddTopology_R8P
+        procedure         :: AddGeometry_R4P => xdmf_contiguous_hyperslab_handler_AddGeometry_R4P
+        procedure         :: AddGeometry_R8P => xdmf_contiguous_hyperslab_handler_AddGeometry_R8P
+        procedure         :: AddTopology_I4P => xdmf_contiguous_hyperslab_handler_AddTopology_I4P
+        procedure         :: AddTopology_I8P => xdmf_contiguous_hyperslab_handler_AddTopology_I8P
         procedure, public :: OpenFile        => xdmf_contiguous_hyperslab_handler_OpenFile
         procedure, public :: CloseFile       => xdmf_contiguous_hyperslab_handler_CloseFile
-        generic,   public :: AddGeometry     => AddGeometry_I4P, &
-                                                AddGeometry_I8P
-        generic,   public :: AddTopology     => AddTopology_R4P, &
-                                                AddTopology_R8P
+        generic,   public :: AddGeometry     => AddGeometry_R4P, &
+                                                AddGeometry_R8P
+        generic,   public :: AddTopology     => AddTopology_I4P, &
+                                                AddTopology_I8P
         procedure, public :: DeferredWrite => xdmf_contiguous_hyperslab_handler_DeferredWrite
         procedure, public :: WriteGeometry   => xdmf_contiguous_hyperslab_handler_WriteGeometry
         procedure, public :: WriteTopology   => xdmf_contiguous_hyperslab_handler_WriteTopology
@@ -60,78 +60,78 @@ public :: xdmf_contiguous_hyperslab_handler_t
 
 contains
 
-    subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo(this, XPath, ConnectivitiesPrecision, ArrayDimensions)
+    subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo(this, XPath, CoordinatesPrecision, CoordinatesDimension)
+    !-----------------------------------------------------------------
+    !< XDMF geometry info
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                  !< XMDF contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: XPath                 !< XDMF XPath to the HDF5 connetivities
+        integer(I4P),                               intent(IN)    :: CoordinatesPrecision  !< Precision of the Coordinates in the HDF5 file
+        integer(I4P),                               intent(IN)    :: CoordinatesDimension  !< Dimensions of the Coordinates array in the HDF5 file
+    !-----------------------------------------------------------------
+        this%geometry_info%XPath                = XPath
+        this%geometry_info%CoordinatesPrecision = CoordinatesPrecision
+        this%geometry_info%CoordinatesDimension = CoordinatesDimension
+    end subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_SetTopologyInfo(this, XPath, ConnectivitiesPrecision, ConnectivitiesDimension)
     !-----------------------------------------------------------------
     !< XDMF geometry info
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                    !< XMDF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: XPath                   !< XDMF XPath to the HDF5 connetivities
-        integer(I4P),                               intent(IN)    :: ConnectivitiesPrecision !< Precision of the connectivities in the HDF5 file
-        integer(I4P),                               intent(IN)    :: Arraydimensions         !< Dimensions of the connectivities array in the HDF5 file
-    !-----------------------------------------------------------------
-        this%geometry_info%XPath                   = XPath
-        this%geometry_info%ConnectivitiesPrecision = ConnectivitiesPrecision
-        this%geometry_info%ArrayDimensions         = ArrayDimensions
-    end subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_SetTopologyInfo(this, XPath, CoordinatesPrecision, ArrayDimensions)
-    !-----------------------------------------------------------------
-    !< XDMF geometry info
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                 !< XMDF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: XPath                !< XDMF XPath to the HDF5 coordinates
-        integer(I4P),                               intent(IN)    :: CoordinatesPrecision !< Precision of the coordinates in the HDF5 file
-        integer(I4P),                               intent(IN)    :: Arraydimensions         !< Dimensions of the connectivities array in the HDF5 file
+        character(len=*),                           intent(IN)    :: XPath                   !< XDMF XPath to the HDF5 coordinates
+        integer(I4P),                               intent(IN)    :: ConnectivitiesPrecision !< Precision of the coordinates in the HDF5 file
+        integer(I4P),                               intent(IN)    :: ConnectivitiesDimension !< Dimensions of the coordinates array in the HDF5 file
     !-----------------------------------------------------------------
         this%topology_info%XPath                    = XPath
-        this%topology_info%CoordinatesPrecision     = CoordinatesPrecision
-        this%topology_info%ArrayDimensions          = ArrayDimensions
+        this%topology_info%ConnectivitiesPrecision  = ConnectivitiesPrecision
+        this%topology_info%ConnectivitiesDimension  = ConnectivitiesDimension
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopologyInfo
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_I4P(this, Connectivities)
+    subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_R4P(this, Coordinates)
     !-----------------------------------------------------------------
-    !< Add I4P geometry info to the handler. Used for deferred writing 
+    !< Add R4P geometry info to the handler. Used for deferred writing 
     !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid connectivities
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
+        real(R4P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
-        call this%SetGeometryInfo(XPath='Connectivities', ConnectivitiesPrecision=4, ArrayDimensions=1)
-    end subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_I4P
+        call this%SetGeometryInfo(XPath='Coordinates', CoordinatesPrecision=4, CoordinatesDimension=1)
+    end subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_R4P
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_I8P(this, Connectivities)
-    !-----------------------------------------------------------------
-    !< Add I8P geometry info to the handler. Used for deferred writing 
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        integer(I8P),                               intent(IN)    :: Connectivities(:) !< Grid connectivities
-    !-----------------------------------------------------------------
-        call this%SetGeometryInfo(XPath='Connectivities', ConnectivitiesPrecision=8, ArrayDimensions=1)
-    end subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_I8P
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_AddTopology_R4P(this, Coordinates)
-    !-----------------------------------------------------------------
-    !< Add I4P geometry info to the handler. Used for deferred writing 
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        real(R4P),                                  intent(IN)    :: Coordinates(:)    !< Grid Coordinates
-    !-----------------------------------------------------------------
-        call this%SetTopologyInfo(XPath='Coordinates', CoordinatesPrecision=4, ArrayDimensions=1)
-    end subroutine xdmf_contiguous_hyperslab_handler_AddTopology_R4P
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_AddTopology_R8P(this, Coordinates)
+    subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_R8P(this, Coordinates)
     !-----------------------------------------------------------------
     !< Add R8P geometry info to the handler. Used for deferred writing 
     !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        real(R8P),                                  intent(IN)    :: Coordinates(:)    !< Grid Coordinates
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
+        real(R8P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
-        call this%SetTopologyInfo(XPath='Coordinates', CoordinatesPrecision=8, ArrayDimensions=1)
-    end subroutine xdmf_contiguous_hyperslab_handler_AddTopology_R8P
+        call this%SetGeometryInfo(XPath='Coordinates', CoordinatesPrecision=8, CoordinatesDimension=1)
+    end subroutine xdmf_contiguous_hyperslab_handler_AddGeometry_R8P
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_AddTopology_I4P(this, Connectivities)
+    !-----------------------------------------------------------------
+    !< Add I4P topology info to the handler. Used for deferred writing 
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
+        integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
+    !-----------------------------------------------------------------
+        call this%SetTopologyInfo(XPath='Connectivities', ConnectivitiesPrecision=4, ConnectivitiesDimension=1)
+    end subroutine xdmf_contiguous_hyperslab_handler_AddTopology_I4P
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_AddTopology_I8P(this, Connectivities)
+    !-----------------------------------------------------------------
+    !< Add I8P topology info to the handler. Used for deferred writing 
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
+        integer(I8P),                               intent(IN)    :: Connectivities(:)    !< Grid Connectivities
+    !-----------------------------------------------------------------
+        call this%SetTopologyInfo(XPath='Connectivities', ConnectivitiesPrecision=8, ConnectivitiesDimension=1)
+    end subroutine xdmf_contiguous_hyperslab_handler_AddTopology_I8P
 
 
     subroutine xdmf_contiguous_hyperslab_handler_OpenFile(this, fileprefix)
@@ -200,7 +200,7 @@ contains
         integer(I8P)                                              :: Count                   !< Hyperslab count
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
     !-----------------------------------------------------------------
-    !< @Note: allow different Topology or Geometry for each part of the spatial grid?
+    !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
                 LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
@@ -223,7 +223,7 @@ contains
                     ItemType    = 'HyperSlab',&
                     Format      = 'HDF')
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions     = (/3_I4P,this%topology_info%ArrayDimensions/),&
+                    Dimensions     = (/3_I4P,this%topology_info%ConnectivitiesDimension/),&
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
@@ -232,9 +232,9 @@ contains
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open( xml_handler = this%file%xml_handler,         &
                     Dimensions  = (/GlobalNumberOfElements*NodesPerElement/),&
-                    NumberType  = 'Float',&
+                    NumberType  = 'Int',&
                     Format      = 'HDF',& 
-                    Precision   = this%topology_info%CoordinatesPrecision) 
+                    Precision   = this%topology_info%ConnectivitiesPrecision) 
             call chardata%open( xml_handler = this%file%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%topology_info%XPath )
             call dataitem%close(xml_handler=this%file%xml_handler)
@@ -272,11 +272,6 @@ contains
             GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
             Count = LocalNumberOfNodes*SpaceDimension
-print*, '------------------------------------------------'
-print*, this%geometry_info%XPath, this%geometry_info%ConnectivitiesPrecision,this%geometry_info%ArrayDimensions
-print*, spaceDimension,  GlobalNumberOfNodes,LocalNumberOfNodes, Start, Count
-print*, (/Start,1_I8P,Count/) 
-print*, '------------------------------------------------'
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
@@ -284,7 +279,7 @@ print*, '------------------------------------------------'
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P,this%geometry_info%ArrayDimensions/), &
+                    Dimensions = (/3_I4P,this%geometry_info%CoordinatesDimension/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
@@ -293,9 +288,9 @@ print*, '------------------------------------------------'
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open(xml_handler = this%file%xml_handler, &
                     Dimensions = (/GlobalNumberOfNodes*SpaceDimension/), &
-                    NumberType = 'Int', &
+                    NumberType = 'Float', &
                     Format     = 'HDF', &
-                    Precision  = this%geometry_info%ConnectivitiesPrecision) 
+                    Precision  = this%geometry_info%CoordinatesPrecision) 
             call chardata%open( xml_handler = this%file%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%geometry_info%XPath)
             call dataitem%close(xml_handler = this%file%xml_handler)
