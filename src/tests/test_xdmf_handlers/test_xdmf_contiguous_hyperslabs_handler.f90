@@ -7,10 +7,12 @@ use xdmf_contiguous_hyperslab_handler
 use mpi_environment
 use spatial_grid_descriptor
 use uniform_grid_descriptor
+#ifdef ENABLE_MPI
 #ifdef MPI_MOD
   use mpi
 #else
   include 'mpif.h'
+#endif
 #endif
 
 implicit none
