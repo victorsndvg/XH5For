@@ -50,7 +50,6 @@ contains
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-print*, spacedim, globalnumberofnodes, localnumberofnodes,nodeoffset
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
                 dims     = (/spacedim*globalnumberofnodes/),  &
