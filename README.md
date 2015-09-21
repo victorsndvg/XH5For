@@ -25,10 +25,10 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [ ] Unstructured
   * Element:
     * Linear
-      * [ ] Triangle
-      * [ ] Quadrangle
-      * [ ] Tretrahedron
-      * [ ] Hexahedron
+      * [x] Triangle
+      * [x] Quadrangle
+      * [x] Tretrahedron
+      * [x] Hexahedron
       * [ ] Mixed
   * Field:
     * Center on: not defined yet...

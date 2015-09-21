@@ -1,11 +1,12 @@
 program example_unstructured_triangles
 
 use xh5for
+#ifdef ENABLE_MPI
 #ifdef MPI_MOD
-use mpi
+  use mpi
+#else
+  include 'mpif.h'
 #endif
-#ifdef MPI_H
-include 'mpif.h'
 #endif
 
 implicit none
@@ -13,8 +14,12 @@ implicit none
     !< Variable definition
     !----------------------------------------------------------------- 
     type(xh5for_t)             :: xh5
-    real(R4P), dimension(8)    :: trianglegeometry = (/0.0,0.0, 1.0,0.0, 0.0,1.0, 1.0,1.0/)
-    integer(I4P), dimension(6) :: triangletopology = (/0,1,2,1,2,3/)
+    real(R4P), dimension(8)    :: trianglegeometry = (/0.0, 0.0, &
+                                                       1.0, 0.0, &
+                                                       0.0, 1.0, &
+                                                       1.0, 1.0/)
+    integer(I4P), dimension(6) :: triangletopology = (/0, 1, 2, &
+                                                       1, 2, 3/)
     integer                    :: rank = 0
     integer                    :: mpierr
 
