@@ -21,10 +21,10 @@ private
     !----------------------------------------------------------------- 
         character(len=:),            allocatable :: prefix                          !< Name prefix of the XDMF file
         character(len=4)                         :: ext = '.xmf'                    !< XDMF file extension
+        type(xdmf_file_t)                        :: file                            !< XDMF file handler
         type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
-        type(xdmf_file_t)                        :: file                            !< XDMF file handler
         logical                                  :: warn = .true.                   !< Flag to show warnings on screen
     contains
     private
@@ -63,6 +63,7 @@ contains
         character(len=*),      intent(IN)    :: fileprefix            !< XDMF filename
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
+            this%prefix = trim(adjustl(fileprefix))
             call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
             call this%file%openfile()
         endif

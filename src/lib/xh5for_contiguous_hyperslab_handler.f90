@@ -14,7 +14,7 @@ private
         type(hdf5_contiguous_hyperslab_handler_t) :: HeavyData
     contains
         procedure         :: WriteGeometry_I4P => xh5for_contiguous_hyperslab_handler_WriteGeometry_I4P
-!        procedure         :: WriteGeometry_I8P => xh5for_contiguous_hyperslab_handler_WriteGeometry_I8P
+        procedure         :: WriteGeometry_I8P => xh5for_contiguous_hyperslab_handler_WriteGeometry_I8P
         procedure         :: WriteTopology_R4P => xh5for_contiguous_hyperslab_handler_WriteTopology_R4P
         procedure         :: WriteTopology_R8P => xh5for_contiguous_hyperslab_handler_WriteTopology_R8P
         procedure, public :: Initialize        => xh5for_contiguous_hyperslab_handler_Initialize
@@ -28,10 +28,14 @@ public :: xh5for_contiguous_hyperslab_handler_t
 contains
 
     subroutine xh5for_contiguous_hyperslab_handler_Initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
-        class(xh5for_contiguous_hyperslab_handler_t),         intent(INOUT) :: this
-        type(mpi_env_t),                 intent(IN)    :: MPIEnvironment        !< MPI environment 
-        type(spatial_grid_descriptor_t), intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
-        type(uniform_grid_descriptor_t), intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+    !-----------------------------------------------------------------
+    !< XH5FOR initialization procedure
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this                  !< XH5For contiguous hyperslab handler
+        type(mpi_env_t),                              intent(IN)    :: MPIEnvironment        !< MPI environment 
+        type(spatial_grid_descriptor_t),              intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
+        type(uniform_grid_descriptor_t),              intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+    !-----------------------------------------------------------------
         ! Light data initialization
         call this%LightData%Initialize(                        &
                 MPIEnvironment        = MPIEnvironment,        &
@@ -44,49 +48,79 @@ contains
                 SpatialGridDescriptor = SpatialGridDescriptor)
     end subroutine xh5for_contiguous_hyperslab_handler_Initialize
 
+
     subroutine xh5for_contiguous_hyperslab_handler_Open(this, fileprefix)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        character(len=*),         intent(IN)    :: fileprefix
-        call this%LightData%OpenFile(fileprefix)
+    !-----------------------------------------------------------------
+    !< Open the lightdata and the heavydata files
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this         !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: fileprefix   !< Filename prefix
+    !-----------------------------------------------------------------
         call this%HeavyData%OpenFile(fileprefix)
+        call this%LightData%OpenFile(fileprefix)
     end subroutine xh5for_contiguous_hyperslab_handler_Open
 
 
     subroutine xh5for_contiguous_hyperslab_handler_Close(this)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this
-        call this%LightData%CloseFile()
+    !-----------------------------------------------------------------
+    !< Close the lightdata and the heavydata files
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XH5For contigous hyperslab handler
+    !-----------------------------------------------------------------
         call this%HeavyData%CloseFile()
+        !< XDMF deferred writing when hdf5 closes    
+        call this%LightData%DeferredWrite()
+        call this%LightData%CloseFile()
     end subroutine xh5for_contiguous_hyperslab_handler_Close
 
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteGeometry_I4P(this, Connectivities)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(IN) :: this
-        integer(I4P),                                 intent(IN) :: Connectivities(:)      !< Grid connectivities
-!        call this%LightData%AddGeometry(Connectivities)
+    !-----------------------------------------------------------------
+    !< Write an I4P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(I4P),                                 intent(IN)    :: Connectivities(:) !< Grid connectivities
+    !-----------------------------------------------------------------
+        call this%LightData%AddGeometry(Connectivities = Connectivities)
         call this%HeavyData%WriteGeometry(Connectivities = Connectivities)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteGeometry_I4P
 
+
     subroutine xh5for_contiguous_hyperslab_handler_WriteGeometry_I8P(this, Connectivities)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(IN) :: this
-        real(I8P),                                    intent(IN) :: Connectivities(:)      !< Grid coordinates
-!        call this%LightData%AddGeometry(Connectivities)
-!        call this%HeavyData%WriteGeometry(Connectivities)
+    !-----------------------------------------------------------------
+    !< Write an I8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(I8P),                                 intent(IN)    :: Connectivities(:) !< Grid coordinates
+    !-----------------------------------------------------------------
+        call this%LightData%AddGeometry(Connectivities = Connectivities)
+        call this%HeavyData%WriteGeometry(Connectivities = Connectivities)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteGeometry_I8P
 
+
     subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_R4P(this, Coordinates)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(IN) :: this
-        real(R4P),                                    intent(IN) :: Coordinates(:)      !< Grid connectivities
-!        call this%LightData%AddTopology(Coordinates)
+    !-----------------------------------------------------------------
+    !< Write an R4P Topology for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this            !< XH5For contiguous hyperslab handler
+        real(R4P),                                    intent(IN)    :: Coordinates(:)  !< Grid connectivities
+    !-----------------------------------------------------------------
+        call this%LightData%AddTopology(Coordinates = Coordinates)
         call this%HeavyData%WriteTopology(Coordinates = Coordinates)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_R4P
 
+
     subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_R8P(this, Coordinates)
-        class(xh5for_contiguous_hyperslab_handler_t), intent(IN) :: this
-        real(R8P),                                    intent(IN) :: Coordinates(:)      !< Grid connectivities
-!        call this%LightData%AddTopology(Coordinates)
+    !-----------------------------------------------------------------
+    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this            !< XH5For contiguous hyperslab handler
+        real(R8P),                                    intent(IN)    :: Coordinates(:)  !< Grid connectivities
+    !----------------------------------------------------------------- 
+        call this%LightData%AddTopology(Coordinates = Coordinates)
         call this%HeavyData%WriteTopology(Coordinates = Coordinates)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_R8P
-
+    !----------------------------------------------------------------- 
 
 !        subroutine xh5for_handler_Attribute(this)
 !            class(xh5for_handler_t), intent(INOUT) :: this

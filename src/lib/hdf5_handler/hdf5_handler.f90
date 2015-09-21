@@ -24,15 +24,59 @@ private
     !----------------------------------------------------------------- 
         character(len=:),            allocatable :: prefix                          !< Name prefix of the HDF5 file
         character(len=3)                         :: ext = '.h5'                     !< HDF5 file extension
-        integer(HID_T)                           :: file_id                         ! File identifier 
+        integer(HID_T)                           :: file_id                         !< File identifier 
         type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
     contains
-        procedure :: Initialize => hdf5_handler_Initialize
-        procedure :: OpenFile   => hdf5_handler_OpenFile
-        procedure :: CloseFile  => hdf5_handler_CloseFile
+        procedure(hdf5_handler_WriteGeometry_I4P), deferred :: WriteGeometry_I4P
+        procedure(hdf5_handler_WriteGeometry_I8P), deferred :: WriteGeometry_I8P
+        procedure(hdf5_handler_WriteTopology_R4P), deferred :: WriteTopology_R4P
+        procedure(hdf5_handler_WriteTopology_R8P), deferred :: WriteTopology_R8P
+        procedure                                           :: Initialize => hdf5_handler_Initialize
+        procedure                                           :: OpenFile   => hdf5_handler_OpenFile
+        procedure                                           :: CloseFile  => hdf5_handler_CloseFile
+        generic,                                   public   :: WriteTopology  => WriteTopology_R4P, &
+                                                                                 WriteTopology_R8P
+        generic,                                   public   :: WriteGeometry  => WriteGeometry_I4P, &
+                                                                                 WriteGeometry_I8P
     end type hdf5_handler_t
+
+    abstract interface
+        subroutine hdf5_handler_WriteGeometry_I4P(this, Connectivities)
+            import hdf5_handler_t
+            import I4P
+            class(hdf5_handler_t), intent(IN) :: this
+            integer(I4P),            intent(IN) :: Connectivities(:)
+        end subroutine hdf5_handler_WriteGeometry_I4P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteGeometry_I8P(this, Connectivities)
+            import hdf5_handler_t
+            import I8P
+            class(hdf5_handler_t), intent(IN) :: this
+            integer(I8P),            intent(IN) :: Connectivities(:)
+        end subroutine hdf5_handler_WriteGeometry_I8P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteTopology_R4P(this, Coordinates)
+            import hdf5_handler_t
+            import R4P
+            class(hdf5_handler_t), intent(IN) :: this
+            real(R4P),               intent(IN) :: Coordinates(:)
+        end subroutine hdf5_handler_WriteTopology_R4P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteTopology_R8P(this, Coordinates)
+            import hdf5_handler_t
+            import R8P
+            class(hdf5_handler_t), intent(IN) :: this
+            real(R8P),               intent(IN) :: Coordinates(:)
+        end subroutine hdf5_handler_WriteTopology_R8P
+    end interface
 
 public :: hdf5_handler_t
 

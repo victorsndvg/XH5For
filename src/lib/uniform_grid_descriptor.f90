@@ -37,37 +37,57 @@ public:: uniform_grid_descriptor_t
 contains
 
     subroutine uniform_grid_descriptor_SetNumberOfNodes(this, NumberOfNodes)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P),          intent(IN)    :: NumberOfNodes
+    !-----------------------------------------------------------------
+    !< Set the number of nodes of the local grid
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this          !< Local grid descriptor
+        integer(I8P),                     intent(IN)    :: NumberOfNodes !< Number of nodes of the local grid
+    !-----------------------------------------------------------------
         this%NumberOfNodes = NumberOfNodes
     end subroutine uniform_grid_descriptor_SetNumberOfNodes
 
+
     subroutine uniform_grid_descriptor_SetNumberOfElements(this, NumberOfElements)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P),          intent(IN)    :: NumberOfElements
+    !-----------------------------------------------------------------
+    !< Set the number of elements of the local grid
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of nodes of the local grid
+    !-----------------------------------------------------------------
         this%NumberOfElements = NumberOfElements
     end subroutine uniform_grid_descriptor_SetNumberOfElements
 
+
     function uniform_grid_descriptor_GetNumberOfNodes(this)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P)                         :: uniform_grid_descriptor_getNumberOfNodes
+    !-----------------------------------------------------------------
+    !< Return the number of nodes of the local grid
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
+        integer(I8P) :: uniform_grid_descriptor_getNumberOfNodes      !< Number of nodes of the local grid
+    !-----------------------------------------------------------------
         uniform_grid_descriptor_GetNumberOfNodes = this%NumberOfNodes
     end function uniform_grid_descriptor_GetNumberOfNodes
 
+
     function uniform_grid_descriptor_GetNumberOfElements(this)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P)                         :: uniform_grid_descriptor_GetNumberOfElements
+    !-----------------------------------------------------------------
+    !< Return the number of elements of the local grid
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Localk grid descriptor
+        integer(I8P) :: uniform_grid_descriptor_GetNumberOfElements   !< Number of elements of the local grid
+    !-----------------------------------------------------------------
         uniform_grid_descriptor_GetNumberOfElements = this%NumberOfElements
     end function uniform_grid_descriptor_GetNumberOfElements
+
 
     function uniform_grid_descriptor_is_valid_TopologyType(this, TopologyType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
-        integer(I4P),           intent(IN) :: TopologyType            !< XDMF Topology Type
-        logical                            :: is_valid                !< Valid Topology Type confirmation flag
-        integer(I4P), allocatable          :: allowed_TopologyTypes(:)!< Dataitem Topology Type list 
+        integer(I4P),                      intent(IN) :: TopologyType            !< XDMF Topology Type
+        logical                                       :: is_valid                !< Valid Topology Type confirmation flag
+        integer(I4P), allocatable                     :: allowed_TopologyTypes(:)!< Dataitem Topology Type list 
     !----------------------------------------------------------------- 
         !< @Note: Mixed topologies or variable number of node elements not allowed
         !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
@@ -107,10 +127,14 @@ contains
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
     end function uniform_grid_descriptor_is_valid_TopologyType
 
-    subroutine uniform_grid_descriptor_SetTopologyType(this, TopologyType)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I4P),          intent(IN)    :: TopologyType
 
+    subroutine uniform_grid_descriptor_SetTopologyType(this, TopologyType)
+    !-----------------------------------------------------------------  
+    !< Set XDMF topology type
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this         !< Local grid derived type
+        integer(I4P),                     intent(IN)    :: TopologyType !< XDMF topology type
+    !-----------------------------------------------------------------
         if(this%is_valid_TopologyType(TopologyType)) then
             this%TopologyType = TopologyType
         else
@@ -118,20 +142,26 @@ contains
         endif
     end subroutine uniform_grid_descriptor_SetTopologyType
 
+
     function uniform_grid_descriptor_GetTopologyType(this)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I4P)                         :: uniform_grid_descriptor_GetTopologyType
+    !-----------------------------------------------------------------
+    !< Return the XDMF topology type of the local grid
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
+        integer(I4P) :: uniform_grid_descriptor_GetTopologyType       !< XDMF Topology type
+    !-----------------------------------------------------------------
         uniform_grid_descriptor_GetTopologyType = this%TopologyType
     end function uniform_grid_descriptor_GetTopologyType
+
 
     function uniform_grid_descriptor_is_valid_GeometryType(this, GeometryType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
-        integer(I4P),           intent(IN) :: GeometryType            !< XDMF Geometry Type
-        logical                            :: is_valid                !< Valid Geometry Type confirmation flag
-        integer(I4P), allocatable          :: allowed_GeometryTypes(:)!< Dataitem Geometry Type list 
+        integer(I4P),                      intent(IN) :: GeometryType            !< XDMF Geometry Type
+        logical                                       :: is_valid                !< Valid Geometry Type confirmation flag
+        integer(I4P), allocatable                     :: allowed_GeometryTypes(:)!< Dataitem Geometry Type list 
     !----------------------------------------------------------------- 
         !< @Note: Mixed topologies or variable number of node elements not allowed
         !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
@@ -144,10 +174,14 @@ contains
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Geometry Type: "'//trim(str(no_sign=.true., n=GeometryType))//'"')
     end function uniform_grid_descriptor_is_valid_GeometryType
 
-    subroutine uniform_grid_descriptor_SetGeometryType(this, GeometryType)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I4P),          intent(IN)    :: GeometryType
 
+    subroutine uniform_grid_descriptor_SetGeometryType(this, GeometryType)
+    !-----------------------------------------------------------------
+    !< Set XDMF geometry type
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this         !< Local grid descriptor
+        integer(I4P),                     intent(IN)    :: GeometryType !< Local grid geometry type
+    !----------------------------------------------------------------
         if(this%is_valid_GeometryType(GeometryType)) then
             this%GeometryType = GeometryType
         else
@@ -155,19 +189,28 @@ contains
         endif
     end subroutine uniform_grid_descriptor_SetGeometryType
 
+
     function uniform_grid_descriptor_GetGeometryType(this)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I4P)                         :: uniform_grid_descriptor_GetGeometryType
+    !-----------------------------------------------------------------
+    !< Return XDMF geometry type
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this                         !< Local grid descriptor
+        integer(I4P)                         :: uniform_grid_descriptor_GetGeometryType !< XDMF geometry type
+    !-----------------------------------------------------------------
         uniform_grid_descriptor_GetGeometryType = this%GeometryType
     end function uniform_grid_descriptor_GetGeometryType
 
-    subroutine uniform_grid_descriptor_initialize(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
-        class(uniform_grid_descriptor_t), intent(INOUT) :: this
-        integer(I8P),  intent(IN)    :: NumberOfNodes
-        integer(I8P),  intent(IN)    :: NumberOfElements
-        integer(I4P),  intent(IN)    :: TopologyType
-        integer(I4P),  intent(IN)    :: GeometryType
 
+    subroutine uniform_grid_descriptor_initialize(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
+    !-----------------------------------------------------------------
+    !< Uniform grid descriptor initization procedure
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P),                     intent(IN)    :: NumberOfNodes    !< Number of nodes of the local grid
+        integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of elements of the local grid
+        integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the local grid
+        integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the local grid
+    !-----------------------------------------------------------------
         call this%SetNumberOfNodes(NumberOfNodes=NumberOfNodes)
         call this%SetNumberOfElements(NumberOfElements=NumberOfElements)
         call this%SetTopologyType(TopologyType=TopologyType)

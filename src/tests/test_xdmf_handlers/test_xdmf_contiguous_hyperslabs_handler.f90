@@ -19,7 +19,8 @@ implicit none
     type(spatial_grid_descriptor_t) :: spatialgrid
     type(uniform_grid_descriptor_t) :: uniformgrid
     type(xdmf_contiguous_hyperslab_handler_t) :: lightdata
-    integer         :: mpierr, i
+    integer         :: mpierr
+    integer(I4P)    :: i
 
 #if defined(MPI_MOD) || defined(MPI_H)
     call MPI_INIT(mpierr)

@@ -24,14 +24,20 @@ implicit none
     private
         procedure         :: xh5for_Initialize_I4P
         procedure         :: xh5for_Initialize_I8P
+        procedure         :: xh5for_WriteGeometry_I4P
+        procedure         :: xh5for_WriteGeometry_I8P
+        procedure         :: xh5for_WriteTopology_R4P
+        procedure         :: xh5for_WriteTopology_R8P
         procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_I4P, &
                                                       xh5for_Initialize_I8P
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Close                 => xh5for_Close
-        procedure, public :: WriteTopology         => xh5for_WriteTopology
-        procedure, public :: WriteGeometry         => xh5for_WriteGeometry
+        generic,   public :: WriteTopology         => xh5for_WriteTopology_R4P, &
+                                                      xh5for_WriteTopology_R8P
+        generic,   public :: WriteGeometry         => xh5for_WriteGeometry_I4P, &
+                                                      xh5for_WriteGeometry_I8P
     end type xh5for_t
 
 contains
@@ -49,6 +55,7 @@ contains
         is_valid = MINVAL(ABS(allowed_strategies - Strategy)) == 0_I4P
         if(.not. is_valid) call warning_message('Wrong Strategy: "'//trim(str(no_sign=.true., n=Strategy))//'"')
     end function xh5for_is_valid_strategy
+
 
     subroutine xh5for_SetStrategy(this, Strategy)
     !----------------------------------------------------------------- 
@@ -75,8 +82,6 @@ contains
         integer                           :: error
         integer                           :: r_root = 0
     !----------------------------------------------------------------- 
-
-
         if(present(root)) r_root = root
 ! FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
         select case(this%Strategy)
@@ -117,7 +122,6 @@ contains
     end subroutine xh5for_Initialize_I4P
 
 
-
     subroutine xh5for_Initialize_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
@@ -132,8 +136,6 @@ contains
         integer                           :: error
         integer                           :: r_root = 0
     !----------------------------------------------------------------- 
-
-
         if(present(root)) r_root = root
 ! FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
         select case(this%Strategy)
@@ -171,6 +173,7 @@ contains
                 UniformGridDescriptor=this%UniformGridDescriptor)
     end subroutine xh5for_Initialize_I8P
 
+
     subroutine xh5for_Open(this, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF and HDF5 files
@@ -181,6 +184,7 @@ contains
         call this%Handler%Open(fileprefix)
     end subroutine xh5for_Open
 
+
     subroutine xh5for_Close(this)
     !-----------------------------------------------------------------
     !< Open a XDMF and HDF5 files
@@ -190,24 +194,43 @@ contains
         call this%Handler%Close()
     end subroutine xh5for_Close
 
-    subroutine xh5for_WriteGeometry(this, Connectivities)
+
+    subroutine xh5for_WriteGeometry_I4P(this, Connectivities)
     !----------------------------------------------------------------- 
     !< Set the strategy of data handling
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(IN) :: this
-        integer(I4P),       intent(IN) :: Connectivities(:)
+        class(xh5for_t), intent(INOUT) :: this
+        integer(I4P),    intent(IN)    :: Connectivities(:)
         call this%Handler%WriteGeometry(Connectivities = Connectivities)
-    end subroutine
+    end subroutine xh5for_WriteGeometry_I4P
 
-
-    subroutine xh5for_WriteTopology(this, Coordinates)
+    subroutine xh5for_WriteGeometry_I8P(this, Connectivities)
     !----------------------------------------------------------------- 
     !< Set the strategy of data handling
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(IN) :: this
-        real(R4P),       intent(IN) :: Coordinates(:)
-        call this%Handler%WriteTopology(Coordinates = Coordinates)
-    end subroutine
+        class(xh5for_t), intent(INOUT) :: this
+        integer(I8P),    intent(IN)    :: Connectivities(:)
+        call this%Handler%WriteGeometry(Connectivities = Connectivities)
+    end subroutine xh5for_WriteGeometry_I8P
 
+
+    subroutine xh5for_WriteTopology_R4P(this, Coordinates)
+    !----------------------------------------------------------------- 
+    !< Set the strategy of data handling
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this
+        real(R4P),       intent(IN)    :: Coordinates(:)
+        call this%Handler%WriteTopology(Coordinates = Coordinates)
+    end subroutine xh5for_WriteTopology_R4P
+
+
+    subroutine xh5for_WriteTopology_R8P(this, Coordinates)
+    !----------------------------------------------------------------- 
+    !< Set the strategy of data handling
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this
+        real(R8P),       intent(IN)    :: Coordinates(:)
+        call this%Handler%WriteTopology(Coordinates = Coordinates)
+    end subroutine xh5for_WriteTopology_R8P
 
 end module xh5for
