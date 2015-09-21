@@ -21,7 +21,7 @@ private
     contains
         procedure         :: is_valid_TopologyType => uniform_grid_descriptor_is_valid_TopologyType
         procedure         :: is_valid_GeometryType => uniform_grid_descriptor_is_valid_GeometryType
-        procedure, public :: Initialize             => uniform_grid_descriptor_Initialize
+        procedure, public :: Initialize            => uniform_grid_descriptor_Initialize
         procedure, public :: SetNumberOfNodes      => uniform_grid_descriptor_SetNumberOfNodes
         procedure, public :: SetNumberOfElements   => uniform_grid_descriptor_SetNumberOfElements
         procedure, public :: SetTopologyType       => uniform_grid_descriptor_SetTopologyType

@@ -22,12 +22,12 @@ private
     !-----------------------------------------------------------------
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
-        character(len=:),            allocatable :: prefix                !< Name prefix of the HDF5 file
-        character(len=3)                         :: ext = '.h5'           !< HDF5 file extension
-        integer(HID_T)                           :: file_id               ! File identifier 
-        type(mpi_env_t),                 pointer :: MPIEnvironment        !< MPI environment 
-        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Spatial grid descriptor
-        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor !< Uniform grid descriptor
+        character(len=:),            allocatable :: prefix                          !< Name prefix of the HDF5 file
+        character(len=3)                         :: ext = '.h5'                     !< HDF5 file extension
+        integer(HID_T)                           :: file_id                         ! File identifier 
+        type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
+        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
+        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
     contains
         procedure :: Initialize => hdf5_handler_Initialize
         procedure :: OpenFile   => hdf5_handler_OpenFile

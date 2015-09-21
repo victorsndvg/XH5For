@@ -19,13 +19,13 @@ private
     !-----------------------------------------------------------------
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
-        character(len=:),            allocatable :: prefix                !< Name prefix of the XDMF file
-        character(len=4)                         :: ext = '.xmf'          !< XDMF file extension
-        type(mpi_env_t),                 pointer :: MPIEnvironment        !< MPI environment 
-        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Global grid info
-        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor !< Local grid info
-        type(xdmf_file_t)                        :: file                  !< XDMF file handler
-        logical                                  :: warn = .true.         !< Flag to show warnings on screen
+        character(len=:),            allocatable :: prefix                          !< Name prefix of the XDMF file
+        character(len=4)                         :: ext = '.xmf'                    !< XDMF file extension
+        type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
+        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
+        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
+        type(xdmf_file_t)                        :: file                            !< XDMF file handler
+        logical                                  :: warn = .true.                   !< Flag to show warnings on screen
     contains
     private
     !< @TODO: abstract procedures
@@ -73,7 +73,7 @@ contains
     !-----------------------------------------------------------------
     !< Close a XDMF file
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT)    :: this              !< XDMF handler
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             call this%file%closefile()
@@ -84,9 +84,9 @@ contains
     !-----------------------------------------------------------------
     !< Open a XDMF grid
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler
-        integer(I4P),          optional,            intent(IN)    :: GridID !< Grid ID number
-        type(xdmf_grid_t)                                         :: grid   !< XDMF Grid type
+        class(xdmf_handler_t),           intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
+        integer(I4P),          optional, intent(IN)    :: GridID      !< Grid ID number
+        type(xdmf_grid_t)                              :: grid        !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             call grid%open(xml_handler=this%file%xml_handler, &
@@ -98,9 +98,9 @@ contains
     !-----------------------------------------------------------------
     !< Close a XDMF grid
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler
-        integer(I4P),          optional,            intent(IN)    :: GridID !< Grid ID number
-        type(xdmf_grid_t)                                         :: grid   !< XDMF Grid type
+        class(xdmf_handler_t),           intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
+        integer(I4P),          optional, intent(IN)    :: GridID      !< Grid ID number
+        type(xdmf_grid_t)                              :: grid        !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             call grid%Close(xml_handler=this%file%xml_handler)

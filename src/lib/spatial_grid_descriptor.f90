@@ -22,7 +22,7 @@ private
         integer(I8P), allocatable                :: NumberOfElementsPerGrid(:)  !< Array of number of elements per grid
         integer(I4P), allocatable                :: TopologyTypePerGrid(:)      !< Array of topology type per grid
         integer(I4P), allocatable                :: GeometryTypePerGrid(:)      !< Array of geometry type per grid
-        type(mpi_env_t), pointer                 :: MPIEnvironment              !< MPI environment 
+        type(mpi_env_t), pointer                 :: MPIEnvironment => null()    !< MPI environment 
     contains
     private
         procedure         :: SetGlobalNumberOfNodes         => spatial_grid_descriptor_SetGlobalNumberOfNodes
