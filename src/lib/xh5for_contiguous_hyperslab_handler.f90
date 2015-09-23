@@ -13,15 +13,18 @@ private
         type(xdmf_contiguous_hyperslab_handler_t) :: LightData
         type(hdf5_contiguous_hyperslab_handler_t) :: HeavyData
     contains
-        procedure         :: WriteGeometry_R4P => xh5for_contiguous_hyperslab_handler_WriteGeometry_R4P
-        procedure         :: WriteGeometry_R8P => xh5for_contiguous_hyperslab_handler_WriteGeometry_R8P
-        procedure         :: WriteTopology_I4P => xh5for_contiguous_hyperslab_handler_WriteTopology_I4P
-        procedure         :: WriteTopology_I8P => xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
-        procedure, public :: Initialize        => xh5for_contiguous_hyperslab_handler_Initialize
-        procedure, public :: Free              => xh5for_contiguous_hyperslab_handler_Free
-        procedure, public :: Open              => xh5for_contiguous_hyperslab_handler_Open
-        procedure, public :: Close             => xh5for_contiguous_hyperslab_handler_Close
-!        procedure, public :: WriteAttribute => xh5for_contiguous_hyperslab_handler_WriteAttribute
+        procedure         :: WriteGeometry_R4P  => xh5for_contiguous_hyperslab_handler_WriteGeometry_R4P
+        procedure         :: WriteGeometry_R8P  => xh5for_contiguous_hyperslab_handler_WriteGeometry_R8P
+        procedure         :: WriteTopology_I4P  => xh5for_contiguous_hyperslab_handler_WriteTopology_I4P
+        procedure         :: WriteTopology_I8P  => xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
+        procedure         :: WriteAttribute_I4P => xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P
+        procedure         :: WriteAttribute_I8P => xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P
+        procedure         :: WriteAttribute_R4P => xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P
+        procedure         :: WriteAttribute_R8P => xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P
+        procedure, public :: Initialize         => xh5for_contiguous_hyperslab_handler_Initialize
+        procedure, public :: Free               => xh5for_contiguous_hyperslab_handler_Free
+        procedure, public :: Open               => xh5for_contiguous_hyperslab_handler_Open
+        procedure, public :: Close              => xh5for_contiguous_hyperslab_handler_Close
     end type xh5for_contiguous_hyperslab_handler_t
 
 public :: xh5for_contiguous_hyperslab_handler_t
@@ -102,7 +105,7 @@ contains
     !-----------------------------------------------------------------
     !< Write an R8P geometry for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XH5For contiguous hyperslab handler
         real(R8P),                                    intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
         call this%LightData%AddGeometry(Coordinates = Coordinates)
@@ -114,8 +117,8 @@ contains
     !-----------------------------------------------------------------
     !< Write an I4P Topology for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this            !< XH5For contiguous hyperslab handler
-        integer(R4P),                                 intent(IN)    :: Connectivities(:)  !< Grid connectivities
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(R4P),                                 intent(IN)    :: Connectivities(:) !< Grid connectivities
     !-----------------------------------------------------------------
         call this%LightData%AddTopology(Connectivities = Connectivities)
         call this%HeavyData%WriteTopology(Connectivities = Connectivities)
@@ -126,17 +129,64 @@ contains
     !-----------------------------------------------------------------
     !< Write an R8P geometry for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this            !< XH5For contiguous hyperslab handler
-        integer(I8P),                                 intent(IN)    :: Connectivities(:)  !< Grid connectivities
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(I8P),                                 intent(IN)    :: Connectivities(:) !< Grid connectivities
     !----------------------------------------------------------------- 
         call this%LightData%AddTopology(Connectivities = Connectivities)
         call this%HeavyData%WriteTopology(Connectivities = Connectivities)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
-    !----------------------------------------------------------------- 
 
-!        subroutine xh5for_handler_Attribute(this)
-!            class(xh5for_handler_t), intent(INOUT) :: this
-!        end subroutine xh5for_handler_Attribute
+
+    subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P(this, Name, Values)
+    !-----------------------------------------------------------------
+    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I4P),                                 intent(IN)    :: Values(:)  !< I4P Grid attribute
+    !----------------------------------------------------------------- 
+!        call this%LightData%AddAttribute(Values = Values)
+        call this%HeavyData%WriteAttribute(NAme = Name, Values = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P(this, Name, Values)
+    !-----------------------------------------------------------------
+    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I8P),                                 intent(IN)    :: Values(:)  !< I8P Grid attribute
+    !----------------------------------------------------------------- 
+!        call this%LightData%AddAttribute(Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P(this, Name, Values)
+    !-----------------------------------------------------------------
+    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        real(R4P),                                    intent(IN)    :: Values(:)  !< R4P Grid attribute
+    !----------------------------------------------------------------- 
+!        call this%LightData%AddAttribute(Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P(this, Name, Values)
+    !-----------------------------------------------------------------
+    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        real(R8P),                                    intent(IN)    :: Values(:)  !< R8P Grid attribute
+    !----------------------------------------------------------------- 
+!        call this%LightData%AddAttribute(Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P
 
 
 end module xh5for_contiguous_hyperslab_handler

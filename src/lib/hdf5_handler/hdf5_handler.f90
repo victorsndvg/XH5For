@@ -29,18 +29,26 @@ private
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
     contains
-        procedure(hdf5_handler_WriteGeometry_R4P), deferred :: WriteGeometry_R4P
-        procedure(hdf5_handler_WriteGeometry_R8P), deferred :: WriteGeometry_R8P
-        procedure(hdf5_handler_WriteTopology_I4P), deferred :: WriteTopology_I4P
-        procedure(hdf5_handler_WriteTopology_I8P), deferred :: WriteTopology_I8P
-        procedure                                           :: Initialize => hdf5_handler_Initialize
-        procedure                                           :: Free       => hdf5_handler_Free
-        procedure                                           :: OpenFile   => hdf5_handler_OpenFile
-        procedure                                           :: CloseFile  => hdf5_handler_CloseFile
-        generic,                                   public   :: WriteTopology  => WriteTopology_I4P, &
-                                                                                 WriteTopology_I8P
-        generic,                                   public   :: WriteGeometry  => WriteGeometry_R4P, &
-                                                                                 WriteGeometry_R8P
+        procedure(hdf5_handler_WriteGeometry_R4P),  deferred :: WriteGeometry_R4P
+        procedure(hdf5_handler_WriteGeometry_R8P),  deferred :: WriteGeometry_R8P
+        procedure(hdf5_handler_WriteTopology_I4P),  deferred :: WriteTopology_I4P
+        procedure(hdf5_handler_WriteTopology_I8P),  deferred :: WriteTopology_I8P
+        procedure(hdf5_handler_WriteAttribute_I4P), deferred :: WriteAttribute_I4P
+        procedure(hdf5_handler_WriteAttribute_I8P), deferred :: WriteAttribute_I8P
+        procedure(hdf5_handler_WriteAttribute_R4P), deferred :: WriteAttribute_R4P
+        procedure(hdf5_handler_WriteAttribute_R8P), deferred :: WriteAttribute_R8P
+        procedure                                            :: Initialize => hdf5_handler_Initialize
+        procedure                                            :: Free       => hdf5_handler_Free
+        procedure                                            :: OpenFile   => hdf5_handler_OpenFile
+        procedure                                            :: CloseFile  => hdf5_handler_CloseFile
+        generic,                                    public   :: WriteTopology  => WriteTopology_I4P, &
+                                                                                  WriteTopology_I8P
+        generic,                                    public   :: WriteGeometry  => WriteGeometry_R4P, &
+                                                                                  WriteGeometry_R8P
+        generic,                                    public   :: WriteAttribute => WriteAttribute_I4P, &
+                                                                                  WriteAttribute_I8P, &
+                                                                                  WriteAttribute_R4P, &
+                                                                                  WriteAttribute_R8P
     end type hdf5_handler_t
 
     abstract interface
@@ -77,6 +85,46 @@ private
             class(hdf5_handler_t), intent(IN) :: this
             integer(I8P),          intent(IN) :: Connectivities(:)
         end subroutine hdf5_handler_WriteTopology_I8P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteAttribute_I4P(this, Name, Values)
+            import hdf5_handler_t
+            import I4P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: values(:)
+        end subroutine hdf5_handler_WriteAttribute_I4P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteAttribute_I8P(this, Name, Values)
+            import hdf5_handler_t
+            import I8P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            integer(I8P),          intent(IN) :: values(:)
+        end subroutine hdf5_handler_WriteAttribute_I8P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteAttribute_R4P(this, Name, Values)
+            import hdf5_handler_t
+            import R4P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            real(R4P),             intent(IN) :: values(:)
+        end subroutine hdf5_handler_WriteAttribute_R4P
+    end interface
+
+    abstract interface
+        subroutine hdf5_handler_WriteAttribute_R8P(this, Name, Values)
+            import hdf5_handler_t
+            import R8P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            real(R8P),             intent(IN) :: values(:)
+        end subroutine hdf5_handler_WriteAttribute_R8P
     end interface
 
 public :: hdf5_handler_t

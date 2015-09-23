@@ -18,15 +18,22 @@ private
         procedure(xh5for_handler_WriteGeometry_R8P),       deferred :: WriteGeometry_R8P
         procedure(xh5for_handler_WriteTopology_I4P),       deferred :: WriteTopology_I4P
         procedure(xh5for_handler_WriteTopology_I8P),       deferred :: WriteTopology_I8P
+        procedure(xh5for_handler_WriteAttribute_I4P),      deferred :: WriteAttribute_I4P
+        procedure(xh5for_handler_WriteAttribute_I8P),      deferred :: WriteAttribute_I8P
+        procedure(xh5for_handler_WriteAttribute_R4P),      deferred :: WriteAttribute_R4P
+        procedure(xh5for_handler_WriteAttribute_R8P),      deferred :: WriteAttribute_R8P
         procedure(xh5for_handler_Initialize),      public, deferred :: Initialize
         procedure(xh5for_handler_Free),            public, deferred :: Free
         procedure(xh5for_handler_Open),            public, deferred :: Open
         procedure(xh5for_handler_Close),           public, deferred :: Close
-        generic,                                   public           :: WriteTopology => WriteTopology_I4P, &
-                                                                                        WriteTopology_I8P
-        generic,                                   public           :: WriteGeometry => WriteGeometry_R4P, &
-                                                                                        WriteGeometry_R8P
-!        procedure(xh5for_handler_WriteAttribute), public, deferred :: WriteAttribute
+        generic,                                   public           :: WriteTopology  => WriteTopology_I4P, &
+                                                                                         WriteTopology_I8P
+        generic,                                   public           :: WriteGeometry  => WriteGeometry_R4P, &
+                                                                                         WriteGeometry_R8P
+        generic,                                   public           :: WriteAttribute => WriteAttribute_I4P, &
+                                                                                         WriteAttribute_I8P, &
+                                                                                         WriteAttribute_R4P, &
+                                                                                         WriteAttribute_R8P
 
     end type xh5for_handler_t
 
@@ -103,10 +110,43 @@ private
     end interface
 
     abstract interface
-        subroutine xh5for_handler_Attribute(this)
+        subroutine xh5for_handler_WriteAttribute_I4P(this, Name, Values)
             import xh5for_handler_t
+            import I4P
             class(xh5for_handler_t), intent(INOUT) :: this
-        end subroutine xh5for_handler_Attribute
+            character(len=*),        intent(IN)    :: Name
+            integer(I4P),            intent(IN)    :: Values(:)
+        end subroutine xh5for_handler_WriteAttribute_I4P
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_WriteAttribute_I8P(this, Name, Values)
+            import xh5for_handler_t
+            import I8P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            character(len=*),        intent(IN)    :: Name
+            integer(I8P),            intent(IN)    :: Values(:)
+        end subroutine xh5for_handler_WriteAttribute_I8P
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_WriteAttribute_R4P(this, Name, Values)
+            import xh5for_handler_t
+            import R4P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            character(len=*),        intent(IN)    :: Name
+            real(R4P),               intent(IN)    :: Values(:)
+        end subroutine xh5for_handler_WriteAttribute_R4P
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_WriteAttribute_R8P(this, Name, Values)
+            import xh5for_handler_t
+            import R8P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            character(len=*),        intent(IN)    :: Name
+            real(R8P),               intent(IN)    :: Values(:)
+        end subroutine xh5for_handler_WriteAttribute_R8P
     end interface
 
 public :: xh5for_handler_t

@@ -28,6 +28,10 @@ implicit none
         procedure         :: xh5for_WriteGeometry_R8P
         procedure         :: xh5for_WriteTopology_I4P
         procedure         :: xh5for_WriteTopology_I8P
+        procedure         :: xh5for_WriteAttribute_I4P
+        procedure         :: xh5for_WriteAttribute_I8P
+        procedure         :: xh5for_WriteAttribute_R4P
+        procedure         :: xh5for_WriteAttribute_R8P
         procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_I4P, &
@@ -39,6 +43,11 @@ implicit none
                                                       xh5for_WriteTopology_I8P
         generic,   public :: WriteGeometry         => xh5for_WriteGeometry_R4P, &
                                                       xh5for_WriteGeometry_R8P
+        generic,   public :: WriteAttribute        => xh5for_WriteAttribute_I4P, &
+                                                      xh5for_WriteAttribute_I8P, &
+                                                      xh5for_WriteAttribute_R4P, &
+                                                      xh5for_WriteAttribute_R8P
+
     end type xh5for_t
 
 contains
@@ -85,18 +94,18 @@ contains
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
-        class(xh5for_t),   intent(INOUT)  :: this
-        integer(I4P),      intent(IN)     :: NumberOfNodes    !< Number of nodes of the current grid (I4P)
-        integer(I4P),      intent(IN)     :: NumberOfElements !< Number of elements of the current grid (I4P)
-        integer(I4P),      intent(IN)     :: TopologyType     !< Topology type of the current grid
-        integer(I4P),      intent(IN)     :: GeometryType     !< Geometry type of the current grid
-        integer, optional, intent(IN)     :: comm
-        integer, optional, intent(IN)     :: root
-        integer                           :: error
-        integer                           :: r_root = 0
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+        integer(I4P),      intent(IN)     :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
+        integer(I4P),      intent(IN)     :: NumberOfElements         !< Number of elements of the current grid (I4P)
+        integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
+        integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
+        integer, optional, intent(IN)     :: comm                     !< MPI communicator
+        integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        integer                           :: error                    !< Error variable
+        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
         if(present(root)) r_root = root
-! FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        call this%Free()
         select case(this%Strategy)
 
             case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
@@ -139,18 +148,18 @@ contains
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
-        class(xh5for_t),   intent(INOUT)  :: this
-        integer(I8P),      intent(IN)     :: NumberOfNodes    !< Number of nodes of the current grid (I8P)
-        integer(I8P),      intent(IN)     :: NumberOfElements !< Number of elements of the current grid (I8P)
-        integer(I4P),      intent(IN)     :: TopologyType     !< Topology type of the current grid
-        integer(I4P),      intent(IN)     :: GeometryType     !< Geometry type of the current grid
-        integer, optional, intent(IN)     :: comm
-        integer, optional, intent(IN)     :: root
-        integer                           :: error
-        integer                           :: r_root = 0
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+        integer(I8P),      intent(IN)     :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
+        integer(I8P),      intent(IN)     :: NumberOfElements         !< Number of elements of the current grid (I4P)
+        integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
+        integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
+        integer, optional, intent(IN)     :: comm                     !< MPI communicator
+        integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        integer                           :: error                    !< Error variable
+        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
         if(present(root)) r_root = root
-! FREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        call this%Free()
         select case(this%Strategy)
 
             case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
@@ -191,8 +200,8 @@ contains
     !-----------------------------------------------------------------
     !< Open a XDMF and HDF5 files
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XDMF handler
-        character(len=*),      intent(IN)    :: fileprefix            !< XDMF filename
+        class(xh5for_t),  intent(INOUT) :: this                       !< XH5For derived type
+        character(len=*), intent(IN)    :: fileprefix                 !< XDMF filename prefix
     !-----------------------------------------------------------------
         call this%Handler%Open(fileprefix)
     end subroutine xh5for_Open
@@ -202,7 +211,7 @@ contains
     !-----------------------------------------------------------------
     !< Open a XDMF and HDF5 files
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XDMF handler
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
         call this%Handler%Close()
     end subroutine xh5for_Close
@@ -210,40 +219,92 @@ contains
 
     subroutine xh5for_WriteGeometry_R4P(this, Coordinates)
     !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
+    !< Write R4P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        real(R4P),       intent(IN)    :: Coordinates(:)
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        real(R4P),       intent(IN)    :: Coordinates(:)              !< R4P grid geometry coordinates
+    !-----------------------------------------------------------------
         call this%Handler%WriteGeometry(Coordinates = Coordinates)
     end subroutine xh5for_WriteGeometry_R4P
 
     subroutine xh5for_WriteGeometry_R8P(this, Coordinates)
     !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
+    !< Write R8P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        real(R8P),       intent(IN)    :: Coordinates(:)
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type                        
+        real(R8P),       intent(IN)    :: Coordinates(:)              !< R8P grid geometry coordinates
+    !-----------------------------------------------------------------
         call this%Handler%WriteGeometry(Coordinates = Coordinates)
     end subroutine xh5for_WriteGeometry_R8P
 
 
     subroutine xh5for_WriteTopology_I4P(this, Connectivities)
     !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
+    !< Write I4P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        integer(R4P),    intent(IN)    :: Connectivities(:)
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        integer(I4P),    intent(IN)    :: Connectivities(:)           !< I4P grid topology connectivities
+    !-----------------------------------------------------------------
         call this%Handler%WriteTopology(Connectivities = Connectivities)
     end subroutine xh5for_WriteTopology_I4P
 
 
     subroutine xh5for_WriteTopology_I8P(this, Connectivities)
     !----------------------------------------------------------------- 
-    !< Set the strategy of data handling
+    !< Write I8P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this
-        integer(I8P),    intent(IN)    :: Connectivities(:)
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        integer(I8P),    intent(IN)    :: Connectivities(:)           !< I8P grid topology connectivities
+    !-----------------------------------------------------------------
         call this%Handler%WriteTopology(Connectivities = Connectivities)
     end subroutine xh5for_WriteTopology_I8P
+
+
+    subroutine xh5for_WriteAttribute_I4P(this, Name, Values)
+    !----------------------------------------------------------------- 
+    !< Write I4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_WriteAttribute_I4P
+
+
+    subroutine xh5for_WriteAttribute_I8P(this, Name, Values)
+    !----------------------------------------------------------------- 
+    !< Write I4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_WriteAttribute_I8P
+
+
+    subroutine xh5for_WriteAttribute_R4P(this, Name, Values)
+    !----------------------------------------------------------------- 
+    !< Write I4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        character(len=*),intent(IN)    :: Name                        !< Attribute name
+        real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_WriteAttribute_R4P
+
+
+    subroutine xh5for_WriteAttribute_R8P(this, Name, Values)
+    !----------------------------------------------------------------- 
+    !< Write I4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+        character(len=*),intent(IN)    :: Name                        !< Attribute name
+        real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+    end subroutine xh5for_WriteAttribute_R8P
 
 end module xh5for
