@@ -36,10 +36,11 @@ implicit none
 
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(fileprefix='hyperslab')
+    call xh5%Open(fileprefix='contiguous_hyperslab_tetrahedron')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(Coordinates = geometry + rank)
     call xh5%Close()
+    call xh5%Free()
 
 #ifdef ENABLE_MPI
     call MPI_FINALIZE(mpierr)

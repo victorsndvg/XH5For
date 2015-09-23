@@ -34,6 +34,7 @@ private
         procedure(hdf5_handler_WriteTopology_I4P), deferred :: WriteTopology_I4P
         procedure(hdf5_handler_WriteTopology_I8P), deferred :: WriteTopology_I8P
         procedure                                           :: Initialize => hdf5_handler_Initialize
+        procedure                                           :: Free       => hdf5_handler_Free
         procedure                                           :: OpenFile   => hdf5_handler_OpenFile
         procedure                                           :: CloseFile  => hdf5_handler_CloseFile
         generic,                                   public   :: WriteTopology  => WriteTopology_I4P, &
@@ -101,6 +102,18 @@ contains
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
     end subroutine hdf5_handler_Initialize
+
+
+    subroutine hdf5_handler_Free(this)
+    !-----------------------------------------------------------------
+    !< HDF5 handler free
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t),  intent(INOUT) :: this                 !< HDF5 handler type
+    !----------------------------------------------------------------- 
+        nullify(this%MPIEnvironment)
+        nullify(this%UniformGridDescriptor)
+        nullify(this%SpatialGridDescriptor)
+    end subroutine hdf5_handler_Free
 
 
     subroutine hdf5_handler_OpenFile(this, fileprefix)

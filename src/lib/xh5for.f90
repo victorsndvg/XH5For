@@ -32,6 +32,7 @@ implicit none
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_I4P, &
                                                       xh5for_Initialize_I8P
+        procedure, public :: Free                  => xh5for_Free
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
@@ -67,6 +68,18 @@ contains
         if(this%is_valid_Strategy(Strategy)) this%Strategy = Strategy
     end subroutine xh5for_SetStrategy
 
+    subroutine xh5for_Free(this)
+    !----------------------------------------------------------------- 
+    !< Free XH5For derived type
+    !----------------------------------------------------------------- 
+        class(xh5for_t),   intent(INOUT)  :: this
+    !----------------------------------------------------------------- 
+        if(allocated(this%Handler)) call this%Handler%Free()
+        this%Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
+        call this%MPIEnvironment%Free()
+        call this%UniformGridDescriptor%Free()
+        call this%SpatialGridDescriptor%Free()
+    end subroutine xh5for_Free
 
     subroutine xh5for_Initialize_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 

@@ -29,7 +29,8 @@ private
     contains
     private
     !< @TODO: abstract procedures
-        procedure, public :: initialize     => xdmf_handler_initialize
+        procedure, public :: Initialize     => xdmf_handler_Initialize
+        procedure, public :: Free           => xdmf_handler_Free
         procedure, public :: OpenFile       => xdmf_handler_OpenFile
         procedure, public :: CloseFile      => xdmf_handler_CloseFile
         procedure, public :: OpenGrid       => xdmf_handler_OpenGrid
@@ -40,7 +41,7 @@ public :: xdmf_handler_t
 
 contains
 
-    subroutine xdmf_handler_initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
+    subroutine xdmf_handler_Initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
     !-----------------------------------------------------------------
     !< XDMF file handler initialization procedure
     !----------------------------------------------------------------- 
@@ -49,11 +50,24 @@ contains
         type(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
         type(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
+        call this%Free()
         this%MPIEnvironment        => MPIEnvironment
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
-    end subroutine xdmf_handler_initialize
+    end subroutine xdmf_handler_Initialize
 
+    subroutine xdmf_handler_Free(this)
+    !-----------------------------------------------------------------
+    !< Free XDMF file handler
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),                   intent(INOUT) :: this               !< XMDF handler
+    !----------------------------------------------------------------- 
+        if(allocated(this%prefix)) deallocate(this%prefix)
+        !call this%file%Free()
+        nullify(this%MPIEnvironment)
+        nullify(this%SpatialGridDescriptor)
+        nullify(this%UniformGridDescriptor)
+    end subroutine xdmf_handler_Free
 
     subroutine xdmf_handler_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------

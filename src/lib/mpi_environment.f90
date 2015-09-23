@@ -29,6 +29,7 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
         procedure         :: mpi_allgather_single_int_value_I4P
         procedure         :: mpi_allgather_single_int_value_I8P
         procedure, public :: Initialize                   => mpi_Initialize
+        procedure, public :: Free                         => mpi_Free
         procedure, public :: get_comm                     => mpi_get_comm
         procedure, public :: get_root                     => mpi_get_root
         procedure, public :: get_rank                     => mpi_get_rank
@@ -85,6 +86,16 @@ contains
         if(present(mpierror)) mpierror = mpierr
 #endif
     end subroutine mpi_initialize
+
+    subroutine mpi_Free(this)
+    !-----------------------------------------------------------------
+    !< Free MPI derived type
+    !----------------------------------------------------------------- 
+        class(mpi_env_t), intent(INOUT) :: this                     !< MPI environment
+    !----------------------------------------------------------------- 
+        ! No allocatable variables. Default initialization
+        call this%Initialize()
+    end subroutine mpi_Free
 
     function mpi_get_comm(this)
     !-----------------------------------------------------------------

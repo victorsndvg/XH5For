@@ -19,6 +19,7 @@ private
         procedure(xh5for_handler_WriteTopology_I4P),       deferred :: WriteTopology_I4P
         procedure(xh5for_handler_WriteTopology_I8P),       deferred :: WriteTopology_I8P
         procedure(xh5for_handler_Initialize),      public, deferred :: Initialize
+        procedure(xh5for_handler_Free),            public, deferred :: Free
         procedure(xh5for_handler_Open),            public, deferred :: Open
         procedure(xh5for_handler_Close),           public, deferred :: Close
         generic,                                   public           :: WriteTopology => WriteTopology_I4P, &
@@ -41,6 +42,13 @@ private
             type(uniform_grid_descriptor_t), intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
             type(spatial_grid_descriptor_t), intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
         end subroutine xh5for_handler_Initialize
+    end interface
+
+    abstract interface
+        subroutine xh5for_handler_Free(this)
+            import xh5for_handler_t
+            class(xh5for_handler_t), intent(INOUT) :: this
+        end subroutine xh5for_handler_Free
     end interface
 
     abstract interface

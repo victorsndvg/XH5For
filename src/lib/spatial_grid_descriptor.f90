@@ -16,8 +16,8 @@ private
     !< XDMF contiguous HyperSlab handler implementation
     !----------------------------------------------------------------- 
     private
-        integer(I8P)                             :: GlobalNumberOfNodes         !< Total number of nodes of the spatial grid
-        integer(I8P)                             :: GlobalNumberOfElements      !< Total number of elements of the spatial grid
+        integer(I8P)                             :: GlobalNumberOfNodes = 0     !< Total number of nodes of the spatial grid
+        integer(I8P)                             :: GlobalNumberOfElements = 0  !< Total number of elements of the spatial grid
         integer(I8P), allocatable                :: NumberOfNodesPerGrid(:)     !< Array of number of nodes per grid
         integer(I8P), allocatable                :: NumberOfElementsPerGrid(:)  !< Array of number of elements per grid
         integer(I4P), allocatable                :: TopologyTypePerGrid(:)      !< Array of topology type per grid
@@ -35,7 +35,8 @@ private
         procedure, public :: GetGeometryTypeFromGridID      => spatial_grid_descriptor_GetGeometryTypeFromGridID
         procedure, public :: GetNodeOffsetFromGridID        => spatial_grid_descriptor_GetNodeOffsetFromGridID
         procedure, public :: GetElementOffsetFromGridID     => spatial_grid_descriptor_GetElementOffsetFromGridID
-        procedure, public :: initialize                     => spatial_grid_descriptor_initialize
+        procedure, public :: Initialize                     => spatial_grid_descriptor_Initialize
+        procedure, public :: Free                           => spatial_grid_descriptor_Free
     end type spatial_grid_descriptor_t
 
 public :: spatial_grid_descriptor_t
@@ -177,5 +178,23 @@ contains
         call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
     end subroutine spatial_grid_descriptor_initialize
+
+    subroutine spatial_grid_descriptor_Free(this)
+    !-----------------------------------------------------------------
+    !< Free the spatial grid descriptor type
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this       !< Spatial grid descriptor type
+    !----------------------------------------------------------------- 
+
+        This%GlobalNumberOfNodes = 0
+        This%GlobalNumberOfElements = 0
+        if(allocated(this%NumberOfNodesPerGrid))    deallocate(this%NumberOfNodesPerGrid)
+        if(allocated(this%NumberOfElementsPerGrid)) deallocate(this%NumberOfElementsPerGrid)
+        if(allocated(this%TopologyTypePerGrid))     deallocate(this%TopologyTypePerGrid)
+        if(allocated(this%GeometryTypePerGrid))     deallocate(this%GeometryTypePerGrid)
+        nullify(this%MPIEnvironment)
+
+    end subroutine spatial_grid_descriptor_Free
+
 
 end module spatial_grid_descriptor

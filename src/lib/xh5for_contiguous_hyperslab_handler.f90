@@ -18,6 +18,7 @@ private
         procedure         :: WriteTopology_I4P => xh5for_contiguous_hyperslab_handler_WriteTopology_I4P
         procedure         :: WriteTopology_I8P => xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
         procedure, public :: Initialize        => xh5for_contiguous_hyperslab_handler_Initialize
+        procedure, public :: Free              => xh5for_contiguous_hyperslab_handler_Free
         procedure, public :: Open              => xh5for_contiguous_hyperslab_handler_Open
         procedure, public :: Close             => xh5for_contiguous_hyperslab_handler_Close
 !        procedure, public :: WriteAttribute => xh5for_contiguous_hyperslab_handler_WriteAttribute
@@ -36,6 +37,7 @@ contains
         type(spatial_grid_descriptor_t),              intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
         type(uniform_grid_descriptor_t),              intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
     !-----------------------------------------------------------------
+        call this%Free()
         ! Light data initialization
         call this%LightData%Initialize(                        &
                 MPIEnvironment        = MPIEnvironment,        &
@@ -48,6 +50,16 @@ contains
                 SpatialGridDescriptor = SpatialGridDescriptor)
     end subroutine xh5for_contiguous_hyperslab_handler_Initialize
 
+
+    subroutine xh5for_contiguous_hyperslab_handler_Free(this)
+    !-----------------------------------------------------------------
+    !< XH5FOR Free procedure
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XH5For contiguous hyperslab handler
+    !----------------------------------------------------------------- 
+        call this%LightData%Free()
+        call this%HeavyData%Free()
+    end subroutine xh5for_contiguous_hyperslab_handler_Free
 
     subroutine xh5for_contiguous_hyperslab_handler_Open(this, fileprefix)
     !-----------------------------------------------------------------

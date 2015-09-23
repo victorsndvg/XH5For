@@ -22,6 +22,7 @@ private
         procedure         :: is_valid_TopologyType => uniform_grid_descriptor_is_valid_TopologyType
         procedure         :: is_valid_GeometryType => uniform_grid_descriptor_is_valid_GeometryType
         procedure, public :: Initialize            => uniform_grid_descriptor_Initialize
+        procedure, public :: Free                  => uniform_grid_descriptor_Free
         procedure, public :: SetNumberOfNodes      => uniform_grid_descriptor_SetNumberOfNodes
         procedure, public :: SetNumberOfElements   => uniform_grid_descriptor_SetNumberOfElements
         procedure, public :: SetTopologyType       => uniform_grid_descriptor_SetTopologyType
@@ -216,6 +217,21 @@ contains
         call this%SetTopologyType(TopologyType=TopologyType)
         call this%SetGeometryType(GeometryType=GeometryType)
     end subroutine uniform_grid_descriptor_initialize
+
+
+    subroutine uniform_grid_descriptor_Free(this)
+    !-----------------------------------------------------------------
+    !< Free Uniform grid descriptor 
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+    !----------------------------------------------------------------- 
+        ! No allocatable variables. Default initialization
+        this%GridType           = XDMF_GRID_TYPE_UNSTRUCTURED
+        this%GeometryType       = XDMF_GEOMETRY_TYPE_XYZ
+        this%TopologyType       = XDMF_NO_VALUE
+        this%NumberOfNodes      = XDMF_NO_VALUE
+        this%NumberOfElements   = XDMF_NO_VALUE
+    end subroutine uniform_grid_descriptor_Free
 
 
 end module uniform_grid_descriptor
