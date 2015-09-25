@@ -20,6 +20,7 @@ implicit none
                                                        1.0, 1.0/)
     integer(I4P), dimension(6) :: triangletopology = (/0, 1, 2, &
                                                        1, 2, 3/)
+    integer(I4P), dimension(2) :: cellfield = (/0, 1/)
     integer                    :: rank = 0
     integer                    :: mpierr
 
@@ -38,6 +39,8 @@ implicit none
     call xh5%Open(fileprefix='contiguous_hyperslab_triangles')
     call xh5%WriteTopology(Connectivities = triangletopology)
     call xh5%WriteGeometry(Coordinates = trianglegeometry + rank)
+    call xh5%WriteAttribute(Name='GridNumber', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_GRID , Values=(/int(rank,I4P)/))
+    call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield+rank)
     call xh5%Close()
     call xh5%Free()
 

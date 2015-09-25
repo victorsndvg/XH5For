@@ -21,6 +21,11 @@ implicit none
                                                1.0, 1.0, 1.0/)
     integer(I4P), dimension(8) :: topology = (/0, 1, 2, 3,&
                                                1, 2, 3, 4/)
+    real(R4P),    dimension(15) :: vectorvelocity = (/0,0,0, &
+                                                     1,0,0, &
+                                                     2,0,0, &
+                                                     3,0,0, &
+                                                     4,0,0/)
     integer                    :: rank = 0
     integer                    :: mpierr
 
@@ -39,6 +44,7 @@ implicit none
     call xh5%Open(fileprefix='contiguous_hyperslab_tetrahedron')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(Coordinates = geometry + rank)
+    call xh5%WriteAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=vectorvelocity+rank)
     call xh5%Close()
     call xh5%Free()
 

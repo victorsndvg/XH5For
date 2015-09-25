@@ -148,7 +148,7 @@ contains
         integer(I4P),                                 intent(IN)    :: Values(:)  !< I4P Grid attribute
     !----------------------------------------------------------------- 
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
-        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P
 
 
@@ -163,7 +163,7 @@ contains
         integer(I8P),                                 intent(IN)    :: Values(:)  !< I8P Grid attribute
     !----------------------------------------------------------------- 
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
-        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P
 
 
@@ -178,7 +178,7 @@ contains
         real(R4P),                                    intent(IN)    :: Values(:)  !< R4P Grid attribute
     !----------------------------------------------------------------- 
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
-        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P
 
 
@@ -193,7 +193,7 @@ contains
         real(R8P),                                    intent(IN)    :: Values(:)  !< R8P Grid attribute
     !----------------------------------------------------------------- 
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
-        call this%HeavyData%WriteAttribute(Name = Name, Values = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P
 
 

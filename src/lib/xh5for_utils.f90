@@ -247,4 +247,37 @@ contains
     end function GetXDMFAttributeTypeName
 
 
+    function GetNumberOfComponentsFromAttributeType(AttributeType) result(NumberOfComponents)
+        integer(I4P), intent(IN) :: attributeType
+        integer(I4P)             :: NumberOfComponents
+
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_SCALAR   = 200
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_VECTOR   = 201
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_TENSOR   = 202
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_MATRIX   = 203
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_TENSOR6  = 204
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_GLOBALID = 205
+    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_NOTYPE   = 206
+
+        select case(AttributeType)
+            case(XDMF_ATTRIBUTE_TYPE_SCALAR)
+                NumberOfComponents = 1; return
+            case(XDMF_ATTRIBUTE_TYPE_VECTOR)
+                NumberOfComponents = 3; return
+            case(XDMF_ATTRIBUTE_TYPE_TENSOR)
+                NumberOfComponents = 9; return
+!            case(XDMF_ATTRIBUTE_TYPE_MATRIX)
+!                NumberOfComponents = 1; return
+            case(XDMF_ATTRIBUTE_TYPE_TENSOR6)
+                NumberOfComponents = 6; return
+!            case(XDMF_ATTRIBUTE_TYPE_GLOBALID)
+!                NumberOfComponents = 1; return
+!            case(XDMF_ATTRIBUTE_TYPE_NOTYPE)
+!                NumberOfComponents = 1; return
+            case DEFAULT
+                NumberOfComponents = 1; return
+        end select
+    end function GetNumberOfComponentsFromAttributeType
+
+
 end module xh5for_utils

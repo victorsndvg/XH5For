@@ -15,11 +15,11 @@ private
 
     type :: xdmf_metainfo_t
         character(len=:), allocatable :: XPath
-        integer(I4P)                  :: Type
-        integer(I4P)                  :: Center
+        integer(I4P)                  :: Type       = XDMF_NO_VALUE
+        integer(I4P)                  :: Center     = XDMF_NO_VALUE
         character(len=:), allocatable :: DataType
-        integer(I4P)                  :: Precision
-        integer(I4P)                  :: Dimension
+        integer(I4P)                  :: Precision  = XDMF_NO_VALUE
+        integer(I4P)                  :: Dimension  = XDMF_NO_VALUE
     end type xdmf_metainfo_t
 
     type, extends(xdmf_handler_t) :: xdmf_contiguous_hyperslab_handler_t
@@ -31,6 +31,7 @@ private
         type(xdmf_metainfo_t),  allocatable :: attributes_info(:)              !< XDMF contiguous hyperslab attributes info 
     contains
     private
+        procedure         :: CalculateHyperSlabDimensions => xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
         procedure         :: SetGeometryInfo          => xdmf_contiguous_hyperslab_handler_SetGeometryInfo
         procedure         :: SetTopologyInfo          => xdmf_contiguous_hyperslab_handler_SetTopologyInfo
         procedure         :: SetLastAttributeInfo     => xdmf_contiguous_hyperslab_handler_SetLastAttributeInfo
@@ -63,6 +64,29 @@ private
 public :: xdmf_contiguous_hyperslab_handler_t
 
 contains
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_Free(this)
+    !-----------------------------------------------------------------
+    !< Free XDMF file handler
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XMDF handler
+        integer(I4P)                                              :: indx
+    !----------------------------------------------------------------- 
+        if(allocated(this%prefix)) deallocate(this%prefix)
+        !call this%file%Free()
+        if(allocated(this%attributes_info)) then
+            do indx = 1, this%NumberOfAttributes
+                if(allocated(this%attributes_info(indx)%XPath)) deallocate(this%attributes_info(indx)%XPath)
+                if(allocated(this%attributes_info(indx)%DataType)) deallocate(this%attributes_info(indx)%DataType)
+            enddo
+            deallocate(this%attributes_info)
+        endif
+        nullify(this%MPIEnvironment)
+        nullify(this%SpatialGridDescriptor)
+        nullify(this%UniformGridDescriptor)
+    end subroutine xdmf_contiguous_hyperslab_handler_Free
+
 
     subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo(this, XPath, Precision, Dimension)
     !-----------------------------------------------------------------
@@ -107,6 +131,7 @@ contains
         integer(I4P),                               intent(IN)    :: Dimension !< Dimensions of the attribute array in the HDF5 file
     !-----------------------------------------------------------------
         this%attributes_info(this%NumberOfAttributes)%XPath      = XPath
+        this%attributes_info(this%NumberOfAttributes)%Type       = Type
         this%attributes_info(this%NumberOfAttributes)%DataType   = DataType
         this%attributes_info(this%NumberOfAttributes)%Center     = Center
         this%attributes_info(this%NumberOfAttributes)%Precision  = Precision
@@ -240,6 +265,39 @@ contains
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
 
 
+    subroutine xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions(this, GridID, Center, GlobalNumberOfData, LocalNumberOfData, DataOffset)
+    !-----------------------------------------------------------------
+    !< Calculate hyperslab dimensions for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< xmdf contiguous hyperslab handler
+        integer(I4P),                               intent(IN)  :: GridID              !< Grid ID
+        integer(I4P),                               intent(IN)  :: Center              !< Attribute center at (Node, Cell, etc.)
+        integer(I8P),                               intent(OUT) :: GlobalNumberOfData  !< Global number of data
+        integer(I8P),                               intent(OUT) :: LocalNumberOfData   !< Local number of data
+        integer(I8P),                               intent(OUT) :: DataOffset          !< Data offset for current grid
+    !----------------------------------------------------------------- 
+    !< @TODO: face and edge centered attributes
+        select case(Center)
+            case (XDMF_ATTRIBUTE_CENTER_NODE)
+                GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+            case (XDMF_ATTRIBUTE_CENTER_CELL)
+                GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)
+            case (XDMF_ATTRIBUTE_CENTER_GRID)
+                GlobalNumberOfData = this%MPIEnvironment%get_comm_size()
+                LocalNumberOfData  = 1_I8P
+                DataOffset         = GridID
+            case Default
+                GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+        end select
+    end subroutine xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
+
+
     subroutine xdmf_contiguous_hyperslab_handler_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file for the contiguous HyperSlab strategy
@@ -361,7 +419,7 @@ contains
         type(xdmf_dataitem_t)                          :: dataitem              !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata              !< XDMF Character Data type
         integer(I8P)                                   :: LocalNumberOfNodes    !< Local number of nodes
-        integer(I8P)                                   :: GlobalNumberOfNodes   !< Local number of elements
+        integer(I8P)                                   :: GlobalNumberOfNodes   !< Global number of nodes
         integer(I4P)                                   :: SpaceDimension        !< Space dimension
         integer(I8P)                                   :: Start                 !< Hyperslab start
         integer(I8P)                                   :: Count                 !< Hyperslab count
@@ -412,6 +470,7 @@ contains
     !< Writes a XDMF Attribute into a opened file for the contiguous HyperSlab strategy
     !< @NOTE: only nodal attributes
     !< @TODO: add cell, face and grid centered attributes
+    !< @NOTE: Not Working!
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                   !< XDMF contiguous hyperslab handler
         character(len=*),                           intent(IN)    :: Name                   !< Attribute name
@@ -475,23 +534,32 @@ contains
         type(xdmf_attribute_t)                                    :: attribute              !< XDMF Attribute type
         type(xdmf_dataitem_t)                                     :: dataitem               !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata               !< XDMF Character Data type
-        integer(I8P)                                              :: LocalNumberOfNodes     !< Local number of nodes
-        integer(I8P)                                              :: Start                 !< Hyperslab start
-        integer(I8P)                                              :: Count                 !< Hyperslab count
+        integer(I8P)                                              :: LocalNumberOfData      !< Local number of data
+        integer(I8P)                                              :: GlobalNumberOfData     !< Global number of nodes
+        integer(I8P)                                              :: DataOffset             !< DataOffset
+        integer(I4P)                                              :: NumberOfComponents     !< Number of components given attribute type
         character(len=:), allocatable                             :: XDMFAttributeTypeName  !< String Attibute type identifier
         character(len=:), allocatable                             :: XDMFCenterTypeName     !< String Attribute Center identifier
         integer(I4P)                                              :: indx           
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
-            else
-                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
-                Start = 0
-            endif
-            Count = localNumberOfNodes
             do indx = 1, this%NumberOfAttributes
+                if(present(GridID)) then
+                    call this%CalculateHyperSlabDimensions(         &
+                        GridID = GridID,                            &
+                        Center = this%attributes_info(indx)%Center, &
+                        GlobalNumberOfData = GlobalNumberOfData,    &
+                        LocalNumberOfData = LocalNumberOfData,      &
+                        DataOffset = DataOffset)
+                else
+                    call this%CalculateHyperSlabDimensions(         &
+                        GridID = this%MPIEnvironment%get_rank(),    &
+                        Center = this%attributes_info(indx)%Center, &
+                        GlobalNumberOfData = GlobalNumberOfData,    &
+                        LocalNumberOfData = LocalNumberOfData,      &
+                        DataOffset = DataOffset)
+                endif
+                NumberOfComponents = GetNumberOfComponentsFromAttributeType(this%attributes_info(indx)%Type)
                 XDMFAttributeTypeName = GetXDMFAttributeTypeName(this%attributes_info(indx)%Type)
                 XDMFCenterTypeName = GetXDMFCenterTypeName(this%attributes_info(indx)%Center)
                 call attribute%open(xml_handler = this%file%xml_handler, &
@@ -499,21 +567,21 @@ contains
                         AttributeType = XDMFAttributeTypeName,           &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = this%file%xml_handler,                           &
-                        Dimensions = (/int(localNumberOfNodes,I8P)/), &
+                        Dimensions = (/int(LocalNumberOfData*int(NumberOfComponents,I8P),I8P)/),  &
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler,             &
+                call dataitem%open(xml_handler = this%file%xml_handler,              &
                         Dimensions = (/3_I4P,this%attributes_info(indx)%Dimension/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
                 call chardata%open( xml_handler = this%file%xml_handler, &
-                        Data = (/Start,1_I8P,Count/) )
+                        Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))
                 call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler,                           &
-                        Dimensions = (/int(localNumberOfNodes,I8P)/), &
-                        NumberType = this%attributes_info(indx)%DataType,                         &
-                        Format     = 'HDF',                                                       &
+                call dataitem%open(xml_handler = this%file%xml_handler,                            &
+                        Dimensions = (/int(GlobalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),  &
+                        NumberType = this%attributes_info(indx)%DataType,                          &
+                        Format     = 'HDF',                                                        &
                         Precision  = this%attributes_info(indx)%Precision) 
                 call chardata%open( xml_handler = this%file%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//this%attributes_info(indx)%XPath)

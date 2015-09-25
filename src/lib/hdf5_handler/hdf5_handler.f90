@@ -88,41 +88,52 @@ private
     end interface
 
     abstract interface
-        subroutine hdf5_handler_WriteAttribute_I4P(this, Name, Values)
+        subroutine hdf5_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I4P
             class(hdf5_handler_t), intent(IN) :: this
             character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
             integer(I4P),          intent(IN) :: values(:)
         end subroutine hdf5_handler_WriteAttribute_I4P
     end interface
 
     abstract interface
-        subroutine hdf5_handler_WriteAttribute_I8P(this, Name, Values)
+        subroutine hdf5_handler_WriteAttribute_I8P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I8P
+            import I4P
             class(hdf5_handler_t), intent(IN) :: this
             character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
             integer(I8P),          intent(IN) :: values(:)
         end subroutine hdf5_handler_WriteAttribute_I8P
     end interface
 
     abstract interface
-        subroutine hdf5_handler_WriteAttribute_R4P(this, Name, Values)
+        subroutine hdf5_handler_WriteAttribute_R4P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import R4P
+            import I4P
             class(hdf5_handler_t), intent(IN) :: this
             character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
             real(R4P),             intent(IN) :: values(:)
         end subroutine hdf5_handler_WriteAttribute_R4P
     end interface
 
     abstract interface
-        subroutine hdf5_handler_WriteAttribute_R8P(this, Name, Values)
+        subroutine hdf5_handler_WriteAttribute_R8P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import R8P
+            import I4P
             class(hdf5_handler_t), intent(IN) :: this
             character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
             real(R8P),             intent(IN) :: values(:)
         end subroutine hdf5_handler_WriteAttribute_R8P
     end interface
