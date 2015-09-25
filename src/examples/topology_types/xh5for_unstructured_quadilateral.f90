@@ -14,7 +14,7 @@ implicit none
     !< Variable definition
     !----------------------------------------------------------------- 
     type(xh5for_t)             :: xh5
-    real(R4P), dimension(12)   :: geometry = (/0.0, 0.0, &
+    real(R4P),    dimension(12):: geometry = (/0.0, 0.0, &
                                                1.0, 0.0, &
                                                1.0, 1.0, &
                                                0.0, 1.0, &
@@ -22,6 +22,8 @@ implicit none
                                                1.0, 2.0/)
     integer(I4P), dimension(8) :: topology = (/0, 1, 2, 3, &
                                                2, 3, 4, 5/)
+    real(R4P),    dimension(6) :: scalartempR4P = (/0, 1, 2, 3, 4, 5/)
+    real(R8P),    dimension(6) :: scalartempR8P = (/0, 1, 2, 3, 4, 5/)
     integer                    :: rank = 0
     integer                    :: mpierr
 
@@ -40,6 +42,8 @@ implicit none
     call xh5%Open(fileprefix='contiguous_hyperslab_quadrilateral')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(Coordinates = geometry + rank)
+    call xh5%WriteAttribute(Name='Temperature_R4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempR4P+rank)
+    call xh5%WriteAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempR8P+rank)
     call xh5%Close()
     call xh5%Free()
 

@@ -25,6 +25,7 @@ private
         type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
+        integer                                  :: NumberOfAttributes = 0          !< Number of attributes of the grid
         logical                                  :: warn = .true.                   !< Flag to show warnings on screen
     contains
     private

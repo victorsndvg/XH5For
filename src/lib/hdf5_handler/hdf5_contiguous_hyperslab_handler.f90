@@ -460,9 +460,9 @@ contains
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName = Name,                &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
                 Values          = Values)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
@@ -494,9 +494,9 @@ contains
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName = Name,                &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
                 Values          = Values)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
@@ -528,9 +528,9 @@ contains
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName = Name,                &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
                 Values          = Values)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
@@ -562,9 +562,9 @@ contains
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName = Name,                &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
                 Values          = Values)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P

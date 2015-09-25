@@ -260,51 +260,59 @@ contains
     end subroutine xh5for_WriteTopology_I8P
 
 
-    subroutine xh5for_WriteAttribute_I4P(this, Name, Values)
+    subroutine xh5for_WriteAttribute_I4P(this, Name, Type, Center, Values)
     !----------------------------------------------------------------- 
     !< Write I4P Attribute
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
         character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I4P),    intent(IN)    :: Type                        !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I4P
 
 
-    subroutine xh5for_WriteAttribute_I8P(this, Name, Values)
+    subroutine xh5for_WriteAttribute_I8P(this, Name, Type, Center, Values)
     !----------------------------------------------------------------- 
     !< Write I4P Attribute
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
         character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I4P),    intent(IN)    :: Type                        !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I8P
 
 
-    subroutine xh5for_WriteAttribute_R4P(this, Name, Values)
+    subroutine xh5for_WriteAttribute_R4P(this, Name, Type, Center, Values)
     !----------------------------------------------------------------- 
     !< Write I4P Attribute
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
         character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I4P),    intent(IN)    :: Type                        !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R4P
 
 
-    subroutine xh5for_WriteAttribute_R8P(this, Name, Values)
+    subroutine xh5for_WriteAttribute_R8P(this, Name, Type, Center, Values)
     !----------------------------------------------------------------- 
     !< Write I4P Attribute
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
         character(len=*),intent(IN)    :: Name                        !< Attribute name
+        integer(I4P),    intent(IN)    :: Type                        !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Values = Values)
+        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R8P
 
 end module xh5for
