@@ -22,7 +22,7 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
 ### Exporters:
   * Mesh:
     * [ ] Structured
-    * [ ] Unstructured
+    * [x] Unstructured
   * Element:
     * Linear
       * [x] Triangle
@@ -31,8 +31,20 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
       * [x] Hexahedron
       * [ ] Mixed
   * Field:
-    * Center on: not defined yet...
-    * Number of components: not defined yet...
+    * Center on: 
+        * [x] Node
+        * [x] Cell
+        * [x] Grid
+        * [ ] Edge
+        * [ ] Face
+    * Type:
+        * [x] Scalar
+        * [x] Vector
+        * [ ] Tensor
+        * [ ] Matrix
+        * [ ] Tensor6
+        * [ ] GlobalID
+        * [ ] NoType
   * XDMF tags ([FoX wxml](https://github.com/andreww/fox)  wrapper):
     * [x] Xdmf
     * [x] Domain
@@ -47,7 +59,7 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [ ] Groups
     * [ ] DataSpaces
     * [ ] DataSets
-    * [ ] HyperSlabs
+    * [x] HyperSlabs
 
 ### Importers
   * (Future work...)
