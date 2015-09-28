@@ -4,11 +4,10 @@ use xdmf_utils
 use xh5for_handler
 use mpi_environment
 use xh5for_parameters
+use xh5for_handler_factory
 use uniform_grid_descriptor
 use spatial_grid_descriptor
 use IR_Precision, only: I4P, I8P, str
-use xh5for_contiguous_hyperslab_handler
-
 
 
 implicit none
@@ -101,21 +100,12 @@ contains
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
         integer, optional, intent(IN)     :: comm                     !< MPI communicator
         integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
         if(present(root)) r_root = root
         call this%Free()
-        select case(this%Strategy)
-
-            case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-                allocate(xh5for_contiguous_hyperslab_handler_t::this%Handler)
-
-            case default
-                allocate(xh5for_contiguous_hyperslab_handler_t::this%Handler)
-        end select 
-
-
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -135,6 +125,8 @@ contains
                 NumberOfElements = int(NumberOfElements,I8P),  &
                 TopologyType = TopologyType,                   &
                 GeometryType = GeometryType)
+        ! Get the concrete handler
+        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
         ! XH5For handler initialization
         call this%Handler%Initialize(                             &
                 MPIEnvironment=this%MPIEnvironment,               &
@@ -155,20 +147,12 @@ contains
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
         integer, optional, intent(IN)     :: comm                     !< MPI communicator
         integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
         if(present(root)) r_root = root
         call this%Free()
-        select case(this%Strategy)
-
-            case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-                allocate(xh5for_contiguous_hyperslab_handler_t::this%Handler)
-
-            case default
-                allocate(xh5for_contiguous_hyperslab_handler_t::this%Handler)
-        end select 
-
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -188,6 +172,8 @@ contains
                 NumberOfElements = NumberOfElements,  &
                 TopologyType = TopologyType,          &
                 GeometryType = GeometryType)
+        ! Get the concrete handler
+        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
         ! XH5For handler initialization
         call this%Handler%Initialize(                              &
                 MPIEnvironment=this%MPIEnvironment,               &
