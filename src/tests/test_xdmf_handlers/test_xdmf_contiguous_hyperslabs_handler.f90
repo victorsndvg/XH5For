@@ -18,9 +18,12 @@ use uniform_grid_descriptor
 implicit none
 
     type(mpi_env_t) :: mpienv
-    type(spatial_grid_descriptor_t) :: spatialgrid
-    type(uniform_grid_descriptor_t) :: uniformgrid
+    type(spatial_grid_descriptor_t)           :: spatialgrid
+    type(uniform_grid_descriptor_t)           :: uniformgrid
     type(xdmf_contiguous_hyperslab_handler_t) :: lightdata
+    real(R4P),    dimension(8)                :: geometry  = (/0,0,0,1,1,1,1,0/)
+    integer(I4P), dimension(4)                :: topology  = (/0,1,2,3/)
+    real(R4P),    dimension(4)                :: values    = (/9,8,7,6/)
     integer         :: mpierr
     integer(I4P)    :: i
 
@@ -31,14 +34,11 @@ implicit none
     call spatialgrid%initialize(MPIEnvironment=mpienv, NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
     call uniformgrid%initialize(NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
     call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call lightdata%OpenFile('hyperslab.xmf')
-    do i=0, mpienv%get_comm_size()-1
-        call lightdata%OpenGrid(GridID=i)
-        call lightdata%WriteTopology(GridID=i)
-        call lightdata%WriteGeometry(GridID=i)
-        call lightdata%CloseGrid()
-!        call lightdata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, GridID=i)
-    enddo
+    call lightdata%OpenFile(fileprefix='xdmf_hyperslab')
+    call lightdata%SetTopology(Connectivities=topology)
+    call lightdata%SetGeometry(Coordinates=geometry)
+    call lightdata%AppendAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Attribute=values)
+    call lightdata%Serialize()
     call lightdata%CloseFile()
 #if defined(MPI_MOD) || defined(MPI_H)
     call MPI_FINALIZE(mpierr)

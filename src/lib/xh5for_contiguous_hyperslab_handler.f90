@@ -84,7 +84,7 @@ contains
     !-----------------------------------------------------------------
         call this%HeavyData%CloseFile()
         !< XDMF deferred writing when hdf5 closes    
-        call this%LightData%DeferredWrite()
+        call this%LightData%Serialize()
         call this%LightData%CloseFile()
     end subroutine xh5for_contiguous_hyperslab_handler_Close
 

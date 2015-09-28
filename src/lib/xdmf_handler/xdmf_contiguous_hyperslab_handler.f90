@@ -4,7 +4,7 @@ module xdmf_contiguous_hyperslab_handler
 !< XDMF Time handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use IR_Precision, only : I4P, I8P, R4P, R8P
+use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_utils
 use fox_xdmf
 use xdmf_handler
@@ -44,26 +44,48 @@ private
         procedure         :: AppendAttribute_I8P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
         procedure         :: AppendAttribute_R4P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
         procedure         :: AppendAttribute_R8P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
-        procedure, public :: OpenFile                 => xdmf_contiguous_hyperslab_handler_OpenFile
-        procedure, public :: CloseFile                => xdmf_contiguous_hyperslab_handler_CloseFile
-        generic,   public :: SetGeometry              => SetGeometry_R4P, &
-                                                         SetGeometry_R8P
-        generic,   public :: SetTopology              => SetTopology_I4P, &
-                                                         SetTopology_I8P
-        generic,   public :: AppendAttribute          => AppendAttribute_I4P, &
-                                                         AppendAttribute_I8P, &
-                                                         AppendAttribute_R4P, &
-                                                         AppendAttribute_R8P
-        procedure, public :: DeferredWrite            => xdmf_contiguous_hyperslab_handler_DeferredWrite
-        procedure, public :: WriteGeometry            => xdmf_contiguous_hyperslab_handler_WriteGeometry
-        procedure, public :: WriteTopology            => xdmf_contiguous_hyperslab_handler_WriteTopology
-        procedure, public :: WriteAttribute           => xdmf_contiguous_hyperslab_handler_WriteAttribute
+        procedure         :: WriteGeometry            => xdmf_contiguous_hyperslab_handler_WriteGeometry
+        procedure         :: WriteTopology            => xdmf_contiguous_hyperslab_handler_WriteTopology
         procedure         :: WriteAttributes          => xdmf_contiguous_hyperslab_handler_WriteAttributes
+        procedure         :: OpenGrid                 => xdmf_contiguous_hyperslab_handler_OpenGrid
+        procedure         :: CloseGrid                => xdmf_contiguous_hyperslab_handler_CloseGrid
+        procedure, public :: OpenFile                 => xdmf_contiguous_hyperslab_handler_OpenFile
+        procedure, public :: Free                     => xdmf_contiguous_hyperslab_handler_Free
+        procedure, public :: CloseFile                => xdmf_contiguous_hyperslab_handler_CloseFile
+        procedure, public :: Serialize                => xdmf_contiguous_hyperslab_handler_Serialize
     end type xdmf_contiguous_hyperslab_handler_t
 
 public :: xdmf_contiguous_hyperslab_handler_t
 
 contains
+
+    subroutine xdmf_contiguous_hyperslab_handler_OpenGrid(this, GridID)
+    !-----------------------------------------------------------------
+    !< Open a XDMF grid
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
+        integer(I4P),                     optional, intent(IN)    :: GridID      !< Grid ID number
+        type(xdmf_grid_t)                                         :: grid        !< XDMF Grid type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            call grid%open(xml_handler=this%file%xml_handler, &
+                Name='Grid'//trim(adjustl(str(no_sign=.true.,n=GridID))))
+        endif
+    end subroutine xdmf_contiguous_hyperslab_handler_OpenGrid
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_CloseGrid(this, GridID)
+    !-----------------------------------------------------------------
+    !< Close a XDMF grid
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
+        integer(I4P),                     optional, intent(IN)    :: GridID      !< Grid ID number
+        type(xdmf_grid_t)                                         :: grid        !< XDMF Grid type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            call grid%Close(xml_handler=this%file%xml_handler)
+        endif
+    end subroutine xdmf_contiguous_hyperslab_handler_CloseGrid
 
 
     subroutine xdmf_contiguous_hyperslab_handler_Free(this)
@@ -336,7 +358,7 @@ contains
     end subroutine xdmf_contiguous_hyperslab_handler_CloseFile
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_DeferredWrite(this)
+    subroutine xdmf_contiguous_hyperslab_handler_Serialize(this)
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this  !< XDMF contiguous hyperslab handler
         integer(I4P)                                              :: IDidx !< GridID idex
 
@@ -347,7 +369,7 @@ contains
             call this%WriteAttributes(GridID = IDidx)
             call this%CloseGrid(GridID = IDidx)
         enddo
-    end subroutine xdmf_contiguous_hyperslab_handler_DeferredWrite
+    end subroutine xdmf_contiguous_hyperslab_handler_Serialize
 
     subroutine xdmf_contiguous_hyperslab_handler_WriteTopology(this, GridID)
     !-----------------------------------------------------------------
@@ -463,64 +485,6 @@ contains
             call geometry%close(xml_handler = this%file%xml_handler)
         endif                    
     end subroutine xdmf_contiguous_hyperslab_handler_WriteGeometry
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_WriteAttribute(this, Name, Center, Type, GridID)
-    !-----------------------------------------------------------------
-    !< Writes a XDMF Attribute into a opened file for the contiguous HyperSlab strategy
-    !< @NOTE: only nodal attributes
-    !< @TODO: add cell, face and grid centered attributes
-    !< @NOTE: Not Working!
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                   !< XDMF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: Name                   !< Attribute name
-        integer(I4P),                               intent(IN)    :: Center                 !< XDMF Attribute center
-        integer(I4P),                               intent(IN)    :: Type                   !< XDMF Attribute type
-        integer(I4P), optional,                     intent(IN)    :: GridID                 !< Grid ID number
-        type(xdmf_attribute_t)                                    :: attribute              !< XDMF Attribute type
-        type(xdmf_dataitem_t)                                     :: dataitem               !< XDMF Dataitem type
-        integer(I8P)                                              :: LocalNumberOfElements  !< Local number of elements
-        integer(I8P)                                              :: LocalNumberOfNodes     !< Local number of nodes
-        integer(I4P)                                              :: NodesPerElement        !< Number of nodes per element
-        character(len=:), allocatable                             :: XDMFAttributeTypeName  !< String Attibute type identifier
-        character(len=:), allocatable                             :: XDMFCenterTypeName     !< String Attribute Center identifier
-    !-----------------------------------------------------------------
-        if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                localNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                localNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
-            else
-                localNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
-                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
-                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
-            endif
-            XDMFAttributeTypeName = GetXDMFAttributeTypeName(Type)
-            XDMFCenterTypeName = GetXDMFCenterTypeName(Center)
-            call attribute%open(xml_handler = this%file%xml_handler, &
-                    Name          = name, &
-                    AttributeType = XDMFAttributeTypeName, &
-                    Center        = XDMFCenterTypeName)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/int(localNumberOfElements,I8P)*int(NodesPerElement,I8P)/), &
-                    ItemType   = 'HyperSlab', &
-                    Format     = 'HDF')
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P,1_I4P/), &
-                    NumberType = 'Int', &
-                    Format     = 'XML', &
-                    Precision=4) 
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/int(localNumberOfElements,I8P)*int(NodesPerElement,I8P)/), &
-                    NumberType = 'Int', &
-                    Format     = 'HDF', &
-                    Precision  = 4) 
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call attribute%close(xml_handler = this%file%xml_handler)
-        endif                    
-    end subroutine xdmf_contiguous_hyperslab_handler_WriteAttribute
 
 
     subroutine xdmf_contiguous_hyperslab_handler_WriteAttributes(this, GridID)

@@ -5,7 +5,7 @@ module xdmf_handler
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
 use xh5for_parameters
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use IR_Precision, only : I4P, I8P, R4P, R8P
 use fox_xdmf
 use mpi_environment
 use spatial_grid_descriptor
@@ -29,14 +29,123 @@ private
         logical                                  :: warn = .true.                   !< Flag to show warnings on screen
     contains
     private
-    !< @TODO: abstract procedures
-        procedure, public :: Initialize     => xdmf_handler_Initialize
-        procedure, public :: Free           => xdmf_handler_Free
-        procedure, public :: OpenFile       => xdmf_handler_OpenFile
-        procedure, public :: CloseFile      => xdmf_handler_CloseFile
-        procedure, public :: OpenGrid       => xdmf_handler_OpenGrid
-        procedure, public :: CloseGrid      => xdmf_handler_CloseGrid
+        procedure(xdmf_handler_SetGeometry_R4P),     deferred :: SetGeometry_R4P
+        procedure(xdmf_handler_SetGeometry_R8P),     deferred :: SetGeometry_R8P
+        procedure(xdmf_handler_SetTopology_I4P),     deferred :: SetTopology_I4P
+        procedure(xdmf_handler_SetTopology_I8P),     deferred :: SetTopology_I8P
+        procedure(xdmf_handler_AppendAttribute_I4P), deferred :: AppendAttribute_I4P
+        procedure(xdmf_handler_AppendAttribute_I8P), deferred :: AppendAttribute_I8P
+        procedure(xdmf_handler_AppendAttribute_R4P), deferred :: AppendAttribute_R4P
+        procedure(xdmf_handler_AppendAttribute_R8P), deferred :: AppendAttribute_R8P
+        procedure(xdmf_handler_Serialize), public,   deferred :: Serialize
+        procedure,                                   public   :: Initialize      => xdmf_handler_Initialize
+        procedure,                                   public   :: Free            => xdmf_handler_Free
+        procedure,                                   public   :: OpenFile        => xdmf_handler_OpenFile
+        procedure,                                   public   :: CloseFile       => xdmf_handler_CloseFile
+        generic,                                     public   :: SetGeometry     => SetGeometry_R4P, &
+                                                                                    SetGeometry_R8P
+        generic,                                     public   :: SetTopology     => SetTopology_I4P, &
+                                                                                    SetTopology_I8P
+        generic,                                     public   :: AppendAttribute => AppendAttribute_I4P, &
+                                                                                    AppendAttribute_I8P, &
+                                                                                    AppendAttribute_R4P, &
+                                                                                    AppendAttribute_R8P
     end type xdmf_handler_t
+
+    abstract interface
+        subroutine xdmf_handler_SetGeometry_R4P(this, Coordinates)
+            import xdmf_handler_t
+            import R4P
+            class(xdmf_handler_t), intent(INOUT) :: this
+            real(R4P),             intent(IN)    :: Coordinates(:)
+        end subroutine xdmf_handler_SetGeometry_R4P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_SetGeometry_R8P(this, Coordinates)
+            import xdmf_handler_t
+            import R8P
+            class(xdmf_handler_t), intent(INOUT) :: this
+            real(R8P),             intent(IN)    :: Coordinates(:)
+        end subroutine xdmf_handler_SetGeometry_R8P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_SetTopology_I4P(this, Connectivities)
+            import xdmf_handler_t
+            import I4P
+            class(xdmf_handler_t), intent(INOUT) :: this
+            integer(I4P),          intent(IN)    :: Connectivities(:)
+        end subroutine xdmf_handler_SetTopology_I4P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_SetTopology_I8P(this, Connectivities)
+            import xdmf_handler_t
+            import I8P
+            class(xdmf_handler_t), intent(INOUT) :: this
+            integer(I8P),          intent(IN)    :: Connectivities(:)
+        end subroutine xdmf_handler_SetTopology_I8P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_AppendAttribute_I4P(this, Name, Type, Center, Attribute)
+            import xdmf_handler_t
+            import I4P
+            class(xdmf_handler_t), intent(INOUT) :: this         
+            character(len=*),      intent(IN)    :: Name         
+            integer(I4P),          intent(IN)    :: Type         
+            integer(I4P),          intent(IN)    :: Center       
+            integer(I4P),          intent(IN)    :: Attribute(:) 
+        end subroutine xdmf_handler_AppendAttribute_I4P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_AppendAttribute_I8P(this, Name, Type, Center, Attribute)
+            import xdmf_handler_t
+            import I4P
+            import I8P
+            class(xdmf_handler_t), intent(INOUT) :: this         
+            character(len=*),      intent(IN)    :: Name         
+            integer(I4P),          intent(IN)    :: Type         
+            integer(I4P),          intent(IN)    :: Center       
+            integer(I8P),          intent(IN)    :: Attribute(:) 
+        end subroutine xdmf_handler_AppendAttribute_I8P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_AppendAttribute_R4P(this, Name, Type, Center, Attribute)
+            import xdmf_handler_t
+            import I4P
+            import R4P
+            class(xdmf_handler_t), intent(INOUT) :: this         
+            character(len=*),      intent(IN)    :: Name         
+            integer(I4P),          intent(IN)    :: Type         
+            integer(I4P),          intent(IN)    :: Center       
+            real(R4P),             intent(IN)    :: Attribute(:) 
+        end subroutine xdmf_handler_AppendAttribute_R4P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_AppendAttribute_R8P(this, Name, Type, Center, Attribute)
+            import xdmf_handler_t
+            import I4P
+            import R8P
+            class(xdmf_handler_t), intent(INOUT) :: this         
+            character(len=*),      intent(IN)    :: Name         
+            integer(I4P),          intent(IN)    :: Type         
+            integer(I4P),          intent(IN)    :: Center       
+            real(R8P),             intent(IN)    :: Attribute(:) 
+        end subroutine xdmf_handler_AppendAttribute_R8P
+    end interface
+
+    abstract interface
+        subroutine xdmf_handler_Serialize(this)
+            import xdmf_handler_t
+            class(xdmf_handler_t), intent(INOUT) :: this
+        end subroutine xdmf_handler_Serialize
+    end interface
+
 
 public :: xdmf_handler_t
 
@@ -57,6 +166,7 @@ contains
         this%UniformGridDescriptor => UniformGridDescriptor
     end subroutine xdmf_handler_Initialize
 
+
     subroutine xdmf_handler_Free(this)
     !-----------------------------------------------------------------
     !< Free XDMF file handler
@@ -69,6 +179,7 @@ contains
         nullify(this%SpatialGridDescriptor)
         nullify(this%UniformGridDescriptor)
     end subroutine xdmf_handler_Free
+
 
     subroutine xdmf_handler_OpenFile(this, fileprefix)
     !-----------------------------------------------------------------
@@ -95,32 +206,5 @@ contains
             call this%file%closefile()
         endif
     end subroutine xdmf_handler_CloseFile
-
-    subroutine xdmf_handler_OpenGrid(this, GridID)
-    !-----------------------------------------------------------------
-    !< Open a XDMF grid
-    !----------------------------------------------------------------- 
-        class(xdmf_handler_t),           intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
-        integer(I4P),          optional, intent(IN)    :: GridID      !< Grid ID number
-        type(xdmf_grid_t)                              :: grid        !< XDMF Grid type
-    !-----------------------------------------------------------------
-        if(this%MPIEnvironment%is_root()) then
-            call grid%open(xml_handler=this%file%xml_handler, &
-                Name='Grid'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-        endif
-    end subroutine xdmf_handler_OpenGrid
-
-    subroutine xdmf_handler_CloseGrid(this, GridID)
-    !-----------------------------------------------------------------
-    !< Close a XDMF grid
-    !----------------------------------------------------------------- 
-        class(xdmf_handler_t),           intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
-        integer(I4P),          optional, intent(IN)    :: GridID      !< Grid ID number
-        type(xdmf_grid_t)                              :: grid        !< XDMF Grid type
-    !-----------------------------------------------------------------
-        if(this%MPIEnvironment%is_root()) then
-            call grid%Close(xml_handler=this%file%xml_handler)
-        endif
-    end subroutine xdmf_handler_CloseGrid
 
 end module xdmf_handler
