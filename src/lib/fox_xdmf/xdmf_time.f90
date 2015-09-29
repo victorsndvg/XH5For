@@ -3,8 +3,9 @@ module xdmf_time
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF Time handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: R4P, R8P, str
+use IR_Precision, only: R4P, R8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
@@ -21,18 +22,21 @@ implicit none
     !----------------------------------------------------------------- 
     private
         character(len=:), allocatable :: TimeType
+        real(R8P)                     :: Value
     contains
     private
         procedure         :: default_initialization => time_default_initialization
         procedure         :: is_valid_TimeType      => time_is_valid_TimeType
-        procedure         :: free                   => time_free
+        procedure, public :: free                   => time_free
         procedure         :: time_open_timetype
         procedure         :: time_open_R4P_value
         procedure         :: time_open_R8P_value
         generic,   public :: open                   => time_open_R4P_value, &
                                                        time_open_R8P_value, &
                                                        time_open_timetype
+        procedure, public :: parse                  => time_parse
         procedure, public :: close                  => time_close
+        procedure, public :: print                  => time_print
     end type xdmf_time_t
 
 contains
@@ -70,7 +74,8 @@ contains
         class(xdmf_time_t), intent(INOUT) :: this                 !< XDMF Time type
     !----------------------------------------------------------------- 
         call this%free()
-        this%TimeType = 'XYZ'
+        this%TimeType = ''
+        this%Value = 0._R8P
     end subroutine time_default_initialization
 
     subroutine time_open_timetype(this, xml_handler, TimeType)
@@ -128,6 +133,31 @@ contains
     end subroutine time_open_R8P_value
 
 
+    subroutine time_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM time into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_time_t),         intent(INOUT) :: this             !< XDMF Time type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Time element
+        character(len=:), allocatable             :: TimeType         !< XDMF Time TimeType attribute
+        real(R8P)                                 :: Value            !< XDMF Time Value attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_time(DOMNode)) then
+
+            if(hasAttribute(DOMNode, 'TimeType')) then
+                TimeType = getAttribute(DOMNode, 'TimeType')
+                if(this%is_valid_TimeType(TimeType=TimeType)) this%TimeType = TimeType
+            endif
+
+            if(hasAttribute(DOMNode, 'Value')) then
+                this%Value = cton(str=getAttribute(DOMNode, 'Value'),knd=0._R8P)
+            endif
+        endif
+    end subroutine time_parse
+
+
     subroutine time_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Time XDMF element
@@ -137,6 +167,19 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Time')
     end subroutine time_close
+
+    subroutine time_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Time XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_time_t), intent(IN)    :: this                     !< XDMF Time type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'TIME:'
+        print*, '-------------------------------------------'
+        if(allocated(this%TimeType)) print*, 'TimeType: '//this%TimeType
+        print*, 'Value: '//str(no_sign=.true.,n=this%Value)
+    end subroutine time_print
 
 
 end module xdmf_time

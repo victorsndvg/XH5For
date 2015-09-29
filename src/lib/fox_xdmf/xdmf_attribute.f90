@@ -5,6 +5,7 @@ module xdmf_attribute
 !--------------------------------------------------------------------- -----------------------------------------------------------
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
@@ -30,9 +31,11 @@ implicit none
         procedure         :: default_initialization => attribute_default_initialization
         procedure         :: is_valid_AttributeType => attribute_is_valid_AttributeType
         procedure         :: is_valid_Center        => attribute_is_valid_Center
-        procedure         :: free                   => attribute_free
+        procedure, public :: free                   => attribute_free
         generic,   public :: open                   => attribute_open
+        procedure, public :: parse                  => attribute_parse
         procedure, public :: close                  => attribute_close
+        procedure, public :: print                  => attribute_print
     end type xdmf_attribute_t
 
 contains
@@ -119,6 +122,36 @@ contains
     end subroutine attribute_open
 
 
+    subroutine attribute_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM attribute into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_attribute_t),    intent(INOUT) :: this             !< XDMF Attribute type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Attribute element
+        character(len=:), allocatable             :: Name             !< XDMF Attribute Name attribute
+        character(len=:), allocatable             :: AttributeType    !< XDMF Attribute AttributeType attribute
+        character(len=:), allocatable             :: Center           !< XDMF Attribute Center attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_attribute(DOMNode)) then
+            if(hasAttribute(DOMNode, 'Name')) then
+                this%Name = getAttribute(DOMNode, 'Name')
+            endif
+
+            if(hasAttribute(DOMNode, 'AttributeType')) then
+                AttributeType = getAttribute(DOMNode, 'AttributeType')
+                if(this%is_valid_AttributeType(AttributeType=AttributeType)) this%AttributeType = AttributeType
+            endif
+
+            if(hasAttribute(DOMNode, 'Center')) then
+                center = getAttribute(DOMNode, 'Center')
+                if(this%is_valid_Center(Center=Center)) this%Center = Center
+            endif
+        endif
+    end subroutine attribute_parse
+
+
     subroutine attribute_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new attribute XDMF element
@@ -128,6 +161,22 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Attribute')
     end subroutine attribute_close
+
+
+    subroutine attribute_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Attribute XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_attribute_t), intent(IN)    :: this                !< XDMF grid type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'ATTRIBUTE:'
+        print*, '-------------------------------------------'
+        if(allocated(this%Name)) print*, 'Name: '//this%Name
+        if(allocated(this%AttributeType)) print*, 'AttributeType: '//this%AttributeType
+        if(allocated(this%Center)) print*, 'Center: '//this%Center
+    end subroutine attribute_print
+
 
 
 end module xdmf_attribute

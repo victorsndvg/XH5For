@@ -5,6 +5,7 @@ module xdmf_domain
 !--------------------------------------------------------------------- -----------------------------------------------------------
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_element, only: xdmf_element_t
 
 implicit none
@@ -23,9 +24,11 @@ implicit none
     private
         procedure         :: domain_open
         procedure         :: default_initialization => domain_default_initialization
-        procedure         :: free                   => domain_free
+        procedure, public :: free                   => domain_free
         generic,   public :: open                   => domain_open
+        procedure, public :: parse                  => domain_parse
         procedure, public :: close                  => domain_close
+        procedure, public :: print                  => domain_print
     end type xdmf_domain_t
 
 contains
@@ -47,6 +50,7 @@ contains
         class(xdmf_domain_t), intent(INOUT) :: this                   !< XDMF Domain type
     !----------------------------------------------------------------- 
         call this%free()
+        call this%set_tag('Domain')
     end subroutine domain_default_initialization
 
 
@@ -66,6 +70,24 @@ contains
     end subroutine domain_open
 
 
+    subroutine domain_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM Domain into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_domain_t),       intent(INOUT) :: this             !< XDMF Domain type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Domain element
+        character(len=:), allocatable             :: Name             !< XDMF Domain Name attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_domain(DOMNode)) then
+            if(hasAttribute(DOMNode, 'Name')) then
+                this%Name = getAttribute(DOMNode, 'Name')
+            endif
+        endif
+    end subroutine Domain_parse
+
+
     subroutine domain_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Domain XDMF element
@@ -75,6 +97,20 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Domain')
     end subroutine domain_close
+
+
+    subroutine domain_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Domain XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_domain_t), intent(IN)    :: this                   !< XDMF domain type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'Domain:'
+        print*, '-------------------------------------------'
+        if(allocated(this%Name)) print*, 'Name: '//this%Name
+    end subroutine domain_print
+
 
 
 end module xdmf_domain

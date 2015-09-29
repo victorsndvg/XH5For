@@ -5,6 +5,7 @@ module xdmf_grid
 !--------------------------------------------------------------------- -----------------------------------------------------------
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
@@ -33,9 +34,14 @@ implicit none
         procedure         :: is_valid_GridType      => grid_is_valid_GridType
         procedure         :: is_valid_CollectionType=> grid_is_valid_CollectionType
         procedure         :: is_valid_Section       => grid_is_valid_Section
-        procedure         :: free                   => grid_free
+        procedure         :: collectiontype_is_spatial => grid_collectiontype_is_spatial
+        procedure         :: gridtype_is_collection => grid_gridtype_is_collection
+        procedure, public :: is_spatial_collection  => grid_is_spatial_collection
+        procedure, public :: free                   => grid_free
         generic,   public :: open                   => grid_open
+        procedure, public :: parse                  => grid_parse
         procedure, public :: close                  => grid_close
+        procedure, public :: print                  => grid_print
     end type xdmf_grid_t
 
 contains
@@ -87,6 +93,39 @@ contains
     end function grid_is_valid_Section
 
 
+    function grid_gridtype_is_collection(this)
+    !-----------------------------------------------------------------
+    !< Check if GridType is collection
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
+        logical :: grid_gridtype_is_collection
+    !-----------------------------------------------------------------         
+        if(allocated(this%GridType)) grid_gridtype_is_collection = this%GridType == 'Collection'
+    end function grid_gridtype_is_collection
+
+
+    function grid_collectiontype_is_spatial(this)
+    !-----------------------------------------------------------------
+    !< Check if CollectionType is spatial
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
+        logical :: grid_collectiontype_is_spatial
+    !-----------------------------------------------------------------
+        if(allocated(This%CollectionType)) grid_collectiontype_is_spatial = this%CollectionType=='Spatial'
+    end function grid_collectiontype_is_spatial
+
+
+    function grid_is_spatial_collection(this)
+    !-----------------------------------------------------------------
+    !< Check if is a spatial collection grid
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
+        logical :: grid_is_spatial_collection
+    !-----------------------------------------------------------------
+        grid_is_spatial_collection = this%gridtype_is_collection() .and. this%collectiontype_is_spatial()
+    end function grid_is_spatial_collection
+
+
     subroutine grid_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Grid type
@@ -107,6 +146,7 @@ contains
         class(xdmf_grid_t), intent(INOUT) :: this                     !< XDMF grid type
     !----------------------------------------------------------------- 
         call this%free()
+        call this%set_tag('Grid')
         this%GridType       = 'Uniform'
         this%CollectionType = 'Spatial'
         this%Section        = 'DataItem'
@@ -144,6 +184,41 @@ contains
     end subroutine grid_open
 
 
+    subroutine grid_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM grid into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Grid element
+        character(len=:), allocatable             :: Name             !< XDMF Grid Name attribute
+        character(len=:), allocatable             :: GridType         !< XDMF Grid GridType attribute
+        character(len=:), allocatable             :: CollectionType   !< XDMF Grid CollectionType attribute
+        character(len=:), allocatable             :: Section          !< XDMF Grid Section attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_grid(DOMNode)) then
+            if(hasAttribute(DOMNode, 'Name')) then
+                this%Name = getAttribute(DOMNode, 'Name')
+            endif
+
+            if(hasAttribute(DOMNode, 'GridType')) then
+                GridType = getAttribute(DOMNode, 'GridType')
+                if(this%is_valid_GridType(GridType=GridType)) this%GridType = GridType
+            endif
+
+            if(hasAttribute(DOMNode, 'CollectionType')) then
+                CollectionType = getAttribute(DOMNode, 'CollectionType')
+                if(this%is_valid_CollectionType(CollectionType=CollectionType)) this%CollectionType = CollectionType
+            endif
+
+            if(hasAttribute(DOMNode, 'Section')) then
+                Section = getAttribute(DOMNode, 'Section')
+                if(this%is_valid_Section(Section=Section)) this%Section = Section
+            endif
+        endif
+    end subroutine grid_parse
+
     subroutine grid_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new grid XDMF element
@@ -154,5 +229,19 @@ contains
         call xml_EndElement(xml_handler, 'Grid')
     end subroutine grid_close
 
+    subroutine grid_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Grid XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t), intent(IN)    :: this                     !< XDMF grid type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'GRID:'
+        print*, '-------------------------------------------'
+        if(allocated(this%Name)) print*, 'Name: '//this%Name
+        if(allocated(this%GridType)) print*, 'GridType: '//this%GridType
+        if(allocated(this%CollectionType)) print*, 'CollectionType: '//this%CollectionType
+        if(allocated(this%Section)) print*, 'Section: '//this%Section
+    end subroutine grid_print
 
 end module xdmf_grid

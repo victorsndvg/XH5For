@@ -5,6 +5,7 @@ module xdmf_information
 !--------------------------------------------------------------------- -----------------------------------------------------------
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_element, only: xdmf_element_t
 
 implicit none
@@ -24,9 +25,11 @@ implicit none
     private
         procedure         :: information_open
         procedure         :: default_initialization => information_default_initialization
-        procedure         :: free                   => information_free
+        procedure, public :: free                   => information_free
         generic,   public :: open                   => information_open
+        procedure, public :: parse                  => information_parse
         procedure, public :: close                  => information_close
+        procedure, public :: print                  => information_print
     end type xdmf_information_t
 
 contains
@@ -72,6 +75,29 @@ contains
     end subroutine information_open
 
 
+    subroutine information_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM information into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_information_t),  intent(INOUT) :: this             !< XDMF Information type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Information element
+        character(len=:), allocatable             :: Name             !< XDMF Information Name attribute
+        character(len=:), allocatable             :: Value            !< XDMF Information Value attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_information(DOMNode)) then
+            if(hasAttribute(DOMNode, 'Name')) then
+                this%Name = getAttribute(DOMNode, 'Name')
+            endif
+
+            if(hasAttribute(DOMNode, 'Value')) then
+                this%Value = getAttribute(DOMNode, 'Value')
+            endif
+        endif
+    end subroutine information_parse
+
+
     subroutine information_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Information XDMF element
@@ -81,6 +107,20 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Information')
     end subroutine information_close
+
+
+    subroutine information_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Information XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_information_t), intent(IN)    :: this              !< XDMF Information type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'INFORMATION:'
+        print*, '-------------------------------------------'
+        if(allocated(this%Name)) print*, 'Name: '//this%Name
+        if(allocated(this%Value)) print*, 'Value: '//this%Value
+    end subroutine information_print
 
 
 end module xdmf_information

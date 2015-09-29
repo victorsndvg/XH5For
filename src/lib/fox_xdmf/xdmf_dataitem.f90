@@ -3,9 +3,10 @@ module xdmf_dataitem
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF DataItem handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, I8P, str
+use IR_Precision, only: I4P, I8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
-use xdmf_utils,   only: Upper_Case, is_in_option_list, warning_message
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
+use xdmf_utils,   only: Upper_Case, Count_tokens, Next_token, is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
 implicit none
@@ -49,13 +50,14 @@ implicit none
         procedure         :: is_valid_Precision     => dataitem_is_valid_Precision
         procedure         :: is_valid_Format        => dataitem_is_valid_Format
         procedure         :: default_initialization => dataitem_default_initialization
-        procedure         :: free                   => dataitem_free
+        procedure, public :: free                   => dataitem_free
         generic,   public :: open                   => dataitem_open_no_dimensions,  &
                                                        dataitem_open_I4P_dimension,  &
                                                        dataitem_open_I4P_dimensions, &
                                                        dataitem_open_I8P_dimensions
-
+        procedure, public :: parse                  => dataitem_parse
         procedure, public :: close                  => dataitem_close
+        procedure, public :: print                  => dataitem_print
     end type xdmf_dataitem_t
 
     !public :: xdmf_dataitem_t
@@ -372,6 +374,63 @@ contains
     end subroutine dataitem_open_I8P_dimensions
 
 
+    subroutine dataitem_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM grid into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t),     intent(INOUT) :: this             !< XDMF DataItem type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a DataItem element
+        character(len=:), allocatable             :: Name             !< XDMF DataItem Name attribute
+        character(len=:), allocatable             :: ItemType         !< XDMF DataItem ItemType attribute
+        character(len=:), allocatable             :: NumberType       !< XDMF DataItem NumberType attribute
+        character(len=:), allocatable             :: Format           !< XDMF DataItem Format attribute
+        integer(I8P),     allocatable             :: Dimensions(:)    !< XDMF DataItem Dimensions attribute
+        integer(I4P)                              :: Precision        !< XDMF DataItem Precision attribute
+        character(len=:), allocatable             :: AuxDims          !< Aux dimensions string
+        integer(I4P)                              :: NumTokens        !< Number of tokens in a string
+        integer(I4P)                              :: i                !< Loop index in NumTokens
+        integer(I4P)                              :: pos              !< Start position of next token
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_dataitem(DOMNode)) then
+            if(hasAttribute(DOMNode, 'Name')) then
+                this%Name = getAttribute(DOMNode, 'Name')
+            endif
+
+            if(hasAttribute(DOMNode, 'ItemType')) then
+                ItemType = getAttribute(DOMNode, 'ItemType')
+                if(this%is_valid_ItemType(ItemType=ItemType)) this%ItemType = ItemType
+            endif
+
+            if(hasAttribute(DOMNode, 'NumberType')) then
+                NumberType = getAttribute(DOMNode, 'NumberType')
+                if(this%is_valid_NumberType(NumberType=NumberType)) this%NumberType = NumberType
+            endif
+
+            if(hasAttribute(DOMNode, 'Format')) then
+                Format = getAttribute(DOMNode, 'Format')
+                if(this%is_valid_Format(Format=Format)) this%Format = Format
+            endif
+
+            if(hasAttribute(DOMNode, 'Precision')) then
+                Precision = cton(str=getAttribute(DOMNode, 'Precision'), knd=1_I4P)
+                if(this%is_valid_Precision(Precision=Precision)) this%Precision = Precision
+            endif
+
+            if(hasAttribute(DOMNode, 'Dimensions')) then
+                AuxDims = getAttribute(DOMNode, 'Dimensions')
+                NumTokens = Count_tokens(AuxDims)
+                allocate(this%Dimensions(NumTokens))
+                pos = 1
+                do i=1,NumTokens
+                    this%Dimensions(i) = cton(str=Next_token(AuxDims,pos), knd=1_I8P)
+                enddo
+            endif
+        endif
+    end subroutine dataitem_parse
+
+
     subroutine dataitem_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new dataitem XDMF element
@@ -381,6 +440,24 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, this%get_tag())
     end subroutine dataitem_close
+
+
+    subroutine dataitem_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the DataItem XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN)    :: this                 !< XDMF DataItem type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'DATAITEM:'
+        print*, '-------------------------------------------'
+        if(allocated(this%Name)) print*, 'Name: '//this%Name
+        if(allocated(this%ItemType)) print*, 'ItemType: '//this%ItemType
+        if(allocated(this%NumberType)) print*, 'NumberType: '//this%NumberType
+        if(allocated(this%Format)) print*, 'Format: '//this%Format
+        if(allocated(this%Dimensions)) print*, 'Dimensions: '//str(no_sign=.true.,n=this%Dimensions)
+        print*, 'Precision: '//str(no_sign=.true.,n=this%Precision)
+    end subroutine dataitem_print
 
 
 end module xdmf_dataitem

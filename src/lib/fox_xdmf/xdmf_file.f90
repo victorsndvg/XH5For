@@ -5,23 +5,29 @@ module xdmf_file
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
 use FoX_wxml
+use FoX_dom, only: Node, parseFile
 
 implicit none
+private
 
     type xdmf_file_t
     !-----------------------------------------------------------------
     !< XDMF file handler type
     !----------------------------------------------------------------- 
+    private
         character(len=:), allocatable :: filename                     !< File name
-        type(xmlf_t)                  :: xml_handler                  !< FoX XML File handler
+        type(xmlf_t), public          :: xml_handler                  !< FoX SAX XML File handler
+        type(Node),       pointer     :: Root => null()               !< FoX DOM node list pointing to XML root element
     !----------------------------------------------------------------- 
     contains
     private
         procedure, public :: openfile             => xdmf_openfile
+        procedure, public :: parsefile            => xdmf_parsefile
         procedure, public :: closefile            => xdmf_closefile
         procedure, public :: set_filename         => xdmf_set_filename
         procedure, public :: get_filename         => xdmf_get_filename
         procedure, public :: get_xml_handler      => xdmf_get_xml_handler
+        procedure, public :: get_document_root    => xdmf_get_document_root
     end type xdmf_file_t
 
     public :: xdmf_file_t
@@ -55,13 +61,24 @@ contains
 
     function xdmf_get_xml_handler(xdmf_file) result(xml_handler)
     !-----------------------------------------------------------------
-    !< Set the filename of xdmf_file type
+    !< Get the filename of xdmf_file type
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), target, intent(IN) :: xdmf_file                !< XDMF file handler
+        type(xmlf_t), pointer             :: xml_handler              !< Fox XML file handler
+    !----------------------------------------------------------------- 
+         xml_handler => xdmf_file%xml_handler
+    end function xdmf_get_xml_handler
+
+
+    function xdmf_get_document_root(xdmf_file) result(root)
+    !-----------------------------------------------------------------
+    !< Get the filename of xdmf_file type
     !----------------------------------------------------------------- 
         class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
-        type(xmlf_t)                      :: xml_handler              !< Fox XML file handler
+        type(Node), pointer               :: root                     !< Fox DOM Node 
     !----------------------------------------------------------------- 
-         xml_handler = xdmf_file%xml_handler
-    end function xdmf_get_xml_handler
+         root => xdmf_file%Root
+    end function xdmf_get_document_root
 
 
     subroutine xdmf_openfile(xdmf_file, IO_error)
@@ -92,6 +109,15 @@ contains
         call xml_AddAttribute(xdmf_file%xml_handler,"Version","2.1")
 
     end subroutine xdmf_openfile
+
+    subroutine xdmf_parsefile(xdmf_file)
+    !-----------------------------------------------------------------
+    !< Parse a XDMF file with FoX DOM
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
+    !-----------------------------------------------------------------
+        xdmf_file%root => parseFile(xdmf_file%filename)
+    end subroutine xdmf_parseFile
 
     subroutine xdmf_closefile(xdmf_file)
     !-----------------------------------------------------------------

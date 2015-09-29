@@ -5,6 +5,7 @@ module xdmf_geometry
 !--------------------------------------------------------------------- -----------------------------------------------------------
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
+use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
@@ -25,9 +26,11 @@ implicit none
         procedure         :: geometry_open 
         procedure         :: default_initialization => geometry_default_initialization
         procedure         :: is_valid_GeometryType  => geometry_is_valid_GeometryType
-        procedure         :: free                   => geometry_free
+        procedure, public :: free                   => geometry_free
         generic,   public :: open                   => geometry_open
+        procedure, public :: parse                  => geometry_parse
         procedure, public :: close                  => geometry_close
+        procedure, public :: print                  => geometry_print
     end type xdmf_geometry_t
 
 contains
@@ -86,6 +89,25 @@ contains
     end subroutine geometry_open
 
 
+    subroutine geometry_parse(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Parse a DOM geometry into a XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_geometry_t),     intent(INOUT) :: this             !< XDMF Geometry type
+        type(Node),       pointer,  intent(IN)    :: DOMNode          !< FoX DOM Node containig a Geometry element
+        character(len=:), allocatable             :: GeometryType     !< XDMF Geometry Geometry attribute
+    !----------------------------------------------------------------- 
+        call this%default_initialization()
+
+        if(this%node_is_geometry(DOMNode)) then
+            if(hasAttribute(DOMNode, 'GeometryType')) then
+                GeometryType = getAttribute(DOMNode, 'GeometryType')
+                if(this%is_valid_GeometryType(GeometryType=GeometryType)) this%GeometryType = GeometryType
+            endif
+        endif
+    end subroutine geometry_parse
+
+
     subroutine geometry_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Geometry XDMF element
@@ -95,6 +117,19 @@ contains
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Geometry')
     end subroutine geometry_close
+
+
+    subroutine geometry_print(this)
+    !-----------------------------------------------------------------
+    !< Print on screen the Geometry XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_geometry_t), intent(IN)    :: this                     !< XDMF Geometry type
+    !-----------------------------------------------------------------
+        print*, '-------------------------------------------'
+        print*, 'GEOMETRY:'
+        print*, '-------------------------------------------'
+        if(allocated(this%GeometryType)) print*, 'GeometryType: '//this%GeometryType
+    end subroutine geometry_print
 
 
 end module xdmf_geometry
