@@ -1,12 +1,16 @@
 program test_xdmf_topology
 
 use fox_xdmf
+use fox_dom
 use IR_Precision, only: I4P, I8P
 
 implicit none
 
     type(xdmf_file_t) :: file
     type(xdmf_topology_t) :: topology
+    type(Node), pointer :: document_root, element
+    type(NodeList), pointer :: element_list
+    integer :: i
 
 ! Name               (no default)
 ! TopologyType       Polyvertex | Polyline | Polygon |
@@ -60,5 +64,17 @@ implicit none
     call topology%open(file%xml_handler,TopologyType='Triangle',NodesPerElement=3,Dimensions=(/3_I8P,9007199254740992_I8P/),Order=1,BaseOffset=0); call topology%close(file%xml_handler)
     call file%closefile()
 
+    call file%parsefile()
+    document_root => getDocumentElement(file%get_document_root())
+
+    if(hasChildNodes(document_root)) then
+        element_list => getElementsByTagname(document_root, 'Topology')
+        do i = 0, getLength(element_list) - 1
+            element => item(element_list, i)
+            call topology%parse(element)
+            call topology%print()
+        enddo
+    endif
+    call topology%free()
 
 end program test_xdmf_topology

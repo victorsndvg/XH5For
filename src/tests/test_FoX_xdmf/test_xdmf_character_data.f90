@@ -1,6 +1,7 @@
 program test_xdmf_character_data
 
 use fox_xdmf
+use fox_dom
 use IR_Precision, only: I4P, I8P, R4P, R8P
 
 implicit none
@@ -8,6 +9,9 @@ implicit none
     type(xdmf_file_t) :: file
     type(xdmf_dataitem_t) :: dataitem
     type(xdmf_character_data_t) :: character_data
+    type(Node), pointer :: document_root, element
+    type(NodeList), pointer :: element_list
+    integer :: i
 
     call file%set_filename('test_xdmf_character_data.xmf')
     call file%openfile()
@@ -58,6 +62,19 @@ implicit none
     call dataitem%close(file%xml_handler)
 
     call file%closefile()
+
+    call file%parsefile()
+    document_root => getDocumentElement(file%get_document_root())
+
+    if(hasChildNodes(document_root)) then
+        element_list => getElementsByTagname(document_root, "DataItem")
+        do i = 0, getLength(element_list) - 1
+            element => item(element_list, i)
+            call dataitem%parse(element)
+            call dataitem%print()
+        enddo
+    endif
+    call dataitem%free()
 
 
 end program test_xdmf_character_data

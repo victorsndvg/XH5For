@@ -1,11 +1,15 @@
 program test_xdmf_attribute
 
 use fox_xdmf
+use fox_dom
 
 implicit none
 
     type(xdmf_file_t) :: file
     type(xdmf_attribute_t) :: attribute
+    type(Node), pointer :: document_root, element
+    type(NodeList), pointer :: element_list
+    integer :: i
 
 
     call file%set_filename('test_xdmf_attribute.xmf')
@@ -28,5 +32,17 @@ implicit none
     call attribute%open(file%xml_handler, AttributeType='Scalar', Center='Node'); call attribute%close(file%xml_handler)
     call file%closefile()
 
+    call file%parsefile()
+    document_root => getDocumentElement(file%get_document_root())
+
+    if(hasChildNodes(document_root)) then
+        element_list => getElementsByTagname(document_root, "Attribute")
+        do i = 0, getLength(element_list) - 1
+            element => item(element_list, i)
+            call attribute%parse(element)
+            call attribute%print()
+        enddo
+    endif
+    call attribute%free()
 
 end program test_xdmf_attribute
