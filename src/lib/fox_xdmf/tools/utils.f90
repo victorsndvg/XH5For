@@ -28,6 +28,51 @@ contains
     end function Upper_Case
 
 
+    function Count_tokens(s1)
+    !-----------------------------------------------------------------
+    !< Function for counting tokens of a string 
+    !< @author David Frank  dave_frank@hotmail.com (http://home.earthlink.net/~dave_gemini/strings.f90)
+    !-----------------------------------------------------------------
+        character(len=*), intent(IN) :: s1
+        character(len=len(s1))       :: s
+        integer                      :: Count_tokens
+        integer                      :: i, k
+    !-----------------------------------------------------------------
+        s = s1                            ! remove possible last char null (in C)
+        k = 0  ; if (s /= ' ') k = 1      ! string has at least 1 item
+        do i = 1,len_trim(s)-1
+           if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') k = k+1
+        enddo
+        Count_tokens = k
+    end function Count_tokens
+
+    function Next_token(s1, pos)
+    !-----------------------------------------------------------------
+    !< Return the next token given a initial position. The position
+    !< is updated to reference the start of the next token
+    !-----------------------------------------------------------------
+        character(len=*), intent(IN)    :: s1
+        integer,          intent(INOUT) :: pos
+        character(len=len(s1))          :: s
+        character(len=:), allocatable   :: Next_token
+        integer                         :: i, k
+    !-----------------------------------------------------------------
+        s = s1    
+        if(pos<=len(s)) then     
+            k = len_trim(s)
+            do i = pos,len_trim(s)-1
+                if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') then
+                    k = i+1
+                    exit
+                endif
+            enddo
+            Next_token = s(pos:k)
+            pos = k
+        endif
+
+    end function Next_token
+
+
     elemental function is_in_option_list(option_list, option, separator) 
     !-----------------------------------------------------------------
     !< Return True if *option* is a substring of *option_list*
