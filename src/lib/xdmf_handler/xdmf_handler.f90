@@ -7,6 +7,7 @@ module xdmf_handler
 use xh5for_parameters
 use IR_Precision, only : I4P, I8P, R4P, R8P
 use fox_xdmf
+use fox_dom
 use mpi_environment
 use spatial_grid_descriptor
 use uniform_grid_descriptor
@@ -22,6 +23,7 @@ private
         character(len=:),            allocatable :: prefix                          !< Name prefix of the XDMF file
         character(len=4)                         :: ext = '.xmf'                    !< XDMF file extension
         type(xdmf_file_t)                        :: file                            !< XDMF file handler
+        integer(I4P)                             :: action                          !< XDMF purpose (Read or Write)
         type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
@@ -41,6 +43,7 @@ private
         procedure,                                   public   :: Initialize      => xdmf_handler_Initialize
         procedure,                                   public   :: Free            => xdmf_handler_Free
         procedure,                                   public   :: OpenFile        => xdmf_handler_OpenFile
+!        procedure,                                   public   :: ParseFile       => xdmf_handler_ParseFile
         procedure,                                   public   :: CloseFile       => xdmf_handler_CloseFile
         generic,                                     public   :: SetGeometry     => SetGeometry_R4P, &
                                                                                     SetGeometry_R8P
@@ -181,17 +184,24 @@ contains
     end subroutine xdmf_handler_Free
 
 
-    subroutine xdmf_handler_OpenFile(this, fileprefix)
+    subroutine xdmf_handler_OpenFile(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file
     !----------------------------------------------------------------- 
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
+        integer(I4P),          intent(IN)    :: action                !< XDMF Openfile action (Read of Write)
         character(len=*),      intent(IN)    :: fileprefix            !< XDMF filename
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             this%prefix = trim(adjustl(fileprefix))
+            this%action = action
             call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
-            call this%file%openfile()
+            select case(this%action)
+                case(XDMF_ACTION_WRITE) 
+                    call this%file%openfile()
+                case(XDMF_ACTION_READ) 
+                    call this%file%parsefile()
+            end select
         endif
     end subroutine xdmf_handler_OpenFile
 
@@ -203,8 +213,29 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call this%file%closefile()
+            select case(this%action)
+                case(XDMF_ACTION_WRITE) 
+                    call this%file%closefile()
+                case(XDMF_ACTION_READ) 
+                    call destroy(this%file%get_document_root())
+            end select
         endif
     end subroutine xdmf_handler_CloseFile
+
+
+    function xdmf_handler_NodeIsDocumentRoot(this, DOMNode) result(NodeIsDocumentRoot)
+    !-----------------------------------------------------------------
+    !< Check if a DOM node is a document root
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
+        type(Node), pointer,   intent(IN)    :: DOMNode               !< FoX DOM Node 
+        logical                              :: NodeIsDocumentRoot    !< Return True if the passed node is the root of the document
+    !----------------------------------------------------------------- 
+        NodeIsDocumentRoot = .false.
+        if(associated(DOMNode)) then
+            NodeIsDocumentRoot = (getNodeType(this%file%get_document_root())==DOCUMENT_NODE)
+        endif
+    end function xdmf_handler_NodeIsDocumentRoot
+
 
 end module xdmf_handler

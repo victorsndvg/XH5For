@@ -59,9 +59,11 @@ private
     end interface
 
     abstract interface
-        subroutine xh5for_handler_Open(this, fileprefix)
+        subroutine xh5for_handler_Open(this, action, fileprefix)
             import xh5for_handler_t 
+            import I4P
             class(xh5for_handler_t), intent(INOUT) :: this
+            integer(I4P),            intent(IN)    :: action
             character(len=*),        intent(IN)    :: fileprefix
         end subroutine xh5for_handler_Open
     end interface

@@ -15,14 +15,16 @@ implicit none
     type :: xh5for_t
     private
         integer(I4P)                         :: Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
+        integer(I4P)                         :: Action   = XDMF_ACTION_WRITE
         type(mpi_env_t)                      :: MPIEnvironment
         type(uniform_grid_descriptor_t)      :: UniformGridDescriptor
         type(spatial_grid_descriptor_t)      :: SpatialGridDescriptor
         class(xh5for_handler_t), allocatable :: Handler
     contains
     private
-        procedure         :: xh5for_Initialize_I4P
-        procedure         :: xh5for_Initialize_I8P
+        procedure         :: xh5for_Initialize_Reader
+        procedure         :: xh5for_Initialize_Writer_I4P
+        procedure         :: xh5for_Initialize_Writer_I8P
         procedure         :: xh5for_WriteGeometry_R4P
         procedure         :: xh5for_WriteGeometry_R8P
         procedure         :: xh5for_WriteTopology_I4P
@@ -33,8 +35,9 @@ implicit none
         procedure         :: xh5for_WriteAttribute_R8P
         procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
-        generic,   public :: Initialize            => xh5for_Initialize_I4P, &
-                                                      xh5for_Initialize_I8P
+        generic,   public :: Initialize            => xh5for_Initialize_Writer_I4P, &
+                                                      xh5for_Initialize_Writer_I8P, &
+                                                      xh5for_Initialize_Reader
         procedure, public :: Free                  => xh5for_Free
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Close                 => xh5for_Close
@@ -76,6 +79,7 @@ contains
         if(this%is_valid_Strategy(Strategy)) this%Strategy = Strategy
     end subroutine xh5for_SetStrategy
 
+
     subroutine xh5for_Free(this)
     !----------------------------------------------------------------- 
     !< Free XH5For derived type
@@ -89,7 +93,37 @@ contains
         call this%SpatialGridDescriptor%Free()
     end subroutine xh5for_Free
 
-    subroutine xh5for_Initialize_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+
+    subroutine xh5for_Initialize_Reader(this, comm, root)
+    !----------------------------------------------------------------- 
+    !< Apply strategy and initialize lightdata and heavydata handlers
+    !----------------------------------------------------------------- 
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+        integer, optional, intent(IN)     :: comm                     !< MPI communicator
+        integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
+        integer                           :: error                    !< Error variable
+        integer                           :: r_root = 0               !< Real MPI root procesor
+    !----------------------------------------------------------------- 
+        this%Action = XDMF_ACTION_READ
+        if(present(root)) r_root = root
+        call this%Free()
+        ! MPI environment initialization
+        if(present(comm)) then
+            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
+        else
+            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
+        endif
+        ! XH5For handler initialization
+        call this%Handler%Initialize(                             &
+                MPIEnvironment=this%MPIEnvironment,               &
+                SpatialGridDescriptor=this%SpatialGridDescriptor, &
+                UniformGridDescriptor=this%UniformGridDescriptor)
+
+    end subroutine xh5for_Initialize_Reader
+
+
+    subroutine xh5for_Initialize_Writer_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
@@ -104,6 +138,7 @@ contains
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
+        this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
         call this%Free()
         ! MPI environment initialization
@@ -133,10 +168,10 @@ contains
                 SpatialGridDescriptor=this%SpatialGridDescriptor, &
                 UniformGridDescriptor=this%UniformGridDescriptor)
 
-    end subroutine xh5for_Initialize_I4P
+    end subroutine xh5for_Initialize_Writer_I4P
 
 
-    subroutine xh5for_Initialize_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+    subroutine xh5for_Initialize_Writer_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
@@ -151,6 +186,7 @@ contains
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
+        this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
         call this%Free()
         ! MPI environment initialization
@@ -179,17 +215,19 @@ contains
                 MPIEnvironment=this%MPIEnvironment,               &
                 SpatialGridDescriptor=this%SpatialGridDescriptor, &
                 UniformGridDescriptor=this%UniformGridDescriptor)
-    end subroutine xh5for_Initialize_I8P
+    end subroutine xh5for_Initialize_Writer_I8P
 
 
-    subroutine xh5for_Open(this, fileprefix)
+    subroutine xh5for_Open(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF and HDF5 files
     !----------------------------------------------------------------- 
-        class(xh5for_t),  intent(INOUT) :: this                       !< XH5For derived type
-        character(len=*), intent(IN)    :: fileprefix                 !< XDMF filename prefix
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        character(len=*),       intent(IN)    :: fileprefix           !< XDMF filename prefix
+        integer(I4P), optional, intent(IN)    :: action               !< XDMF Open file action (Read or Write)
     !-----------------------------------------------------------------
-        call this%Handler%Open(fileprefix)
+        if(present(action)) this%action = action
+        call this%Handler%Open(action=this%action, fileprefix=fileprefix)
     end subroutine xh5for_Open
 
 

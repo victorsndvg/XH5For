@@ -25,6 +25,7 @@ private
         character(len=:),            allocatable :: prefix                          !< Name prefix of the HDF5 file
         character(len=3)                         :: ext = '.h5'                     !< HDF5 file extension
         integer(HID_T)                           :: file_id                         !< File identifier 
+        integer(I4P)                             :: action                          !< HDF5 action to be perfomed (Read or Write)
         type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
         type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
         type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
@@ -175,16 +176,35 @@ contains
     end subroutine hdf5_handler_Free
 
 
-    subroutine hdf5_handler_OpenFile(this, fileprefix)
+    subroutine hdf5_handler_OpenFile(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open a HDF5 file
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
+        integer(I4P),          intent(IN)    :: action                !< Action to be perfomed (Read or Write)
+        character(len=*),      intent(IN)    :: fileprefix            !< HDF5 file prefix
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
-        character(len=*),  intent(IN)        :: fileprefix
+        integer                              :: access_flag           !< HDF5 access flag for file creation
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
+
+        this%action = action
+        select case(this%action)
+            case(XDMF_ACTION_WRITE)
+                ! If file already exists, file is opened with read-write 
+                ! access and new data overwrites existing data, destroying 
+                ! all prior content, i.e., file content is truncated upon
+                ! opening. 
+                ! If file does not exist, it is created and opened with 
+                ! read-write access.
+                access_flag = H5F_ACC_TRUNC_F
+            case(XDMF_ACTION_READ)
+                ! Existing file is opened with read-only access. If file 
+                ! does not exist, H5Fopen fails.
+                access_flag = H5F_ACC_RDONLY_F
+        end select
+
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
         call H5pset_fapl_mpio_f(prp_id = plist_id, &
@@ -198,6 +218,7 @@ contains
                         creation_prp = H5P_DEFAULT_F,                &
                         access_prp   = plist_id)
         call h5pclose_f(prp_id = plist_id, hdferr = hdferror)
+
 #endif
     end subroutine hdf5_handler_OpenFile
 

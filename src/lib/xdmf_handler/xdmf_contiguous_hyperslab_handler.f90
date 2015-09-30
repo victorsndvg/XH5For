@@ -320,23 +320,30 @@ contains
     end subroutine xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_OpenFile(this, fileprefix)
+    subroutine xdmf_contiguous_hyperslab_handler_OpenFile(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler
+        integer(I4P),                               intent(IN)    :: action     !< XDMF action to be performed (Read or Write)
         character(len=*),                           intent(IN)    :: fileprefix !< XDMF filename prefix
         type(xdmf_grid_t)                                         :: grid       !< XDMF Grid type
         type(xdmf_domain_t)                                       :: domain     !< XDMF Domain type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             this%prefix = trim(adjustl(fileprefix))
-            call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
-            call this%file%openfile()
-            call domain%open(xml_handler = this%file%xml_handler)
-            call grid%open(xml_handler = this%file%xml_handler, &
-                    GridType='Collection', &
-                    CollectionType='Spatial')
+            this%action = action
+            select case(this%action)
+                case(XDMF_ACTION_WRITE)
+                    call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
+                    call this%file%openfile()
+                    call domain%open(xml_handler = this%file%xml_handler)
+                    call grid%open(xml_handler = this%file%xml_handler, &
+                            GridType='Collection', &
+                            CollectionType='Spatial')
+                case(XDMF_ACTION_READ) 
+                    call this%file%parsefile()
+            end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_OpenFile
 
@@ -351,9 +358,14 @@ contains
         type(xdmf_domain_t)                                       :: domain   !< XDMF Domain type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call grid%close(xml_handler=this%file%xml_handler)
-            call domain%close(xml_handler = this%file%xml_handler)
-            call this%file%closefile()
+            select case(this%action)
+                case(XDMF_ACTION_WRITE)
+                    call grid%close(xml_handler=this%file%xml_handler)
+                    call domain%close(xml_handler = this%file%xml_handler)
+                    call this%file%closefile()
+                case(XDMF_ACTION_READ)
+                    call this%file%parsefile()
+            end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_CloseFile
 

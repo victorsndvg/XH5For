@@ -64,15 +64,16 @@ contains
         call this%HeavyData%Free()
     end subroutine xh5for_contiguous_hyperslab_handler_Free
 
-    subroutine xh5for_contiguous_hyperslab_handler_Open(this, fileprefix)
+    subroutine xh5for_contiguous_hyperslab_handler_Open(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open the lightdata and the heavydata files
     !----------------------------------------------------------------- 
         class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this         !< XH5For contiguous hyperslab handler
+        integer(I4P),                                 intent(IN)    :: action       !< XH5For Open action (Read or Write)
         character(len=*),                             intent(IN)    :: fileprefix   !< Filename prefix
     !-----------------------------------------------------------------
-        call this%HeavyData%OpenFile(fileprefix)
-        call this%LightData%OpenFile(fileprefix)
+        call this%HeavyData%OpenFile(action=action, fileprefix=fileprefix)
+        call this%LightData%OpenFile(action=action, fileprefix=fileprefix)
     end subroutine xh5for_contiguous_hyperslab_handler_Open
 
 
