@@ -41,27 +41,100 @@ implicit none
         integer(I4P)                  :: BaseOffset
     contains
     private
-        procedure         :: topology_open_no_dimensions
-        procedure         :: topology_open_I4P_dimension
-        procedure         :: topology_open_I8P_dimension
-        procedure         :: topology_open_I4P_dimensions
-        procedure         :: topology_open_I8P_dimensions
-        procedure         :: default_initialization => topology_default_initialization
-        procedure         :: is_valid_TopologyType  => topology_is_valid_TopologyType
-        procedure, public :: free                   => topology_free
-        generic,   public :: open                   => topology_open_no_dimensions,  &
-                                                       topology_open_I4P_dimension,  &
-                                                       topology_open_I8P_dimension,  &
-                                                       topology_open_I4P_dimensions, &
-                                                       topology_open_I8P_dimensions
-        procedure, public :: close                  => topology_close
-        procedure, public :: parse                  => topology_parse
-        procedure, public :: print                  => topology_print
+        procedure         :: xdmf_topology_open_no_dimensions
+        procedure         :: xdmf_topology_open_I4P_dimension
+        procedure         :: xdmf_topology_open_I8P_dimension
+        procedure         :: xdmf_topology_open_I4P_dimensions
+        procedure         :: xdmf_topology_open_I8P_dimensions
+        procedure         :: default_initialization => xdmf_topology_default_initialization
+        procedure         :: is_valid_TopologyType  => xdmf_topology_is_valid_TopologyType
+        procedure, public :: free                   => xdmf_topology_free
+        generic,   public :: open                   => xdmf_topology_open_no_dimensions,  &
+                                                       xdmf_topology_open_I4P_dimension,  &
+                                                       xdmf_topology_open_I8P_dimension,  &
+                                                       xdmf_topology_open_I4P_dimensions, &
+                                                       xdmf_topology_open_I8P_dimensions
+        procedure, public :: close                  => xdmf_topology_close
+        procedure, public :: parse                  => xdmf_topology_parse
+        procedure, public :: print                  => xdmf_topology_print
+        procedure, public :: get_Name               => xdmf_topology_get_Name
+        procedure, public :: get_TopologyType       => xdmf_topology_get_TopologyType
+        procedure, public :: get_NodesPerElement    => xdmf_topology_get_NodesPerElement
+        procedure, public :: get_Dimensions         => xdmf_topology_get_Dimensions
+        procedure, public :: get_Order              => xdmf_topology_get_Order
+        procedure, public :: get_BaseOffset         => xdmf_topology_get_BaseOffset
     end type xdmf_topology_t
 
 contains
 
-    function topology_is_valid_TopologyType(this, TopologyType) result(is_valid)
+
+    function xdmf_topology_get_Name(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology Name
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
+        character(len=:), allocatable :: xdmf_topology_get_name       !< Topology Name
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_name = this%Name
+    end function xdmf_topology_get_Name
+
+
+    function xdmf_topology_get_TopologyType(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology TopologyType
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                      !< XDMF Topology type
+        character(len=:), allocatable :: xdmf_topology_get_TopologyType !< Topology TopologyType
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_TopologyType = this%TopologyType
+    end function xdmf_topology_get_TopologyType
+
+
+    function xdmf_topology_get_NodesPerElement(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology NodesPerElement
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
+        integer(I4P) :: xdmf_topology_get_NodesPerElement             !< Topology NodePerElement
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_NodesPerElement = this%NodesPerElement
+    end function xdmf_topology_get_NodesPerElement
+
+
+    function xdmf_topology_get_Dimensions(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology Dimensions
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
+        integer(I4P), allocatable :: xdmf_topology_get_Dimensions(:)  !< Topology Dimensions
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_Dimensions = this%Dimensions
+    end function xdmf_topology_get_Dimensions
+
+
+    function xdmf_topology_get_Order(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology Order
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
+        integer(I4P) :: xdmf_topology_get_Order                       !< Topology Order
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_Order = this%Order
+    end function xdmf_topology_get_Order
+
+
+    function xdmf_topology_get_BaseOffset(this)
+    !-----------------------------------------------------------------
+    !< Return the Topology BaseOffset
+    !----------------------------------------------------------------- 
+        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
+        integer(I4P) :: xdmf_topology_get_BaseOffset                  !< Topology BaseOffset
+    !----------------------------------------------------------------- 
+        xdmf_topology_get_baseOffset = this%BaseOffset
+    end function xdmf_topology_get_BaseOffset
+
+
+    function xdmf_topology_is_valid_TopologyType(this, TopologyType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid Topology TopologyType
     !----------------------------------------------------------------- 
@@ -79,10 +152,10 @@ contains
 
         is_valid = is_in_option_list(option_list=allowed_TopologyTypes, option=TopologyType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong TopologyType: "'//TopologyType//'" (Note: Case sensitive)')
-    end function topology_is_valid_TopologyType
+    end function xdmf_topology_is_valid_TopologyType
 
 
-    subroutine topology_free(this)
+    subroutine xdmf_topology_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Topology type
     !----------------------------------------------------------------- 
@@ -94,20 +167,20 @@ contains
         this%NodesPerElement = 0
         this%Order = 0
         this%BaseOffset = 0
-    end subroutine topology_free
+    end subroutine xdmf_topology_free
 
 
-    subroutine topology_default_initialization(this)
+    subroutine xdmf_topology_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF Topology with default attribute values
     !----------------------------------------------------------------- 
         class(xdmf_topology_t), intent(INOUT) :: this                 !< XDMF topology type
     !----------------------------------------------------------------- 
         call this%free()
-    end subroutine topology_default_initialization
+    end subroutine xdmf_topology_default_initialization
 
 
-    subroutine topology_open_no_dimensions(this, xml_handler, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    subroutine xdmf_topology_open_no_dimensions(this, xml_handler, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -139,10 +212,10 @@ contains
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open_no_dimensions
+    end subroutine xdmf_topology_open_no_dimensions
 
 
-    subroutine topology_open_I4P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    subroutine xdmf_topology_open_I4P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -179,10 +252,10 @@ contains
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open_I4P_dimension
+    end subroutine xdmf_topology_open_I4P_dimension
 
 
-    subroutine topology_open_I8P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    subroutine xdmf_topology_open_I8P_dimension(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -219,11 +292,11 @@ contains
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open_I8P_dimension
+    end subroutine xdmf_topology_open_I8P_dimension
 
 
 
-    subroutine topology_open_I4P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    subroutine xdmf_topology_open_I4P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -263,10 +336,10 @@ contains
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open_I4P_dimensions
+    end subroutine xdmf_topology_open_I4P_dimensions
 
 
-    subroutine topology_open_I8P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
+    subroutine xdmf_topology_open_I8P_dimensions(this, xml_handler, Dimensions, Name, TopologyType, NodesPerElement, Order, BaseOffset)
     !-----------------------------------------------------------------
     !< Open a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -306,10 +379,10 @@ contains
 
         if(PRESENT(BaseOffset)) &
             call xml_AddAttribute(xml_handler, name="BaseOffset", value=BaseOffset)
-    end subroutine topology_open_I8P_dimensions
+    end subroutine xdmf_topology_open_I8P_dimensions
 
 
-    subroutine topology_parse(this, DOMNode)
+    subroutine xdmf_topology_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM topology into a XDMF element
     !----------------------------------------------------------------- 
@@ -361,10 +434,10 @@ contains
             endif
 
         endif
-    end subroutine topology_parse
+    end subroutine xdmf_topology_parse
 
 
-    subroutine topology_close(this, xml_handler)
+    subroutine xdmf_topology_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new topology XDMF element
     !----------------------------------------------------------------- 
@@ -372,10 +445,10 @@ contains
         type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Topology')
-    end subroutine topology_close
+    end subroutine xdmf_topology_close
 
 
-    subroutine topology_print(this, IndentationLevel)
+    subroutine xdmf_topology_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Topology XDMF element
     !----------------------------------------------------------------- 
@@ -393,7 +466,7 @@ contains
         print*, repeat('  ',indlev)//'NodesPerElement: '//str(no_sign=.true.,n=this%NodesPerElement)
 !        print*, repeat('  ',indlev)//'Order: '//str(no_sign=.true.,n=this%Order)
 !        print*, repeat('  ',indlev)//'BaseOffset: '//str(no_sign=.true.,n=this%BaseOffset)
-    end subroutine topology_print
+    end subroutine xdmf_topology_print
 
 
 end module xdmf_topology

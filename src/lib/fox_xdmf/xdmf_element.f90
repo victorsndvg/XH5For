@@ -19,67 +19,67 @@ implicit none
         logical, public               :: warn = .true. !< @Note Remove this variable or set to .false.. .true. Only valid under development
     contains
     private
-        procedure, public                 :: get_tag             => element_get_tag
-        procedure, public                 :: set_tag             => element_set_tag
-        procedure, public                 :: node_is_xdmf        => element_node_is_xdmf
-        procedure, public                 :: node_is_domain      => element_node_is_domain
-        procedure, public                 :: node_is_grid        => element_node_is_grid
-        procedure, public                 :: node_is_topology    => element_node_is_topology
-        procedure, public                 :: node_is_geometry    => element_node_is_geometry
-        procedure, public                 :: node_is_attribute   => element_node_is_attribute
-        procedure, public                 :: node_is_dataitem    => element_node_is_dataitem
-        procedure, public                 :: node_is_time        => element_node_is_time
-        procedure, public                 :: node_is_information => element_node_is_information
-        procedure(element_default_initialization), deferred :: default_initialization
-        procedure(element_free),   public,         deferred :: free
+        procedure, public                 :: get_tag             => xdmf_element_get_tag
+        procedure, public                 :: set_tag             => xdmf_element_set_tag
+        procedure, public                 :: node_is_xdmf        => xdmf_element_node_is_xdmf
+        procedure, public                 :: node_is_domain      => xdmf_element_node_is_domain
+        procedure, public                 :: node_is_grid        => xdmf_element_node_is_grid
+        procedure, public                 :: node_is_topology    => xdmf_element_node_is_topology
+        procedure, public                 :: node_is_geometry    => xdmf_element_node_is_geometry
+        procedure, public                 :: node_is_attribute   => xdmf_element_node_is_attribute
+        procedure, public                 :: node_is_dataitem    => xdmf_element_node_is_dataitem
+        procedure, public                 :: node_is_time        => xdmf_element_node_is_time
+        procedure, public                 :: node_is_information => xdmf_element_node_is_information
+        procedure(xdmf_element_default_initialization), deferred :: default_initialization
+        procedure(xdmf_element_free),   public,         deferred :: free
 
-        procedure(element_parse),  public,         deferred :: parse
-        procedure(element_close),  public,         deferred :: close
-        procedure(element_print),  public,         deferred :: print
+        procedure(xdmf_element_parse),  public,         deferred :: parse
+        procedure(xdmf_element_close),  public,         deferred :: close
+        procedure(xdmf_element_print),  public,         deferred :: print
     end type xdmf_element_t
 
     abstract interface
-        subroutine element_default_initialization(this)
+        subroutine xdmf_element_default_initialization(this)
             import xdmf_element_t
             class(xdmf_element_t), intent(INOUT) :: this
-        end subroutine element_default_initialization
+        end subroutine xdmf_element_default_initialization
 
-        subroutine element_free(this)
+        subroutine xdmf_element_free(this)
             import xdmf_element_t
             class(xdmf_element_t), intent(INOUT) :: this
-        end subroutine element_free
+        end subroutine xdmf_element_free
 
-        subroutine element_open(this)
+        subroutine xdmf_element_open(this)
             import xdmf_element_t
             class(xdmf_element_t), intent(INOUT) :: this
-        end subroutine element_open
+        end subroutine xdmf_element_open
 
-        subroutine element_parse(this, DOMNode)
+        subroutine xdmf_element_parse(this, DOMNode)
             import xdmf_element_t
             import Node
             class(xdmf_element_t), intent(INOUT) :: this
             type(Node), pointer,   intent(IN)    :: DOMNode
-        end subroutine element_parse
+        end subroutine xdmf_element_parse
 
-        subroutine element_close(this, xml_handler)
+        subroutine xdmf_element_close(this, xml_handler)
             import xdmf_element_t
             import xmlf_t
             class(xdmf_element_t), intent(IN)    :: this
             type(xmlf_t),          intent(INOUT) :: xml_handler
-        end subroutine element_close
+        end subroutine xdmf_element_close
 
-        subroutine element_print(this, IndentationLevel)
+        subroutine xdmf_element_print(this, IndentationLevel)
             import xdmf_element_t
             import I4P
             class(xdmf_element_t),  intent(IN) :: this
             integer(I4P), optional, intent(IN) :: IndentationLevel
-        end subroutine element_print
+        end subroutine xdmf_element_print
     end interface
 
 
 contains
 
-    function element_get_tag(this) result(tag)
+    function xdmf_element_get_tag(this) result(tag)
     !----------------------------------------------------------------- 
     !< Get the element Tag
     !----------------------------------------------------------------- 
@@ -87,10 +87,10 @@ contains
         character(len=:), allocatable :: tag
     !----------------------------------------------------------------- 
         if(allocated(this%tag)) tag = this%tag
-    end function element_get_tag
+    end function xdmf_element_get_tag
 
 
-    subroutine element_set_tag(this, tag) 
+    subroutine xdmf_element_set_tag(this, tag) 
     !-----------------------------------------------------------------
     !< Set the element Tag
     !----------------------------------------------------------------- 
@@ -98,114 +98,114 @@ contains
         character(len=*), intent(IN) :: tag
     !----------------------------------------------------------------- 
         this%Tag = tag
-    end subroutine element_set_tag
+    end subroutine xdmf_element_set_tag
 
 
-    function element_node_is_xdmf(this, DOMNode)
+    function xdmf_element_node_is_xdmf(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Xdmf
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                  !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode               !< FoX DOM Node 
-        logical                              :: element_node_is_xdmf  !< True if DOM Node is a XDMF Xdmf
+        logical                              :: xdmf_element_node_is_xdmf  !< True if DOM Node is a XDMF Xdmf
     !----------------------------------------------------------------- 
-        element_node_is_xdmf = (getTagName(DOMNode) == 'Xdmf')
-    end function element_node_is_Xdmf
+        xdmf_element_node_is_xdmf = (getTagName(DOMNode) == 'Xdmf')
+    end function xdmf_element_node_is_Xdmf
 
 
-    function element_node_is_domain(this, DOMNode)
+    function xdmf_element_node_is_domain(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Domain
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                  !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode               !< FoX DOM Node 
-        logical                              :: element_node_is_domain!< True if DOM Node is a XDMF Domain
+        logical                              :: xdmf_element_node_is_domain!< True if DOM Node is a XDMF Domain
     !----------------------------------------------------------------- 
-        element_node_is_domain = (getTagName(DOMNode) == 'Domain')
-    end function element_node_is_domain
+        xdmf_element_node_is_domain = (getTagName(DOMNode) == 'Domain')
+    end function xdmf_element_node_is_domain
 
 
-    function element_node_is_grid(this, DOMNode)
+    function xdmf_element_node_is_grid(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Grid
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                  !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode               !< FoX DOM Node 
-        logical                              :: element_node_is_grid  !< True if DOM Node is a XDMF Grid
+        logical                              :: xdmf_element_node_is_grid  !< True if DOM Node is a XDMF Grid
     !----------------------------------------------------------------- 
-        element_node_is_grid = (getTagName(DOMNode) == 'Grid')
-    end function element_node_is_grid
+        xdmf_element_node_is_grid = (getTagName(DOMNode) == 'Grid')
+    end function xdmf_element_node_is_grid
 
 
-    function element_node_is_topology(this, DOMNode)
+    function xdmf_element_node_is_topology(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Topology
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                     !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode                  !< FoX DOM Node 
-        logical                              :: element_node_is_topology !< True if DOM Node is a XDMF Topology
+        logical                              :: xdmf_element_node_is_topology !< True if DOM Node is a XDMF Topology
     !----------------------------------------------------------------- 
-        element_node_is_topology = (getTagName(DOMNode) == 'Topology')
-    end function element_node_is_topology
+        xdmf_element_node_is_topology = (getTagName(DOMNode) == 'Topology')
+    end function xdmf_element_node_is_topology
 
 
-    function element_node_is_geometry(this, DOMNode)
+    function xdmf_element_node_is_geometry(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Geometry
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                     !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode                  !< FoX DOM Node 
-        logical                              :: element_node_is_geometry !< True if DOM Node is a XDMF Geometry
+        logical                              :: xdmf_element_node_is_geometry !< True if DOM Node is a XDMF Geometry
     !----------------------------------------------------------------- 
-        element_node_is_geometry = (getTagName(DOMNode) == 'Geometry')
-    end function element_node_is_geometry
+        xdmf_element_node_is_geometry = (getTagName(DOMNode) == 'Geometry')
+    end function xdmf_element_node_is_geometry
 
 
-    function element_node_is_attribute(this, DOMNode)
+    function xdmf_element_node_is_attribute(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Attribute
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                      !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode                   !< FoX DOM Node 
-        logical                              :: element_node_is_attribute !< True if DOM Node is a XDMF Attribute
+        logical                              :: xdmf_element_node_is_attribute !< True if DOM Node is a XDMF Attribute
     !----------------------------------------------------------------- 
-        element_node_is_attribute = (getTagName(DOMNode) == 'Attribute')
-    end function element_node_is_attribute
+        xdmf_element_node_is_attribute = (getTagName(DOMNode) == 'Attribute')
+    end function xdmf_element_node_is_attribute
 
 
-    function element_node_is_dataitem(this, DOMNode)
+    function xdmf_element_node_is_dataitem(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a DataItem
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                     !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode                  !< FoX DOM Node 
-        logical                              :: element_node_is_dataitem !< True if DOM Node is a XDMF DataItem
+        logical                              :: xdmf_element_node_is_dataitem !< True if DOM Node is a XDMF DataItem
     !----------------------------------------------------------------- 
-        element_node_is_dataitem = (getTagName(DOMNode) == 'DataItem')
-    end function element_node_is_dataitem
+        xdmf_element_node_is_dataitem = (getTagName(DOMNode) == 'DataItem')
+    end function xdmf_element_node_is_dataitem
 
 
-    function element_node_is_time(this, DOMNode)
+    function xdmf_element_node_is_time(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Time
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                  !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode               !< FoX DOM Node 
-        logical                              :: element_node_is_time  !< True if DOM Node is a XDMF Time
+        logical                              :: xdmf_element_node_is_time  !< True if DOM Node is a XDMF Time
     !----------------------------------------------------------------- 
-        element_node_is_time = (getTagName(DOMNode) == 'Time')
-    end function element_node_is_time
+        xdmf_element_node_is_time = (getTagName(DOMNode) == 'Time')
+    end function xdmf_element_node_is_time
 
 
-    function element_node_is_information(this, DOMNode)
+    function xdmf_element_node_is_information(this, DOMNode)
     !-----------------------------------------------------------------
     !< Check if a DOM Node is a Information
     !----------------------------------------------------------------- 
         class(xdmf_element_t), intent(INOUT) :: this                        !< XDMF Element type
         type(Node), pointer,   intent(IN)    :: DOMNode                     !< FoX DOM Node 
-        logical                              :: element_node_is_information !< True if DOM Node is a XDMF Information
+        logical                              :: xdmf_element_node_is_information !< True if DOM Node is a XDMF Information
     !----------------------------------------------------------------- 
-        element_node_is_information = (getTagName(DOMNode) == 'Information')
-    end function element_node_is_information
+        xdmf_element_node_is_information = (getTagName(DOMNode) == 'Information')
+    end function xdmf_element_node_is_information
 
 end module xdmf_element

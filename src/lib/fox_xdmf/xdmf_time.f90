@@ -25,23 +25,45 @@ implicit none
         real(R8P)                     :: Value
     contains
     private
-        procedure         :: default_initialization => time_default_initialization
-        procedure         :: is_valid_TimeType      => time_is_valid_TimeType
-        procedure, public :: free                   => time_free
-        procedure         :: time_open_timetype
-        procedure         :: time_open_R4P_value
-        procedure         :: time_open_R8P_value
-        generic,   public :: open                   => time_open_R4P_value, &
-                                                       time_open_R8P_value, &
-                                                       time_open_timetype
-        procedure, public :: parse                  => time_parse
-        procedure, public :: close                  => time_close
-        procedure, public :: print                  => time_print
+        procedure         :: default_initialization => xdmf_time_default_initialization
+        procedure         :: is_valid_TimeType      => xdmf_time_is_valid_TimeType
+        procedure, public :: free                   => xdmf_time_free
+        procedure         :: xdmf_time_open_timetype
+        procedure         :: xdmf_time_open_R4P_value
+        procedure         :: xdmf_time_open_R8P_value
+        generic,   public :: open                   => xdmf_time_open_R4P_value, &
+                                                       xdmf_time_open_R8P_value, &
+                                                       xdmf_time_open_timetype
+        procedure, public :: parse                  => xdmf_time_parse
+        procedure, public :: close                  => xdmf_time_close
+        procedure, public :: print                  => xdmf_time_print
     end type xdmf_time_t
 
 contains
 
-    function time_is_valid_TimeType(this, TimeType) result(is_valid)
+    function xdmf_time_get_TimeType(this)
+    !-----------------------------------------------------------------
+    !< Return the Time TimeType
+    !----------------------------------------------------------------- 
+        class(xdmf_time_t), intent(IN) :: this                        !< XDMF Time type
+        character(len=:), allocatable :: xdmf_time_get_TimeType       !< Time TimeType
+    !----------------------------------------------------------------- 
+        xdmf_time_get_TimeType = this%TimeType
+    end function xdmf_time_get_TimeType
+
+
+    function xdmf_time_get_Value(this)
+    !-----------------------------------------------------------------
+    !< Return the Time Value
+    !----------------------------------------------------------------- 
+        class(xdmf_time_t), intent(IN) :: this                        !< XDMF Time type
+        integer(R8P) :: xdmf_time_get_Value                           !< Time Value
+    !----------------------------------------------------------------- 
+        xdmf_time_get_Value = this%Value
+    end function xdmf_time_get_Value
+
+
+    function xdmf_time_is_valid_TimeType(this, TimeType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid Grid GridType
     !----------------------------------------------------------------- 
@@ -54,20 +76,20 @@ contains
         allowed_TimeTypes = 'Single&HyperSlab&List&Range'
         is_valid = is_in_option_list(option_list=allowed_TimeTypes, option=TimeType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong TimeType: "'//TimeType//'" (Note: Case sensitive)')
-    end function time_is_valid_TimeType
+    end function xdmf_time_is_valid_TimeType
 
 
-    subroutine time_free(this)
+    subroutine xdmf_time_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Time type
     !----------------------------------------------------------------- 
         class(xdmf_time_t), intent(INOUT) :: this                 !< XDMF Time type
     !----------------------------------------------------------------- 
         if(allocated(this%TimeType))   deallocate(this%TimeType)
-    end subroutine time_free
+    end subroutine xdmf_time_free
 
 
-    subroutine time_default_initialization(this)
+    subroutine xdmf_time_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF time with default attribute values
     !----------------------------------------------------------------- 
@@ -76,9 +98,9 @@ contains
         call this%free()
         this%TimeType = ''
         this%Value = 0._R8P
-    end subroutine time_default_initialization
+    end subroutine xdmf_time_default_initialization
 
-    subroutine time_open_timetype(this, xml_handler, TimeType)
+    subroutine xdmf_time_open_timetype(this, xml_handler, TimeType)
     !-----------------------------------------------------------------
     !< Open a new time XDMF element
     !----------------------------------------------------------------- 
@@ -92,9 +114,9 @@ contains
         if(PRESENT(TimeType)) then; if(this%is_valid_TimeType(TimeType)) &
             call xml_AddAttribute(xml_handler, name="TimeType", value=TimeType)
         endif
-    end subroutine time_open_timetype
+    end subroutine xdmf_time_open_timetype
 
-    subroutine time_open_R4P_value(this, xml_handler, TimeType, Value)
+    subroutine xdmf_time_open_R4P_value(this, xml_handler, TimeType, Value)
     !-----------------------------------------------------------------
     !< Open a new time XDMF element
     !----------------------------------------------------------------- 
@@ -111,9 +133,9 @@ contains
         endif
 
         call xml_AddAttribute(xml_handler, name="Value", value=Value)
-    end subroutine time_open_R4P_value
+    end subroutine xdmf_time_open_R4P_value
 
-    subroutine time_open_R8P_value(this, xml_handler, TimeType, Value)
+    subroutine xdmf_time_open_R8P_value(this, xml_handler, TimeType, Value)
     !-----------------------------------------------------------------
     !< Open a new time XDMF element
     !----------------------------------------------------------------- 
@@ -130,10 +152,10 @@ contains
         endif
 
         call xml_AddAttribute(xml_handler, name="Value", value=Value)
-    end subroutine time_open_R8P_value
+    end subroutine xdmf_time_open_R8P_value
 
 
-    subroutine time_parse(this, DOMNode)
+    subroutine xdmf_time_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM time into a XDMF element
     !----------------------------------------------------------------- 
@@ -155,10 +177,10 @@ contains
                 this%Value = cton(str=getAttribute(DOMNode, 'Value'),knd=0._R8P)
             endif
         endif
-    end subroutine time_parse
+    end subroutine xdmf_time_parse
 
 
-    subroutine time_close(this, xml_handler)
+    subroutine xdmf_time_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Time XDMF element
     !----------------------------------------------------------------- 
@@ -166,9 +188,9 @@ contains
         type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Time')
-    end subroutine time_close
+    end subroutine xdmf_time_close
 
-    subroutine time_print(this, IndentationLevel)
+    subroutine xdmf_time_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Time XDMF element
     !----------------------------------------------------------------- 
@@ -182,7 +204,7 @@ contains
         print*, repeat('  ',indlev)//'-------------------------------------------'
         if(allocated(this%TimeType)) print*, repeat('  ',indlev)//'TimeType: '//this%TimeType
         print*, repeat('  ',indlev)//'Value: '//str(no_sign=.true.,n=this%Value)
-    end subroutine time_print
+    end subroutine xdmf_time_print
 
 
 end module xdmf_time

@@ -23,19 +23,31 @@ implicit none
         character(len=:), allocatable :: GeometryType
     contains
     private
-        procedure         :: geometry_open 
-        procedure         :: default_initialization => geometry_default_initialization
-        procedure         :: is_valid_GeometryType  => geometry_is_valid_GeometryType
-        procedure, public :: free                   => geometry_free
-        generic,   public :: open                   => geometry_open
-        procedure, public :: parse                  => geometry_parse
-        procedure, public :: close                  => geometry_close
-        procedure, public :: print                  => geometry_print
+        procedure         :: xdmf_geometry_open 
+        procedure         :: default_initialization => xdmf_geometry_default_initialization
+        procedure         :: is_valid_GeometryType  => xdmf_geometry_is_valid_GeometryType
+        procedure, public :: free                   => xdmf_geometry_free
+        generic,   public :: open                   => xdmf_geometry_open
+        procedure, public :: parse                  => xdmf_geometry_parse
+        procedure, public :: close                  => xdmf_geometry_close
+        procedure, public :: print                  => xdmf_geometry_print
+        procedure, public :: get_GeometryType       => xdmf_geometry_get_GeometryType
     end type xdmf_geometry_t
 
 contains
 
-    function geometry_is_valid_GeometryType(this, GeometryType) result(is_valid)
+    function xdmf_geometry_get_GeometryType(this)
+    !-----------------------------------------------------------------
+    !< Return the Geometry GeometryType
+    !----------------------------------------------------------------- 
+        class(xdmf_geometry_t), intent(IN) :: this                      !< XDMF Geometry type
+        character(len=:), allocatable :: xdmf_geometry_get_GeometryType !< Geometry GeometryType
+    !----------------------------------------------------------------- 
+        xdmf_geometry_get_GeometryType = this%GeometryType
+    end function xdmf_geometry_get_GeometryType
+
+
+    function xdmf_geometry_is_valid_GeometryType(this, GeometryType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid Grid GridType
     !----------------------------------------------------------------- 
@@ -48,20 +60,20 @@ contains
         allowed_GeometryTypes = 'XYZ&XY&X_Y_Z&VxVyVz&Origin_DxDyDz%Origin_DxDy'
         is_valid = is_in_option_list(option_list=allowed_GeometryTypes, option=GeometryType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong GeometryType: "'//GeometryType//'" (Note: Case sensitive)')
-    end function geometry_is_valid_GeometryType
+    end function xdmf_geometry_is_valid_GeometryType
 
 
-    subroutine geometry_free(this)
+    subroutine xdmf_geometry_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Geometry type
     !----------------------------------------------------------------- 
         class(xdmf_geometry_t), intent(INOUT) :: this                 !< XDMF Geometry type
     !----------------------------------------------------------------- 
         if(allocated(this%GeometryType))   deallocate(this%GeometryType)
-    end subroutine geometry_free
+    end subroutine xdmf_geometry_free
 
 
-    subroutine geometry_default_initialization(this)
+    subroutine xdmf_geometry_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF geometry with default attribute values
     !----------------------------------------------------------------- 
@@ -69,10 +81,10 @@ contains
     !----------------------------------------------------------------- 
         call this%free()
         this%GeometryType = 'XYZ'
-    end subroutine geometry_default_initialization
+    end subroutine xdmf_geometry_default_initialization
 
 
-    subroutine geometry_open(this, xml_handler, GeometryType)
+    subroutine xdmf_geometry_open(this, xml_handler, GeometryType)
     !-----------------------------------------------------------------
     !< Open a new geometry XDMF element
     !----------------------------------------------------------------- 
@@ -86,10 +98,10 @@ contains
         if(PRESENT(GeometryType)) then; if(this%is_valid_GeometryType(GeometryType)) &
             call xml_AddAttribute(xml_handler, name="GeometryType", value=GeometryType)
         endif
-    end subroutine geometry_open
+    end subroutine xdmf_geometry_open
 
 
-    subroutine geometry_parse(this, DOMNode)
+    subroutine xdmf_geometry_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM geometry into a XDMF element
     !----------------------------------------------------------------- 
@@ -105,10 +117,10 @@ contains
                 if(this%is_valid_GeometryType(GeometryType=GeometryType)) this%GeometryType = GeometryType
             endif
         endif
-    end subroutine geometry_parse
+    end subroutine xdmf_geometry_parse
 
 
-    subroutine geometry_close(this, xml_handler)
+    subroutine xdmf_geometry_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Geometry XDMF element
     !----------------------------------------------------------------- 
@@ -116,10 +128,10 @@ contains
         type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Geometry')
-    end subroutine geometry_close
+    end subroutine xdmf_geometry_close
 
 
-    subroutine geometry_print(this, IndentationLevel)
+    subroutine xdmf_geometry_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Geometry XDMF element
     !----------------------------------------------------------------- 
@@ -132,7 +144,7 @@ contains
         print*, repeat('  ',indlev)//'GEOMETRY:'
         print*, repeat('  ',indlev)//'-------------------------------------------'
         if(allocated(this%GeometryType)) print*, repeat('  ',indlev)//'GeometryType: '//this%GeometryType
-    end subroutine geometry_print
+    end subroutine xdmf_geometry_print
 
 
 end module xdmf_geometry

@@ -22,28 +22,40 @@ implicit none
         character(len=:), allocatable :: Name
     contains
     private
-        procedure         :: domain_open
-        procedure         :: default_initialization => domain_default_initialization
-        procedure, public :: free                   => domain_free
-        generic,   public :: open                   => domain_open
-        procedure, public :: parse                  => domain_parse
-        procedure, public :: close                  => domain_close
-        procedure, public :: print                  => domain_print
+        procedure         :: xdmf_domain_open
+        procedure         :: default_initialization => xdmf_domain_default_initialization
+        procedure, public :: free                   => xdmf_domain_free
+        generic,   public :: open                   => xdmf_domain_open
+        procedure, public :: parse                  => xdmf_domain_parse
+        procedure, public :: close                  => xdmf_domain_close
+        procedure, public :: print                  => xdmf_domain_print
+        procedure, public :: get_Name               => xdmf_domain_get_Name
     end type xdmf_domain_t
 
 contains
 
-    subroutine domain_free(this)
+    function xdmf_domain_get_Name(this)
+    !-----------------------------------------------------------------
+    !< Return the Domain Name
+    !----------------------------------------------------------------- 
+        class(xdmf_domain_t), intent(IN) :: this                   !< XDMF Domain type
+        character(len=:), allocatable :: xdmf_domain_get_name      !< Domain Name
+    !----------------------------------------------------------------- 
+        xdmf_domain_get_name = this%Name
+    end function xdmf_domain_get_Name
+
+
+    subroutine xdmf_domain_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Domain type
     !----------------------------------------------------------------- 
         class(xdmf_domain_t), intent(INOUT) :: this                   !< XDMF Domain type
     !----------------------------------------------------------------- 
         if(allocated(this%Name))        deallocate(this%Name)
-    end subroutine domain_free
+    end subroutine xdmf_domain_free
 
 
-    subroutine domain_default_initialization(this)
+    subroutine xdmf_domain_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF domain with default attribute values
     !----------------------------------------------------------------- 
@@ -51,10 +63,10 @@ contains
     !----------------------------------------------------------------- 
         call this%free()
         call this%set_tag('Domain')
-    end subroutine domain_default_initialization
+    end subroutine xdmf_domain_default_initialization
 
 
-    subroutine domain_open(this, xml_handler, Name)
+    subroutine xdmf_domain_open(this, xml_handler, Name)
     !-----------------------------------------------------------------
     !< Open a new domain XDMF element
     !----------------------------------------------------------------- 
@@ -67,10 +79,10 @@ contains
         call xml_NewElement(xml_handler, 'Domain')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-    end subroutine domain_open
+    end subroutine xdmf_domain_open
 
 
-    subroutine domain_parse(this, DOMNode)
+    subroutine xdmf_domain_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM Domain into a XDMF element
     !----------------------------------------------------------------- 
@@ -85,10 +97,10 @@ contains
                 this%Name = getAttribute(DOMNode, 'Name')
             endif
         endif
-    end subroutine Domain_parse
+    end subroutine xdmf_domain_parse
 
 
-    subroutine domain_close(this, xml_handler)
+    subroutine xdmf_domain_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new Domain XDMF element
     !----------------------------------------------------------------- 
@@ -96,10 +108,10 @@ contains
         type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Domain')
-    end subroutine domain_close
+    end subroutine xdmf_domain_close
 
 
-    subroutine domain_print(this, IndentationLevel)
+    subroutine xdmf_domain_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Domain XDMF element
     !----------------------------------------------------------------- 
@@ -112,7 +124,7 @@ contains
         print*, repeat('  ',indlev)//'DOMAIN:'
         print*, repeat('  ',indlev)//'-------------------------------------------'
         if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
-    end subroutine domain_print
+    end subroutine xdmf_domain_print
 
 
 

@@ -10,6 +10,7 @@ use xdmf_utils,   only: Upper_Case, Count_tokens, Next_token, is_in_option_list,
 use xdmf_element, only: xdmf_element_t
 
 implicit none
+private
 
 !---------------------------------------------------------------------
 ! XDMFDataItem properties (* Default):
@@ -41,30 +42,102 @@ implicit none
 !        integer(I8P)                  :: Seek
     contains
     private
-        procedure         :: dataitem_open_no_dimensions
-        procedure         :: dataitem_open_I4P_dimension
-        procedure         :: dataitem_open_I4P_dimensions
-        procedure         :: dataitem_open_I8P_dimensions
-        procedure         :: is_valid_ItemType      => dataitem_is_valid_ItemType
-        procedure         :: is_valid_NumberType    => dataitem_is_valid_NumberType
-        procedure         :: is_valid_Precision     => dataitem_is_valid_Precision
-        procedure         :: is_valid_Format        => dataitem_is_valid_Format
-        procedure         :: default_initialization => dataitem_default_initialization
-        procedure, public :: free                   => dataitem_free
-        generic,   public :: open                   => dataitem_open_no_dimensions,  &
-                                                       dataitem_open_I4P_dimension,  &
-                                                       dataitem_open_I4P_dimensions, &
-                                                       dataitem_open_I8P_dimensions
-        procedure, public :: parse                  => dataitem_parse
-        procedure, public :: close                  => dataitem_close
-        procedure, public :: print                  => dataitem_print
+        procedure         :: xdmf_dataitem_open_no_dimensions
+        procedure         :: xdmf_dataitem_open_I4P_dimension
+        procedure         :: xdmf_dataitem_open_I4P_dimensions
+        procedure         :: xdmf_dataitem_open_I8P_dimensions
+        procedure         :: is_valid_ItemType      => xdmf_dataitem_is_valid_ItemType
+        procedure         :: is_valid_NumberType    => xdmf_dataitem_is_valid_NumberType
+        procedure         :: is_valid_Precision     => xdmf_dataitem_is_valid_Precision
+        procedure         :: is_valid_Format        => xdmf_dataitem_is_valid_Format
+        procedure         :: default_initialization => xdmf_dataitem_default_initialization
+        procedure, public :: free                   => xdmf_dataitem_free
+        generic,   public :: open                   => xdmf_dataitem_open_no_dimensions,  &
+                                                       xdmf_dataitem_open_I4P_dimension,  &
+                                                       xdmf_dataitem_open_I4P_dimensions, &
+                                                       xdmf_dataitem_open_I8P_dimensions
+        procedure, public :: parse                  => xdmf_dataitem_parse
+        procedure, public :: close                  => xdmf_dataitem_close
+        procedure, public :: print                  => xdmf_dataitem_print
+        procedure, public :: get_Name               => xdmf_dataitem_get_Name
+        procedure, public :: get_ItemType           => xdmf_dataitem_get_ItemType
+        procedure, public :: get_Dimensions         => xdmf_dataitem_get_Dimensions
+        procedure, public :: get_NumberType         => xdmf_dataitem_get_NumberType
+        procedure, public :: get_Precision          => xdmf_dataitem_get_Precision
+        procedure, public :: get_Format             => xdmf_dataitem_get_Format
     end type xdmf_dataitem_t
 
-    !public :: xdmf_dataitem_t
+public :: xdmf_dataitem_t
 
 contains
 
-    function dataitem_is_valid_ItemType(this, ItemType) result(is_valid)
+    function xdmf_dataitem_get_Name(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem Name
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                   !< XDMF DataItem type
+        character(len=:), allocatable :: xdmf_dataitem_get_name      !< DataItem Name
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_name = this%Name
+    end function xdmf_dataitem_get_Name
+
+
+    function xdmf_dataitem_get_Dimensions(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem Dimensions
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
+        integer(I8P), allocatable :: xdmf_dataitem_get_Dimensions(:)  !< DataItem Dimensions
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_Dimensions = this%Dimensions
+    end function xdmf_dataitem_get_Dimensions
+
+
+    function xdmf_dataitem_get_Precision(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem Precision
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
+        integer(I4P), allocatable :: xdmf_dataitem_get_Precision      !< DataItem Precision
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_Precision = this%Precision
+    end function xdmf_dataitem_get_Precision
+
+
+    function xdmf_dataitem_get_ItemType(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem ItemType
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
+        character(len=:), allocatable :: xdmf_dataitem_get_ItemType   !< DataItem ItemType
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_ItemType = this%ItemType
+    end function xdmf_dataitem_get_ItemType
+
+
+    function xdmf_dataitem_get_NumberType(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem NumberType
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
+        character(len=:), allocatable :: xdmf_dataitem_get_NumberType   !< DataItem NumberType
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_NumberType = this%NumberType
+    end function xdmf_dataitem_get_NumberType
+
+
+    function xdmf_dataitem_get_Format(this)
+    !-----------------------------------------------------------------
+    !< Return the DataItem Format
+    !----------------------------------------------------------------- 
+        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
+        character(len=:), allocatable :: xdmf_dataitem_get_Format   !< DataItem Format
+    !----------------------------------------------------------------- 
+        xdmf_dataitem_get_Format = this%Format
+    end function xdmf_dataitem_get_Format
+
+
+    function xdmf_dataitem_is_valid_ItemType(this, ItemType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem ItemType
     !----------------------------------------------------------------- 
@@ -77,10 +150,10 @@ contains
         allowed_ItemTypes = 'Uniform&Collection&Tree&HyperSlab&Coordinates&Function'
         is_valid = is_in_option_list(option_list=allowed_ItemTypes, option=ItemType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message(msg='Wrong ItemType: "'//ItemType//'" (Note: Case sensitive)')
-    end function dataitem_is_valid_ItemType
+    end function xdmf_dataitem_is_valid_ItemType
 
 
-    function dataitem_is_valid_NumberType(this, NumberType, warn) result(is_valid)
+    function xdmf_dataitem_is_valid_NumberType(this, NumberType, warn) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
@@ -94,9 +167,9 @@ contains
         allowed_NumberTypes = 'Float&Int&UInt&Char&UChar'
         is_valid = is_in_option_list(option_list=allowed_NumberTypes, option=NumberType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong NumberType: "'//NumberType//'" (Note: Case sensitive)')
-    end function dataitem_is_valid_NumberType
+    end function xdmf_dataitem_is_valid_NumberType
 
-    function dataitem_is_valid_Format(this, Format) result(is_valid)
+    function xdmf_dataitem_is_valid_Format(this, Format) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
@@ -115,10 +188,10 @@ contains
                 call warning_message('Wrong Format: "'//Format//'" (Note: Case sensitive)')
             endif
         endif
-    end function dataitem_is_valid_Format
+    end function xdmf_dataitem_is_valid_Format
 
 
-    function dataitem_is_valid_Precision(this, Precision) result(is_valid)
+    function xdmf_dataitem_is_valid_Precision(this, Precision) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
@@ -131,10 +204,10 @@ contains
         allowed_Precisions = (/1_I4P,2_I4P,4_I4P,8_I4P/)
         is_valid = MINVAL(ABS(allowed_Precisions - Precision)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Precision: "'//trim(str(no_sign=.true., n=Precision))//'"')
-    end function dataitem_is_valid_Precision
+    end function xdmf_dataitem_is_valid_Precision
 
 
-    subroutine dataitem_free(this)
+    subroutine xdmf_dataitem_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF dataitem type
     !----------------------------------------------------------------- 
@@ -145,10 +218,10 @@ contains
         if(allocated(this%Dimensions))  deallocate(this%Dimensions)
         if(allocated(this%NumberType))  deallocate(this%NumberType)
         if(allocated(this%Format))      deallocate(this%Format)
-    end subroutine dataitem_free
+    end subroutine xdmf_dataitem_free
 
 
-    subroutine dataitem_default_initialization(this)
+    subroutine xdmf_dataitem_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF dataitem with  default attribute values
     !----------------------------------------------------------------- 
@@ -159,10 +232,10 @@ contains
         this%NumberType  = 'Float'
         this%Precision   = 4
         this%Format      = 'XML'
-    end subroutine dataitem_default_initialization
+    end subroutine xdmf_dataitem_default_initialization
 
 
-    subroutine dataitem_open_no_dimensions(this, xml_handler, Name, ItemType, NumberType, Precision, Format)
+    subroutine xdmf_dataitem_open_no_dimensions(this, xml_handler, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -197,10 +270,10 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open_no_dimensions
+    end subroutine xdmf_dataitem_open_no_dimensions
 
 
-    subroutine dataitem_open_I4P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    subroutine xdmf_dataitem_open_I4P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -239,10 +312,10 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open_I4P_dimension
+    end subroutine xdmf_dataitem_open_I4P_dimension
 
 
-    subroutine dataitem_open_I8P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    subroutine xdmf_dataitem_open_I8P_dimension(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -281,9 +354,9 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open_I8P_dimension
+    end subroutine xdmf_dataitem_open_I8P_dimension
 
-    subroutine dataitem_open_I4P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    subroutine xdmf_dataitem_open_I4P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -326,9 +399,9 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open_I4P_dimensions
+    end subroutine xdmf_dataitem_open_I4P_dimensions
 
-    subroutine dataitem_open_I8P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
+    subroutine xdmf_dataitem_open_I8P_dimensions(this, xml_handler, Dimensions, Name, ItemType, NumberType, Precision, Format)
     !-----------------------------------------------------------------
     !< Open a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -371,10 +444,10 @@ contains
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
-    end subroutine dataitem_open_I8P_dimensions
+    end subroutine xdmf_dataitem_open_I8P_dimensions
 
 
-    subroutine dataitem_parse(this, DOMNode)
+    subroutine xdmf_dataitem_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM grid into a XDMF element
     !----------------------------------------------------------------- 
@@ -428,10 +501,10 @@ contains
                 enddo
             endif
         endif
-    end subroutine dataitem_parse
+    end subroutine xdmf_dataitem_parse
 
 
-    subroutine dataitem_close(this, xml_handler)
+    subroutine xdmf_dataitem_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new dataitem XDMF element
     !----------------------------------------------------------------- 
@@ -439,10 +512,10 @@ contains
         type(xmlf_t),           intent(INOUT) :: xml_handler          !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, this%get_tag())
-    end subroutine dataitem_close
+    end subroutine xdmf_dataitem_close
 
 
-    subroutine dataitem_print(this, IndentationLevel)
+    subroutine xdmf_dataitem_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the DataItem XDMF element
     !----------------------------------------------------------------- 
@@ -460,7 +533,7 @@ contains
         if(allocated(this%Format)) print*, repeat('  ',indlev)//'Format: '//this%Format
         if(allocated(this%Dimensions)) print*, repeat('  ',indlev)//'Dimensions: '//str(no_sign=.true.,n=this%Dimensions)
         print*, repeat('  ',indlev)//'Precision: '//str(no_sign=.true.,n=this%Precision)
-    end subroutine dataitem_print
+    end subroutine xdmf_dataitem_print
 
 
 end module xdmf_dataitem

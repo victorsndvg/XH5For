@@ -29,24 +29,73 @@ implicit none
         character(len=:), allocatable :: Section
     contains
     private
-        procedure         :: grid_open
-        procedure         :: default_initialization => grid_default_initialization
-        procedure         :: is_valid_GridType      => grid_is_valid_GridType
-        procedure         :: is_valid_CollectionType=> grid_is_valid_CollectionType
-        procedure         :: is_valid_Section       => grid_is_valid_Section
-        procedure         :: collectiontype_is_spatial => grid_collectiontype_is_spatial
-        procedure         :: gridtype_is_collection => grid_gridtype_is_collection
-        procedure, public :: is_spatial_collection  => grid_is_spatial_collection
-        procedure, public :: free                   => grid_free
-        generic,   public :: open                   => grid_open
-        procedure, public :: parse                  => grid_parse
-        procedure, public :: close                  => grid_close
-        procedure, public :: print                  => grid_print
+        procedure         :: xdmf_grid_open
+        procedure         :: default_initialization => xdmf_grid_default_initialization
+        procedure         :: is_valid_GridType      => xdmf_grid_is_valid_GridType
+        procedure         :: is_valid_CollectionType=> xdmf_grid_is_valid_CollectionType
+        procedure         :: is_valid_Section       => xdmf_grid_is_valid_Section
+        procedure         :: collectiontype_is_spatial => xdmf_grid_collectiontype_is_spatial
+        procedure         :: gridtype_is_collection => xdmf_grid_gridtype_is_collection
+        procedure, public :: is_spatial_collection  => xdmf_grid_is_spatial_collection
+        procedure, public :: free                   => xdmf_grid_free
+        generic,   public :: open                   => xdmf_grid_open
+        procedure, public :: parse                  => xdmf_grid_parse
+        procedure, public :: close                  => xdmf_grid_close
+        procedure, public :: print                  => xdmf_grid_print
+        procedure, public :: get_Name               => xdmf_grid_get_Name
+        procedure, public :: get_GridType           => xdmf_grid_get_GridType
+        procedure, public :: get_CollectionType     => xdmf_grid_get_CollectionType
+        procedure, public :: get_Section            => xdmf_grid_get_Section
     end type xdmf_grid_t
 
 contains
 
-    function grid_is_valid_GridType(this, GridType) result(is_valid)
+
+    function xdmf_grid_get_Name(this)
+    !-----------------------------------------------------------------
+    !< Return the Grid Name
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t), intent(IN) :: this                        !< XDMF Grid type
+        character(len=:), allocatable :: xdmf_grid_get_Name           !< Grid Name
+    !----------------------------------------------------------------- 
+        xdmf_grid_get_Name = this%Name
+    end function xdmf_grid_get_Name
+
+
+    function xdmf_grid_get_GridType(this)
+    !-----------------------------------------------------------------
+    !< Return the Grid GridTpe
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t), intent(IN) :: this                        !< XDMF Grid type
+        character(len=:), allocatable :: xdmf_grid_get_GridType       !< Grid GridType
+    !----------------------------------------------------------------- 
+        xdmf_grid_get_GridType = this%GridType
+    end function xdmf_grid_get_GridType
+
+
+    function xdmf_grid_get_CollectionType(this)
+    !-----------------------------------------------------------------
+    !< Return the Grid CollectionType
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t), intent(IN) :: this                        !< XDMF Grid type
+        character(len=:), allocatable :: xdmf_grid_get_CollectionType !< Grid CollectionType
+    !----------------------------------------------------------------- 
+        xdmf_grid_get_CollectionType = this%CollectionType
+    end function xdmf_grid_get_CollectionType
+
+
+    function xdmf_grid_get_Section(this)
+    !-----------------------------------------------------------------
+    !< Return the Grid Section
+    !----------------------------------------------------------------- 
+        class(xdmf_grid_t), intent(IN) :: this                        !< XDMF Grid type
+        character(len=:), allocatable :: xdmf_grid_get_Section        !< Grid Section
+    !----------------------------------------------------------------- 
+        xdmf_grid_get_Section = this%Section
+    end function xdmf_grid_get_Section
+
+
+    function xdmf_grid_is_valid_GridType(this, GridType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid Grid GridType
     !----------------------------------------------------------------- 
@@ -59,10 +108,10 @@ contains
         allowed_GridTypes = 'Uniform&Collection&Tree&Subset'
         is_valid = is_in_option_list(option_list=allowed_GridTypes, option=GridType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong GridType: "'//GridType//'" (Note: Case sensitive)')
-    end function grid_is_valid_GridType
+    end function xdmf_grid_is_valid_GridType
 
 
-    function grid_is_valid_CollectionType(this, CollectionType) result(is_valid)
+    function xdmf_grid_is_valid_CollectionType(this, CollectionType) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid grid CollectionType
     !----------------------------------------------------------------- 
@@ -75,9 +124,9 @@ contains
         allowed_CollectionTypes = 'Spatial&Temporal'
         is_valid = is_in_option_list(option_list=allowed_CollectionTypes, option=CollectionType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong CollectionType: "'//CollectionType//'" (Note: Case sensitive)')
-    end function grid_is_valid_CollectionType
+    end function xdmf_grid_is_valid_CollectionType
 
-    function grid_is_valid_Section(this, Section) result(is_valid)
+    function xdmf_grid_is_valid_Section(this, Section) result(is_valid)
     !-----------------------------------------------------------------
     !< Return True if is a valid grid Section
     !----------------------------------------------------------------- 
@@ -90,43 +139,43 @@ contains
         allowed_Sections = 'DataItem&All'
         is_valid = is_in_option_list(option_list=allowed_Sections, option=Section, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Section: "'//Section//'" (Note: Case sensitive)')
-    end function grid_is_valid_Section
+    end function xdmf_grid_is_valid_Section
 
 
-    function grid_gridtype_is_collection(this)
+    function xdmf_grid_gridtype_is_collection(this)
     !-----------------------------------------------------------------
     !< Check if GridType is collection
     !----------------------------------------------------------------- 
         class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
-        logical :: grid_gridtype_is_collection
+        logical :: xdmf_grid_gridtype_is_collection
     !-----------------------------------------------------------------         
-        if(allocated(this%GridType)) grid_gridtype_is_collection = this%GridType == 'Collection'
-    end function grid_gridtype_is_collection
+        if(allocated(this%GridType)) xdmf_grid_gridtype_is_collection = this%GridType == 'Collection'
+    end function xdmf_grid_gridtype_is_collection
 
 
-    function grid_collectiontype_is_spatial(this)
+    function xdmf_grid_collectiontype_is_spatial(this)
     !-----------------------------------------------------------------
     !< Check if CollectionType is spatial
     !----------------------------------------------------------------- 
         class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
-        logical :: grid_collectiontype_is_spatial
+        logical :: xdmf_grid_collectiontype_is_spatial
     !-----------------------------------------------------------------
-        if(allocated(This%CollectionType)) grid_collectiontype_is_spatial = this%CollectionType=='Spatial'
-    end function grid_collectiontype_is_spatial
+        if(allocated(This%CollectionType)) xdmf_grid_collectiontype_is_spatial = this%CollectionType=='Spatial'
+    end function xdmf_grid_collectiontype_is_spatial
 
 
-    function grid_is_spatial_collection(this)
+    function xdmf_grid_is_spatial_collection(this)
     !-----------------------------------------------------------------
     !< Check if is a spatial collection grid
     !----------------------------------------------------------------- 
         class(xdmf_grid_t),         intent(INOUT) :: this             !< XDMF Grid type
-        logical :: grid_is_spatial_collection
+        logical :: xdmf_grid_is_spatial_collection
     !-----------------------------------------------------------------
-        grid_is_spatial_collection = this%gridtype_is_collection() .and. this%collectiontype_is_spatial()
-    end function grid_is_spatial_collection
+        xdmf_grid_is_spatial_collection = this%gridtype_is_collection() .and. this%collectiontype_is_spatial()
+    end function xdmf_grid_is_spatial_collection
 
 
-    subroutine grid_free(this)
+    subroutine xdmf_grid_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Grid type
     !----------------------------------------------------------------- 
@@ -136,10 +185,10 @@ contains
         if(allocated(this%GridType))       deallocate(this%GridType)
         if(allocated(this%CollectionType)) deallocate(this%CollectionType)
         if(allocated(this%Section))        deallocate(this%Section)
-    end subroutine grid_free
+    end subroutine xdmf_grid_free
 
 
-    subroutine grid_default_initialization(this)
+    subroutine xdmf_grid_default_initialization(this)
     !-----------------------------------------------------------------
     !< Initialize XDMF Grid with default attribute values
     !----------------------------------------------------------------- 
@@ -150,10 +199,10 @@ contains
         this%GridType       = 'Uniform'
         this%CollectionType = 'Spatial'
         this%Section        = 'DataItem'
-    end subroutine grid_default_initialization
+    end subroutine xdmf_grid_default_initialization
 
 
-    subroutine grid_open(this, xml_handler, Name, GridType, CollectionType, Section)
+    subroutine xdmf_grid_open(this, xml_handler, Name, GridType, CollectionType, Section)
     !-----------------------------------------------------------------
     !< Open a new grid XDMF element
     !----------------------------------------------------------------- 
@@ -181,10 +230,10 @@ contains
         if(PRESENT(Section)) then; if(this%is_valid_Section(Section)) &
             call xml_AddAttribute(xml_handler, name="Section", value=Section)
         endif
-    end subroutine grid_open
+    end subroutine xdmf_grid_open
 
 
-    subroutine grid_parse(this, DOMNode)
+    subroutine xdmf_grid_parse(this, DOMNode)
     !-----------------------------------------------------------------
     !< Parse a DOM grid into a XDMF element
     !----------------------------------------------------------------- 
@@ -217,9 +266,9 @@ contains
                 if(this%is_valid_Section(Section=Section)) this%Section = Section
             endif
         endif
-    end subroutine grid_parse
+    end subroutine xdmf_grid_parse
 
-    subroutine grid_close(this, xml_handler)
+    subroutine xdmf_grid_close(this, xml_handler)
     !-----------------------------------------------------------------
     !< Close a new grid XDMF element
     !----------------------------------------------------------------- 
@@ -227,9 +276,9 @@ contains
         type(xmlf_t),       intent(INOUT) :: xml_handler              !< FoX XML File handler
     !-----------------------------------------------------------------
         call xml_EndElement(xml_handler, 'Grid')
-    end subroutine grid_close
+    end subroutine xdmf_grid_close
 
-    subroutine grid_print(this, IndentationLevel)
+    subroutine xdmf_grid_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Grid XDMF element
     !----------------------------------------------------------------- 
@@ -245,6 +294,6 @@ contains
         if(allocated(this%GridType)) print*, repeat('  ',indlev)//'GridType: '//this%GridType
         if(allocated(this%CollectionType)) print*, repeat('  ',indlev)//'CollectionType: '//this%CollectionType
         if(allocated(this%Section)) print*, repeat('  ',indlev)//'Section: '//this%Section
-    end subroutine grid_print
+    end subroutine xdmf_grid_print
 
 end module xdmf_grid
