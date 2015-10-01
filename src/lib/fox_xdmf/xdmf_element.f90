@@ -6,8 +6,10 @@ module xdmf_element
 !< @TODO add comments.
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use FoX_wxml, only: xmlf_t
-use FoX_dom,  only: Node, getTagName
+
+use FoX_wxml,     only: xmlf_t
+use FoX_dom,      only: Node, getTagName
+use IR_Precision, only: I4P
 
 implicit none
 
@@ -66,9 +68,11 @@ implicit none
             type(xmlf_t),          intent(INOUT) :: xml_handler
         end subroutine element_close
 
-        subroutine element_print(this)
+        subroutine element_print(this, IndentationLevel)
             import xdmf_element_t
-            class(xdmf_element_t), intent(IN) :: this
+            import I4P
+            class(xdmf_element_t),  intent(IN) :: this
+            integer(I4P), optional, intent(IN) :: IndentationLevel
         end subroutine element_print
     end interface
 

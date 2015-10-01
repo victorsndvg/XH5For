@@ -442,21 +442,24 @@ contains
     end subroutine dataitem_close
 
 
-    subroutine dataitem_print(this)
+    subroutine dataitem_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the DataItem XDMF element
     !----------------------------------------------------------------- 
         class(xdmf_dataitem_t), intent(IN)    :: this                 !< XDMF DataItem type
+        integer(I4P), optional, intent(IN)    :: IndentationLevel    !< Indentation level
+        integer(I4P)                          :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'DATAITEM:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
-        if(allocated(this%ItemType)) print*, 'ItemType: '//this%ItemType
-        if(allocated(this%NumberType)) print*, 'NumberType: '//this%NumberType
-        if(allocated(this%Format)) print*, 'Format: '//this%Format
-        if(allocated(this%Dimensions)) print*, 'Dimensions: '//str(no_sign=.true.,n=this%Dimensions)
-        print*, 'Precision: '//str(no_sign=.true.,n=this%Precision)
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'DATAITEM:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
+        if(allocated(this%ItemType)) print*, repeat('  ',indlev)//'ItemType: '//this%ItemType
+        if(allocated(this%NumberType)) print*, repeat('  ',indlev)//'NumberType: '//this%NumberType
+        if(allocated(this%Format)) print*, repeat('  ',indlev)//'Format: '//this%Format
+        if(allocated(this%Dimensions)) print*, repeat('  ',indlev)//'Dimensions: '//str(no_sign=.true.,n=this%Dimensions)
+        print*, repeat('  ',indlev)//'Precision: '//str(no_sign=.true.,n=this%Precision)
     end subroutine dataitem_print
 
 

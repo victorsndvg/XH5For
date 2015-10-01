@@ -119,16 +119,19 @@ contains
     end subroutine geometry_close
 
 
-    subroutine geometry_print(this)
+    subroutine geometry_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Geometry XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_geometry_t), intent(IN)    :: this                     !< XDMF Geometry type
+        class(xdmf_geometry_t), intent(IN)    :: this                !< XDMF Geometry type
+        integer(I4P), optional, intent(IN)    :: IndentationLevel    !< Indentation level
+        integer(I4P)                          :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'GEOMETRY:'
-        print*, '-------------------------------------------'
-        if(allocated(this%GeometryType)) print*, 'GeometryType: '//this%GeometryType
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'GEOMETRY:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%GeometryType)) print*, repeat('  ',indlev)//'GeometryType: '//this%GeometryType
     end subroutine geometry_print
 
 

@@ -99,16 +99,19 @@ contains
     end subroutine domain_close
 
 
-    subroutine domain_print(this)
+    subroutine domain_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Domain XDMF element
     !----------------------------------------------------------------- 
         class(xdmf_domain_t), intent(IN)    :: this                   !< XDMF domain type
+        integer(I4P), optional,  intent(IN) :: IndentationLevel       !< Indentation level
+        integer(I4P)                        :: indlev = 0             !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'Domain:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'DOMAIN:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
     end subroutine domain_print
 
 

@@ -109,17 +109,20 @@ contains
     end subroutine information_close
 
 
-    subroutine information_print(this)
+    subroutine information_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Information XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_information_t), intent(IN)    :: this              !< XDMF Information type
+        class(xdmf_information_t), intent(IN)  :: this                !< XDMF Information type
+        integer(I4P), optional,    intent(IN)  :: IndentationLevel    !< Indentation level
+        integer(I4P)                           :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'INFORMATION:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
-        if(allocated(this%Value)) print*, 'Value: '//this%Value
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'INFORMATION:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
+        if(allocated(this%Value)) print*, repeat('  ',indlev)//'Value: '//this%Value
     end subroutine information_print
 
 

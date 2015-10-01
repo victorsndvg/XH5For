@@ -229,19 +229,22 @@ contains
         call xml_EndElement(xml_handler, 'Grid')
     end subroutine grid_close
 
-    subroutine grid_print(this)
+    subroutine grid_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Grid XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_grid_t), intent(IN)    :: this                     !< XDMF grid type
+        class(xdmf_grid_t), intent(IN)      :: this                   !< XDMF grid type
+        integer(I4P), optional,  intent(IN) :: IndentationLevel       !< Indentation level
+        integer(I4P)                        :: indlev = 0             !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'GRID:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
-        if(allocated(this%GridType)) print*, 'GridType: '//this%GridType
-        if(allocated(this%CollectionType)) print*, 'CollectionType: '//this%CollectionType
-        if(allocated(this%Section)) print*, 'Section: '//this%Section
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'GRID:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
+        if(allocated(this%GridType)) print*, repeat('  ',indlev)//'GridType: '//this%GridType
+        if(allocated(this%CollectionType)) print*, repeat('  ',indlev)//'CollectionType: '//this%CollectionType
+        if(allocated(this%Section)) print*, repeat('  ',indlev)//'Section: '//this%Section
     end subroutine grid_print
 
 end module xdmf_grid

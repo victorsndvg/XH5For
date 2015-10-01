@@ -3,7 +3,7 @@ module xdmf_time
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF Time handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: R4P, R8P, str, cton
+use IR_Precision, only: I4P, R4P, R8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
@@ -168,17 +168,20 @@ contains
         call xml_EndElement(xml_handler, 'Time')
     end subroutine time_close
 
-    subroutine time_print(this)
+    subroutine time_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Time XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_time_t), intent(IN)    :: this                     !< XDMF Time type
+        class(xdmf_time_t),      intent(IN)    :: this                !< XDMF Time type
+        integer(I4P), optional,  intent(IN)    :: IndentationLevel    !< Indentation level
+        integer(I4P)                           :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'TIME:'
-        print*, '-------------------------------------------'
-        if(allocated(this%TimeType)) print*, 'TimeType: '//this%TimeType
-        print*, 'Value: '//str(no_sign=.true.,n=this%Value)
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'TIME:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%TimeType)) print*, repeat('  ',indlev)//'TimeType: '//this%TimeType
+        print*, repeat('  ',indlev)//'Value: '//str(no_sign=.true.,n=this%Value)
     end subroutine time_print
 
 

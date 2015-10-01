@@ -375,21 +375,24 @@ contains
     end subroutine topology_close
 
 
-    subroutine topology_print(this)
+    subroutine topology_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Topology XDMF element
     !----------------------------------------------------------------- 
-        class(xdmf_topology_t), intent(IN)    :: this                 !< XDMF Topology type
+        class(xdmf_topology_t),  intent(IN)    :: this                !< XDMF Topology type
+        integer(I4P), optional,  intent(IN)    :: IndentationLevel    !< Indentation level
+        integer(I4P)                           :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'TOPOLOGY:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
-        if(allocated(this%TopologyType)) print*, 'TopologyType: '//this%TopologyType
-        if(allocated(this%Dimensions)) print*, 'Dimensions: '//str(no_sign=.true., n=this%Dimensions)
-        print*, 'NodesPerElement: '//str(no_sign=.true.,n=this%NodesPerElement)
-!        print*, 'Order: '//str(no_sign=.true.,n=this%Order)
-!        print*, 'BaseOffset: '//str(no_sign=.true.,n=this%BaseOffset)
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'TOPOLOGY:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
+        if(allocated(this%TopologyType)) print*, repeat('  ',indlev)//'TopologyType: '//this%TopologyType
+        if(allocated(this%Dimensions)) print*, repeat('  ',indlev)//'Dimensions: '//str(no_sign=.true., n=this%Dimensions)
+        print*, repeat('  ',indlev)//'NodesPerElement: '//str(no_sign=.true.,n=this%NodesPerElement)
+!        print*, repeat('  ',indlev)//'Order: '//str(no_sign=.true.,n=this%Order)
+!        print*, repeat('  ',indlev)//'BaseOffset: '//str(no_sign=.true.,n=this%BaseOffset)
     end subroutine topology_print
 
 

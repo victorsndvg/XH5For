@@ -163,18 +163,21 @@ contains
     end subroutine attribute_close
 
 
-    subroutine attribute_print(this)
+    subroutine attribute_print(this, IndentationLevel)
     !-----------------------------------------------------------------
     !< Print on screen the Attribute XDMF element
     !----------------------------------------------------------------- 
         class(xdmf_attribute_t), intent(IN)    :: this                !< XDMF grid type
+        integer(I4P), optional,  intent(IN)    :: IndentationLevel    !< Indentation level
+        integer(I4P)                           :: indlev = 0          !< Aux Indentation level
     !-----------------------------------------------------------------
-        print*, '-------------------------------------------'
-        print*, 'ATTRIBUTE:'
-        print*, '-------------------------------------------'
-        if(allocated(this%Name)) print*, 'Name: '//this%Name
-        if(allocated(this%AttributeType)) print*, 'AttributeType: '//this%AttributeType
-        if(allocated(this%Center)) print*, 'Center: '//this%Center
+        if(present(IndentationLevel)) indlev = IndentationLevel
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        print*, repeat('  ',indlev)//'ATTRIBUTE:'
+        print*, repeat('  ',indlev)//'-------------------------------------------'
+        if(allocated(this%Name)) print*, repeat('  ',indlev)//'Name: '//this%Name
+        if(allocated(this%AttributeType)) print*, repeat('  ',indlev)//'AttributeType: '//this%AttributeType
+        if(allocated(this%Center)) print*, repeat('  ',indlev)//'Center: '//this%Center
     end subroutine attribute_print
 
 
