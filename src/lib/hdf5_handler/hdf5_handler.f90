@@ -6,6 +6,7 @@ use HDF5
 use IR_Precision, only : I4P
 #endif
 use mpi_environment
+use xh5for_parameters
 use spatial_grid_descriptor
 use uniform_grid_descriptor
 

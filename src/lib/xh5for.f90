@@ -40,6 +40,7 @@ implicit none
                                                       xh5for_Initialize_Reader
         procedure, public :: Free                  => xh5for_Free
         procedure, public :: Open                  => xh5for_Open
+        procedure, public :: Parse                 => xh5for_Parse
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
@@ -114,6 +115,9 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
+
+        ! Get the concrete handler
+        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
         ! XH5For handler initialization
         call this%Handler%Initialize(                             &
                 MPIEnvironment=this%MPIEnvironment,               &
@@ -229,6 +233,16 @@ contains
         if(present(action)) this%action = action
         call this%Handler%Open(action=this%action, fileprefix=fileprefix)
     end subroutine xh5for_Open
+
+
+    subroutine xh5for_Parse(this)
+    !-----------------------------------------------------------------
+    !< Open a XDMF and HDF5 files
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+    !-----------------------------------------------------------------
+        if(this%Action == XDMF_ACTION_READ) call this%Handler%Parse()
+    end subroutine xh5for_Parse
 
 
     subroutine xh5for_Close(this)

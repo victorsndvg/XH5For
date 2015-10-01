@@ -146,11 +146,88 @@ contains
 !            case (XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331)
 !                topologyName = 'Hexahedron_1331'; return
             case (XDMF_TOPOLOGY_TYPE_MIXED)
-                topologyName = 'mixed_27'; return
+                topologyName = 'Mixed'; return
             case DEFAULT
                 topologyName = 'Triangle'; return
         end select
     end function GetXDMFTopologyTypeName
+
+
+    function GetXDMFTopologyTypeFromName(TopologyNAme) result(topologyType)
+        character(len=:), allocatable, intent(IN)     :: TopologyName
+        integer(I4P) :: topologyType
+!< @Note: How we can manage 2DSMesh, 2DRectMesh, 2DCoRectMesh, 3DSMesh, 3DRectMesh and 3DCoRectMesh TopologyTypes
+!        allowed_topologyTypes = 'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral' // &
+!                            '&Tetrahedron&Pyramid&Wedge&Hexahedron&Edge_3&Triangle_6'// &
+!                            '&Quadrilateral_8&Tetrahedron_10&Pyramid_13&Wedge_15'    // &
+!                            '&Hexahedron_20&Mixed&2DSMesh&2DRectMesh&2DCoRectMesh'   // &
+!                            '&3DSMesh&3DRectMesh&3DCoRectMesh'
+
+        select case(TopologyName)
+            case ('Polyvertex')
+                topologyType = XDMF_TOPOLOGY_TYPE_POLYVERTEX; return
+            case ('Polyline')
+                topologyType = XDMF_TOPOLOGY_TYPE_POLYLINE; return
+            case ('Polygon')
+                topologyType = XDMF_TOPOLOGY_TYPE_POLYGON; return
+            case ('Triangle')
+                topologyType = XDMF_TOPOLOGY_TYPE_TRIANGLE; return
+            case ('Quadrilateral')
+                topologyType = XDMF_TOPOLOGY_TYPE_QUADRILATERAL; return
+            case ('Tetrahedron')
+                topologyType = XDMF_TOPOLOGY_TYPE_TETRAHEDRON; return
+            case ('Pyramid')
+                topologyType = XDMF_TOPOLOGY_TYPE_PYRAMID; return
+            case ('Wedge')
+                topologyType = XDMF_TOPOLOGY_TYPE_WEDGE; return
+            case ('Hexahedron')
+                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON; return
+            case ('Edge_3')
+                topologyType = XDMF_TOPOLOGY_TYPE_EDGE_3; return
+            case ('Triangle_6')
+                topologyType = XDMF_TOPOLOGY_TYPE_TRIANGLE_6; return
+            case ('Quadrilateral_8')
+                topologyType = XDMF_TOPOLOGY_TYPE_QUADRILATERAL_8; return
+            case ('Quadrilateral_9')
+                topologyType = XDMF_TOPOLOGY_TYPE_QUADRILATERAL_9; return
+            case ('Tetrahedron_10')
+                topologyType = XDMF_TOPOLOGY_TYPE_TETRAHEDRON_10; return
+            case ('Pyramid_13')
+                topologyType = XDMF_TOPOLOGY_TYPE_PYRAMID_13; return
+            case ('Wedge_15')
+                topologyType = XDMF_TOPOLOGY_TYPE_WEDGE_15; return
+!            case ('Wedge_18')
+!                topologyType = XDMF_TOPOLOGY_TYPE_WEDGE_18; return
+!            case ('Hexahedron_20')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_20; return
+!            case ('Hexahedron_24')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_24; return
+!            case ('Hexahedron_27')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_27; return
+!            case ('Hexahedron_64')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_64; return
+!            case ('Hexahedron_125')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_125; return
+!            case ('Hexahedron_216')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_216; return
+!            case ('Hexahedron_343')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_343; return
+!            case ('Hexahedron_512')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_512; return
+!            case ('Hexahedron_727')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_727; return
+!            case ('Hexahedron_1000')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000; return
+!            case ('Hexahedron_1331')
+!                topologyType = XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331; return
+            case ('Mixed')
+                topologyType = XDMF_TOPOLOGY_TYPE_MIXED; return
+            case DEFAULT
+                topologyType = XDMF_TOPOLOGY_TYPE_TRIANGLE; return
+        end select
+    end function GetXDMFTopologyTypeFromName
+
+
 
     function GetXDMFGeometryTypeName(GeometryType) result(GeometryName)
         integer(I4P), intent(IN)     :: GeometryType
@@ -175,6 +252,33 @@ contains
         end select
 
     end function GetXDMFGeometryTypeName
+
+
+    function GetXDMFGeometryTypeFromName(GeometryName) result(GeometryType)
+        character(len=:), allocatable, intent(IN) :: GeometryName
+        integer(I4P)                              :: GeometryType
+
+!< @Note: How we can manage X_Y_Z, VxVyVz, Origin_DxDyDz and Origin_DxDy GeometryTypes
+!        allowed_GeometryTypes = 'XYZ&XY&X_Y_Z&VxVyVz&Origin_DxDyDz%Origin_DxDy'
+        select case(GeometryName)
+            case ('XYZ')
+                GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
+            case ('XY')
+                GeometryType = XDMF_GEOMETRY_TYPE_XY; return
+!            case ('X_Y_Z')
+!                GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
+!            case ('VxVyVz')
+!                GeometryType = XDMF_GEOMETRY_TYPE_VxVyVz; return
+!            case ('Origin_DxDyDz')
+!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDyDz; return
+!            case ('Origin_DxDy')
+!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDy; return
+            case DEFAULT
+                GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
+        end select
+
+    end function GetXDMFGeometryTypeFromName
+
 
     function GetSpaceDimension(GeometryType) result(SpaceDimension)
         integer(I4P), intent(IN) :: GeometryType
@@ -240,11 +344,37 @@ contains
             case (XDMF_ATTRIBUTE_TYPE_GLOBALID)
                 AttributeName = 'GlobalID'; return
 !            case (XDMF_ATTRIBUTE_TYPE_NOTYPE)
-!                AttributeName = 'Edge'; return
+!                AttributeName = 'NoType'; return
             case DEFAULT
                 AttributeName ='Scalar'; return
         end select
     end function GetXDMFAttributeTypeName
+
+
+    function GetXDMFAttributeTypeFromName(AttributeName) result(AttributeType)
+        character(len=:), allocatable, intent(IN) :: AttributeName
+        integer(I4P)                              :: AttributeType
+!< @Note: How we can manage NOTYPE CenterTypes
+!        allowed_AttributeTypes = 'Scalar&Vector&Tensor&Tensor6&Matrix&GlobalID'
+        select case(AttributeName)
+            case ('Scalar')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_SCALAR; return
+            case ('Vector')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_VECTOR; return
+            case ('Tensor')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_TENSOR; return
+            case ('Tensor6')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_TENSOR6; return
+            case ('Matrix')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_MATRIX; return
+            case ('GlobalID')
+                AttributeType = XDMF_ATTRIBUTE_TYPE_GLOBALID; return
+!            case ('NoType')
+!                AttributeType = XDMF_ATTRIBUTE_TYPE_NOTYPE; return
+            case DEFAULT
+                AttributeType = XDMF_ATTRIBUTE_TYPE_SCALAR; return
+        end select
+    end function GetXDMFAttributeTypeFromName
 
 
     function GetNumberOfComponentsFromAttributeType(AttributeType) result(NumberOfComponents)

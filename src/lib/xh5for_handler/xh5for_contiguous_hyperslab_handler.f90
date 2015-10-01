@@ -24,6 +24,7 @@ private
         procedure, public :: Initialize         => xh5for_contiguous_hyperslab_handler_Initialize
         procedure, public :: Free               => xh5for_contiguous_hyperslab_handler_Free
         procedure, public :: Open               => xh5for_contiguous_hyperslab_handler_Open
+        procedure, public :: Parse              => xh5for_contiguous_hyperslab_handler_Parse
         procedure, public :: Close              => xh5for_contiguous_hyperslab_handler_Close
     end type xh5for_contiguous_hyperslab_handler_t
 
@@ -36,9 +37,9 @@ contains
     !< XH5FOR initialization procedure
     !----------------------------------------------------------------- 
         class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this                  !< XH5For contiguous hyperslab handler
-        type(mpi_env_t),                              intent(IN)    :: MPIEnvironment        !< MPI environment 
-        type(spatial_grid_descriptor_t),              intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
-        type(uniform_grid_descriptor_t),              intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+        type(mpi_env_t),                 target,      intent(IN)    :: MPIEnvironment        !< MPI environment 
+        type(uniform_grid_descriptor_t), target,      intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+        type(spatial_grid_descriptor_t), target,      intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         call this%Free()
         ! Light data initialization
@@ -75,6 +76,17 @@ contains
         call this%HeavyData%OpenFile(action=action, fileprefix=fileprefix)
         call this%LightData%OpenFile(action=action, fileprefix=fileprefix)
     end subroutine xh5for_contiguous_hyperslab_handler_Open
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_Parse(this)
+    !-----------------------------------------------------------------
+    !< Parse the lightdata
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XH5For contigous hyperslab handler
+    !-----------------------------------------------------------------
+        call this%LightData%ParseFile()
+    end subroutine xh5for_contiguous_hyperslab_handler_Parse
+
 
 
     subroutine xh5for_contiguous_hyperslab_handler_Close(this)

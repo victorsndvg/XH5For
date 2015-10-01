@@ -25,6 +25,7 @@ private
         procedure(xh5for_handler_Initialize),      public, deferred :: Initialize
         procedure(xh5for_handler_Free),            public, deferred :: Free
         procedure(xh5for_handler_Open),            public, deferred :: Open
+        procedure(xh5for_handler_Parse),           public, deferred :: Parse
         procedure(xh5for_handler_Close),           public, deferred :: Close
         generic,                                   public           :: WriteTopology  => WriteTopology_I4P, &
                                                                                          WriteTopology_I8P
@@ -44,21 +45,17 @@ private
             import mpi_env_t 
             import uniform_grid_descriptor_t 
             import spatial_grid_descriptor_t 
-            class(xh5for_handler_t), intent(INOUT) :: this
-            type(mpi_env_t),                 intent(IN)    :: MPIEnvironment        !< MPI environment 
-            type(uniform_grid_descriptor_t), intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
-            type(spatial_grid_descriptor_t), intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
+            class(xh5for_handler_t),                 intent(INOUT) :: this
+            type(mpi_env_t),                 target, intent(IN)    :: MPIEnvironment        !< MPI environment 
+            type(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+            type(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
         end subroutine xh5for_handler_Initialize
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_Free(this)
             import xh5for_handler_t
             class(xh5for_handler_t), intent(INOUT) :: this
         end subroutine xh5for_handler_Free
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_Open(this, action, fileprefix)
             import xh5for_handler_t 
             import I4P
@@ -66,52 +63,45 @@ private
             integer(I4P),            intent(IN)    :: action
             character(len=*),        intent(IN)    :: fileprefix
         end subroutine xh5for_handler_Open
-    end interface
 
-    abstract interface
+        subroutine xh5for_handler_Parse(this)
+            import xh5for_handler_t
+            class(xh5for_handler_t), intent(INOUT) :: this
+        end subroutine xh5for_handler_Parse
+
         subroutine xh5for_handler_Close(this)
             import xh5for_handler_t
             class(xh5for_handler_t), intent(INOUT) :: this
         end subroutine xh5for_handler_Close
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteGeometry_R4P(this, Coordinates)
             import xh5for_handler_t
             import R4P
             class(xh5for_handler_t), intent(INOUT) :: this
             real(R4P),               intent(IN)    :: Coordinates(:)
         end subroutine xh5for_handler_WriteGeometry_R4P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteGeometry_R8P(this, Coordinates)
             import xh5for_handler_t
             import R8P
             class(xh5for_handler_t), intent(INOUT) :: this
             real(R8P),               intent(IN)    :: Coordinates(:)
         end subroutine xh5for_handler_WriteGeometry_R8P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteTopology_I4P(this, Connectivities)
             import xh5for_handler_t
             import I4P
             class(xh5for_handler_t), intent(INOUT) :: this
             integer(I4P),            intent(IN)    :: Connectivities(:)
         end subroutine xh5for_handler_WriteTopology_I4P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteTopology_I8P(this, Connectivities)
             import xh5for_handler_t
             import I8P
             class(xh5for_handler_t), intent(INOUT) :: this
             integer(I8P),            intent(IN)    :: Connectivities(:)
         end subroutine xh5for_handler_WriteTopology_I8P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
             import xh5for_handler_t
             import I4P
@@ -121,9 +111,7 @@ private
             integer(I4P),            intent(IN)    :: Center
             integer(I4P),            intent(IN)    :: Values(:)
         end subroutine xh5for_handler_WriteAttribute_I4P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteAttribute_I8P(this, Name, Type, Center, Values)
             import xh5for_handler_t
             import I8P
@@ -134,9 +122,7 @@ private
             integer(I4P),            intent(IN)    :: Center
             integer(I8P),            intent(IN)    :: Values(:)
         end subroutine xh5for_handler_WriteAttribute_I8P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteAttribute_R4P(this, Name, Type, Center, Values)
             import xh5for_handler_t
             import R4P
@@ -147,9 +133,7 @@ private
             integer(I4P),            intent(IN)    :: Center
             real(R4P),               intent(IN)    :: Values(:)
         end subroutine xh5for_handler_WriteAttribute_R4P
-    end interface
 
-    abstract interface
         subroutine xh5for_handler_WriteAttribute_R8P(this, Name, Type, Center, Values)
             import xh5for_handler_t
             import R8P

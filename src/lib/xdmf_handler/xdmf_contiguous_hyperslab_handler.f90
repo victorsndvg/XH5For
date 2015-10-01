@@ -4,55 +4,46 @@ module xdmf_contiguous_hyperslab_handler
 !< XDMF Time handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use IR_Precision, only: I4P, I8P, R4P, R8P, str
 use xh5for_utils
 use fox_xdmf
+use fox_dom,      only: Node, NodeList, ParseFile, GetDocumentElement, Item, GetLength, GetChildNodes, &
+                        HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, TEXT_NODE, DOCUMENT_NODE
 use xdmf_handler
 
 implicit none
 
 private
 
-    type :: xdmf_metainfo_t
-        character(len=:), allocatable :: XPath
-        integer(I4P)                  :: Type       = XDMF_NO_VALUE
-        integer(I4P)                  :: Center     = XDMF_NO_VALUE
-        character(len=:), allocatable :: DataType
-        integer(I4P)                  :: Precision  = XDMF_NO_VALUE
-        integer(I4P)                  :: Dimension  = XDMF_NO_VALUE
-    end type xdmf_metainfo_t
 
     type, extends(xdmf_handler_t) :: xdmf_contiguous_hyperslab_handler_t
     !-----------------------------------------------------------------
     !< XDMF contiguous HyperSlab handler implementation
     !----------------------------------------------------------------- 
-        type(xdmf_metainfo_t)               :: geometry_info                   !< XDMF contiguous hyperslab geometry info 
-        type(xdmf_metainfo_t)               :: topology_info                   !< XDMF contiguous hyperslab topology info 
-        type(xdmf_metainfo_t),  allocatable :: attributes_info(:)              !< XDMF contiguous hyperslab attributes info 
     contains
     private
         procedure         :: CalculateHyperSlabDimensions => xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
-        procedure         :: SetGeometryInfo          => xdmf_contiguous_hyperslab_handler_SetGeometryInfo
-        procedure         :: SetTopologyInfo          => xdmf_contiguous_hyperslab_handler_SetTopologyInfo
-        procedure         :: SetLastAttributeInfo     => xdmf_contiguous_hyperslab_handler_SetLastAttributeInfo
-        procedure         :: SetGeometry_R4P          => xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
-        procedure         :: SetGeometry_R8P          => xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
-        procedure         :: SetTopology_I4P          => xdmf_contiguous_hyperslab_handler_SetTopology_I4P
-        procedure         :: SetTopology_I8P          => xdmf_contiguous_hyperslab_handler_SetTopology_I8P
-        procedure         :: UpdateNumberOfAttributes => xdmf_contiguous_hyperslab_handler_UpdateNumberOfAttributes
-        procedure         :: AppendAttribute_I4P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
-        procedure         :: AppendAttribute_I8P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
-        procedure         :: AppendAttribute_R4P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
-        procedure         :: AppendAttribute_R8P      => xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
-        procedure         :: WriteGeometry            => xdmf_contiguous_hyperslab_handler_WriteGeometry
-        procedure         :: WriteTopology            => xdmf_contiguous_hyperslab_handler_WriteTopology
-        procedure         :: WriteAttributes          => xdmf_contiguous_hyperslab_handler_WriteAttributes
-        procedure         :: OpenGrid                 => xdmf_contiguous_hyperslab_handler_OpenGrid
-        procedure         :: CloseGrid                => xdmf_contiguous_hyperslab_handler_CloseGrid
-        procedure, public :: OpenFile                 => xdmf_contiguous_hyperslab_handler_OpenFile
-        procedure, public :: Free                     => xdmf_contiguous_hyperslab_handler_Free
-        procedure, public :: CloseFile                => xdmf_contiguous_hyperslab_handler_CloseFile
-        procedure, public :: Serialize                => xdmf_contiguous_hyperslab_handler_Serialize
+        procedure         :: SetGeometry_R4P              => xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
+        procedure         :: SetGeometry_R8P              => xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
+        procedure         :: SetTopology_I4P              => xdmf_contiguous_hyperslab_handler_SetTopology_I4P
+        procedure         :: SetTopology_I8P              => xdmf_contiguous_hyperslab_handler_SetTopology_I8P
+        procedure         :: AppendAttribute_I4P          => xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
+        procedure         :: AppendAttribute_I8P          => xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
+        procedure         :: AppendAttribute_R4P          => xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
+        procedure         :: AppendAttribute_R8P          => xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
+        procedure         :: WriteGeometry                => xdmf_contiguous_hyperslab_handler_WriteGeometry
+        procedure         :: WriteTopology                => xdmf_contiguous_hyperslab_handler_WriteTopology
+        procedure         :: WriteAttributes              => xdmf_contiguous_hyperslab_handler_WriteAttributes
+        procedure         :: OpenGrid                     => xdmf_contiguous_hyperslab_handler_OpenGrid
+        procedure         :: CloseGrid                    => xdmf_contiguous_hyperslab_handler_CloseGrid
+        procedure         :: GetUniqueNodeByTag           => xdmf_contiguous_hyperslab_handler_GetUniqueNodeByTag
+        procedure         :: GetFirstChildByTag           => xdmf_contiguous_hyperslab_handler_GetFirstChildByTag
+        procedure         :: FillSpatialGridDescriptor    => xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor
+        procedure, public :: OpenFile                     => xdmf_contiguous_hyperslab_handler_OpenFile
+        procedure, public :: Free                         => xdmf_contiguous_hyperslab_handler_Free
+        procedure, public :: CloseFile                    => xdmf_contiguous_hyperslab_handler_CloseFile
+        procedure, public :: Serialize                    => xdmf_contiguous_hyperslab_handler_Serialize
+        procedure, public :: ParseFile                    => xdmf_contiguous_hyperslab_handler_ParseFile
     end type xdmf_contiguous_hyperslab_handler_t
 
 public :: xdmf_contiguous_hyperslab_handler_t
@@ -97,68 +88,10 @@ contains
     !----------------------------------------------------------------- 
         if(allocated(this%prefix)) deallocate(this%prefix)
         !call this%file%Free()
-        if(allocated(this%attributes_info)) then
-            do indx = 1, this%NumberOfAttributes
-                if(allocated(this%attributes_info(indx)%XPath)) deallocate(this%attributes_info(indx)%XPath)
-                if(allocated(this%attributes_info(indx)%DataType)) deallocate(this%attributes_info(indx)%DataType)
-            enddo
-            deallocate(this%attributes_info)
-        endif
         nullify(this%MPIEnvironment)
         nullify(this%SpatialGridDescriptor)
         nullify(this%UniformGridDescriptor)
     end subroutine xdmf_contiguous_hyperslab_handler_Free
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo(this, XPath, Precision, Dimension)
-    !-----------------------------------------------------------------
-    !< Set XDMF geometry info
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                  !< XMDF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: XPath                 !< XDMF XPath to the HDF5 connetivities
-        integer(I4P),                               intent(IN)    :: Precision  !< Precision of the Coordinates in the HDF5 file
-        integer(I4P),                               intent(IN)    :: Dimension  !< Dimensions of the Coordinates array in the HDF5 file
-    !-----------------------------------------------------------------
-        this%geometry_info%XPath     = XPath
-        this%geometry_info%Precision = Precision
-        this%geometry_info%Dimension = Dimension
-    end subroutine xdmf_contiguous_hyperslab_handler_SetGeometryInfo
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_SetTopologyInfo(this, XPath, Precision, Dimension)
-    !-----------------------------------------------------------------
-    !< Set XDMF geometry info
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this      !< XMDF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: XPath     !< XDMF XPath to the HDF5 coordinates
-        integer(I4P),                               intent(IN)    :: Precision !< Precision of the coordinates in the HDF5 file
-        integer(I4P),                               intent(IN)    :: Dimension !< Dimensions of the coordinates array in the HDF5 file
-    !-----------------------------------------------------------------
-        this%topology_info%XPath      = XPath
-        this%topology_info%Precision  = Precision
-        this%topology_info%Dimension  = Dimension
-    end subroutine xdmf_contiguous_hyperslab_handler_SetTopologyInfo
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_SetLastAttributeInfo(this, XPath, Type, DataType, Center, Precision, Dimension)
-    !-----------------------------------------------------------------
-    !< Set XDMF geometry info
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this      !< XMDF contiguous hyperslab handler
-        character(len=*),                           intent(IN)    :: XPath     !< XDMF XPath to the HDF5 coordinates
-        integer(I4P),                               intent(IN)    :: Type      !< XDMF attribute type (Scalar, Vector, Tensor, etc.)
-        character(len=*),                           intent(IN)    :: DataType  !< XDMF attribute data type (Int or  Float)
-        integer(I4P),                               intent(IN)    :: Center    !< Center property of the attribute (Node, Face, Edge, Cell or Grid)
-        integer(I4P),                               intent(IN)    :: Precision !< Precision of the attribute in the HDF5 file
-        integer(I4P),                               intent(IN)    :: Dimension !< Dimensions of the attribute array in the HDF5 file
-    !-----------------------------------------------------------------
-        this%attributes_info(this%NumberOfAttributes)%XPath      = XPath
-        this%attributes_info(this%NumberOfAttributes)%Type       = Type
-        this%attributes_info(this%NumberOfAttributes)%DataType   = DataType
-        this%attributes_info(this%NumberOfAttributes)%Center     = Center
-        this%attributes_info(this%NumberOfAttributes)%Precision  = Precision
-        this%attributes_info(this%NumberOfAttributes)%Dimension  = Dimension
-    end subroutine xdmf_contiguous_hyperslab_handler_SetLastAttributeInfo
 
 
     subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P(this, Coordinates)
@@ -168,7 +101,7 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
         real(R4P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
-        call this%SetGeometryInfo(XPath='Coordinates', Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryInfo(XPath='Coordinates', Precision=4, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
 
 
@@ -179,7 +112,7 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
         real(R8P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
-        call this%SetGeometryInfo(XPath='Coordinates', Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryInfo(XPath='Coordinates', Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
 
 
@@ -190,7 +123,7 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
         integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
     !-----------------------------------------------------------------
-        call this%SetTopologyInfo(XPath='Connectivities', Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyInfo(XPath='Connectivities', Precision=4, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P
 
 
@@ -201,30 +134,8 @@ contains
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
         integer(I8P),                               intent(IN)    :: Connectivities(:)    !< Grid Connectivities
     !-----------------------------------------------------------------
-        call this%SetTopologyInfo(XPath='Connectivities', Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyInfo(XPath='Connectivities', Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_UpdateNumberOfAttributes(this)
-    !-----------------------------------------------------------------
-    !< Increase the number of attributes and allocate the attributes_info array to the right size
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        type(xdmf_metainfo_t),  allocatable                       :: aux_attrs_info(:) !< Aux XDMF contiguous hyperslab attributes info 
-        integer(I4P)                                              :: indx
-    !-----------------------------------------------------------------
-        if(.not. allocated(this%attributes_info)) then
-            this%NumberOfAttributes = 0
-            allocate(this%attributes_info(1))
-        elseif(size(this%attributes_info) < (this%NumberOfAttributes+1)) then
-            allocate(aux_attrs_info(this%NumberOfAttributes))
-            aux_attrs_info(:) = this%attributes_info(:)
-            deallocate(this%attributes_info); allocate(this%attributes_info(this%NumberOfAttributes+1))
-            this%attributes_info(1:this%NumberOfAttributes) = aux_attrs_info(1:this%NumberOfAttributes)
-            deallocate(aux_attrs_info)
-        endif
-        this%NumberOfAttributes = this%NumberOfAttributes + 1
-    end subroutine xdmf_contiguous_hyperslab_handler_UpdateNumberOfAttributes
 
 
     subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P(this, Name, Type, Center, Attribute)
@@ -237,8 +148,8 @@ contains
         integer(I4P),                               intent(IN)    :: Center       !< Attribute Center (Node, Cell, etc.)
         integer(I4P),                               intent(IN)    :: Attribute(:) !< I4P Grid attribute
     !-----------------------------------------------------------------
-        call this%UpdateNumberOfAttributes()
-        call this%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
+        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
 
 
@@ -252,8 +163,8 @@ contains
         integer(I4P),                               intent(IN)    :: Center       !< Attribute Center (Node, Cell, etc.)
         integer(I8P),                               intent(IN)    :: Attribute(:) !< I8P Grid attribute
     !-----------------------------------------------------------------
-        call this%UpdateNumberOfAttributes()
-        call this%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
+        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
 
 
@@ -267,8 +178,8 @@ contains
         integer(I4P),                               intent(IN)    :: Center       !< Attribute Center (Node, Cell, etc.)
         real(R4P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
-        call this%UpdateNumberOfAttributes()
-        call this%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
+        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
 
 
@@ -282,8 +193,8 @@ contains
         integer(I4P),                               intent(IN)    :: Center       !< Attribute Center (Node, Cell, etc.)
         real(R8P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
-        call this%UpdateNumberOfAttributes()
-        call this%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
+        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
 
 
@@ -333,9 +244,9 @@ contains
         if(this%MPIEnvironment%is_root()) then
             this%prefix = trim(adjustl(fileprefix))
             this%action = action
+            call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
-                    call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
                     call this%file%openfile()
                     call domain%open(xml_handler = this%file%xml_handler)
                     call grid%open(xml_handler = this%file%xml_handler, &
@@ -346,6 +257,134 @@ contains
             end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_OpenFile
+
+
+    function xdmf_contiguous_hyperslab_handler_GetUniqueNodeByTag(this, FatherNode, Tag) result(ChildNode)
+    !-----------------------------------------------------------------
+    !< Return the first FoX DOM child node given a father node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler
+        type(Node),     pointer,                    intent(IN)    :: FatherNode !< Fox DOM Father node
+        character(len=*),                           intent(IN)    :: Tag        !< Fox DOM Child node
+        type(Node),     pointer                                   :: ChildNode  !< Fox DOM result Child node
+        type(NodeList), pointer                                   :: Childrens  !< List of childrens of the document root node
+        integer(I4P)                                              :: i          !< Index for a loop in Childrens
+    !----------------------------------------------------------------- 
+        nullify(ChildNode)
+        if(hasChildNodes(FatherNode)) then
+            Childrens => getElementsByTagname(FatherNode, Tag)
+            if(getLength(Childrens) == 1) ChildNode => item(Childrens, 0)
+        endif
+    end function xdmf_contiguous_hyperslab_handler_GetUniqueNodeByTag
+
+
+    function xdmf_contiguous_hyperslab_handler_GetFirstChildByTag(this, FatherNode, Tag) result(ChildNode)
+    !-----------------------------------------------------------------
+    !< Return the first FoX DOM child node given a father node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler
+        type(Node),     pointer,                    intent(IN)    :: FatherNode !< Fox DOM Father node
+        character(len=*),                           intent(IN)    :: Tag        !< Fox DOM Child node
+        type(Node),     pointer                                   :: ChildNode  !< Fox DOM result Child node
+        type(NodeList), pointer                                   :: Childrens  !< List of childrens of the document root node
+        integer(I4P)                                              :: i          !< Index for a loop in Childrens
+    !----------------------------------------------------------------- 
+        nullify(ChildNode)
+        if(hasChildNodes(FatherNode)) then
+            Childrens => getChildNodes(FatherNode)
+            do i = 0, getLength(Childrens) - 1
+                ChildNode => item(Childrens, i)
+                if(getNodeType(ChildNode) == TEXT_NODE) cycle
+                if(getTagName(Childnode) == trim(adjustl(Tag))) exit
+                nullify(ChildNode)
+            enddo
+        endif
+    end function xdmf_contiguous_hyperslab_handler_GetFirstChildByTag
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor(this, UniformGridNodes)
+    !-----------------------------------------------------------------
+    !< Return FoX DOM UniformGrid node list given the Spatril Grid Node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this             !< XDMF contiguous hyperslab handler
+        type(NodeList), pointer,                    intent(IN)    :: UniformGridNodes !< Fox DOM Grid node list
+        type(Node),     pointer                                   :: UniformGridNode  !< Fox DOM Grid node
+        type(Node),     pointer                                   :: ChildNode        !< Fox DOM node
+        type(NodeList), pointer                                   :: AttributeNodes   !< Fox DOM Attribute node list
+        type(xdmf_grid_t)                                         :: Grid             !< XDMF Grid derived type
+        type(xdmf_topology_t)                                     :: Topology         !< XDMF Topology derived type
+        type(xdmf_geometry_t)                                     :: Geometry         !< XDMF Topology derived type
+        type(xdmf_attribute_t)                                    :: Attribute        !< XDMF Attribute derived type
+        integer(I4P)                                              :: i                !< Index for a loop in UniformGridNodes
+        integer(I4P)                                              :: j                !< Index for a loop in Attributes
+        integer(I8P), allocatable                                 :: auxDims(:)       !< Aux dimensions variable
+    !----------------------------------------------------------------- 
+        if(associated(UniformGridNodes)) then
+            call this%SpatialGridDescriptor%Allocate(NumberOfGrids=getLength(UniformGridNodes))
+            do i = 0, getLength(UniformGridNodes) - 1
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! UNDER DEVELOPMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                UniformGridNode => item(UniformGridNodes, i)
+                call Grid%Parse(DOMNode = UniformGridNode)
+                call Grid%Print(IndentationLevel=0)
+                ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Topology')
+                call Topology%Parse(DOMNode = ChildNode)
+                call Topology%Print(IndentationLevel=1)
+                call this%SpatialGridDescriptor%SetTopologyTypeByGridID(&
+                            TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=i)
+                auxDims = Topology%get_Dimensions()
+                call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=i)
+                ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Geometry')
+                call Geometry%Parse(DOMNode = ChildNode)
+                call Geometry%Print(IndentationLevel=1)
+                call this%SpatialGridDescriptor%SetGeometryTypeByGridID(&
+                            GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=i)
+                AttributeNodes => getElementsByTagname(UniformGridNode, 'Attribute')
+                call this%SpatialGridDescriptor%AllocateAttributesByGridID(ID=i, NumberOfAttributes=getLength(AttributeNodes))
+                do j=0, getLength(AttributeNodes)-1
+                    ChildNode => item(AttributeNodes, j) 
+                    call Attribute%Parse(ChildNode)
+                call this%SpatialGridDescriptor%SetAttributeTypeByGridID(ID = i,                    &
+                            AttributeType = GetXDMFAttributeTypeFromName(Attribute%get_attributetype()),&
+                            NumberOfAttribute = j+1)
+print*, Attribute%Get_Name(), Attribute%get_AttributeType(), Attribute%get_Center()
+                    call Attribute%Print(IndentationLevel=1)
+                enddo
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            enddo
+        endif
+    end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_ParseFile(this)
+    !-----------------------------------------------------------------
+    !< Parse a readed file and distribute the information
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this             !< XDMF contiguous hyperslab handler
+        type(Node),     pointer                                   :: DocumentRootNode !< Fox DOM Document Root node
+        type(Node),     pointer                                   :: DomainNode       !< Fox DOM Domain node
+        type(Node),     pointer                                   :: SpatialGridNode  !< Fox DOM SpatialGrid node
+        type(NodeList), pointer                                   :: UniformGridNodes !< Fox DOM UniformGrid node list
+    !----------------------------------------------------------------- 
+        if(getNodeType(this%file%get_document_root())==DOCUMENT_NODE) then
+            DocumentRootNode => getDocumentElement(this%file%get_document_root())
+            DomainNode => this%GetUniqueNodeByTag(FatherNode = DocumentRootNode, Tag = 'Domain')
+            if(associated(DomainNode)) then
+                SpatialGridNode => this%GetFirstChildByTag(FatherNode = DomainNode, Tag = 'Grid')
+                if(associated(SpatialGridNode)) then
+                    UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
+                    if(associated(UniformGridNodes)) then
+                        call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
+                    endif
+                endif
+            endif
+        endif
+            
+
+
+    end subroutine xdmf_contiguous_hyperslab_handler_ParseFile
 
 
     subroutine xdmf_contiguous_hyperslab_handler_CloseFile(this)
@@ -364,7 +403,7 @@ contains
                     call domain%close(xml_handler = this%file%xml_handler)
                     call this%file%closefile()
                 case(XDMF_ACTION_READ)
-                    call this%file%parsefile()
+                    call destroy(this%file%get_document_root())
             end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_CloseFile
@@ -422,7 +461,7 @@ contains
                     ItemType    = 'HyperSlab',&
                     Format      = 'HDF')
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions     = (/3_I4P,this%topology_info%Dimension/),&
+                    Dimensions     = (/3_I4P,this%UniformGridDescriptor%GetTopologyDimension()/),&
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
@@ -433,9 +472,9 @@ contains
                     Dimensions  = (/GlobalNumberOfElements*NodesPerElement/),&
                     NumberType  = 'Int',&
                     Format      = 'HDF',& 
-                    Precision   = this%topology_info%Precision) 
+                    Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%open( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%topology_info%XPath )
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyXPath() )
             call dataitem%close(xml_handler=this%file%xml_handler)
             call dataitem%close(xml_handler=this%file%xml_handler)
             call topology%close(xml_handler=this%file%xml_handler)
@@ -478,7 +517,7 @@ contains
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P,this%geometry_info%Dimension/), &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryDimension()/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
@@ -489,9 +528,9 @@ contains
                     Dimensions = (/GlobalNumberOfNodes*SpaceDimension/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
-                    Precision  = this%geometry_info%Precision) 
+                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%open( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%geometry_info%XPath)
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryXPath())
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
@@ -519,48 +558,52 @@ contains
         integer(I4P)                                              :: indx           
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            do indx = 1, this%NumberOfAttributes
+            do indx = 1, this%UniformGridDescriptor%GetNumberOfAttributes()
                 if(present(GridID)) then
-                    call this%CalculateHyperSlabDimensions(         &
-                        GridID = GridID,                            &
-                        Center = this%attributes_info(indx)%Center, &
-                        GlobalNumberOfData = GlobalNumberOfData,    &
-                        LocalNumberOfData = LocalNumberOfData,      &
+                    call this%CalculateHyperSlabDimensions(                                           & 
+                        GridID = GridID,                                                              &
+                        Center = this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx), &
+                        GlobalNumberOfData = GlobalNumberOfData,                                      &
+                        LocalNumberOfData = LocalNumberOfData,                                        &
                         DataOffset = DataOffset)
                 else
-                    call this%CalculateHyperSlabDimensions(         &
-                        GridID = this%MPIEnvironment%get_rank(),    &
-                        Center = this%attributes_info(indx)%Center, &
-                        GlobalNumberOfData = GlobalNumberOfData,    &
-                        LocalNumberOfData = LocalNumberOfData,      &
+                    call this%CalculateHyperSlabDimensions(                                           &
+                        GridID = this%MPIEnvironment%get_rank(),                                      &
+                        Center = this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx), &
+                        GlobalNumberOfData = GlobalNumberOfData,                                      &
+                        LocalNumberOfData = LocalNumberOfData,                                        &
                         DataOffset = DataOffset)
                 endif
-                NumberOfComponents = GetNumberOfComponentsFromAttributeType(this%attributes_info(indx)%Type)
-                XDMFAttributeTypeName = GetXDMFAttributeTypeName(this%attributes_info(indx)%Type)
-                XDMFCenterTypeName = GetXDMFCenterTypeName(this%attributes_info(indx)%Center)
-                call attribute%open(xml_handler = this%file%xml_handler, &
-                        Name          = this%attributes_info(indx)%XPath,&
-                        AttributeType = XDMFAttributeTypeName,           &
+                NumberOfComponents = GetNumberOfComponentsFromAttributeType( &
+                                        this%UniformGridDescriptor%GetAttributeType(AttributeNumber=indx))
+                XDMFAttributeTypeName = GetXDMFAttributeTypeName( &
+                                        this%UniformGridDescriptor%GetAttributeType(AttributeNumber=indx))
+                XDMFCenterTypeName = GetXDMFCenterTypeName( &
+                                        this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
+                call attribute%open(xml_handler = this%file%xml_handler,                                   &
+                        Name          = this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx), &
+                        AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = this%file%xml_handler,                           &
                         Dimensions = (/int(LocalNumberOfData*int(NumberOfComponents,I8P),I8P)/),  &
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = this%file%xml_handler,              &
-                        Dimensions = (/3_I4P,this%attributes_info(indx)%Dimension/), &
+                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeDimension(AttributeNumber=indx)/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
                 call chardata%open( xml_handler = this%file%xml_handler, &
                         Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))
                 call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler,                            &
-                        Dimensions = (/int(GlobalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),  &
-                        NumberType = this%attributes_info(indx)%DataType,                          &
-                        Format     = 'HDF',                                                        &
-                        Precision  = this%attributes_info(indx)%Precision) 
+                call dataitem%open(xml_handler = this%file%xml_handler,                                    &
+                        Dimensions = (/int(GlobalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),          &
+                        NumberType = this%UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
+                        Format     = 'HDF',                                                                &
+                        Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
                 call chardata%open( xml_handler = this%file%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':'//this%attributes_info(indx)%XPath)
+                        Data = trim(adjustl(this%prefix))//'.h5'//':'//&
+                                        this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx))
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call attribute%close(xml_handler = this%file%xml_handler)
