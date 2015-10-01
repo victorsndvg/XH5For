@@ -89,6 +89,7 @@ contains
         class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
         integer(I8P), allocatable :: xdmf_dataitem_get_Dimensions(:)  !< DataItem Dimensions
     !----------------------------------------------------------------- 
+        allocate(xdmf_dataitem_get_Dimensions(size(this%Dimensions, dim=1)))
         xdmf_dataitem_get_Dimensions = this%Dimensions
     end function xdmf_dataitem_get_Dimensions
 

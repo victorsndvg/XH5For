@@ -108,6 +108,7 @@ contains
         class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
         integer(I4P), allocatable :: xdmf_topology_get_Dimensions(:)  !< Topology Dimensions
     !----------------------------------------------------------------- 
+        allocate(xdmf_topology_get_Dimensions(size(this%Dimensions, dim=1)))
         xdmf_topology_get_Dimensions = this%Dimensions
     end function xdmf_topology_get_Dimensions
 
