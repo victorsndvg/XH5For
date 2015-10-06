@@ -27,8 +27,12 @@ implicit none
         procedure         :: xh5for_Initialize_Writer_I8P
         procedure         :: xh5for_WriteGeometry_R4P
         procedure         :: xh5for_WriteGeometry_R8P
+        procedure         :: xh5for_ReadGeometry_R4P
+        procedure         :: xh5for_ReadGeometry_R8P
         procedure         :: xh5for_WriteTopology_I4P
         procedure         :: xh5for_WriteTopology_I8P
+        procedure         :: xh5for_ReadTopology_I4P
+        procedure         :: xh5for_ReadTopology_I8P
         procedure         :: xh5for_WriteAttribute_I4P
         procedure         :: xh5for_WriteAttribute_I8P
         procedure         :: xh5for_WriteAttribute_R4P
@@ -44,8 +48,12 @@ implicit none
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
+        generic,   public :: ReadTopology          => xh5for_ReadTopology_I4P, &
+                                                      xh5for_ReadTopology_I8P
         generic,   public :: WriteGeometry         => xh5for_WriteGeometry_R4P, &
                                                       xh5for_WriteGeometry_R8P
+        generic,   public :: ReadGeometry          => xh5for_ReadGeometry_R4P, &
+                                                      xh5for_ReadGeometry_R8P
         generic,   public :: WriteAttribute        => xh5for_WriteAttribute_I4P, &
                                                       xh5for_WriteAttribute_I8P, &
                                                       xh5for_WriteAttribute_R4P, &
@@ -115,7 +123,8 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
-
+        ! Spatial grid descriptor initialization
+        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Get the concrete handler
         call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
         ! XH5For handler initialization
@@ -265,6 +274,7 @@ contains
         call this%Handler%WriteGeometry(Coordinates = Coordinates)
     end subroutine xh5for_WriteGeometry_R4P
 
+
     subroutine xh5for_WriteGeometry_R8P(this, Coordinates)
     !----------------------------------------------------------------- 
     !< Write R8P Geometry
@@ -274,6 +284,28 @@ contains
     !-----------------------------------------------------------------
         call this%Handler%WriteGeometry(Coordinates = Coordinates)
     end subroutine xh5for_WriteGeometry_R8P
+
+
+    subroutine xh5for_ReadGeometry_R4P(this, Coordinates)
+    !----------------------------------------------------------------- 
+    !< Read R4P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        real(R4P), allocatable, intent(OUT)   :: Coordinates(:)       !< R4P grid geometry coordinates
+    !-----------------------------------------------------------------
+        call this%Handler%ReadGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_ReadGeometry_R4P
+
+
+    subroutine xh5for_ReadGeometry_R8P(this, Coordinates)
+    !----------------------------------------------------------------- 
+    !< Read R8P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        real(R8P), allocatable, intent(OUT)   :: Coordinates(:)       !< R8P grid geometry coordinates
+    !-----------------------------------------------------------------
+        call this%Handler%ReadGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_ReadGeometry_R8P
 
 
     subroutine xh5for_WriteTopology_I4P(this, Connectivities)
@@ -296,6 +328,28 @@ contains
     !-----------------------------------------------------------------
         call this%Handler%WriteTopology(Connectivities = Connectivities)
     end subroutine xh5for_WriteTopology_I8P
+
+
+    subroutine xh5for_ReadTopology_I4P(this, Connectivities)
+    !----------------------------------------------------------------- 
+    !< Read I4P Topology
+    !----------------------------------------------------------------- 
+        class(xh5for_t),             intent(INOUT) :: this            !< XH5For derived type
+        integer(I4P), allocatable,   intent(OUT) :: Connectivities(:) !< I4P grid topology connectivities
+    !-----------------------------------------------------------------
+        call this%Handler%ReadTopology(Connectivities = Connectivities)
+    end subroutine xh5for_ReadTopology_I4P
+
+
+    subroutine xh5for_ReadTopology_I8P(this, Connectivities)
+    !----------------------------------------------------------------- 
+    !< Read I8P Topology
+    !----------------------------------------------------------------- 
+        class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
+        integer(I8P), allocatable, intent(OUT) :: Connectivities(:)   !< I8P grid topology connectivities
+    !-----------------------------------------------------------------
+        call this%Handler%ReadTopology(Connectivities = Connectivities)
+    end subroutine xh5for_ReadTopology_I8P
 
 
     subroutine xh5for_WriteAttribute_I4P(this, Name, Type, Center, Values)

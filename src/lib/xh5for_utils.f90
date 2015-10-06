@@ -325,6 +325,29 @@ contains
     end function GetXDMFCenterTypeName
 
 
+    function GetXDMFCenterTypeFromName(CenterName) result(CenterType)
+        character(len=:), allocatable, intent(IN) :: CenterName
+        integer(I4P)                              :: CenterType
+!< @Note: How we can manage Grid, Face and Edge CenterTypes
+!        allowed_Centers = 'Node&Cell&Grid&Face&Edge'
+        select case(CenterName)
+            case ('Node')
+                CenterType = XDMF_ATTRIBUTE_CENTER_NODE; return
+            case ('Cell')
+                CenterType = XDMF_ATTRIBUTE_CENTER_CELL; return
+            case ('Grid')
+                CenterType = XDMF_ATTRIBUTE_CENTER_GRID; return
+            case ('Face')
+                CenterType = XDMF_ATTRIBUTE_CENTER_FACE; return
+            case ('Edge')
+                CenterType = XDMF_ATTRIBUTE_CENTER_EDGE; return
+            case DEFAULT
+                CenterType = XDMF_ATTRIBUTE_CENTER_NODE; return
+        end select
+
+    end function GetXDMFCenterTypeFromName
+
+
     function GetXDMFAttributeTypeName(AttributeType) result(AttributeName)
         integer(I4P), intent(IN)     :: AttributeType
         character(len=:), allocatable :: AttributeName

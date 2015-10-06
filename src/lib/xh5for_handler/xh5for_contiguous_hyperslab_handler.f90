@@ -15,8 +15,12 @@ private
     contains
         procedure         :: WriteGeometry_R4P  => xh5for_contiguous_hyperslab_handler_WriteGeometry_R4P
         procedure         :: WriteGeometry_R8P  => xh5for_contiguous_hyperslab_handler_WriteGeometry_R8P
+        procedure         :: ReadGeometry_R4P   => xh5for_contiguous_hyperslab_handler_ReadGeometry_R4P
+        procedure         :: ReadGeometry_R8P   => xh5for_contiguous_hyperslab_handler_ReadGeometry_R8P
         procedure         :: WriteTopology_I4P  => xh5for_contiguous_hyperslab_handler_WriteTopology_I4P
         procedure         :: WriteTopology_I8P  => xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
+        procedure         :: ReadTopology_I4P   => xh5for_contiguous_hyperslab_handler_ReadTopology_I4P
+        procedure         :: ReadTopology_I8P   => xh5for_contiguous_hyperslab_handler_ReadTopology_I8P
         procedure         :: WriteAttribute_I4P => xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P
         procedure         :: WriteAttribute_I8P => xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P
         procedure         :: WriteAttribute_R4P => xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P
@@ -122,8 +126,32 @@ contains
         real(R8P),                                    intent(IN)    :: Coordinates(:) !< Grid coordinates
     !-----------------------------------------------------------------
         call this%LightData%SetGeometry(Coordinates = Coordinates)
-        call this%HeavyData%WriteGeometry(Coordinates =  Coordinates)
+        call this%HeavyData%WriteGeometry(Coordinates = Coordinates)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteGeometry_R8P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadGeometry_R4P(this, Coordinates)
+    !-----------------------------------------------------------------
+    !< Read an R4P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XH5For contiguous hyperslab handler
+        real(R4P), allocatable,                       intent(OUT)   :: Coordinates(:) !< Grid connectivities
+    !-----------------------------------------------------------------
+        call this%HeavyData%ReadGeometry(Coordinates = Coordinates)
+        call this%LightData%SetGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadGeometry_R4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadGeometry_R8P(this, Coordinates)
+    !-----------------------------------------------------------------
+    !< Read an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XH5For contiguous hyperslab handler
+        real(R8P), allocatable,                       intent(OUT)   :: Coordinates(:) !< Grid connectivities
+    !-----------------------------------------------------------------
+        call this%HeavyData%ReadGeometry(Coordinates = Coordinates)
+        call this%LightData%SetGeometry(Coordinates = Coordinates)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadGeometry_R8P
 
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_I4P(this, Connectivities)
@@ -148,6 +176,30 @@ contains
         call this%LightData%SetTopology(Connectivities = Connectivities)
         call this%HeavyData%WriteTopology(Connectivities = Connectivities)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteTopology_I8P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadTopology_I4P(this, Connectivities)
+    !-----------------------------------------------------------------
+    !< Read an I4P Topology for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(R4P), allocatable,                    intent(OUT)   :: Connectivities(:) !< Grid connectivities
+    !-----------------------------------------------------------------
+        call this%HeavyData%ReadTopology(Connectivities = Connectivities)
+        call this%LightData%SetTopology(Connectivities = Connectivities)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadTopology_I4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadTopology_I8P(this, Connectivities)
+    !-----------------------------------------------------------------
+    !< Read an R8P geometry for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XH5For contiguous hyperslab handler
+        integer(I8P), allocatable,                    intent(OUT)   :: Connectivities(:) !< Grid connectivities
+    !----------------------------------------------------------------- 
+        call this%HeavyData%ReadTopology(Connectivities = Connectivities)
+        call this%LightData%SetTopology(Connectivities = Connectivities)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadTopology_I8P
 
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
