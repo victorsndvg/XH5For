@@ -28,6 +28,9 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
     private
         procedure         :: mpi_allgather_single_int_value_I4P
         procedure         :: mpi_allgather_single_int_value_I8P
+        procedure         :: mpi_broadcast_int_I4P_array
+        procedure         :: mpi_broadcast_int_I8P_array
+        procedure         :: mpi_broadcast_string
         procedure, public :: Initialize                   => mpi_Initialize
         procedure, public :: Free                         => mpi_Free
         procedure, public :: get_comm                     => mpi_get_comm
@@ -36,8 +39,11 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
         procedure, public :: get_info                     => mpi_get_info
         procedure, public :: get_comm_size                => mpi_get_comm_size
         procedure, public :: is_root                      => mpi_is_root
-        generic, public :: mpi_allgather_single_int_value => mpi_allgather_single_int_value_I4P, &
-                                                        mpi_allgather_single_int_value_I8P
+        generic, public :: mpi_allgather                  => mpi_allgather_single_int_value_I4P, &
+                                                             mpi_allgather_single_int_value_I8P
+        generic, public :: mpi_broadcast                  => mpi_broadcast_int_I4P_array, &
+                                                             mpi_broadcast_int_I8P_array, &
+                                                             mpi_broadcast_string
     end type mpi_env_t
 
 public :: mpi_env_t
@@ -190,6 +196,69 @@ contains
 #endif
         if(present(mpierror)) mpierror = mpierr
     end subroutine mpi_allgather_single_int_value_I8P
+
+
+    subroutine mpi_broadcast_int_I4P_array(this, send_data, mpierror)
+    !-----------------------------------------------------------------
+    !< MPI_allgather interface for a single I4P value per task
+    !----------------------------------------------------------------- 
+        class(mpi_env_t),          intent(IN)    :: this              !< MPI environment
+        integer(I4P), allocatable, intent(INOUT) :: send_data(:)      !< MPI_broadcast send data
+        integer(I4P), optional,    intent(OUT)   :: mpierror          !< MPI error
+        integer(I4P)                             :: data_size         !< Send data size
+        integer(I4P)                             :: mpierr            !< Aux variable for MPI error
+    !----------------------------------------------------------------- 
+        if(present(mpierror)) mpierror = 0
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+        if(this%is_root()) data_size = size(send_data,dim=1)
+        call MPI_BCAST (data_size, 1, MPI_INTEGER, this%root, this%comm, mpierr)
+        if(.not. this%is_root()) allocate(send_data(data_size))
+        call MPI_BCAST (send_data, data_size, MPI_INTEGER, this%root, this%comm, mpierr)
+#endif
+        if(present(mpierror)) mpierror = mpierr
+    end subroutine mpi_broadcast_int_I4P_array
+
+
+    subroutine mpi_broadcast_int_I8P_array(this, send_data, mpierror)
+    !-----------------------------------------------------------------
+    !< MPI_allgather interface for a single I4P value per task
+    !----------------------------------------------------------------- 
+        class(mpi_env_t),          intent(IN)    :: this              !< MPI environment
+        integer(I8P), allocatable, intent(INOUT) :: send_data(:)      !< MPI_broadcast send data
+        integer(I4P), optional,    intent(OUT)   :: mpierror          !< MPI error
+        integer(I4P)                             :: data_size         !< Send data size
+        integer(I4P)                             :: mpierr            !< Aux variable for MPI error
+    !----------------------------------------------------------------- 
+        if(present(mpierror)) mpierror = 0
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+        if(this%is_root()) data_size = size(send_data,dim=1)
+        call MPI_BCAST (data_size, 1, MPI_INTEGER, this%root, this%comm, mpierr)
+        if(.not. this%is_root()) allocate(send_data(data_size))
+        call MPI_BCAST (send_data, data_size, MPI_LONG, this%root, this%comm, mpierr)
+#endif
+        if(present(mpierror)) mpierror = mpierr
+    end subroutine mpi_broadcast_int_I8P_array
+
+
+    subroutine mpi_broadcast_string(this, send_data, mpierror)
+    !-----------------------------------------------------------------
+    !< MPI_allgather interface for a deferred length character array
+    !----------------------------------------------------------------- 
+        class(mpi_env_t),              intent(IN)    :: this          !< MPI environment
+        character(len=:), allocatable, intent(INOUT) :: send_data     !< MPI_broadcast send data
+        integer(I4P),     optional,    intent(OUT)   :: mpierror      !< MPI error
+        integer(I4P)                             :: data_size         !< Send data size
+        integer(I4P)                             :: mpierr            !< Aux variable for MPI error
+    !----------------------------------------------------------------- 
+        if(present(mpierror)) mpierror = 0
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+        if(this%is_root()) data_size = len(send_data)
+        call MPI_BCAST (data_size, 1, MPI_INTEGER, this%root, this%comm, mpierr)
+        if(.not. this%is_root()) allocate(character(len=data_size) :: send_data)
+        call MPI_BCAST (send_data, data_size, MPI_CHAR, this%root, this%comm, mpierr)
+#endif
+        if(present(mpierror)) mpierror = mpierr
+    end subroutine mpi_broadcast_string
 
 
     function mpi_is_root(this)
