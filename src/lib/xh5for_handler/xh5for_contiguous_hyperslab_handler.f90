@@ -25,6 +25,10 @@ private
         procedure         :: WriteAttribute_I8P => xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P
         procedure         :: WriteAttribute_R4P => xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P
         procedure         :: WriteAttribute_R8P => xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P
+        procedure         :: ReadAttribute_I4P => xh5for_contiguous_hyperslab_handler_ReadAttribute_I4P
+        procedure         :: ReadAttribute_I8P => xh5for_contiguous_hyperslab_handler_ReadAttribute_I8P
+        procedure         :: ReadAttribute_R4P => xh5for_contiguous_hyperslab_handler_ReadAttribute_R4P
+        procedure         :: ReadAttribute_R8P => xh5for_contiguous_hyperslab_handler_ReadAttribute_R8P
         procedure, public :: Initialize         => xh5for_contiguous_hyperslab_handler_Initialize
         procedure, public :: Free               => xh5for_contiguous_hyperslab_handler_Free
         procedure, public :: Open               => xh5for_contiguous_hyperslab_handler_Open
@@ -204,7 +208,7 @@ contains
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
     !-----------------------------------------------------------------
-    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !< Write an I4P geometry for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
         class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
         character(len=*),                             intent(IN)    :: Name       !< Attribute name
@@ -219,7 +223,7 @@ contains
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_I8P(this, Name, Type, Center, Values)
     !-----------------------------------------------------------------
-    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !< Write an I8P geometry for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
         class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
         character(len=*),                             intent(IN)    :: Name       !< Attribute name
@@ -234,7 +238,7 @@ contains
 
     subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R4P(this, Name, Type, Center, Values)
     !-----------------------------------------------------------------
-    !< Write an R8P geometry for the contiguous hyperslab strategy
+    !< Write an R4P geometry for the contiguous hyperslab strategy
     !----------------------------------------------------------------- 
         class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
         character(len=*),                             intent(IN)    :: Name       !< Attribute name
@@ -261,5 +265,64 @@ contains
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_contiguous_hyperslab_handler_WriteAttribute_R8P
 
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_I4P(this, Name, Type, Center, Values)
+    !-----------------------------------------------------------------
+    !< Read an I4P attribute for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I4P),                                 intent(IN)    :: Type       !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                                 intent(IN)    :: Center     !< Attribute center (Node, Cell, etc.)
+        integer(I4P), allocatable,                    intent(OUT)   :: Values(:)  !< I4P Grid attribute
+    !----------------------------------------------------------------- 
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_I4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_I8P(this, Name, Type, Center, Values)
+    !-----------------------------------------------------------------
+    !< Read an I8P attribute for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I4P),                                 intent(IN)    :: Type       !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                                 intent(IN)    :: Center     !< Attribute center (Node, Cell, etc.)
+        integer(I8P), allocatable,                    intent(OUT)   :: Values(:)  !< I8P Grid attribute
+    !----------------------------------------------------------------- 
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_I8P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_R4P(this, Name, Type, Center, Values)
+    !-----------------------------------------------------------------
+    !< Read an R4P attribute for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I4P),                                 intent(IN)    :: Type       !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                                 intent(IN)    :: Center     !< Attribute center (Node, Cell, etc.)
+        real(R4P), allocatable,                       intent(OUT)   :: Values(:)  !< R4P Grid attribute
+    !----------------------------------------------------------------- 
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_R4P
+
+
+    subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_R8P(this, Name, Type, Center, Values)
+    !-----------------------------------------------------------------
+    !< Read an R8P attribute for the contiguous hyperslab strategy
+    !----------------------------------------------------------------- 
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XH5For contiguous hyperslab handler
+        character(len=*),                             intent(IN)    :: Name       !< Attribute name
+        integer(I4P),                                 intent(IN)    :: Type       !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                                 intent(IN)    :: Center     !< Attribute center (Node, Cell, etc.)
+        real(R8P), allocatable,                       intent(OUT)   :: Values(:)  !< R4P Grid attribute
+    !----------------------------------------------------------------- 
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+    end subroutine xh5for_contiguous_hyperslab_handler_ReadAttribute_R8P
 
 end module xh5for_contiguous_hyperslab_handler

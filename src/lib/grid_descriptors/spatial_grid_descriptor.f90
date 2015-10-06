@@ -48,11 +48,16 @@ private
         procedure, public :: SetGeometryTypeByGridID        => spatial_grid_descriptor_SetGeometryTypeByGridID
         procedure, public :: SetGeometryXPathByGridID       => spatial_grid_descriptor_SetGeometryXPathByGridID
         procedure, public :: AllocateAttributesByGridID     => spatial_grid_descriptor_AllocateAttributesByGrid
+        procedure, public :: SetNumberOfAttributesByGridID  => spatial_grid_descriptor_SetNumberOfAttributesByGridID
         procedure, public :: SetAttributeTypeByGridID       => spatial_grid_descriptor_SetAttributeTypeByGridID
+        procedure, public :: GetAttributeTypeFromGridID     => spatial_grid_descriptor_GetAttributeTypeFromGridID
         procedure, public :: SetAttributeXPathByGridID      => spatial_grid_descriptor_SetAttributeXPathByGridID
+        procedure, public :: GetAttributeXPathFromGridID    => spatial_grid_descriptor_GetAttributeXPathFromGridID
         procedure, public :: SetAttributeCenterByGridID     => spatial_grid_descriptor_SetAttributeCenterByGridID
+        procedure, public :: GetAttributeCenterFromGridID   => spatial_grid_descriptor_GetAttributeCenterFromGridID
         procedure, public :: GetNumberOfNodesFromGridID     => spatial_grid_descriptor_GetNumberOfNodesFromGridID
         procedure, public :: GetNumberOfElementsFromGridID  => spatial_grid_descriptor_GetNumberOfElementsFromGridID
+        procedure, public :: GetNumberOfAttributesFromGridID=> spatial_grid_descriptor_GetNumberOfAttributesFromGridID
         procedure, public :: GetTopologyTypeFromGridID      => spatial_grid_descriptor_GetTopologyTypeFromGridID
         procedure, public :: GetTopologyXPathFromGridID     => spatial_grid_descriptor_GetTopologyXPathFromGridID
         procedure, public :: GetGeometryTypeFromGridID      => spatial_grid_descriptor_GetGeometryTypeFromGridID
@@ -177,6 +182,18 @@ contains
     end function spatial_grid_descriptor_GetNumberOfElementsFromGridID
 
 
+    function spatial_grid_descriptor_GetNumberOfAttributesFromGridID(this, ID)
+    !-----------------------------------------------------------------
+    !< Return the number of nodes of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this                 !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                   !< Grid identifier
+        integer(I8P) :: spatial_grid_descriptor_GetNumberOfAttributesFromGridID !< Number of nodes of a grid
+    !-----------------------------------------------------------------
+        spatial_grid_descriptor_GetNumberOfAttributesFromGridID = this%AttributesPerGrid(ID+1)%NumberOfAttributes
+    end function spatial_grid_descriptor_GetNumberOfAttributesFromGridID
+
+
     subroutine spatial_grid_descriptor_SetTopologyTypeByGridID(this, TopologyType, ID)
     !-----------------------------------------------------------------
     !< Set the topology type of a particular grid given its ID
@@ -291,6 +308,20 @@ contains
     end subroutine spatial_grid_descriptor_SetGeometryXPathByGridID
 
 
+    subroutine spatial_grid_descriptor_SetNumberOfAttributesByGridID(this, ID, NumberOfAttributes)
+    !-----------------------------------------------------------------
+    !< Set the attribute type of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
+        integer(I4P),                     intent(IN)    :: NumberOfAttributes!< NumberOfAttribute
+    !-----------------------------------------------------------------
+        this%AttributesPerGrid(ID+1)%NumberOfAttributes = NumberOfAttributes
+        if(allocated(this%AttributesPerGrid(ID+1)%attributes_info)) deallocate(this%AttributesPerGrid(ID+1)%attributes_info)
+        allocate(this%AttributesPerGrid(ID+1)%attributes_info(NumberOfAttributes))
+    end subroutine spatial_grid_descriptor_SetNumberOfAttributesByGridID
+
+
     subroutine spatial_grid_descriptor_SetAttributeTypeByGridID(this, AttributeType, ID, NumberOfAttribute)
     !-----------------------------------------------------------------
     !< Set the attribute type of a particular grid given its ID
@@ -302,6 +333,19 @@ contains
     !-----------------------------------------------------------------
         call this%AttributesPerGrid(ID+1)%Attributes_info(NumberOfAttribute)%SetType(Type = AttributeType)
     end subroutine spatial_grid_descriptor_SetAttributeTypeByGridID
+
+
+    Function spatial_grid_descriptor_GetAttributeTypeFromGridID(this, ID, NumberOfAttribute) result(AttributeType)
+    !-----------------------------------------------------------------
+    !< Set the attribute type of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
+        integer(I4P),                     intent(IN)    :: NumberOfAttribute !< NumberOfAttribute
+        integer(I4P)                                    :: AttributeType     !< Attribute type of the grid ID
+    !-----------------------------------------------------------------
+        AttributeType = this%AttributesPerGrid(ID+1)%Attributes_info(NumberOfAttribute)%GetType()
+    end function spatial_grid_descriptor_GetAttributeTypeFromGridID
 
 
     subroutine spatial_grid_descriptor_SetAttributeCenterByGridID(this, Center, ID, NumberOfAttribute)
@@ -317,6 +361,19 @@ contains
     end subroutine spatial_grid_descriptor_SetAttributeCenterByGridID
 
 
+    Function spatial_grid_descriptor_GetAttributeCenterFromGridID(this, ID, NumberOfAttribute) result(AttributeCenter)
+    !-----------------------------------------------------------------
+    !< Get the attribute center of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
+        integer(I4P),                     intent(IN)    :: NumberOfAttribute !< NumberOfAttribute
+        integer(I4P)                                    :: AttributeCenter   !< Attribute center of the grid ID
+    !-----------------------------------------------------------------
+        AttributeCenter = this%AttributesPerGrid(ID+1)%Attributes_info(NumberOfAttribute)%GetCenter()
+    end function spatial_grid_descriptor_GetAttributeCenterFromGridID
+
+
     subroutine spatial_grid_descriptor_SetAttributeXPathByGridID(this, XPath, ID, NumberOfAttribute)
     !-----------------------------------------------------------------
     !< Set the topology XPath of a particular grid given its ID
@@ -328,6 +385,19 @@ contains
     !-----------------------------------------------------------------
         call this%AttributesPerGrid(ID+1)%Attributes_info(NumberOfAttribute)%SetXPath(XPath = XPath)
     end subroutine spatial_grid_descriptor_SetAttributeXPathByGridID
+
+
+    Function spatial_grid_descriptor_GetAttributeXPathFromGridID(this, ID, NumberOfAttribute) result(AttributeXPath)
+    !-----------------------------------------------------------------
+    !< Get the attribute XPath of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
+        integer(I4P),                     intent(IN)    :: NumberOfAttribute !< NumberOfAttribute
+        character(len=:), allocatable                   :: AttributeXPath    !< Attribute XPath of the grid ID
+    !-----------------------------------------------------------------
+        AttributeXPath = this%AttributesPerGrid(ID+1)%Attributes_info(NumberOfAttribute)%GetXPath()
+    end function spatial_grid_descriptor_GetAttributeXPathFromGridID
 
 
     function spatial_grid_descriptor_GetGeometryTypeFromGridID(this, ID)
@@ -430,51 +500,90 @@ contains
         class(spatial_grid_descriptor_t), intent(INOUT) :: this                   !< Spatial grid descriptor type
         integer(I4P),     allocatable                   :: TopologyTypePerGrid(:) !< Topology type for all  grids
         integer(I4P),     allocatable                   :: GeometryTypePerGrid(:) !< Geometry type for all  grids
+        integer(I4P),     allocatable                   :: NumberOfAttributesPerGrid(:) !< Number of attributes per grid
+        integer(I4P),     allocatable                   :: AllAttributeTypes(:)   !< Attribute types for all Attributes
+        integer(I4P),     allocatable                   :: AllAttributeCenters(:) !< Attribute center for all Attributes
+        integer(I4P)                                    :: TotalNumberOfAttributes!< Number of attributes per grid
         character(len=:), allocatable                   :: AllTopologyXPaths      !< Topologies XPath concatenated with &
         character(len=:), allocatable                   :: AllGeometryXPaths      !< Topologies XPath concatenated with &
+        character(len=:), allocatable                   :: AllAttributeXPaths     !< Attributes XPath concatenated with &
         integer(I4P)                                    :: i                      !< Loop index in NumberOfGrids
+        integer(I4P)                                    :: j                      !< Loop index in NumberOfAttributes
+        integer(I4P)                                    :: AttCount               !< Attribute counter
         integer(I4P)                                    :: TopoPos                !< Position for Topology XPath token 
         integer(I4P)                                    :: GeoPos                 !< Position for Geometry XPath token 
+        integer(I4P)                                    :: AttPos                 !< Position for Attribute XPath token 
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             allocate(TopologyTypePerGrid(this%NumberOfGrids))
             allocate(GeometryTypePerGrid(this%NumberOfGrids))
+            allocate(NumberOfAttributesPerGrid(this%NumberOfGrids))
             AllTopologyXPaths=''
             AllGeometryXPaths=''
+            AllAttributeXPaths=''
             do i=0, this%NumberOfGrids-1
                 TopologyTypePerGrid(i+1) = this%GetTopologyTypeFromGridID(ID=i)
                 geometryTypePerGrid(i+1) = this%GetGeometryTypeFromGridID(ID=i)
+                NumberOfAttributesPerGrid(i+1) = this%GetNumberOfAttributesFromGridID(ID=i)
                 AllTopologyXPaths = AllTopologyXPaths//'&'//this%GetTopologyXPathFromGridID(ID=i)
                 AllGeometryXPaths = AllGeometryXPaths//'&'//this%GetGeometryXPathFromGridID(ID=i)
+            enddo
+            TotalNumberOfAttributes = sum(NumberOfAttributesPerGrid)
+            allocate(AllAttributeTypes(TotalNumberOfAttributes))
+            allocate(AllAttributeCenters(TotalNumberOfAttributes))
+            AttCount = 0
+            do i=0, this%NumberOfGrids-1
+                do j=1, this%GetNumberOfAttributesFromGridID(ID=i)
+                    AttCount = AttCount + 1
+                    AllAttributeTypes(AttCount) = this%GetAttributeTypeFromGridID(ID=i, NumberOfAttribute=j)
+                    AllAttributeCenters(AttCount) = this%GetAttributeCenterFromGridID(ID=i, NumberOfAttribute=j)
+                    AllAttributeXPaths = AllAttributeXPaths//'&'//this%GetAttributeXPathFromGridID(ID=i, NumberOfAttribute=j)
+                enddo
             enddo
         endif
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfNodesPerGrid)
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfElementsPerGrid)
+        call this%MPIEnvironment%mpi_broadcast(NumberOfAttributesPerGrid)
         call this%MPIEnvironment%mpi_broadcast(TopologyTypePerGrid)
         call this%MPIEnvironment%mpi_broadcast(GeometryTypePerGrid)
+        call this%MPIEnvironment%mpi_broadcast(AllAttributeTypes)
+        call this%MPIEnvironment%mpi_broadcast(AllAttributeCenters)
         call this%MPIEnvironment%mpi_broadcast(AllTopologyXPaths)
         call this%MPIEnvironment%mpi_broadcast(AllGeometryXPaths)
+        call this%MPIEnvironment%mpi_broadcast(AllAttributeXPaths)
         if(.not. this%MPIEnvironment%is_root()) then
             this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
             allocate(this%GeometryPerGrid(this%NumberOfGrids))
             allocate(this%TopologyPerGrid(this%NumberOfGrids))
             allocate(this%AttributesPerGrid(this%NumberOfGrids))
+            AttCount = 0
             TopoPos = 1
             GeoPos = 1
+            AttPos = 1
             do i=0, this%NumberOfGrids-1
                 call this%SetTopologyTypeByGridID(ID = i, TopologyType = TopologyTypePerGrid(i+1))
                 call this%SetTopologyXPathByGridID(ID = i, XPath = Next_Token(AllTopologyXPaths, TopoPos, '&'))
                 call this%SetGeometryTypeByGridID(ID = i, GeometryType = GeometryTypePerGrid(i+1))
                 call this%SetGeometryXPathByGridID(ID = i, XPath = Next_Token(AllGeometryXPaths, GeoPos, '&'))
+                call this%SetNumberOfAttributesByGridID(ID = i, NumberOfAttributes = NumberOfAttributesPerGrid(i+1))
+                do j=1, this%GetNumberOfAttributesFromGridID(ID=i)
+                    AttCount = AttCount + 1
+                    call this%SetAttributeTypeByGridID(AttributeType=AllAttributeTypes(AttCount), ID=i, NumberOfAttribute=j)
+                    call this%SetAttributeCenterByGridID(Center=AllAttributeCenters(AttCount), ID=i, NumberOfAttribute=j)
+                    call this%SetAttributeXPathByGridID(XPath=Next_Token(AllAttributeXPaths, AttPos, '&'), ID=i, NumberOfAttribute=j)
+                enddo
             enddo
         endif
         call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         deallocate(TopologyTypePerGrid)
         deallocate(GeometryTypePerGrid)
+        deallocate(NumberOfAttributesPerGrid)
+        deallocate(AllAttributeTypes)
+        deallocate(AllAttributeCenters)
         deallocate(AllTopologyXPaths)
         deallocate(AllGeometryXPaths)
-
+        deallocate(AllAttributeXPaths)
     end subroutine spatial_grid_descriptor_DistributeData
 
 

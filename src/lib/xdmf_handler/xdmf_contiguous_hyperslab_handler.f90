@@ -530,9 +530,12 @@ contains
 
 
     subroutine xdmf_contiguous_hyperslab_handler_Serialize(this)
+    !-----------------------------------------------------------------
+    !< Serialize the topology, geometry and attribute metadata to a XDMF file
+    !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this  !< XDMF contiguous hyperslab handler
         integer(I4P)                                              :: IDidx !< GridID idex
-
+    !----------------------------------------------------------------- 
         do IDidx=0, this%MPIEnvironment%get_comm_size()-1
             call this%OpenGrid(GridID = IDidx)
             call this%WriteTopology(GridID = IDidx)

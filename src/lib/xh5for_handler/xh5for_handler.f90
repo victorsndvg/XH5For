@@ -26,6 +26,10 @@ private
         procedure(xh5for_handler_WriteAttribute_I8P),      deferred :: WriteAttribute_I8P
         procedure(xh5for_handler_WriteAttribute_R4P),      deferred :: WriteAttribute_R4P
         procedure(xh5for_handler_WriteAttribute_R8P),      deferred :: WriteAttribute_R8P
+        procedure(xh5for_handler_ReadAttribute_I4P),       deferred :: ReadAttribute_I4P
+        procedure(xh5for_handler_ReadAttribute_I8P),       deferred :: ReadAttribute_I8P
+        procedure(xh5for_handler_ReadAttribute_R4P),       deferred :: ReadAttribute_R4P
+        procedure(xh5for_handler_ReadAttribute_R8P),       deferred :: ReadAttribute_R8P
         procedure(xh5for_handler_Initialize),      public, deferred :: Initialize
         procedure(xh5for_handler_Free),            public, deferred :: Free
         procedure(xh5for_handler_Open),            public, deferred :: Open
@@ -43,6 +47,10 @@ private
                                                                                          WriteAttribute_I8P, &
                                                                                          WriteAttribute_R4P, &
                                                                                          WriteAttribute_R8P
+        generic,                                   public           :: ReadAttribute  => ReadAttribute_I4P, &
+                                                                                         ReadAttribute_I8P, &
+                                                                                         ReadAttribute_R4P, &
+                                                                                         ReadAttribute_R8P
 
     end type xh5for_handler_t
 
@@ -180,6 +188,50 @@ private
             integer(I4P),            intent(IN)    :: Center
             real(R8P),               intent(IN)    :: Values(:)
         end subroutine xh5for_handler_WriteAttribute_R8P
+
+        subroutine xh5for_handler_ReadAttribute_I4P(this, Name, Type, Center, Values)
+            import xh5for_handler_t
+            import I4P
+            class(xh5for_handler_t),   intent(INOUT) :: this
+            character(len=*),          intent(IN)    :: Name
+            integer(I4P),              intent(IN)    :: Type
+            integer(I4P),              intent(IN)    :: Center
+            integer(I4P), allocatable, intent(OUT)   :: Values(:)
+        end subroutine xh5for_handler_ReadAttribute_I4P
+
+        subroutine xh5for_handler_ReadAttribute_I8P(this, Name, Type, Center, Values)
+            import xh5for_handler_t
+            import I4P
+            import I8P
+            class(xh5for_handler_t),   intent(INOUT) :: this
+            character(len=*),          intent(IN)    :: Name
+            integer(I4P),              intent(IN)    :: Type
+            integer(I4P),              intent(IN)    :: Center
+            integer(I8P), allocatable, intent(OUT)   :: Values(:)
+        end subroutine xh5for_handler_ReadAttribute_I8P
+
+        subroutine xh5for_handler_ReadAttribute_R4P(this, Name, Type, Center, Values)
+            import xh5for_handler_t
+            import I4P
+            import R4P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            character(len=*),        intent(IN)    :: Name
+            integer(I4P),            intent(IN)    :: Type
+            integer(I4P),            intent(IN)    :: Center
+            real(R4P), allocatable,  intent(OUT)   :: Values(:)
+        end subroutine xh5for_handler_ReadAttribute_R4P
+
+        subroutine xh5for_handler_ReadAttribute_R8P(this, Name, Type, Center, Values)
+            import xh5for_handler_t
+            import I4P
+            import R8P
+            class(xh5for_handler_t), intent(INOUT) :: this
+            character(len=*),        intent(IN)    :: Name
+            integer(I4P),            intent(IN)    :: Type
+            integer(I4P),            intent(IN)    :: Center
+            real(R8P), allocatable,  intent(OUT)   :: Values(:)
+        end subroutine xh5for_handler_ReadAttribute_R8P
+
     end interface
 
 public :: xh5for_handler_t

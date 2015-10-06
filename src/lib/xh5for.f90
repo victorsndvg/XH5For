@@ -37,6 +37,10 @@ implicit none
         procedure         :: xh5for_WriteAttribute_I8P
         procedure         :: xh5for_WriteAttribute_R4P
         procedure         :: xh5for_WriteAttribute_R8P
+        procedure         :: xh5for_ReadAttribute_I4P
+        procedure         :: xh5for_ReadAttribute_I8P
+        procedure         :: xh5for_ReadAttribute_R4P
+        procedure         :: xh5for_ReadAttribute_R8P
         procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_Writer_I4P, &
@@ -58,6 +62,10 @@ implicit none
                                                       xh5for_WriteAttribute_I8P, &
                                                       xh5for_WriteAttribute_R4P, &
                                                       xh5for_WriteAttribute_R8P
+        generic,   public :: ReadAttribute         => xh5for_ReadAttribute_I4P, &
+                                                      xh5for_ReadAttribute_I8P, &
+                                                      xh5for_ReadAttribute_R4P, &
+                                                      xh5for_ReadAttribute_R8P
 
     end type xh5for_t
 
@@ -406,5 +414,61 @@ contains
     !-----------------------------------------------------------------
         call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R8P
+
+
+    subroutine xh5for_ReadAttribute_I4P(this, Name, Type, Center, Values)
+    !----------------------------------------------------------------- 
+    !< Read I4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
+        character(len=*),          intent(IN)    :: Name              !< Attribute name
+        integer(I4P),              intent(IN)    :: Type              !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
+        integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+    end subroutine xh5for_ReadAttribute_I4P
+
+
+    subroutine xh5for_ReadAttribute_I8P(this, Name, Type, Center, Values)
+    !----------------------------------------------------------------- 
+    !< Read I8P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
+        character(len=*),          intent(IN)    :: Name              !< Attribute name
+        integer(I4P),              intent(IN)    :: Type              !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
+        integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+    end subroutine xh5for_ReadAttribute_I8P
+
+
+    subroutine xh5for_ReadAttribute_R4P(this, Name, Type, Center, Values)
+    !----------------------------------------------------------------- 
+    !< Read R4P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        character(len=*),       intent(IN)    :: Name                 !< Attribute name
+        integer(I4P),           intent(IN)    :: Type                 !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
+        real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+    end subroutine xh5for_ReadAttribute_R4P
+
+
+    subroutine xh5for_ReadAttribute_R8P(this, Name, Type, Center, Values)
+    !----------------------------------------------------------------- 
+    !< Read R8P Attribute
+    !----------------------------------------------------------------- 
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        character(len=*),       intent(IN)    :: Name                 !< Attribute name
+        integer(I4P),           intent(IN)    :: Type                 !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
+        real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
+    !-----------------------------------------------------------------
+        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+    end subroutine xh5for_ReadAttribute_R8P
 
 end module xh5for

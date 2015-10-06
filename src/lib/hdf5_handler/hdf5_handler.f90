@@ -43,6 +43,10 @@ private
         procedure(hdf5_handler_WriteAttribute_I8P), deferred :: WriteAttribute_I8P
         procedure(hdf5_handler_WriteAttribute_R4P), deferred :: WriteAttribute_R4P
         procedure(hdf5_handler_WriteAttribute_R8P), deferred :: WriteAttribute_R8P
+        procedure(hdf5_handler_ReadAttribute_I4P),  deferred :: ReadAttribute_I4P
+        procedure(hdf5_handler_ReadAttribute_I8P),  deferred :: ReadAttribute_I8P
+        procedure(hdf5_handler_ReadAttribute_R4P),  deferred :: ReadAttribute_R4P
+        procedure(hdf5_handler_ReadAttribute_R8P),  deferred :: ReadAttribute_R8P
         procedure                                            :: Initialize => hdf5_handler_Initialize
         procedure                                            :: Free       => hdf5_handler_Free
         procedure                                            :: OpenFile   => hdf5_handler_OpenFile
@@ -59,6 +63,11 @@ private
                                                                                   WriteAttribute_I8P, &
                                                                                   WriteAttribute_R4P, &
                                                                                   WriteAttribute_R8P
+        generic,                                    public   :: ReadAttribute  => ReadAttribute_I4P, &
+                                                                                  ReadAttribute_I8P, &
+                                                                                  ReadAttribute_R4P, &
+                                                                                  ReadAttribute_R8P
+
     end type hdf5_handler_t
 
     abstract interface
@@ -160,6 +169,50 @@ private
             integer(I4P),          intent(IN) :: Center
             real(R8P),             intent(IN) :: values(:)
         end subroutine hdf5_handler_WriteAttribute_R8P
+
+        subroutine hdf5_handler_ReadAttribute_I4P(this, Name, Type, Center, Values)
+            import hdf5_handler_t
+            import I4P
+            class(hdf5_handler_t),    intent(IN) :: this
+            character(len=*),         intent(IN) :: Name
+            integer(I4P),             intent(IN) :: Type
+            integer(I4P),             intent(IN) :: Center
+            integer(I4P), allocatable,intent(OUT):: values(:)
+        end subroutine hdf5_handler_ReadAttribute_I4P
+
+        subroutine hdf5_handler_ReadAttribute_I8P(this, Name, Type, Center, Values)
+            import hdf5_handler_t
+            import I4P
+            import I8P
+            class(hdf5_handler_t),  intent(IN) :: this
+            character(len=*),        intent(IN) :: Name
+            integer(I4P),            intent(IN) :: Type
+            integer(I4P),            intent(IN) :: Center
+            integer(I8P),allocatable,intent(OUT):: values(:)
+        end subroutine hdf5_handler_ReadAttribute_I8P
+
+        subroutine hdf5_handler_ReadAttribute_R4P(this, Name, Type, Center, Values)
+            import hdf5_handler_t
+            import I4P
+            import R4P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
+            real(R4P), allocatable,intent(OUT):: values(:)
+        end subroutine hdf5_handler_ReadAttribute_R4P
+
+        subroutine hdf5_handler_ReadAttribute_R8P(this, Name, Type, Center, Values)
+            import hdf5_handler_t
+            import I4P
+            import R8P
+            class(hdf5_handler_t), intent(IN) :: this
+            character(len=*),      intent(IN) :: Name
+            integer(I4P),          intent(IN) :: Type
+            integer(I4P),          intent(IN) :: Center
+            real(R8P), allocatable,intent(OUT):: values(:)
+        end subroutine hdf5_handler_ReadAttribute_R8P
+
     end interface
 
 public :: hdf5_handler_t
