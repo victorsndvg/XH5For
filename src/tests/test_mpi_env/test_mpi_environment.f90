@@ -23,8 +23,8 @@ implicit none
 
     call env%initialize()
 
-    call env%mpi_allgather_single_int_value(env%get_rank(), recv_int)
-    call env%mpi_allgather_single_int_value(int(env%get_rank(),I8P), recv_double_int)
+    call env%mpi_allgather(env%get_rank(), recv_int)
+    call env%mpi_allgather(int(env%get_rank(),I8P), recv_double_int)
 
     if(env%get_rank() == env%get_root()) then
         print*, 'The MPI communicator has '//trim(str(no_sign=.true.,n=env%get_comm_size()))//&

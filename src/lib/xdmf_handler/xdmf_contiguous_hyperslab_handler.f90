@@ -7,8 +7,9 @@ module xdmf_contiguous_hyperslab_handler
 use IR_Precision, only: I4P, I8P, R4P, R8P, str
 use xh5for_utils
 use fox_xdmf
-use fox_dom,      only: Node, NodeList, ParseFile, GetDocumentElement, Item, GetLength, GetChildNodes, &
-                        HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, TEXT_NODE, DOCUMENT_NODE
+use fox_dom,      only: Node, NodeList, ParseFile, GetDocumentElement, Item, GetLength, GetChildNodes, getAttribute, &
+                        HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, getTextContent, &
+                        TEXT_NODE, DOCUMENT_NODE
 use xdmf_handler
 
 implicit none
@@ -38,6 +39,10 @@ private
         procedure         :: CloseGrid                    => xdmf_contiguous_hyperslab_handler_CloseGrid
         procedure         :: GetUniqueNodeByTag           => xdmf_contiguous_hyperslab_handler_GetUniqueNodeByTag
         procedure         :: GetFirstChildByTag           => xdmf_contiguous_hyperslab_handler_GetFirstChildByTag
+        procedure         :: GetDataItemXPath             => xdmf_contiguous_hyperslab_handler_GetDataItemXPath
+        procedure         :: FillSpatialGridTopology      => xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
+        procedure         :: FillSpatialGridGeometry      => xdmf_contiguous_hyperslab_handler_FillSpatialGridGeometry
+        procedure         :: FillSpatialGridAttributes    => xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes
         procedure         :: FillSpatialGridDescriptor    => xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor
         procedure, public :: OpenFile                     => xdmf_contiguous_hyperslab_handler_OpenFile
         procedure, public :: Free                         => xdmf_contiguous_hyperslab_handler_Free
@@ -252,8 +257,6 @@ contains
                     call grid%open(xml_handler = this%file%xml_handler, &
                             GridType='Collection', &
                             CollectionType='Spatial')
-                case(XDMF_ACTION_READ) 
-                    call this%file%parsefile()
             end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_OpenFile
@@ -275,6 +278,7 @@ contains
             Childrens => getElementsByTagname(FatherNode, Tag)
             if(getLength(Childrens) == 1) ChildNode => item(Childrens, 0)
         endif
+        nullify(Childrens)
     end function xdmf_contiguous_hyperslab_handler_GetUniqueNodeByTag
 
 
@@ -299,12 +303,146 @@ contains
                 nullify(ChildNode)
             enddo
         endif
+        nullify(Childrens)
     end function xdmf_contiguous_hyperslab_handler_GetFirstChildByTag
+
+
+    function xdmf_contiguous_hyperslab_handler_GetDataItemXPath(this, DataItemNode) result(XPath)
+    !-----------------------------------------------------------------
+    !< Returns the XPath from a Hyperslab DataItem FoX DOM Node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
+        type(Node),     pointer,                    intent(IN)    :: DataItemNode   !< Fox DOM DataItem node
+        character(len=:),        allocatable                      :: XPath          !< XPath of the dataitem
+        type(NodeList), pointer                                   :: Childrens      !< Fox DOM node list
+        type(Node), pointer                                       :: ChildNode      !< Fox DOM node
+        type(xdmf_dataitem_t)                                     :: dataitem       !< XDMF Topology derived type
+        integer(I4P)                                              :: i          !< Index for a loop in Childrens
+    !----------------------------------------------------------------- 
+        if(.not. associated(DataItemNode)) return
+        if(hasChildNodes(DataItemNode)) then
+            Childrens => getChildNodes(DataItemNode)
+            do i = 0, getLength(Childrens) - 1
+                ChildNode => item(Childrens, i)
+                if(getNodeType(ChildNode) == TEXT_NODE) cycle
+                if(getTagName(Childnode) == 'DataItem' .and. (getAttribute(ChildNode, 'Format') == 'HDF')) then
+                    XPath = getTextContent(ChildNode)
+                endif
+            enddo
+        endif
+        nullify(Childrens)
+        nullify(ChildNode)
+        call dataitem%Free()
+    end function xdmf_contiguous_hyperslab_handler_GetDataItemXPath
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology(this, TopologyNode, ID)
+    !-----------------------------------------------------------------
+    !< Fill the Spatial grid topology metainfo from a Topology
+    !< FoX DOM Node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this         !< XDMF contiguous hyperslab handler
+        type(Node), pointer,                        intent(IN)    :: TopologyNode !< Fox DOM Topology node
+        integer(I4P),                               intent(IN)    :: ID           !< Grid IDentifier
+        type(xdmf_topology_t)                                     :: Topology     !< XDMF Topology derived type
+        type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
+        integer(I8P),     allocatable                             :: auxDims(:)   !< Aux dimensions variable
+        character(len=:), allocatable                             :: XPath        !< Topology XPath
+    !----------------------------------------------------------------- 
+        if(.not. associated(TopologyNode)) return
+        call Topology%Parse(DOMNode = TopologyNode)
+        ! Set TopologyType
+        call this%SpatialGridDescriptor%SetTopologyTypeByGridID(&
+                    TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=ID)
+        ! Set NumberOfElements
+        auxDims = Topology%get_Dimensions()
+        call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=ID)
+        ! Set XPath
+        DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
+        call this%SpatialGridDescriptor%SetTopologyXPathByGridID(&
+                    XPath = this%GetDataItemXPath(DataItemNode), ID=ID)
+        call Topology%Free()
+        nullify(DataItemNode)
+    end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridGeometry(this, GeometryNode, ID)
+    !----------------------------------------------------------------- 
+    !< Fill the Spatial grid geometry metainfo from a Topology
+    !< FoX DOM Node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this         !< XDMF contiguous hyperslab handler
+        type(Node), pointer,                        intent(IN)    :: GeometryNode !< Fox DOM Geometry node
+        integer(I4P),                               intent(IN)    :: ID           !< Grid IDentifier
+        type(xdmf_geometry_t)                                     :: Geometry     !< XDMF Geometry derived type
+        type(xdmf_dataitem_t)                                     :: DataItem     !< XDMF DataItem derived type
+        type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
+        integer(I8P),           allocatable                       :: auxDims(:)   !< Aux dimensions variable
+        integer(I4P)                                              :: spacedims    !< Space dimensions
+    !----------------------------------------------------------------- 
+        if(.not. associated(GeometryNode)) return
+        call Geometry%Parse(DOMNode = GeometryNode)
+        ! Set GeometryType
+        call this%SpatialGridDescriptor%SetGeometryTypeByGridID(&
+                    GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=ID)
+        ! Set NumberOfNodes
+        DataItemNode => this%GetFirstChildByTag(FatherNode = GeometryNode, Tag = 'DataItem')
+        call DataItem%Parse(DomNode = DataItemNode)
+        auxDims = DataItem%get_Dimensions()
+        spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
+        call this%SpatialGridDescriptor%SetNumberOfNodesByGridID(AuxDims(1)/spacedims,ID=ID)
+        ! Set XPath
+
+        call this%SpatialGridDescriptor%SetGeometryXPathByGridID(&
+                    XPath = this%GetDataItemXPath(DataItemNode), ID=ID)
+        nullify(DataItemNode)
+        call Geometry%Free()
+        call DataItem%Free()
+    end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridGeometry
+
+
+    subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes(this, AttributeNodes, ID)
+    !----------------------------------------------------------------- 
+    !< Fill the Spatial grid geometry metainfo from a Topology
+    !< FoX DOM Node
+    !----------------------------------------------------------------- 
+        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
+        type(NodeList), pointer,                    intent(IN)    :: AttributeNodes !< Fox DOM Attribute node list
+        integer(I4P),                               intent(IN)    :: ID             !< Grid IDentifier
+        type(Node),     pointer                                   :: AttributeNode  !< Fox DOM Attribute node
+        type(Node),     pointer                                   :: DataItemNode   !< Fox DOM Dataitem node
+        type(xdmf_attribute_t)                                    :: Attribute      !< XDMF Geometry derived type
+        integer(I4P)                                              :: i              !< Index for a loop in Attributes
+    !----------------------------------------------------------------- 
+        if(.not. associated(AttributeNodes)) return
+        call this%SpatialGridDescriptor%AllocateAttributesByGridID(ID=ID, NumberOfAttributes=getLength(AttributeNodes))
+        do i=0, getLength(AttributeNodes)-1
+            AttributeNode => item(AttributeNodes, i) 
+            call Attribute%Parse(AttributeNode)
+            ! Set Attribute Type
+            call this%SpatialGridDescriptor%SetAttributeTypeByGridID(ID = ID,                       &
+                        AttributeType = GetXDMFAttributeTypeFromName(Attribute%get_attributetype()),&
+                        NumberOfAttribute = i+1)
+            ! Set Attribute Center
+            call this%SpatialGridDescriptor%SetAttributeCenterByGridID(ID = ID,     &
+                        Center = GetXDMFCenterTypeFromName(Attribute%get_center()), &
+                        NumberOfAttribute = i+1)
+            ! Set Attribute XPath
+            DataItemNode => this%GetFirstChildByTag(FatherNode = AttributeNode, Tag = 'DataItem')
+            call this%SpatialGridDescriptor%SetAttributeXPathByGridID(ID = ID, &
+                        XPath = this%GetDataItemXPath(DataItemNode),           &
+                        NumberOfAttribute = i+1)
+        enddo
+        nullify(AttributeNode)
+        nullify(DataItemNode)
+        call Attribute%Free()
+    end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes
 
 
     subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor(this, UniformGridNodes)
     !-----------------------------------------------------------------
-    !< Return FoX DOM UniformGrid node list given the Spatril Grid Node
+    !< Fill Spatial Grid Descriptor From a FoX DOM UniformGrid node list
+    !< given the Spatial Grid Node
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this             !< XDMF contiguous hyperslab handler
         type(NodeList), pointer,                    intent(IN)    :: UniformGridNodes !< Fox DOM Grid node list
@@ -312,48 +450,30 @@ contains
         type(Node),     pointer                                   :: ChildNode        !< Fox DOM node
         type(NodeList), pointer                                   :: AttributeNodes   !< Fox DOM Attribute node list
         type(xdmf_grid_t)                                         :: Grid             !< XDMF Grid derived type
-        type(xdmf_topology_t)                                     :: Topology         !< XDMF Topology derived type
         type(xdmf_geometry_t)                                     :: Geometry         !< XDMF Topology derived type
         type(xdmf_attribute_t)                                    :: Attribute        !< XDMF Attribute derived type
         integer(I4P)                                              :: i                !< Index for a loop in UniformGridNodes
-        integer(I4P)                                              :: j                !< Index for a loop in Attributes
-        integer(I8P), allocatable                                 :: auxDims(:)       !< Aux dimensions variable
     !----------------------------------------------------------------- 
         if(associated(UniformGridNodes)) then
             call this%SpatialGridDescriptor%Allocate(NumberOfGrids=getLength(UniformGridNodes))
             do i = 0, getLength(UniformGridNodes) - 1
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! UNDER DEVELOPMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 UniformGridNode => item(UniformGridNodes, i)
-                call Grid%Parse(DOMNode = UniformGridNode)
-                call Grid%Print(IndentationLevel=0)
+                ! Fill each Spatial Grid Topology
                 ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Topology')
-                call Topology%Parse(DOMNode = ChildNode)
-                call Topology%Print(IndentationLevel=1)
-                call this%SpatialGridDescriptor%SetTopologyTypeByGridID(&
-                            TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=i)
-                auxDims = Topology%get_Dimensions()
-                call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=i)
+                call this%FillSpatialGridTopology(TopologyNode = ChildNode, ID = i)
+                ! Fill each Spatial Grid Geometry
                 ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Geometry')
-                call Geometry%Parse(DOMNode = ChildNode)
-                call Geometry%Print(IndentationLevel=1)
-                call this%SpatialGridDescriptor%SetGeometryTypeByGridID(&
-                            GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=i)
+                call this%FillSpatialGridGeometry(GeometryNode = Childnode, ID = i)
+                ! Fill each Spatial Grid Attributes
                 AttributeNodes => getElementsByTagname(UniformGridNode, 'Attribute')
-                call this%SpatialGridDescriptor%AllocateAttributesByGridID(ID=i, NumberOfAttributes=getLength(AttributeNodes))
-                do j=0, getLength(AttributeNodes)-1
-                    ChildNode => item(AttributeNodes, j) 
-                    call Attribute%Parse(ChildNode)
-                call this%SpatialGridDescriptor%SetAttributeTypeByGridID(ID = i,                    &
-                            AttributeType = GetXDMFAttributeTypeFromName(Attribute%get_attributetype()),&
-                            NumberOfAttribute = j+1)
-print*, Attribute%Get_Name(), Attribute%get_AttributeType(), Attribute%get_Center()
-                    call Attribute%Print(IndentationLevel=1)
-                enddo
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                call this%FillSpatialGridAttributes(AttributeNodes = AttributeNodes, ID = i)
             enddo
+            nullify(UniformGridNode)
+            nullify(ChildNode)
+            nullify(Attributenodes)
+            call Grid%Free()
+            call Geometry%Free()
+            call Attribute%Free()
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor
 
@@ -368,22 +488,24 @@ print*, Attribute%Get_Name(), Attribute%get_AttributeType(), Attribute%get_Cente
         type(Node),     pointer                                   :: SpatialGridNode  !< Fox DOM SpatialGrid node
         type(NodeList), pointer                                   :: UniformGridNodes !< Fox DOM UniformGrid node list
     !----------------------------------------------------------------- 
-        if(getNodeType(this%file%get_document_root())==DOCUMENT_NODE) then
-            DocumentRootNode => getDocumentElement(this%file%get_document_root())
-            DomainNode => this%GetUniqueNodeByTag(FatherNode = DocumentRootNode, Tag = 'Domain')
-            if(associated(DomainNode)) then
+        if(this%MPIEnvironment%is_root()) then
+            call this%file%parsefile()
+            if(getNodeType(this%file%get_document_root())==DOCUMENT_NODE) then
+                DocumentRootNode => getDocumentElement(this%file%get_document_root())
+                DomainNode => this%GetUniqueNodeByTag(FatherNode = DocumentRootNode, Tag = 'Domain')
+                ! Get Domain Node
+                if(.not. associated(DomainNode)) return
                 SpatialGridNode => this%GetFirstChildByTag(FatherNode = DomainNode, Tag = 'Grid')
-                if(associated(SpatialGridNode)) then
-                    UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
-                    if(associated(UniformGridNodes)) then
-                        call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
-                    endif
-                endif
+                ! Get Spatial Grid Node
+                if(.not. associated(SpatialGridNode)) return
+                UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
+                ! Get Fill Spatial Grid metainfo
+                if(.not. associated(UniformGridNodes)) return
+                call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
             endif
+            call destroy(this%file%get_document_root())
         endif
-            
-
-
+        call this%SpatialGridDescriptor%DistributeData()
     end subroutine xdmf_contiguous_hyperslab_handler_ParseFile
 
 
@@ -402,8 +524,6 @@ print*, Attribute%Get_Name(), Attribute%get_AttributeType(), Attribute%get_Cente
                     call grid%close(xml_handler=this%file%xml_handler)
                     call domain%close(xml_handler = this%file%xml_handler)
                     call this%file%closefile()
-                case(XDMF_ACTION_READ)
-                    call destroy(this%file%get_document_root())
             end select
         endif
     end subroutine xdmf_contiguous_hyperslab_handler_CloseFile

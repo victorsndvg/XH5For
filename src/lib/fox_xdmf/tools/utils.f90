@@ -28,45 +28,68 @@ contains
     end function Upper_Case
 
 
-    function Count_tokens(s1)
+    function Count_tokens(s1, separator)
     !-----------------------------------------------------------------
     !< Function for counting tokens of a string 
+    !< Modified to define a custom a separator. If present, separator
+    !< is the only allowed separator character
     !< @author David Frank  dave_frank@hotmail.com (http://home.earthlink.net/~dave_gemini/strings.f90)
     !-----------------------------------------------------------------
-        character(len=*), intent(IN) :: s1
-        character(len=len(s1))       :: s
-        integer                      :: Count_tokens
-        integer                      :: i, k
+        character(len=*),           intent(IN) :: s1
+        character(len=1), optional, intent(IN) :: separator
+        character(len=len(s1))                 :: s
+        integer                                :: Count_tokens
+        integer                                :: i, k
     !-----------------------------------------------------------------
         s = s1                            ! remove possible last char null (in C)
         k = 0  ; if (s /= ' ') k = 1      ! string has at least 1 item
-        do i = 1,len_trim(s)-1
-           if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') k = k+1
-        enddo
+        if(present(separator) ) then
+            do i = 1,len_trim(s)-1
+               if(s(i:i) /= separator .and.s(i+1:i+1) == separator) k = k+1
+            enddo
+        else
+            do i = 1,len_trim(s)-1
+               if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') k = k+1
+            enddo
+        endif
         Count_tokens = k
     end function Count_tokens
 
-    function Next_token(s1, pos)
+    function Next_token(s1, pos, separator)
     !-----------------------------------------------------------------
     !< Return the next token given a initial position. The position
     !< is updated to reference the start of the next token
     !-----------------------------------------------------------------
-        character(len=*), intent(IN)    :: s1
-        integer,          intent(INOUT) :: pos
-        character(len=len(s1))          :: s
-        character(len=:), allocatable   :: Next_token
-        integer                         :: i, k
+        character(len=*),           intent(IN)    :: s1
+        integer,                    intent(INOUT) :: pos
+        character(len=1), optional, intent(IN)    :: separator
+        character(len=len(s1))                    :: s
+        character(len=:), allocatable             :: Next_token
+        integer                                   :: i, k
     !-----------------------------------------------------------------
         s = s1    
         if(pos<=len(s)) then     
             k = len_trim(s)
-            do i = pos,len_trim(s)-1
-                if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') then
-                    k = i+1
-                    exit
-                endif
-            enddo
-            Next_token = s(pos:k)
+            if(present(separator)) then
+                do i = pos,len_trim(s)-1
+                    if(s(i:i) /= separator.and.s(i+1:i+1) == separator) then
+                        k = i+1
+                        exit
+                    endif
+                enddo
+            else
+                do i = pos,len_trim(s)-1
+                    if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') then
+                        k = i+1
+                        exit
+                    endif
+                enddo
+            endif
+            if(present(separator)) then
+                Next_token = s(pos+1:k-1)
+            else
+                Next_token = s(pos:k)
+            endif
             pos = k
         endif
 
