@@ -445,7 +445,7 @@ contains
                 TopologyTypePerGrid(i+1) = this%GetTopologyTypeFromGridID(ID=i)
                 geometryTypePerGrid(i+1) = this%GetGeometryTypeFromGridID(ID=i)
                 AllTopologyXPaths = AllTopologyXPaths//'&'//this%GetTopologyXPathFromGridID(ID=i)
-                AllGeometryXPaths = AllTopologyXPaths//'&'//this%GetGeometryXPathFromGridID(ID=i)
+                AllGeometryXPaths = AllGeometryXPaths//'&'//this%GetGeometryXPathFromGridID(ID=i)
             enddo
         endif
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfNodesPerGrid)

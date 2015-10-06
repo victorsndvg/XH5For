@@ -896,20 +896,25 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror            !< HDF5 error code
+        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
+        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        XPath = this%SpatialGridDescriptor%GetGeometryXPathFromGridID(ID=this%MPIEnvironment%get_rank())
+        DataSetName = XPath(index(XPath,':')+1:)
         spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName='Coordinates',          &
+        call this%ReadHyperSlab(DatasetName = DatasetName,          &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
                 Values          = Coordinates)
+        deallocate(DatasetName)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P
 
@@ -929,16 +934,20 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror            !< HDF5 error code
+        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
+        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        XPath = this%SpatialGridDescriptor%GetGeometryXPathFromGridID(ID=this%MPIEnvironment%get_rank())
+        DataSetName = XPath(index(XPath,':')+1:)
         spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName='Coordinates',          &
+        call this%ReadHyperSlab(DatasetName = DatasetName,          &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
@@ -962,16 +971,20 @@ contains
         integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror               !< HDF5 error code
+        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
+        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        XPath = this%SpatialGridDescriptor%GetTopologyXPathFromGridID(ID=this%MPIEnvironment%get_rank())
+        DataSetName = XPath(index(XPath,':')+1:)
         nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName='Connectivities',                 &
+        call this%ReadHyperSlab(DatasetName = DataSetName,                    &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
@@ -995,16 +1008,20 @@ contains
         integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror               !< HDF5 error code
+        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
+        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        XPath = this%SpatialGridDescriptor%GetTopologyXPathFromGridID(ID=this%MPIEnvironment%get_rank())
+        DataSetName = XPath(index(XPath,':')+1:)
         nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName='Connectivities',                &
+        call this%WriteHyperSlab(DatasetName = DatasetName,                   &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &

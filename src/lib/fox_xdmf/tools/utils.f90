@@ -73,24 +73,22 @@ contains
             if(present(separator)) then
                 do i = pos,len_trim(s)-1
                     if(s(i:i) /= separator.and.s(i+1:i+1) == separator) then
-                        k = i+1
+                        k = i
                         exit
                     endif
                 enddo
+                if(s(pos:pos) == separator) pos = pos+1
             else
                 do i = pos,len_trim(s)-1
                     if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') then
-                        k = i+1
+                        k = i
                         exit
                     endif
                 enddo
+                if(s(pos:pos) == ' ' .or. s(pos:pos) == ',' ) pos = pos+1
             endif
-            if(present(separator)) then
-                Next_token = s(pos+1:k-1)
-            else
-                Next_token = s(pos:k)
-            endif
-            pos = k
+            Next_token = s(pos:k)
+            pos = k+1
         endif
 
     end function Next_token
