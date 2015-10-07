@@ -55,32 +55,36 @@ private
     end type xdmf_handler_t
 
     abstract interface
-        subroutine xdmf_handler_SetGeometry_R4P(this, Coordinates)
+        subroutine xdmf_handler_SetGeometry_R4P(this, Coordinates, Name)
             import xdmf_handler_t
             import R4P
             class(xdmf_handler_t), intent(INOUT) :: this
             real(R4P),             intent(IN)    :: Coordinates(:)
+            character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R4P
 
-        subroutine xdmf_handler_SetGeometry_R8P(this, Coordinates)
+        subroutine xdmf_handler_SetGeometry_R8P(this, Coordinates, Name)
             import xdmf_handler_t
             import R8P
             class(xdmf_handler_t), intent(INOUT) :: this
             real(R8P),             intent(IN)    :: Coordinates(:)
+            character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R8P
 
-        subroutine xdmf_handler_SetTopology_I4P(this, Connectivities)
+        subroutine xdmf_handler_SetTopology_I4P(this, Connectivities, Name)
             import xdmf_handler_t
             import I4P
             class(xdmf_handler_t), intent(INOUT) :: this
             integer(I4P),          intent(IN)    :: Connectivities(:)
+            character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetTopology_I4P
 
-        subroutine xdmf_handler_SetTopology_I8P(this, Connectivities)
+        subroutine xdmf_handler_SetTopology_I8P(this, Connectivities, Name)
             import xdmf_handler_t
             import I8P
             class(xdmf_handler_t), intent(INOUT) :: this
             integer(I8P),          intent(IN)    :: Connectivities(:)
+            character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetTopology_I8P
 
         subroutine xdmf_handler_AppendAttribute_I4P(this, Name, Type, Center, Attribute)

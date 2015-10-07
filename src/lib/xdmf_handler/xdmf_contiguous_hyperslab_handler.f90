@@ -42,7 +42,6 @@ private
         procedure         :: GetDataItemXPath             => xdmf_contiguous_hyperslab_handler_GetDataItemXPath
         procedure         :: FillSpatialGridTopology      => xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
         procedure         :: FillSpatialGridGeometry      => xdmf_contiguous_hyperslab_handler_FillSpatialGridGeometry
-        procedure         :: FillSpatialGridAttributes    => xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes
         procedure         :: FillSpatialGridDescriptor    => xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor
         procedure, public :: OpenFile                     => xdmf_contiguous_hyperslab_handler_OpenFile
         procedure, public :: Free                         => xdmf_contiguous_hyperslab_handler_Free
@@ -99,47 +98,51 @@ contains
     end subroutine xdmf_contiguous_hyperslab_handler_Free
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P(this, Coordinates)
+    subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Add R4P geometry info to the handler. Used for deferred writing 
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
         real(R4P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
+        character(len=*),                           intent(IN)    :: Name           !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath='Coordinates', Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryInfo(XPath = Name, Precision=4, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P(this, Coordinates)
+    subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Add R8P geometry info to the handler. Used in deferred writing 
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
         real(R8P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
+        character(len=*),                           intent(IN)    :: Name           !< Geometry name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath='Coordinates', Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryInfo(XPath=Name, Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P(this, Connectivities)
+    subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Add I4P topology info to the handler. Used in deferred writing 
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
         integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
+        character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath='Connectivities', Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=4, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P(this, Connectivities)
+    subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Add I8P topology info to the handler. Used in deferred writing 
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this              !< XDMF contiguous hyperslab handler
-        integer(I8P),                               intent(IN)    :: Connectivities(:)    !< Grid Connectivities
+        integer(I8P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
+        character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath='Connectivities', Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=8, Dimension=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P
 
 
@@ -357,10 +360,6 @@ contains
         ! Set NumberOfElements
         auxDims = Topology%get_Dimensions()
         call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=ID)
-        ! Set XPath
-        DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
-        call this%SpatialGridDescriptor%SetTopologyXPathByGridID(&
-                    XPath = this%GetDataItemXPath(DataItemNode), ID=ID)
         call Topology%Free()
         nullify(DataItemNode)
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
@@ -391,52 +390,10 @@ contains
         auxDims = DataItem%get_Dimensions()
         spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
         call this%SpatialGridDescriptor%SetNumberOfNodesByGridID(AuxDims(1)/spacedims,ID=ID)
-        ! Set XPath
-
-        call this%SpatialGridDescriptor%SetGeometryXPathByGridID(&
-                    XPath = this%GetDataItemXPath(DataItemNode), ID=ID)
         nullify(DataItemNode)
         call Geometry%Free()
         call DataItem%Free()
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridGeometry
-
-
-    subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes(this, AttributeNodes, ID)
-    !----------------------------------------------------------------- 
-    !< Fill the Spatial grid geometry metainfo from a Topology
-    !< FoX DOM Node
-    !----------------------------------------------------------------- 
-        class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this           !< XDMF contiguous hyperslab handler
-        type(NodeList), pointer,                    intent(IN)    :: AttributeNodes !< Fox DOM Attribute node list
-        integer(I4P),                               intent(IN)    :: ID             !< Grid IDentifier
-        type(Node),     pointer                                   :: AttributeNode  !< Fox DOM Attribute node
-        type(Node),     pointer                                   :: DataItemNode   !< Fox DOM Dataitem node
-        type(xdmf_attribute_t)                                    :: Attribute      !< XDMF Geometry derived type
-        integer(I4P)                                              :: i              !< Index for a loop in Attributes
-    !----------------------------------------------------------------- 
-        if(.not. associated(AttributeNodes)) return
-        call this%SpatialGridDescriptor%AllocateAttributesByGridID(ID=ID, NumberOfAttributes=getLength(AttributeNodes))
-        do i=0, getLength(AttributeNodes)-1
-            AttributeNode => item(AttributeNodes, i) 
-            call Attribute%Parse(AttributeNode)
-            ! Set Attribute Type
-            call this%SpatialGridDescriptor%SetAttributeTypeByGridID(ID = ID,                       &
-                        AttributeType = GetXDMFAttributeTypeFromName(Attribute%get_attributetype()),&
-                        NumberOfAttribute = i+1)
-            ! Set Attribute Center
-            call this%SpatialGridDescriptor%SetAttributeCenterByGridID(ID = ID,     &
-                        Center = GetXDMFCenterTypeFromName(Attribute%get_center()), &
-                        NumberOfAttribute = i+1)
-            ! Set Attribute XPath
-            DataItemNode => this%GetFirstChildByTag(FatherNode = AttributeNode, Tag = 'DataItem')
-            call this%SpatialGridDescriptor%SetAttributeXPathByGridID(ID = ID, &
-                        XPath = this%GetDataItemXPath(DataItemNode),           &
-                        NumberOfAttribute = i+1)
-        enddo
-        nullify(AttributeNode)
-        nullify(DataItemNode)
-        call Attribute%Free()
-    end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridAttributes
 
 
     subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridDescriptor(this, UniformGridNodes)
@@ -464,9 +421,6 @@ contains
                 ! Fill each Spatial Grid Geometry
                 ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Geometry')
                 call this%FillSpatialGridGeometry(GeometryNode = Childnode, ID = i)
-                ! Fill each Spatial Grid Attributes
-                AttributeNodes => getElementsByTagname(UniformGridNode, 'Attribute')
-                call this%FillSpatialGridAttributes(AttributeNodes = AttributeNodes, ID = i)
             enddo
             nullify(UniformGridNode)
             nullify(ChildNode)
