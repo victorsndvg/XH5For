@@ -188,6 +188,17 @@ contains
     end function uniform_grid_descriptor_GetTopologyType
 
 
+    subroutine uniform_grid_descriptor_SetTopologyXPath(this, Xpath)
+    !-----------------------------------------------------------------
+    !< Set XDMF Topology XPath
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
+        character(len=*),                 intent(IN)    :: XPath      !< Topology XPath
+    !-----------------------------------------------------------------
+        call this%Topology_info%SetXPath(XPath=XPath)
+    end subroutine uniform_grid_descriptor_SetTopologyXPath
+
+
     function uniform_grid_descriptor_GetTopologyXPath(this)
     !-----------------------------------------------------------------
     !< Return XDMF topology XPath
@@ -266,6 +277,17 @@ contains
     !-----------------------------------------------------------------
         uniform_grid_descriptor_GetGeometryType = this%Geometry_info%GetType()
     end function uniform_grid_descriptor_GetGeometryType
+
+
+    subroutine uniform_grid_descriptor_SetGeometryXPath(this, Xpath)
+    !-----------------------------------------------------------------
+    !< Set XDMF geometry XPath
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
+        character(len=*),                 intent(IN)    :: XPath      !< Geometry XPath
+    !-----------------------------------------------------------------
+        call this%Geometry_info%SetXPath(XPath=XPath)
+    end subroutine uniform_grid_descriptor_SetGeometryXPath
 
 
     function uniform_grid_descriptor_GetGeometryXPath(this)

@@ -72,11 +72,11 @@ contains
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
                 DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-                LocalNumberOfData = int(this%UniformGridDescriptor%GetNumberOfElements(),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
                 DataOffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
                 GlobalNumberOfData = int(this%MPIEnvironment%get_comm_size(),HSIZE_T)
@@ -84,7 +84,7 @@ contains
                 DataOffset = this%MPIEnvironment%get_rank()
             case Default
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
                 DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         end select
 #endif
@@ -616,12 +616,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Writes R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
         real(R4P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
@@ -640,7 +641,7 @@ contains
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName='Coordinates',         &
+        call this%WriteHyperSlab(DatasetName=Name,                  &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
@@ -650,12 +651,13 @@ contains
 
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Writes R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
         real(R8P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
@@ -674,7 +676,7 @@ contains
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName='Coordinates',         &
+        call this%WriteHyperSlab(DatasetName=Name,                  &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
@@ -683,12 +685,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Writes I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I4P),                               intent(IN) :: Connectivities(:)      !< I4P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
         integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
         integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
         integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
@@ -707,7 +710,7 @@ contains
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%UniformGridDescriptor%GetNumberOfElements(),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName='Connectivities',                &
+        call this%WriteHyperSlab(DatasetName=Name,                            &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
@@ -716,12 +719,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Writes I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I8P),                               intent(IN) :: Connectivities(:)      !< I8P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
         integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
         integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
         integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
@@ -740,7 +744,7 @@ contains
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%UniformGridDescriptor%GetNumberOfElements(),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName='Connectivities',                &
+        call this%WriteHyperSlab(DatasetName=Name,                            &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
@@ -885,12 +889,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R4P), allocatable,                     intent(OUT) :: Coordinates(:)     !< Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
@@ -900,35 +905,31 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror            !< HDF5 error code
-        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
-        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        XPath = this%SpatialGridDescriptor%GetGeometryXPathFromGridID(ID=this%MPIEnvironment%get_rank())
-        DataSetName = XPath(index(XPath,':')+1:)
         spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = DatasetName,          &
+        call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
                 Values          = Coordinates)
-        deallocate(DatasetName)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P(this, Coordinates)
+    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P(this, Coordinates, Name)
     !-----------------------------------------------------------------
     !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R8P), allocatable,                     intent(OUT) :: Coordinates(:)     !< Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
@@ -938,20 +939,16 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror            !< HDF5 error code
-        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
-        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        XPath = this%SpatialGridDescriptor%GetGeometryXPathFromGridID(ID=this%MPIEnvironment%get_rank())
-        DataSetName = XPath(index(XPath,':')+1:)
         spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = DatasetName,          &
+        call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
@@ -960,12 +957,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Read I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
         integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
         integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
         integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
@@ -975,20 +973,16 @@ contains
         integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror               !< HDF5 error code
-        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
-        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        XPath = this%SpatialGridDescriptor%GetTopologyXPathFromGridID(ID=this%MPIEnvironment%get_rank())
-        DataSetName = XPath(index(XPath,':')+1:)
         nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = DataSetName,                    &
+        call this%ReadHyperSlab(DatasetName = Name,                           &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
@@ -997,12 +991,13 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P(this, Connectivities)
+    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P(this, Connectivities, Name)
     !-----------------------------------------------------------------
     !< Read I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
         integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
         integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
         integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
@@ -1012,20 +1007,16 @@ contains
         integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
         integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
         integer                                                :: hdferror               !< HDF5 error code
-        character(len=:), allocatable                          :: DatasetName         !< HDF5 dataset name for coordinates 
-        character(len=:), allocatable                          :: XPath               !< Path to the file and dataset
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        XPath = this%SpatialGridDescriptor%GetTopologyXPathFromGridID(ID=this%MPIEnvironment%get_rank())
-        DataSetName = XPath(index(XPath,':')+1:)
         nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
         localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName = DatasetName,                   &
+        call this%WriteHyperSlab(DatasetName = Name,                          &
                 DatasetDims     = (/nodesperelement*globalnumberofelements/), &
                 HyperSlabOffset = (/nodesperelement*elementoffset/),          &
                 HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &

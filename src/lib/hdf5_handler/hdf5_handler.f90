@@ -71,60 +71,68 @@ private
     end type hdf5_handler_t
 
     abstract interface
-        subroutine hdf5_handler_WriteGeometry_R4P(this, Coordinates)
+        subroutine hdf5_handler_WriteGeometry_R4P(this, Coordinates, Name)
             import hdf5_handler_t
             import R4P
             class(hdf5_handler_t), intent(IN) :: this
             real(R4P),             intent(IN) :: Coordinates(:)
+            character(len=*),      intent(IN) :: Name
         end subroutine hdf5_handler_WriteGeometry_R4P
 
-        subroutine hdf5_handler_WriteGeometry_R8P(this, Coordinates)
+        subroutine hdf5_handler_WriteGeometry_R8P(this, Coordinates, Name)
             import hdf5_handler_t
             import R8P
             class(hdf5_handler_t), intent(IN) :: this
             real(R8P),             intent(IN) :: Coordinates(:)
+            character(len=*),      intent(IN) :: Name
         end subroutine hdf5_handler_WriteGeometry_R8P
 
-        subroutine hdf5_handler_ReadGeometry_R4P(this, Coordinates)
+        subroutine hdf5_handler_ReadGeometry_R4P(this, Coordinates, Name)
             import hdf5_handler_t
             import R4P
             class(hdf5_handler_t),  intent(IN)  :: this
             real(R4P), allocatable, intent(OUT) :: Coordinates(:)
+            character(len=*),      intent(IN)   :: Name
         end subroutine hdf5_handler_ReadGeometry_R4P
 
-        subroutine hdf5_handler_ReadGeometry_R8P(this, Coordinates)
+        subroutine hdf5_handler_ReadGeometry_R8P(this, Coordinates, Name)
             import hdf5_handler_t
             import R8P
             class(hdf5_handler_t),  intent(IN)  :: this
             real(R8P), allocatable, intent(OUT) :: Coordinates(:)
+            character(len=*),       intent(IN)   :: Name
         end subroutine hdf5_handler_ReadGeometry_R8P
 
-        subroutine hdf5_handler_WriteTopology_I4P(this, Connectivities)
+        subroutine hdf5_handler_WriteTopology_I4P(this, Connectivities, Name)
             import hdf5_handler_t
             import I4P
             class(hdf5_handler_t), intent(IN) :: this
             integer(I4P),          intent(IN) :: Connectivities(:)
+            character(len=*),      intent(IN) :: Name
         end subroutine hdf5_handler_WriteTopology_I4P
 
-        subroutine hdf5_handler_WriteTopology_I8P(this, Connectivities)
+        subroutine hdf5_handler_WriteTopology_I8P(this, Connectivities, Name)
             import hdf5_handler_t
             import I8P
             class(hdf5_handler_t), intent(IN) :: this
             integer(I8P),          intent(IN) :: Connectivities(:)
+            character(len=*),      intent(IN) :: Name
         end subroutine hdf5_handler_WriteTopology_I8P
 
-        subroutine hdf5_handler_ReadTopology_I4P(this, Connectivities)
+        subroutine hdf5_handler_ReadTopology_I4P(this, Connectivities, Name)
             import hdf5_handler_t
             import I4P
             class(hdf5_handler_t),     intent(IN)  :: this
             integer(I4P), allocatable, intent(OUT) :: Connectivities(:)
+            character(len=*),          intent(IN)  :: Name
         end subroutine hdf5_handler_ReadTopology_I4P
 
-        subroutine hdf5_handler_ReadTopology_I8P(this, Connectivities)
+        subroutine hdf5_handler_ReadTopology_I8P(this, Connectivities, Name)
             import hdf5_handler_t
             import I8P
             class(hdf5_handler_t),     intent(IN)  :: this
             integer(I8P), allocatable, intent(OUT) :: Connectivities(:)
+            character(len=*),          intent(IN)  :: Name
         end subroutine hdf5_handler_ReadTopology_I8P
 
         subroutine hdf5_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)

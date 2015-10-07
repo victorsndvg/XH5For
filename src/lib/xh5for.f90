@@ -272,91 +272,132 @@ contains
     end subroutine xh5for_Close
 
 
-    subroutine xh5for_WriteGeometry_R4P(this, Coordinates)
+    subroutine xh5for_WriteGeometry_R4P(this, Coordinates, Name)
     !----------------------------------------------------------------- 
     !< Write R4P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
-        real(R4P),       intent(IN)    :: Coordinates(:)              !< R4P grid geometry coordinates
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P),                  intent(IN)    :: Coordinates(:)   !< R4P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        call this%Handler%WriteGeometry(Coordinates = Coordinates)
+        if(present(Name)) then
+            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = Name)
+        else
+            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+        endif
     end subroutine xh5for_WriteGeometry_R4P
 
 
-    subroutine xh5for_WriteGeometry_R8P(this, Coordinates)
+    subroutine xh5for_WriteGeometry_R8P(this, Coordinates, Name)
     !----------------------------------------------------------------- 
     !< Write R8P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type                        
-        real(R8P),       intent(IN)    :: Coordinates(:)              !< R8P grid geometry coordinates
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type                        
+        real(R8P),                  intent(IN)    :: Coordinates(:)   !< R8P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        call this%Handler%WriteGeometry(Coordinates = Coordinates)
+        if(present(Name)) then
+            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = Name)
+        else
+            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+        endif
     end subroutine xh5for_WriteGeometry_R8P
 
 
-    subroutine xh5for_ReadGeometry_R4P(this, Coordinates)
+    subroutine xh5for_ReadGeometry_R4P(this, Coordinates, Name)
     !----------------------------------------------------------------- 
     !< Read R4P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
-        real(R4P), allocatable, intent(OUT)   :: Coordinates(:)       !< R4P grid geometry coordinates
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P), allocatable,     intent(OUT)   :: Coordinates(:)   !< R4P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        call this%Handler%ReadGeometry(Coordinates = Coordinates)
+        if(present(Name)) then
+            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name = Name )
+        else
+            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name ='Coordinates')
+        endif
     end subroutine xh5for_ReadGeometry_R4P
 
 
-    subroutine xh5for_ReadGeometry_R8P(this, Coordinates)
+    subroutine xh5for_ReadGeometry_R8P(this, Coordinates, Name)
     !----------------------------------------------------------------- 
     !< Read R8P Geometry
     !----------------------------------------------------------------- 
-        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
-        real(R8P), allocatable, intent(OUT)   :: Coordinates(:)       !< R8P grid geometry coordinates
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R8P), allocatable,     intent(OUT)   :: Coordinates(:)   !< R8P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        call this%Handler%ReadGeometry(Coordinates = Coordinates)
+        if(present(Name)) then
+            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name = Name )
+        else
+            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name ='Coordinates')
+        endif
+
     end subroutine xh5for_ReadGeometry_R8P
 
 
-    subroutine xh5for_WriteTopology_I4P(this, Connectivities)
+    subroutine xh5for_WriteTopology_I4P(this, Connectivities, Name)
     !----------------------------------------------------------------- 
     !< Write I4P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
-        integer(I4P),    intent(IN)    :: Connectivities(:)           !< I4P grid topology connectivities
+        class(xh5for_t),            intent(INOUT) :: this              !< XH5For derived type
+        integer(I4P),               intent(IN)    :: Connectivities(:) !< I4P grid topology connectivities
+        character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%Handler%WriteTopology(Connectivities = Connectivities)
+        if(present(Name)) then
+            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
+        else
+            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
+        endif
     end subroutine xh5for_WriteTopology_I4P
 
 
-    subroutine xh5for_WriteTopology_I8P(this, Connectivities)
+    subroutine xh5for_WriteTopology_I8P(this, Connectivities, Name)
     !----------------------------------------------------------------- 
     !< Write I8P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
-        integer(I8P),    intent(IN)    :: Connectivities(:)           !< I8P grid topology connectivities
+        class(xh5for_t),            intent(INOUT) :: this              !< XH5For derived type
+        integer(I8P),               intent(IN)    :: Connectivities(:) !< I8P grid topology connectivities
+        character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%Handler%WriteTopology(Connectivities = Connectivities)
+        if(present(Name)) then
+            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
+        else
+            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
+        endif
     end subroutine xh5for_WriteTopology_I8P
 
 
-    subroutine xh5for_ReadTopology_I4P(this, Connectivities)
+    subroutine xh5for_ReadTopology_I4P(this, Connectivities, Name)
     !----------------------------------------------------------------- 
     !< Read I4P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t),             intent(INOUT) :: this            !< XH5For derived type
-        integer(I4P), allocatable,   intent(OUT) :: Connectivities(:) !< I4P grid topology connectivities
+        class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
+        integer(I4P), allocatable, intent(OUT)   :: Connectivities(:) !< I4P grid topology connectivities
+        character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%Handler%ReadTopology(Connectivities = Connectivities)
+        if(present(Name)) then
+            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = Name)
+        else
+            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+        endif
     end subroutine xh5for_ReadTopology_I4P
 
 
-    subroutine xh5for_ReadTopology_I8P(this, Connectivities)
+    subroutine xh5for_ReadTopology_I8P(this, Connectivities, Name)
     !----------------------------------------------------------------- 
     !< Read I8P Topology
     !----------------------------------------------------------------- 
-        class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
-        integer(I8P), allocatable, intent(OUT) :: Connectivities(:)   !< I8P grid topology connectivities
+        class(xh5for_t),            intent(INOUT) :: this              !< XH5For derived type
+        integer(I8P), allocatable,  intent(OUT)   :: Connectivities(:) !< I8P grid topology connectivities
+        character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%Handler%ReadTopology(Connectivities = Connectivities)
+        if(present(Name)) then
+            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = Name)
+        else
+            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+        endif
     end subroutine xh5for_ReadTopology_I8P
 
 

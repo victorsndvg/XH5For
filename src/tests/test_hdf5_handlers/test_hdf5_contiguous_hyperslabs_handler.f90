@@ -33,8 +33,8 @@ implicit none
     call uniformgrid%initialize(NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
     call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
     call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hyperslab')
-    call heavydata%WriteTopology(triangletopology+mpienv%get_rank())
-    call heavydata%WriteGeometry(trianglegeometry)
+    call heavydata%WriteTopology(triangletopology+mpienv%get_rank(), Name='Connectivities')
+    call heavydata%WriteGeometry(trianglegeometry, Name='Coordinates')
 !    call lightdata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, GridID=i)
     call heavydata%CloseFile()
 #ifdef ENABLE_MPI
