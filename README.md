@@ -17,7 +17,7 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
 * As starting point XML syntax will be based on XDMF v2.x.
 * The handling of XML files is developed on top of [FoX](https://github.com/andreww/fox) (Fortran XML library) for reading/writing XDMF files. Particularly, *FoX_wxml* library is used for writing XDMF files and *FoX_dom* will be used for parsing.
 
-## Under development
+## Under development (Contiguous hyperslab strategy)
 
 ### Exporters:
   * Mesh:
@@ -64,24 +64,24 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
 ### Exporters:
   * Mesh:
     * [ ] Structured
-    * [ ] Unstructured
+    * [x] Unstructured
   * Element:
     * Linear
-      * [ ] Triangle
-      * [ ] Quadrangle
-      * [ ] Tretrahedron
-      * [ ] Hexahedron
+      * [x] Triangle
+      * [x] Quadrangle
+      * [x] Tretrahedron
+      * [x] Hexahedron
       * [ ] Mixed
   * Field:
     * Center on: 
-        * [ ] Node
-        * [ ] Cell
-        * [ ] Grid
+        * [x] Node
+        * [x] Cell
+        * [x] Grid
         * [ ] Edge
         * [ ] Face
     * Type:
-        * [ ] Scalar
-        * [ ] Vector
+        * [x] Scalar
+        * [x] Vector
         * [ ] Tensor
         * [ ] Matrix
         * [ ] Tensor6
@@ -95,13 +95,13 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [x] Geometry
     * [x] Attribute
     * [x] DataItem
-    * [ ] Character data
+    * [x] Character data
   * HDF5:
     * [ ] Manage Files
     * [ ] Groups
-    * [ ] DataSpaces
-    * [ ] DataSets
-    * [] HyperSlabs
+    * [x] DataSpaces
+    * [x] DataSets
+    * [x] HyperSlabs
 
 ## How to collaborate
 If you want to actively collaborate in the project, please feel free to fork and submit pull requests.

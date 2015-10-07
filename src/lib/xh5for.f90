@@ -268,7 +268,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        call this%Handler%Close()
+        call this%Handler%Close(action = this%action)
     end subroutine xh5for_Close
 
 

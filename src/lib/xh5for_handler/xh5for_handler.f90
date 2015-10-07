@@ -85,9 +85,11 @@ private
             class(xh5for_handler_t), intent(INOUT) :: this
         end subroutine xh5for_handler_Parse
 
-        subroutine xh5for_handler_Close(this)
+        subroutine xh5for_handler_Close(this, action)
             import xh5for_handler_t
+            import I4P
             class(xh5for_handler_t), intent(INOUT) :: this
+        integer(I4P),                intent(IN)    :: action
         end subroutine xh5for_handler_Close
 
         subroutine xh5for_handler_WriteGeometry_R4P(this, Coordinates, Name)
