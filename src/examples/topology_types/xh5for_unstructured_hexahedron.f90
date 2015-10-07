@@ -64,7 +64,7 @@ implicit none
     call xh5%Initialize()
     call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_hexahedron')
     call xh5%Parse()
-    call xh5%WriteTopology(Connectivities=out_topology)
+    call xh5%ReadTopology(Connectivities=out_topology)
     call xh5%ReadGeometry(Coordinates=out_geometry)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)
     call xh5%ReadAttribute(Name='Temperature_I8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI8P)

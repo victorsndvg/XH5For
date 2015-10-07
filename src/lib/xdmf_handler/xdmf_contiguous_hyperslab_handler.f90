@@ -542,7 +542,7 @@ contains
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
-            call chardata%open( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open( xml_handler = this%file%xml_handler,         &
@@ -550,7 +550,7 @@ contains
                     NumberType  = 'Int',&
                     Format      = 'HDF',& 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
-            call chardata%open( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyXPath() )
             call dataitem%close(xml_handler=this%file%xml_handler)
             call dataitem%close(xml_handler=this%file%xml_handler)
@@ -598,7 +598,7 @@ contains
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
-            call chardata%open( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open(xml_handler = this%file%xml_handler, &
@@ -606,7 +606,7 @@ contains
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%open( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryXPath())
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%close(xml_handler = this%file%xml_handler)
@@ -670,7 +670,7 @@ contains
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
-                call chardata%open( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call dataitem%open(xml_handler = this%file%xml_handler,                                    &
@@ -678,7 +678,7 @@ contains
                         NumberType = this%UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
                         Format     = 'HDF',                                                                &
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
-                call chardata%open( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&
                                         this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx))
                 call dataitem%close(xml_handler = this%file%xml_handler)

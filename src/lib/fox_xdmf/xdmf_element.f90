@@ -19,6 +19,7 @@ implicit none
         logical, public               :: warn = .true. !< @Note Remove this variable or set to .false.. .true. Only valid under development
     contains
     private
+        procedure                         :: element_open        => xdmf_element_open
         procedure, public                 :: get_tag             => xdmf_element_get_tag
         procedure, public                 :: set_tag             => xdmf_element_set_tag
         procedure, public                 :: node_is_xdmf        => xdmf_element_node_is_xdmf
@@ -30,9 +31,9 @@ implicit none
         procedure, public                 :: node_is_dataitem    => xdmf_element_node_is_dataitem
         procedure, public                 :: node_is_time        => xdmf_element_node_is_time
         procedure, public                 :: node_is_information => xdmf_element_node_is_information
+        generic,                        public                   :: open => element_open
         procedure(xdmf_element_default_initialization), deferred :: default_initialization
         procedure(xdmf_element_free),   public,         deferred :: free
-
         procedure(xdmf_element_parse),  public,         deferred :: parse
         procedure(xdmf_element_close),  public,         deferred :: close
         procedure(xdmf_element_print),  public,         deferred :: print
@@ -48,11 +49,6 @@ implicit none
             import xdmf_element_t
             class(xdmf_element_t), intent(INOUT) :: this
         end subroutine xdmf_element_free
-
-        subroutine xdmf_element_open(this)
-            import xdmf_element_t
-            class(xdmf_element_t), intent(INOUT) :: this
-        end subroutine xdmf_element_open
 
         subroutine xdmf_element_parse(this, DOMNode)
             import xdmf_element_t
@@ -78,6 +74,16 @@ implicit none
 
 
 contains
+
+
+    subroutine xdmf_element_open(this)
+    !----------------------------------------------------------------- 
+    !< Open and XDMF element
+    !----------------------------------------------------------------- 
+        class(xdmf_element_t), intent(INOUT) :: this
+    !----------------------------------------------------------------- 
+    end subroutine xdmf_element_open
+
 
     function xdmf_element_get_tag(this) result(tag)
     !----------------------------------------------------------------- 
