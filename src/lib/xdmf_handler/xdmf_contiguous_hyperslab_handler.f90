@@ -106,7 +106,7 @@ contains
         real(R4P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
         character(len=*),                           intent(IN)    :: Name           !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath = Name, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryMetadata(Name = Name, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
 
 
@@ -118,7 +118,7 @@ contains
         real(R8P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
         character(len=*),                           intent(IN)    :: Name           !< Geometry name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath=Name, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryMetadata(Name=Name, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
 
 
@@ -130,7 +130,7 @@ contains
         integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyMetadata(Name=Name, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P
 
 
@@ -142,7 +142,7 @@ contains
         integer(I8P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyMetadata(Name=Name, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P
 
 
@@ -157,7 +157,7 @@ contains
         integer(I4P),                               intent(IN)    :: Attribute(:) !< I4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
 
 
@@ -172,7 +172,7 @@ contains
         integer(I8P),                               intent(IN)    :: Attribute(:) !< I8P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
 
 
@@ -187,7 +187,7 @@ contains
         real(R4P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
 
 
@@ -202,7 +202,7 @@ contains
         real(R8P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
 
 
@@ -538,7 +538,7 @@ contains
                     ItemType    = 'HyperSlab',&
                     Format      = 'HDF')
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions     = (/3_I4P,this%UniformGridDescriptor%GetTopologyDimension()/),&
+                    Dimensions     = (/3_I4P,this%UniformGridDescriptor%GetTopologyArrayDimensions()/),&
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
@@ -551,7 +551,7 @@ contains
                     Format      = 'HDF',& 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyXPath() )
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyName() )
             call dataitem%close(xml_handler=this%file%xml_handler)
             call dataitem%close(xml_handler=this%file%xml_handler)
             call topology%close(xml_handler=this%file%xml_handler)
@@ -594,7 +594,7 @@ contains
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryDimension()/), &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryArrayDimensions()/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
@@ -607,7 +607,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryXPath())
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryName())
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
@@ -658,7 +658,7 @@ contains
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
                 call attribute%open(xml_handler = this%file%xml_handler,                                   &
-                        Name          = this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx), &
+                        Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = this%file%xml_handler,                           &
@@ -666,7 +666,7 @@ contains
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = this%file%xml_handler,              &
-                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeDimension(AttributeNumber=indx)/), &
+                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx)/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
@@ -680,7 +680,7 @@ contains
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
                 call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&
-                                        this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx))
+                                        this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx))
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call attribute%close(xml_handler = this%file%xml_handler)
