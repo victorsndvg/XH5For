@@ -14,9 +14,10 @@ private
     !-----------------------------------------------------------------
     !< Save local grid information
     !----------------------------------------------------------------- 
-        integer(I4P)                          :: GridType           = XDMF_GRID_TYPE_UNSTRUCTURED
-        integer(I8P)                          :: NumberOfNodes      = XDMF_NO_VALUE
-        integer(I8P)                          :: NumberOfElements   = XDMF_NO_VALUE
+        integer(I4P)                          :: GridType         = XDMF_GRID_TYPE_UNSTRUCTURED
+        integer(I8P)                          :: NumberOfNodes    = XDMF_NO_VALUE
+        integer(I8P)                          :: NumberOfElements = XDMF_NO_VALUE
+        integer(I8P)                          :: ConnectivitySize = XDMF_NO_VALUE
         integer(I4P)                          :: NumberOfAttributes = 0
         type(xh5for_metadata_t)               :: GeometryMetadata
         type(xh5for_metadata_t)               :: TopologyMetadata
@@ -30,11 +31,13 @@ private
         procedure, public :: Free                        => uniform_grid_descriptor_Free
         procedure, public :: SetNumberOfNodes            => uniform_grid_descriptor_SetNumberOfNodes
         procedure, public :: SetNumberOfElements         => uniform_grid_descriptor_SetNumberOfElements
+        procedure, public :: SetConnectivitySize         => uniform_grid_descriptor_SetConnectivitySize
         procedure, public :: SetTopologyType             => uniform_grid_descriptor_SetTopologyType
         procedure, public :: SetGeometryType             => uniform_grid_descriptor_SetGeometryType
         procedure, public :: GetNumberOfNodes            => uniform_grid_descriptor_GetNumberOfNodes
         procedure, public :: GetNumberOfAttributes       => uniform_grid_descriptor_GetNumberOfAttributes
         procedure, public :: GetNumberOfElements         => uniform_grid_descriptor_GetNumberOfElements
+        procedure, public :: GetConnectivitySize         => uniform_grid_descriptor_GetConnectivitySize
         procedure, public :: GetTopologyName             => uniform_grid_descriptor_GetTopologyName
         procedure, public :: GetTopologyType             => uniform_grid_descriptor_GetTopologyType
         procedure, public :: GetTopologyPrecision        => uniform_grid_descriptor_GetTopologyPrecision
@@ -80,6 +83,15 @@ contains
         this%NumberOfElements = NumberOfElements
     end subroutine uniform_grid_descriptor_SetNumberOfElements
 
+    subroutine uniform_grid_descriptor_SetConnectivitySize(this, ConnectivitySize)
+    !-----------------------------------------------------------------
+    !< Set the size of the connectivities array
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P),                     intent(IN)    :: ConnectivitySize !< Size of the array of connectivities
+    !-----------------------------------------------------------------
+        this%ConnectivitySize = ConnectivitySize
+    end subroutine uniform_grid_descriptor_SetConnectivitySize
 
     function uniform_grid_descriptor_GetNumberOfNodes(this)
     !-----------------------------------------------------------------
@@ -112,6 +124,17 @@ contains
     !-----------------------------------------------------------------
         uniform_grid_descriptor_GetNumberOfElements = this%NumberOfElements
     end function uniform_grid_descriptor_GetNumberOfElements
+
+
+    function uniform_grid_descriptor_GetConnectivitySize(this) result(ConnectivitySize)
+    !-----------------------------------------------------------------
+    !< Get the size of the connectivities array
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P)                                    :: ConnectivitySize !< Size of the array of connectivities
+    !-----------------------------------------------------------------
+        ConnectivitySize = this%ConnectivitySize 
+    end function uniform_grid_descriptor_GetConnectivitySize
 
 
     function uniform_grid_descriptor_is_valid_TopologyType(this, TopologyType) result(is_valid)
@@ -154,8 +177,8 @@ contains
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_512,  &
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331 &
-!                                XDMF_TOPOLOGY_TYPE_MIXED            &
+                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
+                                XDMF_TOPOLOGY_TYPE_MIXED            &
                                 /)
         is_valid = MINVAL(ABS(allowed_TopologyTypes - TopologyType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')

@@ -509,8 +509,7 @@ contains
         type(xdmf_dataitem_t)                                     :: dataitem                !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata                !< XDMF Character Data type
         integer(I8P)                                              :: LocalNumberOfElements   !< Local number of elements
-        integer(I8P)                                              :: GlobalNumberOfElements  !< Global number of elements
-        integer(I8P)                                              :: NodesPerElement         !< Number of nodes per element
+        integer(I8P)                                              :: GlobalConnectivitySize  !< Global connectivity size
         integer(I8P)                                              :: Start                   !< Hyperslab start
         integer(I8P)                                              :: Count                   !< Hyperslab count
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
@@ -519,16 +518,14 @@ contains
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
                 LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
-                Start = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)*NodesPerElement
+                Start = this%SpatialGridDescriptor%GetConnectivitySizeOffsetFromGridID(ID=GridID)
             else
                 LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
-                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
                 Start = 0
             endif
-            GlobalNumberOfElements = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
+            GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalConnectivitySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            Count = LocalNumberOfElements*NodesPerElement
+            Count = this%SpatialGridDescriptor%GetConnectivitySizeFromGridID(ID=GridID)
 
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
@@ -545,8 +542,8 @@ contains
             call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open( xml_handler = this%file%xml_handler,         &
-                    Dimensions  = (/GlobalNumberOfElements*NodesPerElement/),&
+            call dataitem%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/GlobalConnectivitySize/),&
                     NumberType  = 'Int',&
                     Format      = 'HDF',& 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
