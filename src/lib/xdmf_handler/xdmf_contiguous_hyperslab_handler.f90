@@ -221,20 +221,20 @@ contains
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=GridID)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
                 GlobalNumberOfData = this%MPIEnvironment%get_comm_size()
                 LocalNumberOfData  = 1_I8P
                 DataOffset         = GridID
             case Default
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
         end select
     end subroutine xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
 
@@ -355,11 +355,11 @@ contains
         if(.not. associated(TopologyNode)) return
         call Topology%Parse(DOMNode = TopologyNode)
         ! Set TopologyType
-        call this%SpatialGridDescriptor%SetTopologyTypeByGridID(&
+        call this%SpatialGridDescriptor%SetTopologyTypePerGridID(&
                     TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=ID)
         ! Set NumberOfElements
         auxDims = Topology%get_Dimensions()
-        call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=ID)
+        call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(AuxDims(1),ID=ID)
         call Topology%Free()
         nullify(DataItemNode)
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
@@ -382,14 +382,14 @@ contains
         if(.not. associated(GeometryNode)) return
         call Geometry%Parse(DOMNode = GeometryNode)
         ! Set GeometryType
-        call this%SpatialGridDescriptor%SetGeometryTypeByGridID(&
+        call this%SpatialGridDescriptor%SetGeometryTypePerGridID(&
                     GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=ID)
         ! Set NumberOfNodes
         DataItemNode => this%GetFirstChildByTag(FatherNode = GeometryNode, Tag = 'DataItem')
         call DataItem%Parse(DomNode = DataItemNode)
         auxDims = DataItem%get_Dimensions()
         spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
-        call this%SpatialGridDescriptor%SetNumberOfNodesByGridID(AuxDims(1)/spacedims,ID=ID)
+        call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
         nullify(DataItemNode)
         call Geometry%Free()
         call DataItem%Free()
@@ -459,7 +459,7 @@ contains
             endif
             call destroy(this%file%get_document_root())
         endif
-        call this%SpatialGridDescriptor%DistributeData()
+        call this%SpatialGridDescriptor%BroadcastMetadata()
     end subroutine xdmf_contiguous_hyperslab_handler_ParseFile
 
 
@@ -517,15 +517,15 @@ contains
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
-                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetConnectivitySizeOffsetFromGridID(ID=GridID)
+                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=GridID)
             else
                 LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 Start = 0
             endif
             GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalConnectivitySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            Count = this%SpatialGridDescriptor%GetConnectivitySizeFromGridID(ID=GridID)
+            Count = this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=GridID)
 
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
@@ -575,8 +575,8 @@ contains
         if(this%MPIEnvironment%is_root()) then
             SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
             if(present(GridID)) then
-                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)*SpaceDimension
+                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)*SpaceDimension
             else
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
                 Start = 0

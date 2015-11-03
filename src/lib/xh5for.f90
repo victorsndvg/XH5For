@@ -346,7 +346,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%SetConnectivitySizePerGrid(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
             call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
         else
@@ -364,7 +364,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%SetConnectivitySizePerGrid(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
             call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
         else
