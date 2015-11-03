@@ -48,6 +48,7 @@ private
         procedure, public :: BroadcastMetadata                  => spatial_grid_descriptor_BroadcastMetadata
         procedure, public :: SetNumberOfNodesPerGridID          => spatial_grid_descriptor_SetNumberOfNodesPerGridID
         procedure, public :: SetNumberOfElementsPerGridID       => spatial_grid_descriptor_SetNumberOfElementsPerGridID
+        procedure, public :: SetConnectivitySizePerGridID       => spatial_grid_descriptor_SetConnectivitySizePerGridID
         procedure, public :: SetTopologyTypePerGridID           => spatial_grid_descriptor_SetTopologyTypePerGridID
         procedure, public :: SetGeometryTypePerGridID           => spatial_grid_descriptor_SetGeometryTypePerGridID
         procedure, public :: GetNumberOfNodesPerGridID          => spatial_grid_descriptor_GetNumberOfNodesPerGridID
@@ -72,12 +73,13 @@ contains
     !-----------------------------------------------------------------
     !< Set the total number of nodes of the spatial grid
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                 !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: NumberOfGrids        !< Total number of grids of the spatial grid
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this          !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: NumberOfGrids !< Total number of grids of the spatial grid
     !----------------------------------------------------------------- 
         this%NumberOfGrids = NumberOfGrids
         allocate(this%NumberOfNodesPerGrid(NumberOfGrids))
         allocate(this%NumberOfElementsPerGrid(NumberOfGrids))
+        allocate(this%ConnectivitySizePerGrid(NumberOfGrids))
         allocate(this%TopologyTypePerGrid(NumberOfGrids))
         allocate(this%GeometryTypePerGrid(NumberOfGrids))
     end subroutine spatial_grid_descriptor_Allocate
@@ -86,8 +88,8 @@ contains
     !-----------------------------------------------------------------
     !< Set the total number of nodes of the spatial grid
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                 !< Spatial grid descriptor type
-        integer(I8P),                     intent(IN)    :: GlobalNumberOfNodes  !< Total number of nodes of the spatial grid
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this                !< Spatial grid descriptor type
+        integer(I8P),                     intent(IN)    :: GlobalNumberOfNodes !< Total number of nodes of the spatial grid
     !----------------------------------------------------------------- 
         this%GlobalNumberOfNodes = GlobalNumberOfNodes
     end subroutine spatial_grid_descriptor_SetGlobalNumberOfNodes
@@ -164,8 +166,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of nodes of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetNumberOfNodesPerGridID !< Number of nodes of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetNumberOfNodesPerGridID = this%NumberOfNodesPerGrid(ID+1)
@@ -176,9 +178,9 @@ contains
     !-----------------------------------------------------------------
     !< Set the number of nodes of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I8P),                     intent(IN)    :: NumberOfElements!< Number of elements of the grid ID
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this             !< Spatial grid descriptor type
+        integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of elements of the grid ID
+        integer(I4P),                     intent(IN)    :: ID               !< Grid identifier
     !-----------------------------------------------------------------
         this%NumberOfElementsPerGrid(ID+1) = NumberOfElements
     end subroutine spatial_grid_descriptor_SetNumberOfElementsPerGridID
@@ -188,8 +190,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of elements of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this               !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID                 !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetNumberOfElementsPerGridID !< Number of elements of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetNumberOfElementsPerGridID = this%NumberOfElementsPerGrid(ID+1)
@@ -200,9 +202,9 @@ contains
     !-----------------------------------------------------------------
     !< Set the connectivity size of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I8P),                     intent(IN)    :: ConnectivitySize!< Connectivity size of the grid ID
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this             !< Spatial grid descriptor type
+        integer(I8P),                     intent(IN)    :: ConnectivitySize !< Connectivity size of the grid ID
+        integer(I4P),                     intent(IN)    :: ID               !< Grid identifier
     !-----------------------------------------------------------------
         this%ConnectivitySizePerGrid(ID+1) = ConnectivitySize
     end subroutine spatial_grid_descriptor_SetConnectivitySizePerGridID
@@ -212,8 +214,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of elements of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this               !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID                 !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this              !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetConnectivitySizePerGridID !< Connectivity Size of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetConnectivitySizePerGridID = this%ConnectivitySizePerGrid(ID+1)
@@ -224,9 +226,9 @@ contains
     !-----------------------------------------------------------------
     !< Set the topology type of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: TopologyType    !< Topology type of the grid ID
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: TopologyType !< Topology type of the grid ID
+        integer(I4P),                     intent(IN)    :: ID           !< Grid identifier
     !-----------------------------------------------------------------
         this%TopologyTypePerGrid(ID+1) = TopologyType
     end subroutine spatial_grid_descriptor_SetTopologyTypePerGridID
@@ -236,8 +238,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the topology type of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this          !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID            !< Grid identifier
         integer(I4P) :: spatial_grid_descriptor_GetTopologyTypePerGridID !< Topology type of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetTopologyTypePerGridID = this%TopologyTypePerGrid(ID+1)
@@ -248,9 +250,9 @@ contains
     !-----------------------------------------------------------------
     !< Set the topology type of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: GeometryType    !< Geometry type of the grid ID
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: GeometryType !< Geometry type of the grid ID
+        integer(I4P),                     intent(IN)    :: ID           !< Grid identifier
     !-----------------------------------------------------------------
         this%GeometryTypePerGrid(ID+1) = GeometryType
     end subroutine spatial_grid_descriptor_SetGeometryTypePerGridID
@@ -260,8 +262,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the geometry type of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this          !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID            !< Grid identifier
         integer(I4P) :: spatial_grid_descriptor_GetGeometryTypePerGridID !< Geometry type of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetGeometryTypePerGridID = this%GeometryTypePerGrid(ID+1)
@@ -272,8 +274,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the node offset of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID           !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this        !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID          !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetNodeOffsetPerGridID !< Node offset of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetNodeOffsetPerGridID = sum(this%NumberOfNodesPerGrid(:ID))
@@ -284,8 +286,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the element offset of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this            !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID              !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID             !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetElementOffsetPerGridID !< Element offset of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetElementOffsetPerGridID = sum(this%NumberOfElementsPerGrid(:ID))
@@ -296,8 +298,8 @@ contains
     !-----------------------------------------------------------------
     !< Return the connectivity size offset of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                     !< Spatial grid descriptor type
-        integer(I4P),                     intent(IN)    :: ID                       !< Grid identifier
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this                    !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: ID                      !< Grid identifier
         integer(I8P) :: spatial_grid_descriptor_GetConnectivitySizeOffsetPerGridID !< Connectivity size offset of a grid
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetConnectivitySizeOffsetPerGridID = sum(this%ConnectivitySizePerGrid(:ID))
@@ -308,13 +310,13 @@ contains
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                   !< Spatial grid descriptor type
-        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment         !< MPI environment type
-        integer(I8P),                     intent(IN)    :: NumberOfNodes          !< Number of nodes of the current grid
-        integer(I8P),                     intent(IN)    :: NumberOfElements       !< Number of elements of the current grid
-        integer(I4P),                     intent(IN)    :: TopologyType           !< Topology type of the current grid
-        integer(I4P),                     intent(IN)    :: GeometryType           !< Geometry type of the current grid
-        integer(I4P)                                    :: i                      !< Loop index in NumberOfGrids
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this             !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment   !< MPI environment type
+        integer(I8P),                     intent(IN)    :: NumberOfNodes    !< Number of nodes of the current grid
+        integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of elements of the current grid
+        integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the current grid
+        integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the current grid
+        integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
         call this%Free()
         this%MPIEnvironment => MPIEnvironment
@@ -332,8 +334,8 @@ contains
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                   !< Spatial grid descriptor type
-        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment         !< MPI environment type
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment !< MPI environment type
     !-----------------------------------------------------------------
         call this%Free()
         this%MPIEnvironment => MPIEnvironment
@@ -342,11 +344,10 @@ contains
 
     subroutine spatial_grid_descriptor_AllgatherConnectivitySize(this, ConnectivitySize)
     !-----------------------------------------------------------------
-    !< Allgather the connectivity size and sets the global connectivity seize
+    !< Allgather the connectivity size and sets the global connectivity size
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                   !< Spatial grid descriptor type
-        integer(I8P), optional,           intent(IN)    :: ConnectivitySize       !< Size of the array of connectivities
-        integer(I4P)                                    :: i                      !< Loop index in NumberOfGrids
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this             !< Spatial grid descriptor type
+        integer(I8P), optional,           intent(IN)    :: ConnectivitySize !< Size of the array of connectivities
     !-----------------------------------------------------------------
         call this%MPIEnvironment%mpi_allgather(ConnectivitySize, this%ConnectivitySizePerGrid)
         call this%SetGlobalConnectivitySize(sum(this%ConnectivitySizePerGrid))
@@ -357,12 +358,14 @@ contains
     !-----------------------------------------------------------------
     !< Broadcast metadata after XDMF parsing
     !----------------------------------------------------------------- 
-        class(spatial_grid_descriptor_t), intent(INOUT) :: this                   !< Spatial grid descriptor type
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this       !< Spatial grid descriptor type
     !-----------------------------------------------------------------
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfNodesPerGrid)
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfElementsPerGrid)
+        call this%MPIEnvironment%mpi_broadcast(this%ConnectivitySizePerGrid)
         call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
+        call this%SetGlobalConnectivitySize(sum(this%ConnectivitySizePerGrid))
         call this%MPIEnvironment%mpi_broadcast(this%TopologyTypePerGrid)
         call this%MPIEnvironment%mpi_broadcast(this%GeometryTypePerGrid)
 		this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
@@ -382,6 +385,7 @@ contains
         This%GlobalNumberOfElements = 0
         if(allocated(this%NumberOfNodesPerGrid))    deallocate(this%NumberOfNodesPerGrid)
         if(allocated(this%NumberOfElementsPerGrid)) deallocate(this%NumberOfElementsPerGrid)
+        if(allocated(this%ConnectivitySizePerGrid)) deallocate(this%ConnectivitySizePerGrid)
         if(allocated(this%TopologyTypePerGrid)) deallocate(this%TopologyTypePerGrid)
         if(allocated(this%GeometryTypePerGrid)) deallocate(this%GeometryTypePerGrid)
         nullify(this%MPIEnvironment)

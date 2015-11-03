@@ -627,11 +627,6 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -662,11 +657,6 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -695,11 +685,6 @@ contains
         integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -728,11 +713,6 @@ contains
         integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -898,11 +878,6 @@ print*, LocalConnectivitySize, GlobalConnectivitySize, ConnectivitySizeOffset
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -932,11 +907,6 @@ print*, LocalConnectivitySize, GlobalConnectivitySize, ConnectivitySizeOffset
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -962,28 +932,21 @@ print*, LocalConnectivitySize, GlobalConnectivitySize, ConnectivitySizeOffset
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,                           &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%ReadHyperSlab(DatasetName = Name,           &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P
@@ -996,28 +959,21 @@ print*, LocalConnectivitySize, GlobalConnectivitySize, ConnectivitySizeOffset
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName = Name,                          &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%ReadHyperSlab(DatasetName = Name,           &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P

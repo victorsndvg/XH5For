@@ -320,7 +320,7 @@ contains
         type(NodeList), pointer                                   :: Childrens      !< Fox DOM node list
         type(Node), pointer                                       :: ChildNode      !< Fox DOM node
         type(xdmf_dataitem_t)                                     :: dataitem       !< XDMF Topology derived type
-        integer(I4P)                                              :: i          !< Index for a loop in Childrens
+        integer(I4P)                                              :: i              !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
         if(.not. associated(DataItemNode)) return
         if(hasChildNodes(DataItemNode)) then
@@ -348,6 +348,7 @@ contains
         type(Node), pointer,                        intent(IN)    :: TopologyNode !< Fox DOM Topology node
         integer(I4P),                               intent(IN)    :: ID           !< Grid IDentifier
         type(xdmf_topology_t)                                     :: Topology     !< XDMF Topology derived type
+        type(xdmf_dataitem_t)                                     :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
         integer(I8P),     allocatable                             :: auxDims(:)   !< Aux dimensions variable
         character(len=:), allocatable                             :: XPath        !< Topology XPath
@@ -360,7 +361,14 @@ contains
         ! Set NumberOfElements
         auxDims = Topology%get_Dimensions()
         call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(AuxDims(1),ID=ID)
+        ! Set ConnectivitySize
+        DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
+        call DataItem%Parse(DomNode = DataItemNode)
+        auxDims = DataItem%get_Dimensions()
+        call this%SpatialGridDescriptor%SetConnectivitySizePerGridID(AuxDims(1),ID=ID)
+        ! Free
         call Topology%Free()
+        call DataItem%Free()
         nullify(DataItemNode)
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
 
@@ -390,6 +398,7 @@ contains
         auxDims = DataItem%get_Dimensions()
         spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
         call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
+        ! Free
         nullify(DataItemNode)
         call Geometry%Free()
         call DataItem%Free()

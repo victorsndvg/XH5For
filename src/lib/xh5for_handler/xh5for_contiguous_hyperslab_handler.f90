@@ -102,7 +102,7 @@ contains
     !-----------------------------------------------------------------
     !< Close the lightdata and the heavydata files
     !----------------------------------------------------------------- 
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this     !< XH5For contigous hyperslab handler
+        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this   !< XH5For contigous hyperslab handler
         integer(I4P),                                 intent(IN)    :: action !< XH5For Close action (Read or Write)
     !-----------------------------------------------------------------
         call this%HeavyData%CloseFile()
