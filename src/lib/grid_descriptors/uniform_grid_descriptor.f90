@@ -14,45 +14,48 @@ private
     !-----------------------------------------------------------------
     !< Save local grid information
     !----------------------------------------------------------------- 
-        integer(I4P)                          :: GridType           = XDMF_GRID_TYPE_UNSTRUCTURED
-        integer(I8P)                          :: NumberOfNodes      = XDMF_NO_VALUE
-        integer(I8P)                          :: NumberOfElements   = XDMF_NO_VALUE
+        integer(I4P)                          :: GridType         = XDMF_GRID_TYPE_UNSTRUCTURED
+        integer(I8P)                          :: NumberOfNodes    = XDMF_NO_VALUE
+        integer(I8P)                          :: NumberOfElements = XDMF_NO_VALUE
+        integer(I8P)                          :: ConnectivitySize = XDMF_NO_VALUE
         integer(I4P)                          :: NumberOfAttributes = 0
-        type(xh5for_metadata_t)               :: geometry_info
-        type(xh5for_metadata_t)               :: topology_info
-        type(xh5for_metadata_t),  allocatable :: attributes_info(:)
+        type(xh5for_metadata_t)               :: GeometryMetadata
+        type(xh5for_metadata_t)               :: TopologyMetadata
+        type(xh5for_metadata_t),  allocatable :: AttributesMetadata(:)
         logical      :: warn = .true.  !< Flag to show warnings on screen
     contains
     private
-        procedure         :: is_valid_TopologyType    => uniform_grid_descriptor_is_valid_TopologyType
-        procedure         :: is_valid_GeometryType    => uniform_grid_descriptor_is_valid_GeometryType
-        procedure, public :: Initialize               => uniform_grid_descriptor_Initialize
-        procedure, public :: Free                     => uniform_grid_descriptor_Free
-        procedure, public :: SetNumberOfNodes         => uniform_grid_descriptor_SetNumberOfNodes
-        procedure, public :: SetNumberOfElements      => uniform_grid_descriptor_SetNumberOfElements
-        procedure, public :: SetTopologyType          => uniform_grid_descriptor_SetTopologyType
-        procedure, public :: SetGeometryType          => uniform_grid_descriptor_SetGeometryType
-        procedure, public :: GetNumberOfNodes         => uniform_grid_descriptor_GetNumberOfNodes
-        procedure, public :: GetNumberOfAttributes    => uniform_grid_descriptor_GetNumberOfAttributes
-        procedure, public :: GetNumberOfElements      => uniform_grid_descriptor_GetNumberOfElements
-        procedure, public :: GetTopologyXPath         => uniform_grid_descriptor_GetTopologyXPath
-        procedure, public :: GetTopologyType          => uniform_grid_descriptor_GetTopologyType
-        procedure, public :: GetTopologyPrecision     => uniform_grid_descriptor_GetTopologyPrecision
-        procedure, public :: GetTopologyDimension     => uniform_grid_descriptor_GetTopologyDimension
-        procedure, public :: GetGeometryXPath         => uniform_grid_descriptor_GetGeometryXPath
-        procedure, public :: GetGeometryType          => uniform_grid_descriptor_GetGeometryType
-        procedure, public :: GetGeometryPrecision     => uniform_grid_descriptor_GetGeometryPrecision
-        procedure, public :: GetGeometryDimension     => uniform_grid_descriptor_GetGeometryDimension
-        procedure, public :: GetAttributeXPath        => uniform_grid_descriptor_GetAttributeXPath
-        procedure, public :: GetAttributeType         => uniform_grid_descriptor_GetAttributeType
-        procedure, public :: GetAttributePrecision    => uniform_grid_descriptor_GetAttributePrecision
-        procedure, public :: GetAttributeDimension    => uniform_grid_descriptor_GetAttributeDimension
-        procedure, public :: GetAttributeDataType     => uniform_grid_descriptor_GetAttributeDataType
-        procedure, public :: GetAttributeCenter       => uniform_grid_descriptor_GetAttributeCenter
-        procedure, public :: SetGeometryInfo          => uniform_grid_descriptor_SetGeometryInfo
-        procedure, public :: SetTopologyInfo          => uniform_grid_descriptor_SetTopologyInfo
-        procedure, public :: SetLastAttributeInfo     => uniform_grid_descriptor_SetLastAttributeInfo
-        procedure, public :: UpdateNumberOfAttributes => uniform_grid_descriptor_UpdateNumberOfAttributes
+        procedure         :: is_valid_TopologyType       => uniform_grid_descriptor_is_valid_TopologyType
+        procedure         :: is_valid_GeometryType       => uniform_grid_descriptor_is_valid_GeometryType
+        procedure, public :: Initialize                  => uniform_grid_descriptor_Initialize
+        procedure, public :: Free                        => uniform_grid_descriptor_Free
+        procedure, public :: SetNumberOfNodes            => uniform_grid_descriptor_SetNumberOfNodes
+        procedure, public :: SetNumberOfElements         => uniform_grid_descriptor_SetNumberOfElements
+        procedure, public :: SetConnectivitySize         => uniform_grid_descriptor_SetConnectivitySize
+        procedure, public :: SetTopologyType             => uniform_grid_descriptor_SetTopologyType
+        procedure, public :: SetGeometryType             => uniform_grid_descriptor_SetGeometryType
+        procedure, public :: GetNumberOfNodes            => uniform_grid_descriptor_GetNumberOfNodes
+        procedure, public :: GetNumberOfAttributes       => uniform_grid_descriptor_GetNumberOfAttributes
+        procedure, public :: GetNumberOfElements         => uniform_grid_descriptor_GetNumberOfElements
+        procedure, public :: GetConnectivitySize         => uniform_grid_descriptor_GetConnectivitySize
+        procedure, public :: GetTopologyName             => uniform_grid_descriptor_GetTopologyName
+        procedure, public :: GetTopologyType             => uniform_grid_descriptor_GetTopologyType
+        procedure, public :: GetTopologyPrecision        => uniform_grid_descriptor_GetTopologyPrecision
+        procedure, public :: GetTopologyArrayDimensions  => uniform_grid_descriptor_GetTopologyArrayDimensions
+        procedure, public :: GetGeometryName             => uniform_grid_descriptor_GetGeometryName
+        procedure, public :: GetGeometryType             => uniform_grid_descriptor_GetGeometryType
+        procedure, public :: GetGeometryPrecision        => uniform_grid_descriptor_GetGeometryPrecision
+        procedure, public :: GetGeometryArrayDimensions  => uniform_grid_descriptor_GetGeometryArrayDimensions
+        procedure, public :: GetAttributeName            => uniform_grid_descriptor_GetAttributeName
+        procedure, public :: GetAttributeType            => uniform_grid_descriptor_GetAttributeType
+        procedure, public :: GetAttributePrecision       => uniform_grid_descriptor_GetAttributePrecision
+        procedure, public :: GetAttributeArrayDimensions => uniform_grid_descriptor_GetAttributeArrayDimensions
+        procedure, public :: GetAttributeDataType        => uniform_grid_descriptor_GetAttributeDataType
+        procedure, public :: GetAttributeCenter          => uniform_grid_descriptor_GetAttributeCenter
+        procedure, public :: SetGeometryMetadata         => uniform_grid_descriptor_SetGeometryMetadata
+        procedure, public :: SetTopologyMetadata         => uniform_grid_descriptor_SetTopologyMetadata
+        procedure, public :: SetLastAttributeMetadata    => uniform_grid_descriptor_SetLastAttributeMetadata
+        procedure, public :: UpdateNumberOfAttributes    => uniform_grid_descriptor_UpdateNumberOfAttributes
     end type uniform_grid_descriptor_t
 
 public:: uniform_grid_descriptor_t
@@ -80,6 +83,15 @@ contains
         this%NumberOfElements = NumberOfElements
     end subroutine uniform_grid_descriptor_SetNumberOfElements
 
+    subroutine uniform_grid_descriptor_SetConnectivitySize(this, ConnectivitySize)
+    !-----------------------------------------------------------------
+    !< Set the size of the connectivities array
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P),                     intent(IN)    :: ConnectivitySize !< Size of the array of connectivities
+    !-----------------------------------------------------------------
+        this%ConnectivitySize = ConnectivitySize
+    end subroutine uniform_grid_descriptor_SetConnectivitySize
 
     function uniform_grid_descriptor_GetNumberOfNodes(this)
     !-----------------------------------------------------------------
@@ -112,6 +124,17 @@ contains
     !-----------------------------------------------------------------
         uniform_grid_descriptor_GetNumberOfElements = this%NumberOfElements
     end function uniform_grid_descriptor_GetNumberOfElements
+
+
+    function uniform_grid_descriptor_GetConnectivitySize(this) result(ConnectivitySize)
+    !-----------------------------------------------------------------
+    !< Get the size of the connectivities array
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
+        integer(I8P)                                    :: ConnectivitySize !< Size of the array of connectivities
+    !-----------------------------------------------------------------
+        ConnectivitySize = this%ConnectivitySize 
+    end function uniform_grid_descriptor_GetConnectivitySize
 
 
     function uniform_grid_descriptor_is_valid_TopologyType(this, TopologyType) result(is_valid)
@@ -154,8 +177,8 @@ contains
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_512,  &
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331 &
-!                                XDMF_TOPOLOGY_TYPE_MIXED            &
+                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
+                                XDMF_TOPOLOGY_TYPE_MIXED            &
                                 /)
         is_valid = MINVAL(ABS(allowed_TopologyTypes - TopologyType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
@@ -170,9 +193,9 @@ contains
         integer(I4P),                     intent(IN)    :: TopologyType !< XDMF topology type
     !-----------------------------------------------------------------
         if(this%is_valid_TopologyType(TopologyType)) then
-            call this%topology_info%SetType(Type = TopologyType)
+            call this%TopologyMetadata%SetType(Type = TopologyType)
         else
-            call this%topology_info%SetType(Type = XDMF_NO_VALUE)
+            call this%TopologyMetadata%SetType(Type = XDMF_NO_VALUE)
         endif
     end subroutine uniform_grid_descriptor_SetTopologyType
 
@@ -184,30 +207,30 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
         integer(I4P) :: uniform_grid_descriptor_GetTopologyType       !< XDMF Topology type
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetTopologyType = this%Topology_info%GetType()
+        uniform_grid_descriptor_GetTopologyType = this%TopologyMetadata%GetType()
     end function uniform_grid_descriptor_GetTopologyType
 
 
-    subroutine uniform_grid_descriptor_SetTopologyXPath(this, Xpath)
+    subroutine uniform_grid_descriptor_SetTopologyName(this, Name)
     !-----------------------------------------------------------------
-    !< Set XDMF Topology XPath
+    !< Set XDMF Topology Name
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
-        character(len=*),                 intent(IN)    :: XPath      !< Topology XPath
+        character(len=*),                 intent(IN)    :: Name      !< Topology Name
     !-----------------------------------------------------------------
-        call this%Topology_info%SetXPath(XPath=XPath)
-    end subroutine uniform_grid_descriptor_SetTopologyXPath
+        call this%TopologyMetadata%SetName(Name=Name)
+    end subroutine uniform_grid_descriptor_SetTopologyName
 
 
-    function uniform_grid_descriptor_GetTopologyXPath(this)
+    function uniform_grid_descriptor_GetTopologyName(this)
     !-----------------------------------------------------------------
-    !< Return XDMF topology XPath
+    !< Return XDMF topology Name
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this                   !< Local grid descriptor
-        Character(len=:), allocatable :: uniform_grid_descriptor_GetTopologyXPath !< Topology XPath
+        Character(len=:), allocatable :: uniform_grid_descriptor_GetTopologyName !< Topology Name
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetTopologyXPath = this%tOPOLOGY_info%GetXPath()
-    end function uniform_grid_descriptor_GetTopologyXPath
+        uniform_grid_descriptor_GetTopologyName = this%TopologyMetadata%GetName()
+    end function uniform_grid_descriptor_GetTopologyName
 
 
     function uniform_grid_descriptor_GetTopologyPrecision(this)
@@ -217,19 +240,19 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
         integer(I4P) :: uniform_grid_descriptor_GetTopologyPrecision  !< Topology Precision
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetTopologyPrecision = this%Topology_info%GetPrecision()
+        uniform_grid_descriptor_GetTopologyPrecision = this%TopologyMetadata%GetPrecision()
     end function uniform_grid_descriptor_GetTopologyPrecision
 
 
-    function uniform_grid_descriptor_GetTopologyDimension(this)
+    function uniform_grid_descriptor_GetTopologyArrayDimensions(this)
     !-----------------------------------------------------------------
     !< Return XDMF topology Dimension
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
-        integer(I4P) :: uniform_grid_descriptor_GetTopologyDimension  !< Topology Dimension
+        integer(I4P) :: uniform_grid_descriptor_GetTopologyArrayDimensions  !< Topology Dimension
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetTopologyDimension = this%Topology_info%GetDimension()
-    end function uniform_grid_descriptor_GetTopologyDimension
+        uniform_grid_descriptor_GetTopologyArrayDimensions = this%TopologyMetadata%GetArrayDimensions()
+    end function uniform_grid_descriptor_GetTopologyArrayDimensions
 
 
     function uniform_grid_descriptor_is_valid_GeometryType(this, GeometryType) result(is_valid)
@@ -261,9 +284,9 @@ contains
         integer(I4P),                     intent(IN)    :: GeometryType !< Local grid geometry type
     !----------------------------------------------------------------
         if(this%is_valid_GeometryType(GeometryType)) then
-            call this%Geometry_info%SetType(Type=GeometryType)
+            call this%GeometryMetadata%SetType(Type=GeometryType)
         else
-            call this%Geometry_info%SetType(Type=XDMF_NO_VALUE)
+            call this%GeometryMetadata%SetType(Type=XDMF_NO_VALUE)
         endif
     end subroutine uniform_grid_descriptor_SetGeometryType
 
@@ -275,30 +298,30 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
         integer(I4P)  :: uniform_grid_descriptor_GetGeometryType      !< XDMF geometry type
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetGeometryType = this%Geometry_info%GetType()
+        uniform_grid_descriptor_GetGeometryType = this%GeometryMetadata%GetType()
     end function uniform_grid_descriptor_GetGeometryType
 
 
-    subroutine uniform_grid_descriptor_SetGeometryXPath(this, Xpath)
+    subroutine uniform_grid_descriptor_SetGeometryName(this, Name)
     !-----------------------------------------------------------------
-    !< Set XDMF geometry XPath
+    !< Set XDMF geometry Name
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
-        character(len=*),                 intent(IN)    :: XPath      !< Geometry XPath
+        character(len=*),                 intent(IN)    :: Name      !< Geometry Name
     !-----------------------------------------------------------------
-        call this%Geometry_info%SetXPath(XPath=XPath)
-    end subroutine uniform_grid_descriptor_SetGeometryXPath
+        call this%GeometryMetadata%SetName(Name=Name)
+    end subroutine uniform_grid_descriptor_SetGeometryName
 
 
-    function uniform_grid_descriptor_GetGeometryXPath(this)
+    function uniform_grid_descriptor_GetGeometryName(this)
     !-----------------------------------------------------------------
-    !< Return XDMF geometry XPath
+    !< Return XDMF geometry Name
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this                   !< Local grid descriptor
-        Character(len=:), allocatable :: uniform_grid_descriptor_GetGeometryXPath !< Geometry XPath
+        Character(len=:), allocatable :: uniform_grid_descriptor_GetGeometryName !< Geometry Name
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetGeometryXPath = this%Geometry_info%GetXPath()
-    end function uniform_grid_descriptor_GetGeometryXPath
+        uniform_grid_descriptor_GetGeometryName = this%GeometryMetadata%GetName()
+    end function uniform_grid_descriptor_GetGeometryName
 
 
     function uniform_grid_descriptor_GetGeometryPrecision(this)
@@ -308,19 +331,19 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
         integer(I4P) :: uniform_grid_descriptor_GetGeometryPrecision  !< Geometry Precision
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetGeometryPrecision = this%Geometry_info%GetPrecision()
+        uniform_grid_descriptor_GetGeometryPrecision = this%GeometryMetadata%GetPrecision()
     end function uniform_grid_descriptor_GetGeometryPrecision
 
 
-    function uniform_grid_descriptor_GetGeometryDimension(this)
+    function uniform_grid_descriptor_GetGeometryArrayDimensions(this)
     !-----------------------------------------------------------------
     !< Return XDMF geometry Dimension
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
-        integer(I4P) :: uniform_grid_descriptor_GetGeometryDimension  !< Geometry Dimension
+        integer(I4P) :: uniform_grid_descriptor_GetGeometryArrayDimensions  !< Geometry Dimension
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetGeometryDimension = this%Geometry_info%GetDimension()
-    end function uniform_grid_descriptor_GetGeometryDimension
+        uniform_grid_descriptor_GetGeometryArrayDimensions = this%GeometryMetadata%GetArrayDimensions()
+    end function uniform_grid_descriptor_GetGeometryArrayDimensions
 
 
     function uniform_grid_descriptor_GetAttributeType(this, AttributeNumber)
@@ -331,20 +354,20 @@ contains
         integer(I4P),                     intent(IN)    :: AttributeNumber !< Attribute Number
         integer(I4P)  :: uniform_grid_descriptor_GetAttributeType          !< XDMF attribute type
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributeType = this%Attributes_info(AttributeNumber)%GetType()
+        uniform_grid_descriptor_GetAttributeType = this%AttributesMetadata(AttributeNumber)%GetType()
     end function uniform_grid_descriptor_GetAttributeType
 
 
-    function uniform_grid_descriptor_GetAttributeXPath(this, AttributeNumber)
+    function uniform_grid_descriptor_GetAttributeName(this, AttributeNumber)
     !-----------------------------------------------------------------
-    !< Return XDMF attribute XPath
+    !< Return XDMF attribute Name
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this                    !< Local grid descriptor
         integer(I4P),                     intent(IN)    :: AttributeNumber         !< Attribute Number
-        Character(len=:), allocatable :: uniform_grid_descriptor_GetAttributeXPath !< Attribute XPath
+        Character(len=:), allocatable :: uniform_grid_descriptor_GetAttributeName !< Attribute Name
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributeXPath = this%Attributes_info(AttributeNumber)%GetXPath()
-    end function uniform_grid_descriptor_GetAttributeXPath
+        uniform_grid_descriptor_GetAttributeName = this%AttributesMetadata(AttributeNumber)%GetName()
+    end function uniform_grid_descriptor_GetAttributeName
 
 
     function uniform_grid_descriptor_GetAttributeDataType(this, AttributeNumber)
@@ -355,7 +378,7 @@ contains
         integer(I4P),                     intent(IN)    :: AttributeNumber            !< Attribute Number
         Character(len=:), allocatable :: uniform_grid_descriptor_GetAttributeDataType !< Attribute DataType
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributeDataType = this%Attributes_info(AttributeNumber)%GetDataType()
+        uniform_grid_descriptor_GetAttributeDataType = this%AttributesMetadata(AttributeNumber)%GetDataType()
     end function uniform_grid_descriptor_GetAttributeDataType
 
 
@@ -367,20 +390,20 @@ contains
         integer(I4P),                     intent(IN)    :: AttributeNumber !< Attribute Number
         integer(I4P) :: uniform_grid_descriptor_GetAttributePrecision      !< Attribute Precision
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributePrecision = this%Attributes_info(AttributeNumber)%GetPrecision()
+        uniform_grid_descriptor_GetAttributePrecision = this%AttributesMetadata(AttributeNumber)%GetPrecision()
     end function uniform_grid_descriptor_GetAttributePrecision
 
 
-    function uniform_grid_descriptor_GetAttributeDimension(this, AttributeNumber)
+    function uniform_grid_descriptor_GetAttributeArrayDimensions(this, AttributeNumber)
     !-----------------------------------------------------------------
     !< Return XDMF Attribute Dimension
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this            !< Local grid descriptor
         integer(I4P),                     intent(IN)    :: AttributeNumber !< Attribute Number
-        integer(I4P) :: uniform_grid_descriptor_GetAttributeDimension      !< Attribute Dimension
+        integer(I4P) :: uniform_grid_descriptor_GetAttributeArrayDimensions      !< Attribute Dimension
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributeDimension = this%Attributes_info(AttributeNumber)%GetDimension()
-    end function uniform_grid_descriptor_GetAttributeDimension
+        uniform_grid_descriptor_GetAttributeArrayDimensions = this%AttributesMetadata(AttributeNumber)%GetArrayDimensions()
+    end function uniform_grid_descriptor_GetAttributeArrayDimensions
 
 
     function uniform_grid_descriptor_GetAttributeCenter(this, AttributeNumber)
@@ -391,7 +414,7 @@ contains
         integer(I4P),                     intent(IN)    :: AttributeNumber !< Attribute Number
         integer(I4P) :: uniform_grid_descriptor_GetAttributeCenter         !< Attribute Center
     !-----------------------------------------------------------------
-        uniform_grid_descriptor_GetAttributeCenter = this%Attributes_info(AttributeNumber)%GetCenter()
+        uniform_grid_descriptor_GetAttributeCenter = this%AttributesMetadata(AttributeNumber)%GetCenter()
     end function uniform_grid_descriptor_GetAttributeCenter
 
 
@@ -412,72 +435,72 @@ contains
     end subroutine uniform_grid_descriptor_initialize
 
 
-    subroutine uniform_grid_descriptor_SetGeometryInfo(this, XPath, Precision, Dimension)
+    subroutine uniform_grid_descriptor_SetGeometryMetadata(this, Name, Precision, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Set Uniform Grid Descriptor geometry info
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this               !< Uniform Grid Descriptor 
-        character(len=*),         intent(IN)    :: XPath              !< XPath to the HDF5 connetivities
+        character(len=*),         intent(IN)    :: Name              !< Name to the HDF5 connetivities
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the Coordinates in the HDF5 file
-        integer(I4P),             intent(IN)    :: Dimension          !< Dimensions of the Coordinates array in the HDF5 file
+        integer(I4P),             intent(IN)    :: ArrayDimensions          !< Dimensions of the Coordinates array in the HDF5 file
     !-----------------------------------------------------------------
-        call this%geometry_info%SetXPath(XPath = XPath)
-        call this%geometry_info%SetPrecision(Precision = Precision)
-        call this%geometry_info%SetDimension(Dimension = Dimension)
-    end subroutine uniform_grid_descriptor_SetGeometryInfo
+        call this%GeometryMetadata%SetName(Name = Name)
+        call this%GeometryMetadata%SetPrecision(Precision = Precision)
+        call this%GeometryMetadata%SetArrayDimensions(ArrayDimensions = ArrayDimensions)
+    end subroutine uniform_grid_descriptor_SetGeometryMetadata
 
 
-    subroutine uniform_grid_descriptor_SetTopologyInfo(this, XPath, Precision, Dimension)
+    subroutine uniform_grid_descriptor_SetTopologyMetadata(this, Name, Precision, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Set Uniform Grid Descriptor topology info
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this               !< Uniform Grid Descriptor 
-        character(len=*),         intent(IN)    :: XPath              !< XPath to the HDF5 coordinates
+        character(len=*),         intent(IN)    :: Name              !< Name to the HDF5 coordinates
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the coordinates in the HDF5 file
-        integer(I4P),             intent(IN)    :: Dimension          !< Dimensions of the coordinates array in the HDF5 file
+        integer(I4P),             intent(IN)    :: ArrayDimensions          !< Dimensions of the coordinates array in the HDF5 file
     !-----------------------------------------------------------------
-        call this%topology_info%SetXPath(XPath = XPath)
-        call this%topology_info%SetPrecision(Precision = Precision)
-        call this%topology_info%SetDimension(Dimension = Dimension)
-    end subroutine uniform_grid_descriptor_SetTopologyInfo
+        call this%TopologyMetadata%SetName(Name = Name)
+        call this%TopologyMetadata%SetPrecision(Precision = Precision)
+        call this%TopologyMetadata%SetArrayDimensions(ArrayDimensions = ArrayDimensions)
+    end subroutine uniform_grid_descriptor_SetTopologyMetadata
 
 
-    subroutine uniform_grid_descriptor_SetLastAttributeInfo(this, XPath, Type, DataType, Center, Precision, Dimension)
+    subroutine uniform_grid_descriptor_SetLastAttributeMetadata(this, Name, Type, DataType, Center, Precision, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Set XH5For geometry info
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this               !< Uniform Grid Descriptor 
-        character(len=*),         intent(IN)    :: XPath              !< XPath to the HDF5 coordinates
+        character(len=*),         intent(IN)    :: Name              !< Name to the HDF5 coordinates
         integer(I4P),             intent(IN)    :: Type               !< XH5For attribute type (Scalar, Vector, Tensor, etc.)
         character(len=*),         intent(IN)    :: DataType           !< XH5For attribute data type (Int or  Float)
         integer(I4P),             intent(IN)    :: Center             !< Center property of the attribute (Node, Face, Edge, Cell or Grid)
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the attribute in the HDF5 file
-        integer(I4P),             intent(IN)    :: Dimension          !< Dimensions of the attribute array in the HDF5 file
+        integer(I4P),             intent(IN)    :: ArrayDimensions          !< Dimensions of the attribute array in the HDF5 file
     !-----------------------------------------------------------------
-        call this%attributes_info(this%NumberOfAttributes)%SetXPath(XPath = XPath)
-        call this%attributes_info(this%NumberOfAttributes)%SetType(Type = Type)
-        call this%attributes_info(this%NumberOfAttributes)%SetDataType(DataType = DataType)
-        call this%attributes_info(this%NumberOfAttributes)%SetCenter(Center = Center)
-        call this%attributes_info(this%NumberOfAttributes)%SetPrecision(Precision = Precision)
-        call this%attributes_info(this%NumberOfAttributes)%SetDimension(Dimension = Dimension)
-    end subroutine uniform_grid_descriptor_SetLastAttributeInfo
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetName(Name = Name)
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetType(Type = Type)
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetDataType(DataType = DataType)
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetCenter(Center = Center)
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetPrecision(Precision = Precision)
+        call this%AttributesMetadata(this%NumberOfAttributes)%SetArrayDimensions(ArrayDimensions = ArrayDimensions)
+    end subroutine uniform_grid_descriptor_SetLastAttributeMetadata
 
 
     subroutine uniform_grid_descriptor_UpdateNumberOfAttributes(this)
     !-----------------------------------------------------------------
-    !< Increase the number of attributes and allocate the attributes_info array to the right size
+    !< Increase the number of attributes and allocate the AttributesMetadata array to the right size
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Uniform Grid Descriptor
         type(xh5for_metadata_t),  allocatable   :: aux_attrs_info(:)  !< Aux XH5For attributes metadata
     !-----------------------------------------------------------------
-        if(.not. allocated(this%attributes_info)) then
+        if(.not. allocated(this%AttributesMetadata)) then
             this%NumberOfAttributes = 0
-            allocate(this%attributes_info(1))
-        elseif(size(this%attributes_info) < (this%NumberOfAttributes+1)) then
+            allocate(this%AttributesMetadata(1))
+        elseif(size(this%AttributesMetadata) < (this%NumberOfAttributes+1)) then
             allocate(aux_attrs_info(this%NumberOfAttributes))
-            aux_attrs_info(:) = this%attributes_info(:)
-            deallocate(this%attributes_info); allocate(this%attributes_info(this%NumberOfAttributes+1))
-            this%attributes_info(1:this%NumberOfAttributes) = aux_attrs_info(1:this%NumberOfAttributes)
+            aux_attrs_info(:) = this%AttributesMetadata(:)
+            deallocate(this%AttributesMetadata); allocate(this%AttributesMetadata(this%NumberOfAttributes+1))
+            this%AttributesMetadata(1:this%NumberOfAttributes) = aux_attrs_info(1:this%NumberOfAttributes)
             deallocate(aux_attrs_info)
         endif
         this%NumberOfAttributes = this%NumberOfAttributes + 1
@@ -495,15 +518,15 @@ contains
         this%GridType           = XDMF_GRID_TYPE_UNSTRUCTURED
         this%NumberOfNodes      = XDMF_NO_VALUE
         this%NumberOfElements   = XDMF_NO_VALUE
-        if(allocated(this%Attributes_info)) then
+        if(allocated(this%AttributesMetadata)) then
             do i = 1, this%NumberOfAttributes
-                call this%Attributes_info(i)%Free()
+                call this%AttributesMetadata(i)%Free()
             enddo
-            deallocate(this%Attributes_info)
+            deallocate(this%AttributesMetadata)
         endif
         this%NumberOfAttributes = 0
-        call this%Geometry_info%Free()
-        call this%Topology_info%Free()
+        call this%GeometryMetadata%Free()
+        call this%TopologyMetadata%Free()
     end subroutine uniform_grid_descriptor_Free
 
 

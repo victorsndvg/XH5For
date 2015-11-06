@@ -72,20 +72,20 @@ contains
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
                 GlobalNumberOfData = int(this%MPIEnvironment%get_comm_size(),HSIZE_T)
                 LocalNumberOfData = 1_HSIZE_T
                 DataOffset = this%MPIEnvironment%get_rank()
             case Default
                 GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         end select
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
@@ -627,20 +627,15 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,                  &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -662,20 +657,15 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,                  &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -692,28 +682,22 @@ contains
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I4P),                               intent(IN) :: Connectivities(:)      !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%UniformGridDescriptor%GetNumberOfElements(),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+
         call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
@@ -726,28 +710,22 @@ contains
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I8P),                               intent(IN) :: Connectivities(:)      !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%UniformGridDescriptor%GetNumberOfElements(),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+print*, LocalConnectivitySize, GlobalConnectivitySize, ConnectivitySizeOffset
         call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P
@@ -900,20 +878,15 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -934,20 +907,15 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        integer(HID_T)                                         :: filespace           !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror            !< HDF5 error code
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -964,28 +932,21 @@ contains
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,                           &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%ReadHyperSlab(DatasetName = Name,           &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P
@@ -998,28 +959,21 @@ contains
         class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
         integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: nodesperelement        !< Nodes per element
-        integer(HSIZE_T)                                       :: globalnumberofelements !< Global number of elements
-        integer(HSIZE_T)                                       :: localnumberofelements  !< Local number of elements
-        integer(HSIZE_T)                                       :: elementoffset          !< Elements offset for a particular grid
-        integer(HID_T)                                         :: filespace              !< HDF5 fiel Dataspace identifier
-        integer(HID_T)                                         :: plist_id               !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id                !< HDF5 Dataset identifier 
-        integer(HID_T)                                         :: memspace               !< HDF5 memory Dataspace identifier
-        integer                                                :: hdferror               !< HDF5 error code
+        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        nodesperelement = int(GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofelements = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-        localnumberofelements = int(this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        elementoffset = int(this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName = Name,                          &
-                DatasetDims     = (/nodesperelement*globalnumberofelements/), &
-                HyperSlabOffset = (/nodesperelement*elementoffset/),          &
-                HyperSlabSize   = (/nodesperelement*localnumberofelements/),  &
+        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%ReadHyperSlab(DatasetName = Name,           &
+                DatasetDims     = (/GlobalConnectivitySize/), &
+                HyperSlabOffset = (/ConnectivitySizeOffset/), &
+                HyperSlabSize   = (/LocalConnectivitySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P

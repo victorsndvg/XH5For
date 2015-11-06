@@ -97,7 +97,7 @@ contains
     !-----------------------------------------------------------------
     !< Free MPI derived type
     !----------------------------------------------------------------- 
-        class(mpi_env_t), intent(INOUT) :: this                     !< MPI environment
+        class(mpi_env_t), intent(INOUT) :: this                       !< MPI environment
     !----------------------------------------------------------------- 
         ! No allocatable variables. Default initialization
         call this%Initialize()

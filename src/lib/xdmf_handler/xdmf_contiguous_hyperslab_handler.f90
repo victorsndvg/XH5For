@@ -106,7 +106,7 @@ contains
         real(R4P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
         character(len=*),                           intent(IN)    :: Name           !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath = Name, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryMetadata(Name = Name, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R4P
 
 
@@ -118,7 +118,7 @@ contains
         real(R8P),                                  intent(IN)    :: Coordinates(:) !< Grid coordinates
         character(len=*),                           intent(IN)    :: Name           !< Geometry name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryInfo(XPath=Name, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetGeometryMetadata(Name=Name, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetGeometry_R8P
 
 
@@ -130,7 +130,7 @@ contains
         integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyMetadata(Name=Name, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I4P
 
 
@@ -142,7 +142,7 @@ contains
         integer(I8P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyInfo(XPath=Name, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetTopologyMetadata(Name=Name, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_SetTopology_I8P
 
 
@@ -157,7 +157,7 @@ contains
         integer(I4P),                               intent(IN)    :: Attribute(:) !< I4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
 
 
@@ -172,7 +172,7 @@ contains
         integer(I8P),                               intent(IN)    :: Attribute(:) !< I8P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
 
 
@@ -187,7 +187,7 @@ contains
         real(R4P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
 
 
@@ -202,7 +202,7 @@ contains
         real(R8P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeInfo(XPath=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, Dimension=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
 
 
@@ -221,20 +221,20 @@ contains
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=GridID)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
                 GlobalNumberOfData = this%MPIEnvironment%get_comm_size()
                 LocalNumberOfData  = 1_I8P
                 DataOffset         = GridID
             case Default
                 GlobalNumberOfData = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
-                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)
+                LocalNumberOfData  = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                DataOffset         = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
         end select
     end subroutine xdmf_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
 
@@ -320,7 +320,7 @@ contains
         type(NodeList), pointer                                   :: Childrens      !< Fox DOM node list
         type(Node), pointer                                       :: ChildNode      !< Fox DOM node
         type(xdmf_dataitem_t)                                     :: dataitem       !< XDMF Topology derived type
-        integer(I4P)                                              :: i          !< Index for a loop in Childrens
+        integer(I4P)                                              :: i              !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
         if(.not. associated(DataItemNode)) return
         if(hasChildNodes(DataItemNode)) then
@@ -348,6 +348,7 @@ contains
         type(Node), pointer,                        intent(IN)    :: TopologyNode !< Fox DOM Topology node
         integer(I4P),                               intent(IN)    :: ID           !< Grid IDentifier
         type(xdmf_topology_t)                                     :: Topology     !< XDMF Topology derived type
+        type(xdmf_dataitem_t)                                     :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
         integer(I8P),     allocatable                             :: auxDims(:)   !< Aux dimensions variable
         character(len=:), allocatable                             :: XPath        !< Topology XPath
@@ -355,12 +356,19 @@ contains
         if(.not. associated(TopologyNode)) return
         call Topology%Parse(DOMNode = TopologyNode)
         ! Set TopologyType
-        call this%SpatialGridDescriptor%SetTopologyTypeByGridID(&
+        call this%SpatialGridDescriptor%SetTopologyTypePerGridID(&
                     TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=ID)
         ! Set NumberOfElements
         auxDims = Topology%get_Dimensions()
-        call this%SpatialGridDescriptor%SetNumberOfElementsByGridID(AuxDims(1),ID=ID)
+        call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(AuxDims(1),ID=ID)
+        ! Set ConnectivitySize
+        DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
+        call DataItem%Parse(DomNode = DataItemNode)
+        auxDims = DataItem%get_Dimensions()
+        call this%SpatialGridDescriptor%SetConnectivitySizePerGridID(AuxDims(1),ID=ID)
+        ! Free
         call Topology%Free()
+        call DataItem%Free()
         nullify(DataItemNode)
     end subroutine xdmf_contiguous_hyperslab_handler_FillSpatialGridTopology
 
@@ -382,14 +390,15 @@ contains
         if(.not. associated(GeometryNode)) return
         call Geometry%Parse(DOMNode = GeometryNode)
         ! Set GeometryType
-        call this%SpatialGridDescriptor%SetGeometryTypeByGridID(&
+        call this%SpatialGridDescriptor%SetGeometryTypePerGridID(&
                     GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=ID)
         ! Set NumberOfNodes
         DataItemNode => this%GetFirstChildByTag(FatherNode = GeometryNode, Tag = 'DataItem')
         call DataItem%Parse(DomNode = DataItemNode)
         auxDims = DataItem%get_Dimensions()
         spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
-        call this%SpatialGridDescriptor%SetNumberOfNodesByGridID(AuxDims(1)/spacedims,ID=ID)
+        call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
+        ! Free
         nullify(DataItemNode)
         call Geometry%Free()
         call DataItem%Free()
@@ -459,7 +468,7 @@ contains
             endif
             call destroy(this%file%get_document_root())
         endif
-        call this%SpatialGridDescriptor%DistributeData()
+        call this%SpatialGridDescriptor%BroadcastMetadata()
     end subroutine xdmf_contiguous_hyperslab_handler_ParseFile
 
 
@@ -509,8 +518,7 @@ contains
         type(xdmf_dataitem_t)                                     :: dataitem                !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata                !< XDMF Character Data type
         integer(I8P)                                              :: LocalNumberOfElements   !< Local number of elements
-        integer(I8P)                                              :: GlobalNumberOfElements  !< Global number of elements
-        integer(I8P)                                              :: NodesPerElement         !< Number of nodes per element
+        integer(I8P)                                              :: GlobalConnectivitySize  !< Global connectivity size
         integer(I8P)                                              :: Start                   !< Hyperslab start
         integer(I8P)                                              :: Count                   !< Hyperslab count
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
@@ -518,17 +526,15 @@ contains
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
-                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsFromGridID(ID=GridID)
-                NodesPerElement = GetNumberOfNodesPerElement(this%SpatialGridDescriptor%GetTopologyTypeFromGridID(ID=GridID))
-                Start = this%SpatialGridDescriptor%GetElementOffsetFromGridID(ID=GridID)*NodesPerElement
+                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=GridID)
             else
                 LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
-                NodesPerElement = GetNumberOfNodesPerElement(this%UniformGridDescriptor%GetTopologyType())
                 Start = 0
             endif
-            GlobalNumberOfElements = this%SpatialGridDescriptor%GetGlobalNumberOfElements()
+            GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalConnectivitySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            Count = LocalNumberOfElements*NodesPerElement
+            Count = this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=GridID)
 
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
@@ -538,20 +544,20 @@ contains
                     ItemType    = 'HyperSlab',&
                     Format      = 'HDF')
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions     = (/3_I4P,this%UniformGridDescriptor%GetTopologyDimension()/),&
+                    Dimensions     = (/3_I4P,this%UniformGridDescriptor%GetTopologyArrayDimensions()/),&
                     NumberType     = 'Int',&
                     Format         = 'XML',&
                     Precision      = 4 ) 
             call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open( xml_handler = this%file%xml_handler,         &
-                    Dimensions  = (/GlobalNumberOfElements*NodesPerElement/),&
+            call dataitem%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/GlobalConnectivitySize/),&
                     NumberType  = 'Int',&
                     Format      = 'HDF',& 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyXPath() )
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyName() )
             call dataitem%close(xml_handler=this%file%xml_handler)
             call dataitem%close(xml_handler=this%file%xml_handler)
             call topology%close(xml_handler=this%file%xml_handler)
@@ -578,8 +584,8 @@ contains
         if(this%MPIEnvironment%is_root()) then
             SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
             if(present(GridID)) then
-                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesFromGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetNodeOffsetFromGridID(ID=GridID)*SpaceDimension
+                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)*SpaceDimension
             else
                 localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
                 Start = 0
@@ -594,7 +600,7 @@ contains
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryDimension()/), &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryArrayDimensions()/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
@@ -607,7 +613,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryXPath())
+                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryName())
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
@@ -658,7 +664,7 @@ contains
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
                 call attribute%open(xml_handler = this%file%xml_handler,                                   &
-                        Name          = this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx), &
+                        Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = this%file%xml_handler,                           &
@@ -666,7 +672,7 @@ contains
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = this%file%xml_handler,              &
-                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeDimension(AttributeNumber=indx)/), &
+                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx)/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
@@ -680,7 +686,7 @@ contains
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
                 call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&
-                                        this%UniformGridDescriptor%GetAttributeXPath(AttributeNumber=indx))
+                                        this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx))
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call attribute%close(xml_handler = this%file%xml_handler)

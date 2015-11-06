@@ -8,41 +8,41 @@ private
 
     type :: xh5for_metadata_t
     private
-        character(len=:), allocatable :: XPath
-        integer(I4P)                  :: Type       = XDMF_NO_VALUE
-        integer(I4P)                  :: Center     = XDMF_NO_VALUE
+        character(len=:), allocatable :: Name
+        integer(I4P)                  :: Type             = XDMF_NO_VALUE
+        integer(I4P)                  :: Center           = XDMF_NO_VALUE
         character(len=:), allocatable :: DataType
-        integer(I4P)                  :: Precision  = XDMF_NO_VALUE
-        integer(I4P)                  :: Dimension  = XDMF_NO_VALUE
+        integer(I4P)                  :: Precision        = XDMF_NO_VALUE
+        integer(I4P)                  :: ArrayDimensions  = XDMF_NO_VALUE
     contains
-        procedure, public :: SetXPath     => xh5for_metadata_SetXPath
-        procedure, public :: SetType      => xh5for_metadata_SetType
-        procedure, public :: SetCenter    => xh5for_metadata_SetCenter
-        procedure, public :: SetDataType  => xh5for_metadata_SetDataType
-        procedure, public :: SetPrecision => xh5for_metadata_SetPrecision
-        procedure, public :: SetDimension => xh5for_metadata_SetDimension
-        procedure, public :: GetXPath     => xh5for_metadata_GetXPath
-        procedure, public :: GetType      => xh5for_metadata_GetType
-        procedure, public :: GetCenter    => xh5for_metadata_GetCenter
-        procedure, public :: GetDataType  => xh5for_metadata_GetDataType
-        procedure, public :: GetPrecision => xh5for_metadata_GetPrecision
-        procedure, public :: GetDimension => xh5for_metadata_GetDimension
-        procedure, public :: Free         => xh5for_metadata_Free
+        procedure, public :: SetName            => xh5for_metadata_SetName
+        procedure, public :: SetType            => xh5for_metadata_SetType
+        procedure, public :: SetCenter          => xh5for_metadata_SetCenter
+        procedure, public :: SetDataType        => xh5for_metadata_SetDataType
+        procedure, public :: SetPrecision       => xh5for_metadata_SetPrecision
+        procedure, public :: SetArrayDimensions => xh5for_metadata_SetArrayDimensions
+        procedure, public :: GetName            => xh5for_metadata_GetName
+        procedure, public :: GetType            => xh5for_metadata_GetType
+        procedure, public :: GetCenter          => xh5for_metadata_GetCenter
+        procedure, public :: GetDataType        => xh5for_metadata_GetDataType
+        procedure, public :: GetPrecision       => xh5for_metadata_GetPrecision
+        procedure, public :: GetArrayDimensions => xh5for_metadata_GetArrayDimensions
+        procedure, public :: Free               => xh5for_metadata_Free
     end type xh5for_metadata_t
 
 public :: xh5for_metadata_t
 
 contains
 
-    subroutine xh5for_metadata_SetXPath(this, XPath)
+    subroutine xh5for_metadata_SetName(this, Name)
     !-----------------------------------------------------------------
-    !< Set the XPath
+    !< Set the Name
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(INOUT) :: this               !< XH5For metadata type
-        character(len=*),         intent(IN)    :: XPath              !< XPath
+        character(len=*),         intent(IN)    :: Name               !< DataSet Name
     !----------------------------------------------------------------- 
-        this%XPath = XPath
-    end subroutine xh5for_metadata_setXPath
+        this%Name = Name
+    end subroutine xh5for_metadata_setName
 
 
     subroutine xh5for_metadata_SetType(this, Type)
@@ -89,26 +89,26 @@ contains
     end subroutine xh5for_metadata_setPrecision
 
 
-    subroutine xh5for_metadata_SetDimension(this, Dimension)
+    subroutine xh5for_metadata_SetArrayDimensions(this, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Set the Dimension
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(INOUT) :: this               !< XH5For metadata type
-        integer(I4P),             intent(IN)    :: Dimension          !< Dimension
+        integer(I4P),             intent(IN)    :: ArrayDimensions    !< Array Dimensions
     !----------------------------------------------------------------- 
-        this%Dimension = Dimension
-    end subroutine xh5for_metadata_setDimension
+        this%ArrayDimensions = ArrayDimensions
+    end subroutine xh5for_metadata_SetArrayDimensions
 
 
-    function xh5for_metadata_GetXPath(this)
+    function xh5for_metadata_GetName(this)
     !-----------------------------------------------------------------
-    !< Return the XPath
+    !< Return the Name
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(IN) :: this                   !< XH5For metadata type
-        character(len=:), allocatable :: xh5for_metadata_GetXPath      !< Returned XPath
+        character(len=:), allocatable :: xh5for_metadata_GetName       !< Returned Name
     !----------------------------------------------------------------- 
-        xh5for_metadata_GetXPath = this%XPath
-    end function xh5for_metadata_GetXPath
+        xh5for_metadata_GetName = this%Name
+    end function xh5for_metadata_GetName
 
 
     function xh5for_metadata_GetType(this)
@@ -155,15 +155,15 @@ contains
     end function xh5for_metadata_GetPrecision
 
 
-    function xh5for_metadata_GetDimension(this)
+    function xh5for_metadata_GetArrayDimensions(this)
     !-----------------------------------------------------------------
     !< Return the Dimension
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(IN) :: this                  !< XH5For metadata type
-        integer(I4P) :: xh5for_metadata_GetDimension                  !< Returned Dimension
+        integer(I4P) :: xh5for_metadata_GetArrayDimensions                  !< Returned Dimension
     !----------------------------------------------------------------- 
-        xh5for_metadata_GetDimension = this%Dimension
-    end function xh5for_metadata_GetDimension
+        xh5for_metadata_GetArrayDimensions = this%ArrayDimensions
+    end function xh5for_metadata_GetArrayDimensions
 
 
     subroutine xh5for_metadata_Free(this)
@@ -172,12 +172,12 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(INOUT) :: this               !< XH5For metadata type
     !----------------------------------------------------------------- 
-        if(allocated(this%XPath)) deallocate(this%XPath)
+        if(allocated(this%Name)) deallocate(this%Name)
         if(allocated(this%DataType)) deallocate(this%DataType)
         this%Type       = XDMF_NO_VALUE
         this%Center     = XDMF_NO_VALUE
         this%Precision  = XDMF_NO_VALUE
-        this%Dimension  = XDMF_NO_VALUE
+        this%ArrayDimensions  = XDMF_NO_VALUE
     end subroutine
 
 

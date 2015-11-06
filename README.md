@@ -1,7 +1,8 @@
 # XdmfHdf5Fortran
 The Fortran way to easy write partitioned XDMF/HDF5 meshes
 
-[![Build Status](https://travis-ci.org/victorsndvg/XdmfHdf5Fortran.svg?branch=master)](https://travis-ci.org/victorsndvg/XdmfHdf5Fortran)
+[![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)
+                 
 
 ## What is XdmfHdf5Fortran?
 Is a library to read and write partitioned FEM meshes taking advantage of the collective/independent IO provided by the HDF5 library. 
@@ -29,7 +30,8 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
       * [x] Quadrangle
       * [x] Tretrahedron
       * [x] Hexahedron
-      * [ ] Mixed
+      * [x] Mixed
+      * [ ] ...
   * Field:
     * Center on: 
         * [x] Node
@@ -56,9 +58,9 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [x] Character data
   * HDF5:
     * [ ] Manage Files
-    * [ ] Groups
-    * [ ] DataSpaces
-    * [ ] DataSets
+    * [x] Groups
+    * [x] DataSpaces
+    * [x] DataSets
     * [x] HyperSlabs
 
 ### Exporters:
@@ -71,7 +73,8 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
       * [x] Quadrangle
       * [x] Tretrahedron
       * [x] Hexahedron
-      * [ ] Mixed
+      * [x] Mixed
+      * [ ] ...
   * Field:
     * Center on: 
         * [x] Node
@@ -98,7 +101,7 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [x] Character data
   * HDF5:
     * [ ] Manage Files
-    * [ ] Groups
+    * [x] Groups
     * [x] DataSpaces
     * [x] DataSets
     * [x] HyperSlabs

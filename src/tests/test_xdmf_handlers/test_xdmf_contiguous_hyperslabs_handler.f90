@@ -32,6 +32,7 @@ implicit none
 #endif
     call mpienv%initialize()
     call spatialgrid%initialize(MPIEnvironment=mpienv, NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
+    call spatialgrid%AllgatherConnectivitySize(ConnectivitySize=int(size(topology,dim=1),I8P))
     call uniformgrid%initialize(NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
     call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
     call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_hyperslab')
