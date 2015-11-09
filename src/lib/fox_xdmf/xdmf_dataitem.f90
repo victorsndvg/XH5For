@@ -199,7 +199,7 @@ contains
         class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
         integer(I4P),           intent(IN) :: Precision               !< Dataitem Precision
         logical                            :: is_valid                !< Valid NumberType confirmation flag
-        integer(I4P), allocatable          :: allowed_Precisions(:)   !< Dataitem NumberTypes list 
+        integer(I4P)                       :: allowed_Precisions(4)   !< Dataitem NumberTypes list 
     !----------------------------------------------------------------- 
         ! & is an invalid character in XML
         allowed_Precisions = (/1_I4P,2_I4P,4_I4P,8_I4P/)
