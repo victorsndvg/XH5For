@@ -6,7 +6,7 @@ implicit none
 
 contains
 
-    elemental function Upper_Case(string)
+    function Upper_Case(string)
     !-----------------------------------------------------------------
     !< Function for converting lower case characters of a string to 
     !< upper case ones.
