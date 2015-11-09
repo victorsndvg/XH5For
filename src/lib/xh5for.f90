@@ -78,7 +78,7 @@ contains
         class(xh5for_t), intent(IN)  :: this
         integer(I4P),    intent(IN)  :: Strategy
         logical                      :: is_valid
-        integer(I4P), allocatable    :: allowed_strategies(:)
+        integer(I4P)                 :: allowed_strategies(1)
     !----------------------------------------------------------------- 
         allowed_Strategies = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
         is_valid = MINVAL(ABS(allowed_strategies - Strategy)) == 0_I4P

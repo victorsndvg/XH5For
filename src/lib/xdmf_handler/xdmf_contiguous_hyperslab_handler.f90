@@ -350,7 +350,7 @@ contains
         type(xdmf_topology_t)                                     :: Topology     !< XDMF Topology derived type
         type(xdmf_dataitem_t)                                     :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
-        integer(I8P),     allocatable                             :: auxDims(:)   !< Aux dimensions variable
+        integer(I8P)                                              :: auxDims(1)   !< Aux dimensions variable
         character(len=:), allocatable                             :: XPath        !< Topology XPath
     !----------------------------------------------------------------- 
         if(.not. associated(TopologyNode)) return
@@ -384,7 +384,7 @@ contains
         type(xdmf_geometry_t)                                     :: Geometry     !< XDMF Geometry derived type
         type(xdmf_dataitem_t)                                     :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                       :: DataItemNode !< Fox DOM Dataitem node
-        integer(I8P),           allocatable                       :: auxDims(:)   !< Aux dimensions variable
+        integer(I8P)                                              :: auxDims(1)   !< Aux dimensions variable
         integer(I4P)                                              :: spacedims    !< Space dimensions
     !----------------------------------------------------------------- 
         if(.not. associated(GeometryNode)) return
