@@ -141,10 +141,10 @@ contains
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem NumberType
     !----------------------------------------------------------------- 
-        class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
-        integer(I4P),                      intent(IN) :: TopologyType            !< XDMF Topology Type
-        logical                                       :: is_valid                !< Valid Topology Type confirmation flag
-        integer(I4P), allocatable                     :: allowed_TopologyTypes(:)!< Dataitem Topology Type list 
+        class(uniform_grid_descriptor_t),  intent(IN) :: this                     !< Local Data Handler
+        integer(I4P),                      intent(IN) :: TopologyType             !< XDMF Topology Type
+        logical                                       :: is_valid                 !< Valid Topology Type confirmation flag
+        integer(I4P)                                  :: allowed_TopologyTypes(26)!< Dataitem Topology Type list 
     !----------------------------------------------------------------- 
         !< @Note: Mixed topologies or variable number of node elements not allowed
         !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
@@ -262,7 +262,7 @@ contains
         class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
         integer(I4P),                      intent(IN) :: GeometryType            !< XDMF Geometry Type
         logical                                       :: is_valid                !< Valid Geometry Type confirmation flag
-        integer(I4P), allocatable                     :: allowed_GeometryTypes(:)!< Dataitem Geometry Type list 
+        integer(I4P)                                  :: allowed_GeometryTypes(2)!< Dataitem Geometry Type list 
     !----------------------------------------------------------------- 
         !< @Note: Mixed topologies or variable number of node elements not allowed
         !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
