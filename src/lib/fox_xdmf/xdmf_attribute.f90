@@ -8,6 +8,7 @@ use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
+use xh5for_parameters   
 
 implicit none
 !---------------------------------------------------------------------
@@ -83,11 +84,8 @@ contains
         class(xdmf_attribute_t), intent(IN) :: this                   !< XDMF Attribute type
         character(len=*),        intent(IN) :: AttributeType          !< XDMF Attribute AttributeType attribute
         logical                             :: is_valid               !< Valid AttributeType confirmation flag
-        character(len=:), allocatable       :: allowed_AttributeTypes !< Allowed AttributeTypes array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_AttributeTypes = 'Scalar&Vector&Tensor&Tensor6&Matrix&GlobalID'
-        is_valid = is_in_option_list(option_list=allowed_AttributeTypes, option=AttributeType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_ATTRIBUTETYPENAMES, option=AttributeType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong AttributeType: "'//AttributeType//'" (Note: Case sensitive)')
     end function xdmf_attribute_is_valid_AttributeType
 
@@ -99,11 +97,8 @@ contains
         class(xdmf_attribute_t), intent(IN) :: this                   !< XDMF Attribute type
         character(len=*),        intent(IN) :: Center                 !< XDMF Attribute Center attribute
         logical                             :: is_valid               !< Valid Center confirmation flag
-        character(len=:), allocatable       :: allowed_Centers        !< Allowed Sections array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_Centers = 'Node&Cell&Grid&Face&Edge'
-        is_valid = is_in_option_list(option_list=allowed_Centers, option=Center, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_ATTRIBUTECENTERNAMES, option=Center, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Center: "'//Center//'" (Note: Case sensitive)')
     end function xdmf_attribute_is_valid_Center
 

@@ -78,10 +78,8 @@ contains
         class(xh5for_t), intent(IN)  :: this
         integer(I4P),    intent(IN)  :: Strategy
         logical                      :: is_valid
-        integer(I4P)                 :: allowed_strategies(1)
     !----------------------------------------------------------------- 
-        allowed_Strategies = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
-        is_valid = MINVAL(ABS(allowed_strategies - Strategy)) == 0_I4P
+        is_valid = MINVAL(ABS(SUPPORTED_STRATEGIES - Strategy)) == 0_I4P
         if(.not. is_valid) call warning_message('Wrong Strategy: "'//trim(str(no_sign=.true., n=Strategy))//'"')
     end function xh5for_is_valid_strategy
 

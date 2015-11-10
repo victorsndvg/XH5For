@@ -8,6 +8,8 @@ use IR_Precision, only: I4P
 
 implicit none 
 
+    integer(I4P), parameter :: XDMF_NO_VALUE  = -1
+
     integer(I4P), parameter :: XDMF_ARRAY_TYPE_INT8    = 0
     integer(I4P), parameter :: XDMF_ARRAY_TYPE_INT16   = 1
     integer(I4P), parameter :: XDMF_ARRAY_TYPE_INT32   = 2
@@ -83,6 +85,75 @@ implicit none
     integer(I4P), parameter :: XDMF_ACTION_READ   = 900
     integer(I4P), parameter :: XDMF_ACTION_WRITE  = 901
 
-    integer(I4P), parameter :: XDMF_NO_VALUE  = -1
+    !-----------------------------------------------------------------
+    !< ACTUALLY SUPPORTED PARAMETERS
+    !----------------------------------------------------------------- 
+
+    integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
+
+    integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
+                                                                XDMF_GEOMETRY_TYPE_XYZ, &
+                                                                XDMF_GEOMETRY_TYPE_XY   &
+                                                             /)
+
+    integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(*)  = (/ &
+!                                                               XDMF_TOPOLOGY_TYPE_POLYVERTEX,      &
+!                                                               XDMF_TOPOLOGY_TYPE_POLYLINE,        &
+!                                                               XDMF_TOPOLOGY_TYPE_POLYGON,         &
+                                                                XDMF_TOPOLOGY_TYPE_TRIANGLE,        &
+                                                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL,   &
+                                                                XDMF_TOPOLOGY_TYPE_TETRAHEDRON,     &
+                                                                XDMF_TOPOLOGY_TYPE_PYRAMID,         &
+                                                                XDMF_TOPOLOGY_TYPE_WEDGE,           &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON,      &
+                                                                XDMF_TOPOLOGY_TYPE_EDGE_3,          &
+                                                                XDMF_TOPOLOGY_TYPE_TRIANGLE_6,      &
+                                                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL_8, &
+                                                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL_9, &
+                                                                XDMF_TOPOLOGY_TYPE_TETRAHEDRON_10,  &
+                                                                XDMF_TOPOLOGY_TYPE_PYRAMID_13,      &
+                                                                XDMF_TOPOLOGY_TYPE_WEDGE_15,        &
+                                                                XDMF_TOPOLOGY_TYPE_WEDGE_18,        &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_20,   &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_24,   &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_27,   &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_64,   &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_125,  &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_216,  &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_343,  &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_512,  &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
+                                                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
+                                                                XDMF_TOPOLOGY_TYPE_MIXED            &
+                                                             /)
+
+    integer(I4P), parameter :: SUPPORTED_DATAITEMPRECISIONS(*) = (/ 1, 2, 4, 8 /)
+
+    character(len=*), parameter :: SUPPORTED_TOPOLOGYTYPENAMES =                                        &
+                                            'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral'     // &
+                                            '&Tetrahedron&Pyramid&Wedge&Hexahedron&Edge_3&Triangle_6'// &
+                                            '&Quadrilateral_8&Tetrahedron_10&Pyramid_13&Wedge_15'    // &
+                                            '&Hexahedron_20&Mixed&2DSMesh&2DRectMesh&2DCoRectMesh'   // &
+                                            '&3DSMesh&3DRectMesh&3DCoRectMesh'
+
+    character(len=*), parameter :: SUPPORTED_TIMETYPENAMES = 'Single&HyperSlab&List&Range'
+
+    character(len=*), parameter :: SUPPORTED_GRIDTYPENAMES = 'Uniform&Collection&Tree&Subset'
+
+    character(len=*), parameter :: SUPPORTED_GRIDCOLLECTIONTYPENAMES = 'Spatial&Temporal'
+
+    character(len=*), parameter :: SUPPORTED_GRIDCOLLECTIONSECTIONAMES = 'DataItem&All'
+
+    character(len=*), parameter :: SUPPORTED_ATTRIBUTETYPENAMES = 'Scalar&Vector&Tensor&Tensor6&Matrix&GlobalID'
+
+    character(len=*), parameter :: SUPPORTED_ATTRIBUTECENTERNAMES = 'Node&Cell&Grid&Face&Edge'
+
+    character(len=*), parameter :: SUPPORTED_DATAITEMTYPENAMES = 'Uniform&Collection&Tree&HyperSlab&Coordinates&Function'
+
+    character(len=*), parameter :: SUPPORTED_DATAITEMNUMBERTYPENAMES = 'Float&Int&UInt&Char&UChar'
+
+    character(len=*), parameter :: SUPPORTED_DATAITEMFORMATNAMES = 'XML&HDF'
+
 
 end module xh5for_parameters

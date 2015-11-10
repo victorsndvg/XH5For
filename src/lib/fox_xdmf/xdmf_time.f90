@@ -8,6 +8,7 @@ use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
+use xh5for_parameters
 
 implicit none
 !---------------------------------------------------------------------
@@ -70,11 +71,8 @@ contains
         class(xdmf_time_t), intent(IN) :: this                        !< XDMF Grid type
         character(len=*),   intent(IN) :: TimeType                    !< XDMF Grid TimeType attribute
         logical                        :: is_valid                    !< Valid TimeType confirmation flag
-        character(len=:), allocatable  :: allowed_TimeTypes           !< Allowed TimeType array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_TimeTypes = 'Single&HyperSlab&List&Range'
-        is_valid = is_in_option_list(option_list=allowed_TimeTypes, option=TimeType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_TIMETYPENAMES, option=TimeType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong TimeType: "'//TimeType//'" (Note: Case sensitive)')
     end function xdmf_time_is_valid_TimeType
 

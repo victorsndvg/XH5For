@@ -8,6 +8,7 @@ use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
+use xh5for_parameters
 
 implicit none
 !---------------------------------------------------------------------
@@ -102,11 +103,8 @@ contains
         class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
         character(len=*),       intent(IN) :: GridType                !< XDMF Grid GridType attribute
         logical                            :: is_valid                !< Valid GridType confirmation flag
-        character(len=:), allocatable      :: allowed_GridTypes       !< Allowed GridTypes array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_GridTypes = 'Uniform&Collection&Tree&Subset'
-        is_valid = is_in_option_list(option_list=allowed_GridTypes, option=GridType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDTYPENAMES, option=GridType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong GridType: "'//GridType//'" (Note: Case sensitive)')
     end function xdmf_grid_is_valid_GridType
 
@@ -118,11 +116,8 @@ contains
         class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
         character(len=*),       intent(IN) :: CollectionType          !< XDMF Grid GridType attribute
         logical                            :: is_valid                !< Valid GridType confirmation flag
-        character(len=:), allocatable      :: allowed_CollectionTypes !< Allowed GridTypes array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_CollectionTypes = 'Spatial&Temporal'
-        is_valid = is_in_option_list(option_list=allowed_CollectionTypes, option=CollectionType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDCOLLECTIONTYPENAMES, option=CollectionType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong CollectionType: "'//CollectionType//'" (Note: Case sensitive)')
     end function xdmf_grid_is_valid_CollectionType
 
@@ -133,11 +128,8 @@ contains
         class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
         character(len=*),       intent(IN) :: Section                 !< XDMF Grid Section attribute
         logical                            :: is_valid                !< Valid Section confirmation flag
-        character(len=:), allocatable      :: allowed_Sections        !< Allowed Sections array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_Sections = 'DataItem&All'
-        is_valid = is_in_option_list(option_list=allowed_Sections, option=Section, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDCOLLECTIONSECTIONAMES, option=Section, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Section: "'//Section//'" (Note: Case sensitive)')
     end function xdmf_grid_is_valid_Section
 

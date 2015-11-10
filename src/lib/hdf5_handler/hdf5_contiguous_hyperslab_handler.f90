@@ -719,7 +719,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
+        LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,                            &
                 DatasetDims     = (/GlobalConnectivitySize/), &

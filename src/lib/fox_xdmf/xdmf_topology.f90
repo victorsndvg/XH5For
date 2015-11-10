@@ -8,6 +8,7 @@ use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: Count_tokens, Next_token, is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
+use xh5for_parameters
 
 implicit none
 !---------------------------------------------------------------------
@@ -142,16 +143,8 @@ contains
         class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
         character(len=*),       intent(IN) :: TopologyType            !< XDMF Topology TopologyType attribute
         logical                            :: is_valid                !< Valid TopologyType confirmation flag
-        character(len=:), allocatable      :: allowed_TopologyTypes   !< Allowed TopologyTypes array
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_topologyTypes = 'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral' // &
-                            '&Tetrahedron&Pyramid&Wedge&Hexahedron&Edge_3&Triangle_6'// &
-                            '&Quadrilateral_8&Tetrahedron_10&Pyramid_13&Wedge_15'    // &
-                            '&Hexahedron_20&Mixed&2DSMesh&2DRectMesh&2DCoRectMesh'   // &
-                            '&3DSMesh&3DRectMesh&3DCoRectMesh'
-
-        is_valid = is_in_option_list(option_list=allowed_TopologyTypes, option=TopologyType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_TOPOLOGYTYPENAMES, option=TopologyType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong TopologyType: "'//TopologyType//'" (Note: Case sensitive)')
     end function xdmf_topology_is_valid_TopologyType
 

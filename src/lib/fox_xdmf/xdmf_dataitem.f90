@@ -8,6 +8,7 @@ use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: Upper_Case, Count_tokens, Next_token, is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
+use xh5for_parameters
 
 implicit none
 private
@@ -145,11 +146,8 @@ contains
         class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
         character(len=*),       intent(IN) :: ItemType                !< Dataitem ItemType 
         logical                            :: is_valid                !< Valid ItemType confirmation flag
-        character(len=:), allocatable      :: allowed_ItemTypes       !< Dataitem ItemTypes list 
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_ItemTypes = 'Uniform&Collection&Tree&HyperSlab&Coordinates&Function'
-        is_valid = is_in_option_list(option_list=allowed_ItemTypes, option=ItemType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMTYPENAMES, option=ItemType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message(msg='Wrong ItemType: "'//ItemType//'" (Note: Case sensitive)')
     end function xdmf_dataitem_is_valid_ItemType
 
@@ -162,11 +160,8 @@ contains
         character(len=*),       intent(IN) :: NumberType              !< Dataitem NumberType 
         logical, optional,      intent(IN) :: warn                    !< Warn if is not valid
         logical                            :: is_valid                !< Valid NumberType confirmation flag
-        character(len=:), allocatable      :: allowed_NumberTypes     !< Dataitem NumberTypes list 
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_NumberTypes = 'Float&Int&UInt&Char&UChar'
-        is_valid = is_in_option_list(option_list=allowed_NumberTypes, option=NumberType, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMNUMBERTYPENAMES, option=NumberType, separator='&') 
         if(.not. is_valid .and. this%warn) call warning_message('Wrong NumberType: "'//NumberType//'" (Note: Case sensitive)')
     end function xdmf_dataitem_is_valid_NumberType
 
@@ -177,11 +172,8 @@ contains
         class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
         character(len=*),       intent(IN) :: Format                  !< Dataitem Format
         logical                            :: is_valid                !< Valid NumberType confirmation flag
-        character(len=:), allocatable      :: allowed_Formats         !< Dataitem Formats list 
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_Formats = 'XML&HDF'
-        is_valid = is_in_option_list(option_list=allowed_Formats, option=Format, separator='&') 
+        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMFORMATNAMES, option=Format, separator='&') 
         if(.not. is_valid .and. this%warn) then
             if(INDEX('BINARY', Upper_Case(adjustl(trim(Format)))) > 0) then
                 call warning_message('Not supported Format: "'//Format//'"')
@@ -199,11 +191,8 @@ contains
         class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
         integer(I4P),           intent(IN) :: Precision               !< Dataitem Precision
         logical                            :: is_valid                !< Valid NumberType confirmation flag
-        integer(I4P)                       :: allowed_Precisions(4)   !< Dataitem NumberTypes list 
     !----------------------------------------------------------------- 
-        ! & is an invalid character in XML
-        allowed_Precisions = (/1_I4P,2_I4P,4_I4P,8_I4P/)
-        is_valid = MINVAL(ABS(allowed_Precisions - Precision)) == 0_I4P
+        is_valid = MINVAL(ABS(SUPPORTED_DATAITEMPRECISIONS - Precision)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Precision: "'//trim(str(no_sign=.true., n=Precision))//'"')
     end function xdmf_dataitem_is_valid_Precision
 

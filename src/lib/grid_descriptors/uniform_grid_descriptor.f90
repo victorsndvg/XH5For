@@ -144,43 +144,8 @@ contains
         class(uniform_grid_descriptor_t),  intent(IN) :: this                     !< Local Data Handler
         integer(I4P),                      intent(IN) :: TopologyType             !< XDMF Topology Type
         logical                                       :: is_valid                 !< Valid Topology Type confirmation flag
-        integer(I4P)                                  :: allowed_TopologyTypes(26)!< Dataitem Topology Type list 
     !----------------------------------------------------------------- 
-        !< @Note: Mixed topologies or variable number of node elements not allowed
-        !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
-        !< @Note: variable number of nodes can be implemented with and array of number of nodes (offset?)
-        allowed_TopologyTypes = (/ &
-!                                XDMF_TOPOLOGY_TYPE_POLYVERTEX,      &
-!                                XDMF_TOPOLOGY_TYPE_POLYLINE,        &
-!                                XDMF_TOPOLOGY_TYPE_POLYGON,         &
-                                XDMF_TOPOLOGY_TYPE_TRIANGLE,        &
-                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL,   &
-                                XDMF_TOPOLOGY_TYPE_TETRAHEDRON,     &
-                                XDMF_TOPOLOGY_TYPE_PYRAMID,         &
-                                XDMF_TOPOLOGY_TYPE_WEDGE,           &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON,      &
-                                XDMF_TOPOLOGY_TYPE_EDGE_3,          &
-                                XDMF_TOPOLOGY_TYPE_TRIANGLE_6,      &
-                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL_8, &
-                                XDMF_TOPOLOGY_TYPE_QUADRILATERAL_9, &
-                                XDMF_TOPOLOGY_TYPE_TETRAHEDRON_10,  &
-                                XDMF_TOPOLOGY_TYPE_PYRAMID_13,      &
-                                XDMF_TOPOLOGY_TYPE_WEDGE_15,        &
-                                XDMF_TOPOLOGY_TYPE_WEDGE_18,        &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_20,   &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_24,   &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_27,   &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_64,   &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_125,  &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_216,  &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_343,  &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_512,  &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
-                                XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
-                                XDMF_TOPOLOGY_TYPE_MIXED            &
-                                /)
-        is_valid = MINVAL(ABS(allowed_TopologyTypes - TopologyType)) == 0_I4P
+        is_valid = MINVAL(ABS(SUPPORTED_TOPOLOGYTYPES - TopologyType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
     end function uniform_grid_descriptor_is_valid_TopologyType
 
@@ -262,16 +227,8 @@ contains
         class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
         integer(I4P),                      intent(IN) :: GeometryType            !< XDMF Geometry Type
         logical                                       :: is_valid                !< Valid Geometry Type confirmation flag
-        integer(I4P)                                  :: allowed_GeometryTypes(2)!< Dataitem Geometry Type list 
     !----------------------------------------------------------------- 
-        !< @Note: Mixed topologies or variable number of node elements not allowed
-        !< @Note: mixed topologies can be implemented with and array of celltypes (offset?)
-        !< @Note: variable number of nodes can be implemented with and array of number of nodes (offset?)
-        allowed_GeometryTypes = (/ &
-                                XDMF_GEOMETRY_TYPE_XYZ, &
-                                XDMF_GEOMETRY_TYPE_XY   &
-                                /)
-        is_valid = MINVAL(ABS(allowed_GeometryTypes - GeometryType)) == 0_I4P
+        is_valid = MINVAL(ABS(SUPPORTED_GEOMETRYTYPES - GeometryType)) == 0_I4P
         if(.not. is_valid .and. this%warn) call warning_message('Wrong Geometry Type: "'//trim(str(no_sign=.true., n=GeometryType))//'"')
     end function uniform_grid_descriptor_is_valid_GeometryType
 
