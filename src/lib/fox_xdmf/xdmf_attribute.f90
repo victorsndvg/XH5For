@@ -6,9 +6,8 @@ module xdmf_attribute
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
-use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
-use xh5for_parameters   
+use xdmf_utils
 
 implicit none
 !---------------------------------------------------------------------
@@ -30,8 +29,6 @@ implicit none
     private
         procedure         :: xdmf_attribute_open
         procedure         :: default_initialization => xdmf_attribute_default_initialization
-        procedure         :: is_valid_AttributeType => xdmf_attribute_is_valid_AttributeType
-        procedure         :: is_valid_Center        => xdmf_attribute_is_valid_Center
         procedure, public :: free                   => xdmf_attribute_free
         generic,   public :: open                   => xdmf_attribute_open
         procedure, public :: parse                  => xdmf_attribute_parse
@@ -77,32 +74,6 @@ contains
     end function xdmf_attribute_get_Center
 
 
-    function xdmf_attribute_is_valid_AttributeType(this, AttributeType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid Attribute AttributeType
-    !----------------------------------------------------------------- 
-        class(xdmf_attribute_t), intent(IN) :: this                   !< XDMF Attribute type
-        character(len=*),        intent(IN) :: AttributeType          !< XDMF Attribute AttributeType attribute
-        logical                             :: is_valid               !< Valid AttributeType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_ATTRIBUTETYPENAMES, option=AttributeType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong AttributeType: "'//AttributeType//'" (Note: Case sensitive)')
-    end function xdmf_attribute_is_valid_AttributeType
-
-
-    function xdmf_attribute_is_valid_Center(this, Center) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid attribute Section
-    !----------------------------------------------------------------- 
-        class(xdmf_attribute_t), intent(IN) :: this                   !< XDMF Attribute type
-        character(len=*),        intent(IN) :: Center                 !< XDMF Attribute Center attribute
-        logical                             :: is_valid               !< Valid Center confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_ATTRIBUTECENTERNAMES, option=Center, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong Center: "'//Center//'" (Note: Case sensitive)')
-    end function xdmf_attribute_is_valid_Center
-
-
     subroutine xdmf_attribute_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Attribute type
@@ -143,11 +114,11 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(AttributeType)) then; if(this%is_valid_AttributeType(AttributeType)) &
+        if(PRESENT(AttributeType)) then; if(isSupportedAttributeTypeName(AttributeType)) &
             call xml_AddAttribute(xml_handler, name="AttributeType", value=AttributeType)
         endif
 
-        if(PRESENT(Center)) then; if(this%is_valid_Center(Center)) &
+        if(PRESENT(Center)) then; if(isSupportedAttributeCenterName(Center)) &
             call xml_AddAttribute(xml_handler, name="Center", value=Center)
         endif
     end subroutine xdmf_attribute_open
@@ -172,12 +143,12 @@ contains
 
             if(hasAttribute(DOMNode, 'AttributeType')) then
                 AttributeType = getAttribute(DOMNode, 'AttributeType')
-                if(this%is_valid_AttributeType(AttributeType=AttributeType)) this%AttributeType = AttributeType
+                if(isSupportedAttributeTypeName(AttributeType)) this%AttributeType = AttributeType
             endif
 
             if(hasAttribute(DOMNode, 'Center')) then
                 center = getAttribute(DOMNode, 'Center')
-                if(this%is_valid_Center(Center=Center)) this%Center = Center
+                if(isSupportedAttributeCenterName(Center)) this%Center = Center
             endif
         endif
     end subroutine xdmf_attribute_parse

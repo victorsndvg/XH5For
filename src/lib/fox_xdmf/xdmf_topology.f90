@@ -6,9 +6,8 @@ module xdmf_topology
 use IR_Precision, only: I4P, I8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
-use xdmf_utils,   only: Count_tokens, Next_token, is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
-use xh5for_parameters
+use xdmf_utils
 
 implicit none
 !---------------------------------------------------------------------
@@ -48,7 +47,6 @@ implicit none
         procedure         :: xdmf_topology_open_I4P_dimensions
         procedure         :: xdmf_topology_open_I8P_dimensions
         procedure         :: default_initialization => xdmf_topology_default_initialization
-        procedure         :: is_valid_TopologyType  => xdmf_topology_is_valid_TopologyType
         procedure, public :: free                   => xdmf_topology_free
         generic,   public :: open                   => xdmf_topology_open_no_dimensions,  &
                                                        xdmf_topology_open_I4P_dimension,  &
@@ -136,19 +134,6 @@ contains
     end function xdmf_topology_get_BaseOffset
 
 
-    function xdmf_topology_is_valid_TopologyType(this, TopologyType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid Topology TopologyType
-    !----------------------------------------------------------------- 
-        class(xdmf_topology_t), intent(IN) :: this                    !< XDMF Topology type
-        character(len=*),       intent(IN) :: TopologyType            !< XDMF Topology TopologyType attribute
-        logical                            :: is_valid                !< Valid TopologyType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_TOPOLOGYTYPENAMES, option=TopologyType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong TopologyType: "'//TopologyType//'" (Note: Case sensitive)')
-    end function xdmf_topology_is_valid_TopologyType
-
-
     subroutine xdmf_topology_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Topology type
@@ -194,7 +179,7 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+        if(PRESENT(TopologyType)) then; if(isSupportedTopologyTypeName(TopologyType)) &
             call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
 
@@ -230,7 +215,7 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+        if(PRESENT(TopologyType)) then; if(isSupportedTopologyTypeName(TopologyType)) &
             call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
 
@@ -270,7 +255,7 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+        if(PRESENT(TopologyType)) then; if(isSupportedTopologyTypeName(TopologyType)) &
             call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
 
@@ -311,7 +296,7 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+        if(PRESENT(TopologyType)) then; if(isSupportedTopologyTypeName(TopologyType)) &
             call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
 
@@ -354,7 +339,7 @@ contains
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(TopologyType)) then; if(this%is_valid_TopologyType(TopologyType)) &
+        if(PRESENT(TopologyType)) then; if(isSupportedTopologyTypeName(TopologyType)) &
             call xml_AddAttribute(xml_handler, name="TopologyType", value=TopologyType)
         endif
 
@@ -402,7 +387,7 @@ contains
 
             if(hasAttribute(DOMNode, 'TopologyType')) then
                 TopologyType = getAttribute(DOMNode, 'TopologyType')
-                if(this%is_valid_TopologyType(TopologyType=TopologyType)) this%TopologyType = TopologyType
+                if(isSupportedTopologyTypeName(TopologyType)) this%TopologyType = TopologyType
             endif
 
             if(hasAttribute(DOMNode, 'NodesPerElement')) then

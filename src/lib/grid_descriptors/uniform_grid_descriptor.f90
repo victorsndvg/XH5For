@@ -1,8 +1,8 @@
 module uniform_grid_descriptor
 
 use IR_Precision, only: I4P, I8P, str
-use xdmf_utils,   only : warning_message
 use XH5For_metadata
+use XH5For_utils
 use XH5For_parameters
 
 implicit none
@@ -25,8 +25,6 @@ private
         logical      :: warn = .true.  !< Flag to show warnings on screen
     contains
     private
-        procedure         :: is_valid_TopologyType       => uniform_grid_descriptor_is_valid_TopologyType
-        procedure         :: is_valid_GeometryType       => uniform_grid_descriptor_is_valid_GeometryType
         procedure, public :: Initialize                  => uniform_grid_descriptor_Initialize
         procedure, public :: Free                        => uniform_grid_descriptor_Free
         procedure, public :: SetNumberOfNodes            => uniform_grid_descriptor_SetNumberOfNodes
@@ -137,19 +135,6 @@ contains
     end function uniform_grid_descriptor_GetConnectivitySize
 
 
-    function uniform_grid_descriptor_is_valid_TopologyType(this, TopologyType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem NumberType
-    !----------------------------------------------------------------- 
-        class(uniform_grid_descriptor_t),  intent(IN) :: this                     !< Local Data Handler
-        integer(I4P),                      intent(IN) :: TopologyType             !< XDMF Topology Type
-        logical                                       :: is_valid                 !< Valid Topology Type confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = MINVAL(ABS(SUPPORTED_TOPOLOGYTYPES - TopologyType)) == 0_I4P
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
-    end function uniform_grid_descriptor_is_valid_TopologyType
-
-
     subroutine uniform_grid_descriptor_SetTopologyType(this, TopologyType)
     !-----------------------------------------------------------------  
     !< Set XDMF topology type
@@ -157,7 +142,7 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this         !< Local grid derived type
         integer(I4P),                     intent(IN)    :: TopologyType !< XDMF topology type
     !-----------------------------------------------------------------
-        if(this%is_valid_TopologyType(TopologyType)) then
+        if(isSupportedTopologyType(TopologyType)) then
             call this%TopologyMetadata%SetType(Type = TopologyType)
         else
             call this%TopologyMetadata%SetType(Type = XDMF_NO_VALUE)
@@ -220,19 +205,6 @@ contains
     end function uniform_grid_descriptor_GetTopologyArrayDimensions
 
 
-    function uniform_grid_descriptor_is_valid_GeometryType(this, GeometryType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem NumberType
-    !----------------------------------------------------------------- 
-        class(uniform_grid_descriptor_t),  intent(IN) :: this                    !< Local Data Handler
-        integer(I4P),                      intent(IN) :: GeometryType            !< XDMF Geometry Type
-        logical                                       :: is_valid                !< Valid Geometry Type confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = MINVAL(ABS(SUPPORTED_GEOMETRYTYPES - GeometryType)) == 0_I4P
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong Geometry Type: "'//trim(str(no_sign=.true., n=GeometryType))//'"')
-    end function uniform_grid_descriptor_is_valid_GeometryType
-
-
     subroutine uniform_grid_descriptor_SetGeometryType(this, GeometryType)
     !-----------------------------------------------------------------
     !< Set XDMF geometry type
@@ -240,7 +212,7 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this         !< Local grid descriptor
         integer(I4P),                     intent(IN)    :: GeometryType !< Local grid geometry type
     !----------------------------------------------------------------
-        if(this%is_valid_GeometryType(GeometryType)) then
+        if(isSupportedGeometryType(GeometryType)) then
             call this%GeometryMetadata%SetType(Type=GeometryType)
         else
             call this%GeometryMetadata%SetType(Type=XDMF_NO_VALUE)

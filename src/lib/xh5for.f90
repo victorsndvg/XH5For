@@ -1,8 +1,8 @@
 module xh5for
 
-use xdmf_utils
 use xh5for_handler
 use mpi_environment
+use xh5for_utils
 use xh5for_parameters
 use xh5for_handler_factory
 use uniform_grid_descriptor
@@ -41,7 +41,6 @@ implicit none
         procedure         :: xh5for_ReadAttribute_I8P
         procedure         :: xh5for_ReadAttribute_R4P
         procedure         :: xh5for_ReadAttribute_R8P
-        procedure         :: is_valid_Strategy     => xh5for_is_valid_strategy
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         generic,   public :: Initialize            => xh5for_Initialize_Writer_I4P, &
                                                       xh5for_Initialize_Writer_I8P, &
@@ -71,19 +70,6 @@ implicit none
 
 contains
 
-    function xh5for_is_valid_strategy(this, Strategy) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid Strategy
-    !----------------------------------------------------------------- 
-        class(xh5for_t), intent(IN)  :: this
-        integer(I4P),    intent(IN)  :: Strategy
-        logical                      :: is_valid
-    !----------------------------------------------------------------- 
-        is_valid = MINVAL(ABS(SUPPORTED_STRATEGIES - Strategy)) == 0_I4P
-        if(.not. is_valid) call warning_message('Wrong Strategy: "'//trim(str(no_sign=.true., n=Strategy))//'"')
-    end function xh5for_is_valid_strategy
-
-
     subroutine xh5for_SetStrategy(this, Strategy)
     !----------------------------------------------------------------- 
     !< Set the strategy of data handling
@@ -91,7 +77,7 @@ contains
         class(xh5for_t), intent(INOUT)  :: this
         integer(I4P),    intent(IN)     :: Strategy
     !----------------------------------------------------------------- 
-        if(this%is_valid_Strategy(Strategy)) this%Strategy = Strategy
+        if(isSupportedStrategy(Strategy)) this%Strategy = Strategy
     end subroutine xh5for_SetStrategy
 
 

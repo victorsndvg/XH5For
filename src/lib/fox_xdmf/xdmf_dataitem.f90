@@ -6,9 +6,8 @@ module xdmf_dataitem
 use IR_Precision, only: I4P, I8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
-use xdmf_utils,   only: Upper_Case, Count_tokens, Next_token, is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
-use xh5for_parameters
+use xdmf_utils
 
 implicit none
 private
@@ -47,10 +46,6 @@ private
         procedure         :: xdmf_dataitem_open_I4P_dimension
         procedure         :: xdmf_dataitem_open_I4P_dimensions
         procedure         :: xdmf_dataitem_open_I8P_dimensions
-        procedure         :: is_valid_ItemType      => xdmf_dataitem_is_valid_ItemType
-        procedure         :: is_valid_NumberType    => xdmf_dataitem_is_valid_NumberType
-        procedure         :: is_valid_Precision     => xdmf_dataitem_is_valid_Precision
-        procedure         :: is_valid_Format        => xdmf_dataitem_is_valid_Format
         procedure         :: default_initialization => xdmf_dataitem_default_initialization
         procedure, public :: free                   => xdmf_dataitem_free
         generic,   public :: open                   => xdmf_dataitem_open_no_dimensions,  &
@@ -139,64 +134,6 @@ contains
     end function xdmf_dataitem_get_Format
 
 
-    function xdmf_dataitem_is_valid_ItemType(this, ItemType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem ItemType
-    !----------------------------------------------------------------- 
-        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
-        character(len=*),       intent(IN) :: ItemType                !< Dataitem ItemType 
-        logical                            :: is_valid                !< Valid ItemType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMTYPENAMES, option=ItemType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message(msg='Wrong ItemType: "'//ItemType//'" (Note: Case sensitive)')
-    end function xdmf_dataitem_is_valid_ItemType
-
-
-    function xdmf_dataitem_is_valid_NumberType(this, NumberType, warn) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem NumberType
-    !----------------------------------------------------------------- 
-        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
-        character(len=*),       intent(IN) :: NumberType              !< Dataitem NumberType 
-        logical, optional,      intent(IN) :: warn                    !< Warn if is not valid
-        logical                            :: is_valid                !< Valid NumberType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMNUMBERTYPENAMES, option=NumberType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong NumberType: "'//NumberType//'" (Note: Case sensitive)')
-    end function xdmf_dataitem_is_valid_NumberType
-
-    function xdmf_dataitem_is_valid_Format(this, Format) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem NumberType
-    !----------------------------------------------------------------- 
-        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
-        character(len=*),       intent(IN) :: Format                  !< Dataitem Format
-        logical                            :: is_valid                !< Valid NumberType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_DATAITEMFORMATNAMES, option=Format, separator='&') 
-        if(.not. is_valid .and. this%warn) then
-            if(INDEX('BINARY', Upper_Case(adjustl(trim(Format)))) > 0) then
-                call warning_message('Not supported Format: "'//Format//'"')
-            else
-                call warning_message('Wrong Format: "'//Format//'" (Note: Case sensitive)')
-            endif
-        endif
-    end function xdmf_dataitem_is_valid_Format
-
-
-    function xdmf_dataitem_is_valid_Precision(this, Precision) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid dataitem NumberType
-    !----------------------------------------------------------------- 
-        class(xdmf_dataitem_t), intent(IN) :: this                    !< XDMF DataItem type
-        integer(I4P),           intent(IN) :: Precision               !< Dataitem Precision
-        logical                            :: is_valid                !< Valid NumberType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = MINVAL(ABS(SUPPORTED_DATAITEMPRECISIONS - Precision)) == 0_I4P
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong Precision: "'//trim(str(no_sign=.true., n=Precision))//'"')
-    end function xdmf_dataitem_is_valid_Precision
-
-
     subroutine xdmf_dataitem_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF dataitem type
@@ -244,19 +181,19 @@ contains
         call xml_NewElement(xml_handler, 'DataItem')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+        if(PRESENT(ItemType)) then; if(isSupportedDataItemTypeNAme(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
         endif
 
-        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+        if(PRESENT(NumberType)) then; if(isSupportedDataItemNumberTypeName(NumberType)) &
             call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
         endif
 
-        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+        if(PRESENT(Precision)) then; if(isSupportedDataItemPrecision(Precision))    &
             call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
         endif
 
-        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+        if(PRESENT(Format)) then; if(isSupportedDataItemFormatName(Format))             &
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
@@ -282,7 +219,7 @@ contains
         call xml_NewElement(xml_handler, 'DataItem')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+        if(PRESENT(ItemType)) then; if(isSupportedDataItemTypeName(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
         endif
 
@@ -290,15 +227,15 @@ contains
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
         deallocate(char_dims)
 
-        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+        if(PRESENT(NumberType)) then; if(isSupportedDataItemNumberTypeName(NumberType)) &
             call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
         endif
 
-        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+        if(PRESENT(Precision)) then; if(isSupportedDataItemPrecision(Precision))    &
             call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
         endif
 
-        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+        if(PRESENT(Format)) then; if(isSupportedDataItemFormatName(Format))             &
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
@@ -324,7 +261,7 @@ contains
         call xml_NewElement(xml_handler, 'DataItem')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+        if(PRESENT(ItemType)) then; if(isSupportedDataItemTypeName(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
         endif
 
@@ -332,15 +269,15 @@ contains
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
         deallocate(char_dims)
 
-        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+        if(PRESENT(NumberType)) then; if(isSupportedDataItemNumberTypeName(NumberType)) &
             call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
         endif
 
-        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+        if(PRESENT(Precision)) then; if(isSupportedDataItemPrecision(Precision))    &
             call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
         endif
 
-        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+        if(PRESENT(Format)) then; if(isSupportedDataItemFormatName(Format))             &
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
@@ -366,7 +303,7 @@ contains
         call xml_NewElement(xml_handler, 'DataItem')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+        if(PRESENT(ItemType)) then; if(isSupportedDataItemTypeName(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
         endif
 
@@ -377,15 +314,15 @@ contains
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
         deallocate(char_dims)
 
-        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+        if(PRESENT(NumberType)) then; if(isSupportedDataItemNumberTypeName(NumberType)) &
             call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
         endif
 
-        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+        if(PRESENT(Precision)) then; if(isSupportedDataItemPrecision(Precision))    &
             call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
         endif
 
-        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+        if(PRESENT(Format)) then; if(isSupportedDataItemFormatName(Format))             &
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
@@ -411,7 +348,7 @@ contains
         call xml_NewElement(xml_handler, 'DataItem')
         if(PRESENT(Name))                                                      &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
-        if(PRESENT(ItemType)) then; if(this%is_valid_ItemType(ItemType))       &
+        if(PRESENT(ItemType)) then; if(isSupportedDataItemTypeName(ItemType))       &
             call xml_AddAttribute(xml_handler, name="ItemType", value=ItemType)
         endif
 
@@ -422,15 +359,15 @@ contains
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
         deallocate(char_dims)
 
-        if(PRESENT(NumberType)) then; if(this%is_valid_NumberType(NumberType)) &
+        if(PRESENT(NumberType)) then; if(isSupportedDataItemNumberTypeName(NumberType)) &
             call xml_AddAttribute(xml_handler, name="NumberType", value=NumberType)
         endif
 
-        if(PRESENT(Precision)) then; if(this%is_valid_Precision(Precision))    &
+        if(PRESENT(Precision)) then; if(isSupportedDataItemPrecision(Precision))    &
             call xml_AddAttribute(xml_handler, name="Precision", value=Precision)
         endif
 
-        if(PRESENT(Format)) then; if(this%is_valid_Format(Format))             &
+        if(PRESENT(Format)) then; if(isSupportedDataItemFormatName(Format))             &
             call xml_AddAttribute(xml_handler, name="Format", value=Format)
         endif
 
@@ -463,22 +400,22 @@ contains
 
             if(hasAttribute(DOMNode, 'ItemType')) then
                 ItemType = getAttribute(DOMNode, 'ItemType')
-                if(this%is_valid_ItemType(ItemType=ItemType)) this%ItemType = ItemType
+                if(isSupportedDataItemTypeName(ItemType)) this%ItemType = ItemType
             endif
 
             if(hasAttribute(DOMNode, 'NumberType')) then
                 NumberType = getAttribute(DOMNode, 'NumberType')
-                if(this%is_valid_NumberType(NumberType=NumberType)) this%NumberType = NumberType
+                if(isSupportedDataItemNumberTypeName(NumberType)) this%NumberType = NumberType
             endif
 
             if(hasAttribute(DOMNode, 'Format')) then
                 Format = getAttribute(DOMNode, 'Format')
-                if(this%is_valid_Format(Format=Format)) this%Format = Format
+                if(isSupportedDataItemFormatName(Format)) this%Format = Format
             endif
 
             if(hasAttribute(DOMNode, 'Precision')) then
                 Precision = cton(str=getAttribute(DOMNode, 'Precision'), knd=1_I4P)
-                if(this%is_valid_Precision(Precision=Precision)) this%Precision = Precision
+                if(isSupportedDataItemPrecision(Precision)) this%Precision = Precision
             endif
 
             if(hasAttribute(DOMNode, 'Dimensions')) then

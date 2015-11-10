@@ -6,9 +6,8 @@ module xdmf_time
 use IR_Precision, only: I4P, R4P, R8P, str, cton
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
-use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
-use xh5for_parameters
+use xdmf_utils
 
 implicit none
 !---------------------------------------------------------------------
@@ -27,7 +26,6 @@ implicit none
     contains
     private
         procedure         :: default_initialization => xdmf_time_default_initialization
-        procedure         :: is_valid_TimeType      => xdmf_time_is_valid_TimeType
         procedure, public :: free                   => xdmf_time_free
         procedure         :: xdmf_time_open_timetype
         procedure         :: xdmf_time_open_R4P_value
@@ -64,19 +62,6 @@ contains
     end function xdmf_time_get_Value
 
 
-    function xdmf_time_is_valid_TimeType(this, TimeType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid Grid GridType
-    !----------------------------------------------------------------- 
-        class(xdmf_time_t), intent(IN) :: this                        !< XDMF Grid type
-        character(len=*),   intent(IN) :: TimeType                    !< XDMF Grid TimeType attribute
-        logical                        :: is_valid                    !< Valid TimeType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_TIMETYPENAMES, option=TimeType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong TimeType: "'//TimeType//'" (Note: Case sensitive)')
-    end function xdmf_time_is_valid_TimeType
-
-
     subroutine xdmf_time_free(this)
     !-----------------------------------------------------------------
     !< Free XDMF Time type
@@ -109,7 +94,7 @@ contains
         call this%set_tag('Time')
 
         call xml_NewElement(xml_handler, 'Time')
-        if(PRESENT(TimeType)) then; if(this%is_valid_TimeType(TimeType)) &
+        if(PRESENT(TimeType)) then; if(isSupportedTimeTypeName(TimeType)) &
             call xml_AddAttribute(xml_handler, name="TimeType", value=TimeType)
         endif
     end subroutine xdmf_time_open_timetype
@@ -126,7 +111,7 @@ contains
         call this%set_tag('Time')
 
         call xml_NewElement(xml_handler, 'Time')
-        if(PRESENT(TimeType)) then; if(this%is_valid_TimeType(TimeType)) &
+        if(PRESENT(TimeType)) then; if(isSupportedTimeTypeName(TimeType)) &
             call xml_AddAttribute(xml_handler, name="TimeType", value=TimeType)
         endif
 
@@ -145,7 +130,7 @@ contains
         call this%set_tag('Time')
 
         call xml_NewElement(xml_handler, 'Time')
-        if(PRESENT(TimeType)) then; if(this%is_valid_TimeType(TimeType)) &
+        if(PRESENT(TimeType)) then; if(isSupportedTimeTypeName(TimeType)) &
             call xml_AddAttribute(xml_handler, name="TimeType", value=TimeType)
         endif
 
@@ -168,7 +153,7 @@ contains
 
             if(hasAttribute(DOMNode, 'TimeType')) then
                 TimeType = getAttribute(DOMNode, 'TimeType')
-                if(this%is_valid_TimeType(TimeType=TimeType)) this%TimeType = TimeType
+                if(isSupportedTimeTypeName(TimeType)) this%TimeType = TimeType
             endif
 
             if(hasAttribute(DOMNode, 'Value')) then

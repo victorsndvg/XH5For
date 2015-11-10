@@ -3,7 +3,8 @@ module xh5for_utils
 !< XH5For: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XH5For utilities
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P
+use IR_Precision, only: I4P, str
+use xdmf_utils,   only : warning_message
 use xh5for_parameters
 
 implicit none 
@@ -431,6 +432,42 @@ contains
                 NumberOfComponents = 1; return
         end select
     end function GetNumberOfComponentsFromAttributeType
+
+
+    function isSupportedStrategy(Strategy) result(supported)
+    !-----------------------------------------------------------------
+    !< Return True if is a supported Strategy
+    !----------------------------------------------------------------- 
+        integer(I4P),    intent(IN)  :: Strategy
+        logical                      :: supported
+    !----------------------------------------------------------------- 
+        supported = MINVAL(ABS(SUPPORTED_STRATEGIES - Strategy)) == 0_I4P
+        if(.not. supported) call warning_message('Not supported Strategy: "'//trim(str(no_sign=.true., n=Strategy))//'"')
+    end function isSupportedStrategy
+
+
+    function isSupportedTopologyType(TopologyType) result(supported)
+    !-----------------------------------------------------------------
+    !< Return True if is a supported topology type
+    !----------------------------------------------------------------- 
+        integer(I4P),                      intent(IN) :: TopologyType  !< XDMF Topology Type
+        logical                                       :: supported     !< Valid Topology Type confirmation flag
+    !----------------------------------------------------------------- 
+        supported = MINVAL(ABS(SUPPORTED_TOPOLOGYTYPES - TopologyType)) == 0_I4P
+        if(.not. supported) call warning_message('Not supported Topology Type: "'//trim(str(no_sign=.true., n=TopologyType))//'"')
+    end function isSupportedTopologyType
+
+
+    function isSupportedGeometryType(GeometryType) result(supported)
+    !-----------------------------------------------------------------
+    !< Return True if is a valid dataitem NumberType
+    !----------------------------------------------------------------- 
+        integer(I4P),                      intent(IN) :: GeometryType  !< XDMF Geometry Type
+        logical                                       :: supported     !< Valid Geometry Type confirmation flag
+    !----------------------------------------------------------------- 
+        supported = MINVAL(ABS(SUPPORTED_GEOMETRYTYPES - GeometryType)) == 0_I4P
+        if(.not. supported) call warning_message('Not supported Geometry Type: "'//trim(str(no_sign=.true., n=GeometryType))//'"')
+    end function isSupportedGeometryType
 
 
 end module xh5for_utils

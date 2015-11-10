@@ -6,9 +6,8 @@ module xdmf_grid
 use IR_Precision, only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
-use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
-use xh5for_parameters
+use xdmf_utils
 
 implicit none
 !---------------------------------------------------------------------
@@ -32,9 +31,6 @@ implicit none
     private
         procedure         :: xdmf_grid_open
         procedure         :: default_initialization => xdmf_grid_default_initialization
-        procedure         :: is_valid_GridType      => xdmf_grid_is_valid_GridType
-        procedure         :: is_valid_CollectionType=> xdmf_grid_is_valid_CollectionType
-        procedure         :: is_valid_Section       => xdmf_grid_is_valid_Section
         procedure         :: collectiontype_is_spatial => xdmf_grid_collectiontype_is_spatial
         procedure         :: gridtype_is_collection => xdmf_grid_gridtype_is_collection
         procedure, public :: is_spatial_collection  => xdmf_grid_is_spatial_collection
@@ -94,44 +90,6 @@ contains
     !----------------------------------------------------------------- 
         xdmf_grid_get_Section = this%Section
     end function xdmf_grid_get_Section
-
-
-    function xdmf_grid_is_valid_GridType(this, GridType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid Grid GridType
-    !----------------------------------------------------------------- 
-        class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
-        character(len=*),       intent(IN) :: GridType                !< XDMF Grid GridType attribute
-        logical                            :: is_valid                !< Valid GridType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDTYPENAMES, option=GridType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong GridType: "'//GridType//'" (Note: Case sensitive)')
-    end function xdmf_grid_is_valid_GridType
-
-
-    function xdmf_grid_is_valid_CollectionType(this, CollectionType) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid grid CollectionType
-    !----------------------------------------------------------------- 
-        class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
-        character(len=*),       intent(IN) :: CollectionType          !< XDMF Grid GridType attribute
-        logical                            :: is_valid                !< Valid GridType confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDCOLLECTIONTYPENAMES, option=CollectionType, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong CollectionType: "'//CollectionType//'" (Note: Case sensitive)')
-    end function xdmf_grid_is_valid_CollectionType
-
-    function xdmf_grid_is_valid_Section(this, Section) result(is_valid)
-    !-----------------------------------------------------------------
-    !< Return True if is a valid grid Section
-    !----------------------------------------------------------------- 
-        class(xdmf_grid_t),     intent(IN) :: this                    !< XDMF Grid type
-        character(len=*),       intent(IN) :: Section                 !< XDMF Grid Section attribute
-        logical                            :: is_valid                !< Valid Section confirmation flag
-    !----------------------------------------------------------------- 
-        is_valid = is_in_option_list(option_list=SUPPORTED_GRIDCOLLECTIONSECTIONAMES, option=Section, separator='&') 
-        if(.not. is_valid .and. this%warn) call warning_message('Wrong Section: "'//Section//'" (Note: Case sensitive)')
-    end function xdmf_grid_is_valid_Section
 
 
     function xdmf_grid_gridtype_is_collection(this)
@@ -208,18 +166,18 @@ contains
         call this%set_tag('Grid')
 
         call xml_NewElement(xml_handler, 'Grid')
-        if(PRESENT(Name))                                                      &
+        if(PRESENT(Name))  &
             call xml_AddAttribute(xml_handler, name="Name", value=Name)
 
-        if(PRESENT(GridType)) then; if(this%is_valid_GridType(GridType)) &
+        if(PRESENT(GridType)) then; if(isSupportedGridTypeName(GridType)) &
             call xml_AddAttribute(xml_handler, name="GridType", value=GridType)
         endif
 
-        if(PRESENT(CollectionType)) then; if(this%is_valid_CollectionType(CollectionType)) &
+        if(PRESENT(CollectionType)) then; if(isSupportedGridCollectionTypeName(CollectionType)) &
             call xml_AddAttribute(xml_handler, name="CollectionType", value=CollectionType)
         endif
 
-        if(PRESENT(Section)) then; if(this%is_valid_Section(Section)) &
+        if(PRESENT(Section)) then; if(isSupportedGridSectionName(Section)) &
             call xml_AddAttribute(xml_handler, name="Section", value=Section)
         endif
     end subroutine xdmf_grid_open
@@ -245,17 +203,17 @@ contains
 
             if(hasAttribute(DOMNode, 'GridType')) then
                 GridType = getAttribute(DOMNode, 'GridType')
-                if(this%is_valid_GridType(GridType=GridType)) this%GridType = GridType
+                if(isSupportedGridTypeName(GridType)) this%GridType = GridType
             endif
 
             if(hasAttribute(DOMNode, 'CollectionType')) then
                 CollectionType = getAttribute(DOMNode, 'CollectionType')
-                if(this%is_valid_CollectionType(CollectionType=CollectionType)) this%CollectionType = CollectionType
+                if(isSupportedGridCollectionTypeName(CollectionType)) this%CollectionType = CollectionType
             endif
 
             if(hasAttribute(DOMNode, 'Section')) then
                 Section = getAttribute(DOMNode, 'Section')
-                if(this%is_valid_Section(Section=Section)) this%Section = Section
+                if(isSupportedGridSectionName(Section)) this%Section = Section
             endif
         endif
     end subroutine xdmf_grid_parse
