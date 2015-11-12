@@ -48,6 +48,15 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 #################################################################
+# STATIC LIBRARIES
+#################################################################
+# Try to search first static libraries
+IF(NOT ${BUILD_SHARED_LIBS})
+    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+    SET( HDF5_USE_STATIC_LIBRARIES ON)
+ENDIF()
+
+#################################################################
 # List of external libraries
 #################################################################
 
@@ -112,7 +121,7 @@ IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
     # Add MPI directories
     ADD_DEFINITIONS(${MPI_Fortran_COMPILE_FLAGS})
     INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
-    LINK_DIRECTORIES(${MPI_Fortran_LIBRARIES})
+#    LINK_DIRECTORIES(${MPI_Fortran_LIBRARIES})
 ENDIF()
 
 #################################################################
@@ -148,7 +157,7 @@ ELSEIF (${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel" OR Fortran_COMPILER_NAME M
 
 ELSEIF (${CMAKE_Fortran_COMPILER_ID} STREQUAL "XL" OR Fortran_COMPILER_NAME MATCHES "xlf*")
   # xlf (untested)
-  set(FORTRAN_FLAGS "-q64 -qrealsize=8 -qsuffix=f=f90:cpp=f90 ${EXTRA_FLAGS} ")
+  set(FORTRAN_FLAGS "-q64 -qrealsize=8 -qsuffix=f=f90:cpp=f90 -qxlf2003=polymorphic -Wl,-dy ${EXTRA_FLAGS} ")
   set (CMAKE_Fortran_FLAGS "${FORTRAN_FLAGS} ${MACROS} ${INCLUDES}" CACHE STRING "" FORCE)
   set (CMAKE_Fortran_FLAGS_RELEASE "-O3 -qstrict ${EXTRA_FLAGS} " CACHE STRING "" FORCE)
   set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g -qfullpath -qkeepparm ${EXTRA_FLAGS} " CACHE STRING "" FORCE)
@@ -173,15 +182,6 @@ message (STATUS "CMAKE_Fortran_FLAGS_DEBUG: " ${CMAKE_Fortran_FLAGS_DEBUG})
 SET(BUILDNAME ${CMAKE_Fortran_COMPILER_ID}_${CMAKE_BUILD_TYPE}_MKL=${${PROJECT_NAME}_ENABLE_MKL} CACHE STRING "" )
 ENABLE_TESTING()
 INCLUDE(CTest)
-
-#################################################################
-# STATIC LIBRARIES
-#################################################################
-# Try to search first static libraries
-IF(NOT ${BUILD_SHARED_LIBS})
-    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a ${CMAKE_FIND_LIBRARY_SUFFIXES}")
-ENDIF()
-
 
 #################################################################
 # Add external projects
