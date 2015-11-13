@@ -446,6 +446,18 @@ contains
     end function isSupportedStrategy
 
 
+    function isSupportedGridType(GridType) result(supported)
+    !-----------------------------------------------------------------
+    !< Return True if is a supported GridType
+    !----------------------------------------------------------------- 
+        integer(I4P),    intent(IN)  :: GridType
+        logical                      :: supported
+    !----------------------------------------------------------------- 
+        supported = MINVAL(ABS(SUPPORTED_GRIDTYPES - GridType)) == 0_I4P
+        if(.not. supported) call warning_message('Not supported Grid Type: "'//trim(str(no_sign=.true., n=GridType))//'"')
+    end function isSupportedGridType
+
+
     function isSupportedTopologyType(TopologyType) result(supported)
     !-----------------------------------------------------------------
     !< Return True if is a supported topology type

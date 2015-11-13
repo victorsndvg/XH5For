@@ -14,11 +14,12 @@ implicit none
 
     type :: xh5for_t
     private
-        integer(I4P)                         :: Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
-        integer(I4P)                         :: Action   = XDMF_ACTION_WRITE
-        type(mpi_env_t)                      :: MPIEnvironment
-        type(uniform_grid_descriptor_t)      :: UniformGridDescriptor
-        type(spatial_grid_descriptor_t)      :: SpatialGridDescriptor
+        integer(I4P)                                  :: Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
+        integer(I4P)                                  :: GridType = XDMF_GRID_TYPE_UNSTRUCTURED
+        integer(I4P)                                  :: Action   = XDMF_ACTION_WRITE
+        type(mpi_env_t)                               :: MPIEnvironment
+        class(uniform_grid_descriptor_t), allocatable :: UniformGridDescriptor
+        class(spatial_grid_descriptor_t), allocatable :: SpatialGridDescriptor
         class(xh5for_handler_t), allocatable :: Handler
     contains
     private
@@ -42,6 +43,7 @@ implicit none
         procedure         :: xh5for_ReadAttribute_R4P
         procedure         :: xh5for_ReadAttribute_R8P
         procedure, public :: SetStrategy           => xh5for_SetStrategy
+        procedure, public :: SetGridType           => xh5for_SetGridType
         generic,   public :: Initialize            => xh5for_Initialize_Writer_I4P, &
                                                       xh5for_Initialize_Writer_I8P, &
                                                       xh5for_Initialize_Reader
@@ -81,6 +83,17 @@ contains
     end subroutine xh5for_SetStrategy
 
 
+    subroutine xh5for_SetGridType(this, GridType)
+    !----------------------------------------------------------------- 
+    !< Set the strategy of data handling
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT)  :: this
+        integer(I4P),    intent(IN)     :: GridType
+    !----------------------------------------------------------------- 
+        if(isSupportedGridType(GridType)) this%GridType = GridType
+    end subroutine xh5for_SetGridType
+
+
     subroutine xh5for_Free(this)
     !----------------------------------------------------------------- 
     !< Free XH5For derived type
@@ -90,8 +103,14 @@ contains
         if(allocated(this%Handler)) call this%Handler%Free()
         this%Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
         call this%MPIEnvironment%Free()
-        call this%UniformGridDescriptor%Free()
-        call this%SpatialGridDescriptor%Free()
+        if(allocated(this%UniformGridDescriptor)) then
+            call this%UniformGridDescriptor%Free()
+            deallocate(this%UniformGridDescriptor)
+        endif
+        if(allocated(this%SpatialGridDescriptor)) then
+            call this%SpatialGridDescriptor%Free()
+            deallocate(this%SpatialGridDescriptor)
+        endif
     end subroutine xh5for_Free
 
 
@@ -115,6 +134,9 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
+        ! Grid descriptors allocation
+        allocate(this%UniformGridDescriptor)
+        allocate(this%SpatialGridDescriptor)
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Get the concrete handler
@@ -152,6 +174,9 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
+        ! Grid descriptors allocation
+        allocate(this%UniformGridDescriptor)
+        allocate(this%SpatialGridDescriptor)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
                 NumberOfNodes = int(NumberOfNodes,I8P),       &
@@ -200,6 +225,9 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
+        ! Grid descriptors allocation
+        allocate(this%UniformGridDescriptor)
+        allocate(this%SpatialGridDescriptor)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(  &
                 NumberOfNodes = NumberOfNodes,       &

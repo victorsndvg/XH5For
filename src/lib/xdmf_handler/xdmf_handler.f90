@@ -20,14 +20,13 @@ private
     !-----------------------------------------------------------------
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
-        character(len=:),            allocatable :: prefix                          !< Name prefix of the XDMF file
-        character(len=4)                         :: ext = '.xmf'                    !< XDMF file extension
-        type(xdmf_file_t)                        :: file                            !< XDMF file handler
-        integer(I4P)                             :: action                          !< XDMF purpose (Read or Write)
-        type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
-        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
-        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
-        logical                                  :: warn = .true.                   !< Flag to show warnings on screen
+        character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
+        character(len=4)                          :: ext = '.xmf'                    !< XDMF file extension
+        type(xdmf_file_t)                         :: file                            !< XDMF file handler
+        integer(I4P)                              :: action                          !< XDMF purpose (Read or Write)
+        type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
     contains
     private
         procedure(xdmf_handler_SetGeometry_R4P),     deferred :: SetGeometry_R4P

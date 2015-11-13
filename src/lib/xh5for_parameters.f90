@@ -128,4 +128,11 @@ implicit none
                                                                 XDMF_TOPOLOGY_TYPE_MIXED            &
                                                              /)
 
+    integer(I4P), parameter :: SUPPORTED_GRIDTYPES(*)  = (/ &
+                                                            XDMF_GRID_TYPE_CURVILINEAR , &
+                                                            XDMF_GRID_TYPE_RECTILINEAR , &
+                                                            XDMF_GRID_TYPE_REGULAR     , &
+                                                            XDMF_GRID_TYPE_UNSTRUCTURED  &
+                                                         /)
+
 end module xh5for_parameters

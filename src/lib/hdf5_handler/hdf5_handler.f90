@@ -23,13 +23,13 @@ private
     !-----------------------------------------------------------------
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
-        character(len=:),            allocatable :: prefix                          !< Name prefix of the HDF5 file
-        character(len=3)                         :: ext = '.h5'                     !< HDF5 file extension
-        integer(HID_T)                           :: file_id                         !< File identifier 
-        integer(I4P)                             :: action                          !< HDF5 action to be perfomed (Read or Write)
-        type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
-        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
-        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
+        character(len=:),             allocatable :: prefix                          !< Name prefix of the HDF5 file
+        character(len=3)                          :: ext = '.h5'                     !< HDF5 file extension
+        integer(HID_T)                            :: file_id                         !< File identifier 
+        integer(I4P)                              :: action                          !< HDF5 action to be perfomed (Read or Write)
+        type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
     contains
         procedure(hdf5_handler_WriteGeometry_R4P),  deferred :: WriteGeometry_R4P
         procedure(hdf5_handler_WriteGeometry_R8P),  deferred :: WriteGeometry_R8P

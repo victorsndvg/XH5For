@@ -61,10 +61,10 @@ private
             import mpi_env_t 
             import uniform_grid_descriptor_t 
             import spatial_grid_descriptor_t 
-            class(xh5for_handler_t),                 intent(INOUT) :: this
-            type(mpi_env_t),                 target, intent(IN)    :: MPIEnvironment        !< MPI environment 
-            type(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
-            type(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
+            class(xh5for_handler_t),                  intent(INOUT) :: this
+            type(mpi_env_t),                  target, intent(IN)    :: MPIEnvironment        !< MPI environment 
+            class(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+            class(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
         end subroutine xh5for_handler_Initialize
 
         subroutine xh5for_handler_Free(this)

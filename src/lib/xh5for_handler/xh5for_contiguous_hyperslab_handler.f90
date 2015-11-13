@@ -45,10 +45,10 @@ contains
     !-----------------------------------------------------------------
     !< XH5FOR initialization procedure
     !----------------------------------------------------------------- 
-        class(xh5for_contiguous_hyperslab_handler_t), intent(INOUT) :: this                  !< XH5For contiguous hyperslab handler
-        type(mpi_env_t),                 target,      intent(IN)    :: MPIEnvironment        !< MPI environment 
-        type(uniform_grid_descriptor_t), target,      intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
-        type(spatial_grid_descriptor_t), target,      intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(xh5for_contiguous_hyperslab_handler_t),  intent(INOUT) :: this                  !< XH5For contiguous hyperslab handler
+        type(mpi_env_t),                  target,      intent(IN)    :: MPIEnvironment        !< MPI environment 
+        class(uniform_grid_descriptor_t), target,      intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor
+        class(spatial_grid_descriptor_t), target,      intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         call this%Free()
         ! Light data initialization
