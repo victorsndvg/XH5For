@@ -38,6 +38,11 @@ private
 
 public :: hdf5_contiguous_hyperslab_handler_t
 
+#ifndef ENABLE_HDF5
+public :: HID_T
+public :: HSIZE_T
+#endif
+
 contains
 
 
