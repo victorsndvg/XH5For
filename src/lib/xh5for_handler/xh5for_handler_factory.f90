@@ -3,7 +3,7 @@ module xh5for_handler_factory
 use IR_Precision, only: I4P
 use xh5for_parameters
 use xh5for_handler
-use xh5for_contiguous_hyperslab_handler
+use xh5for_unstructured_contiguous_hyperslab_handler
 
 implicit none
 private
@@ -25,10 +25,10 @@ contains
 
         select case(Strategy)
             case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-                allocate(xh5for_contiguous_hyperslab_handler_t::Handler)
+                allocate(xh5for_unstructured_contiguous_hyperslab_handler_t::Handler)
 
             case default
-                allocate(xh5for_contiguous_hyperslab_handler_t::Handler)
+                allocate(xh5for_unstructured_contiguous_hyperslab_handler_t::Handler)
         end select 
     end subroutine
 

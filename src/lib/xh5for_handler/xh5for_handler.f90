@@ -12,6 +12,8 @@ implicit none
 private
 
     type, abstract :: xh5for_handler_t
+        class(xdmf_handler_t), allocatable :: LightData
+        class(hdf5_handler_t), allocatable :: HeavyData
     contains
     private
         procedure(xh5for_handler_WriteGeometry_R4P),       deferred :: WriteGeometry_R4P

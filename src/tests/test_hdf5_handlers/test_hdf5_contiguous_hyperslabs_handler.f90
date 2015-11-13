@@ -2,7 +2,7 @@ program test_xdmf_hyperslabs_handler
 
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
-use hdf5_contiguous_hyperslab_handler
+use hdf5_unstructured_contiguous_hyperslab_handler
 use mpi_environment
 use spatial_grid_descriptor
 use uniform_grid_descriptor
@@ -17,13 +17,13 @@ use uniform_grid_descriptor
 
 implicit none
 
-    type(mpi_env_t)                           :: mpienv
-    type(spatial_grid_descriptor_t)           :: spatialgrid
-    type(uniform_grid_descriptor_t)           :: uniformgrid
-    type(hdf5_contiguous_hyperslab_handler_t) :: heavydata
-    real(R8P), dimension(8)                   :: trianglegeometry = (/0.0,0.0, 1.0,0.0, 0.0,1.0, 1.1,1.1/)
-    integer(I4P), dimension(6)                :: triangletopology = (/0,1,2,1,2,3/)
-    integer         :: mpierr, i
+    type(mpi_env_t)                                        :: mpienv
+    type(spatial_grid_descriptor_t)                        :: spatialgrid
+    type(uniform_grid_descriptor_t)                        :: uniformgrid
+    type(hdf5_unstructured_contiguous_hyperslab_handler_t) :: heavydata
+    real(R8P), dimension(8)                                :: trianglegeometry = (/0.0,0.0, 1.0,0.0, 0.0,1.0, 1.1,1.1/)
+    integer(I4P), dimension(6)                             :: triangletopology = (/0,1,2,1,2,3/)
+    integer                                                :: mpierr, i
 
 #ifdef ENABLE_MPI
     call MPI_INIT(mpierr)
