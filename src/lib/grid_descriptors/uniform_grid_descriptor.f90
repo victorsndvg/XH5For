@@ -17,7 +17,7 @@ private
         integer(I4P)                          :: GridType         = XDMF_NO_VALUE
         integer(I8P)                          :: NumberOfNodes    = XDMF_NO_VALUE
         integer(I8P)                          :: NumberOfElements = XDMF_NO_VALUE
-        integer(I8P)                          :: ConnectivitySize = XDMF_NO_VALUE
+        integer(I8P)                          :: TopologySize     = XDMF_NO_VALUE
         integer(I4P)                          :: NumberOfAttributes = 0
         type(xh5for_metadata_t)               :: GeometryMetadata
         type(xh5for_metadata_t)               :: TopologyMetadata
@@ -30,14 +30,14 @@ private
         procedure, public :: SetGridType                 => uniform_grid_descriptor_SetGridType
         procedure, public :: SetNumberOfNodes            => uniform_grid_descriptor_SetNumberOfNodes
         procedure, public :: SetNumberOfElements         => uniform_grid_descriptor_SetNumberOfElements
-        procedure, public :: SetConnectivitySize         => uniform_grid_descriptor_SetConnectivitySize
+        procedure, public :: SetTopologySize             => uniform_grid_descriptor_SetTopologySize
         procedure, public :: SetTopologyType             => uniform_grid_descriptor_SetTopologyType
         procedure, public :: SetGeometryType             => uniform_grid_descriptor_SetGeometryType
         procedure, public :: GetGridType                 => uniform_grid_descriptor_GetGridType
         procedure, public :: GetNumberOfNodes            => uniform_grid_descriptor_GetNumberOfNodes
         procedure, public :: GetNumberOfAttributes       => uniform_grid_descriptor_GetNumberOfAttributes
         procedure, public :: GetNumberOfElements         => uniform_grid_descriptor_GetNumberOfElements
-        procedure, public :: GetConnectivitySize         => uniform_grid_descriptor_GetConnectivitySize
+        procedure, public :: GetTopologySize             => uniform_grid_descriptor_GetTopologySize
         procedure, public :: GetTopologyName             => uniform_grid_descriptor_GetTopologyName
         procedure, public :: GetTopologyType             => uniform_grid_descriptor_GetTopologyType
         procedure, public :: GetTopologyPrecision        => uniform_grid_descriptor_GetTopologyPrecision
@@ -95,15 +95,15 @@ contains
     end subroutine uniform_grid_descriptor_SetNumberOfElements
 
 
-    subroutine uniform_grid_descriptor_SetConnectivitySize(this, ConnectivitySize)
+    subroutine uniform_grid_descriptor_SetTopologySize(this, TopologySize)
     !-----------------------------------------------------------------
     !< Set the size of the connectivities array
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
-        integer(I8P),                     intent(IN)    :: ConnectivitySize !< Size of the array of connectivities
+        integer(I8P),                     intent(IN)    :: TopologySize !< Size of the array of connectivities
     !-----------------------------------------------------------------
-        this%ConnectivitySize = ConnectivitySize
-    end subroutine uniform_grid_descriptor_SetConnectivitySize
+        this%TopologySize = TopologySize
+    end subroutine uniform_grid_descriptor_SetTopologySize
 
 
     function uniform_grid_descriptor_GetGridType(this)
@@ -150,15 +150,15 @@ contains
     end function uniform_grid_descriptor_GetNumberOfElements
 
 
-    function uniform_grid_descriptor_GetConnectivitySize(this) result(ConnectivitySize)
+    function uniform_grid_descriptor_GetTopologySize(this) result(TopologySize)
     !-----------------------------------------------------------------
     !< Get the size of the connectivities array
     !----------------------------------------------------------------- 
         class(uniform_grid_descriptor_t), intent(INOUT) :: this             !< Local grid descriptor
-        integer(I8P)                                    :: ConnectivitySize !< Size of the array of connectivities
+        integer(I8P)                                    :: TopologySize !< Size of the array of connectivities
     !-----------------------------------------------------------------
-        ConnectivitySize = this%ConnectivitySize 
-    end function uniform_grid_descriptor_GetConnectivitySize
+        TopologySize = this%TopologySize 
+    end function uniform_grid_descriptor_GetTopologySize
 
 
     subroutine uniform_grid_descriptor_SetTopologyType(this, TopologyType)

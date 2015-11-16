@@ -390,8 +390,6 @@ contains
         integer(I4P),               intent(IN)    :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)
@@ -410,8 +408,6 @@ contains
         integer(I8P),               intent(IN)    :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)

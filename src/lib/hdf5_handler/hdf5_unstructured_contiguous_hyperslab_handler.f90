@@ -170,24 +170,24 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
         integer(I4P),                               intent(IN) :: Connectivities(:)      !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=this%MPIEnvironment%get_rank())
+        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize = int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
 
         call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
+                DatasetDims     = (/GlobalTopologySize/), &
+                HyperSlabOffset = (/TopologySizeOffset/), &
+                HyperSlabSize   = (/LocalTopologySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_WriteTopology_I4P
@@ -200,23 +200,23 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
         integer(I8P),                               intent(IN) :: Connectivities(:)      !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=this%MPIEnvironment%get_rank())
+        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize = int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
+                DatasetDims     = (/GlobalTopologySize/), &
+                HyperSlabOffset = (/TopologySizeOffset/), &
+                HyperSlabSize   = (/LocalTopologySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_WriteTopology_I8P
@@ -423,21 +423,21 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
         integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize =  int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize  =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,           &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
+                DatasetDims     = (/GlobalTopologySize/), &
+                HyperSlabOffset = (/TopologySizeOffset/), &
+                HyperSlabSize   = (/LocalTopologySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_ReadTopology_I4P
@@ -450,21 +450,21 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
         integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize =  int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,           &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
+                DatasetDims     = (/GlobalTopologySize/), &
+                HyperSlabOffset = (/TopologySizeOffset/), &
+                HyperSlabSize   = (/LocalTopologySize/),  &
                 Values          = Connectivities)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_ReadTopology_I8P

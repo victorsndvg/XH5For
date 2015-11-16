@@ -113,7 +113,7 @@ contains
         DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
         call DataItem%Parse(DomNode = DataItemNode)
         auxDims = DataItem%get_Dimensions()
-        call this%SpatialGridDescriptor%SetConnectivitySizePerGridID(AuxDims(1),ID=ID)
+        call this%SpatialGridDescriptor%SetTopologySizePerGridID(AuxDims(1),ID=ID)
         ! Free
         call Topology%Free()
         call DataItem%Free()
@@ -239,14 +239,14 @@ contains
         if(this%MPIEnvironment%is_root()) then
             if(present(GridID)) then
                 LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=GridID)
             else
                 LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
                 Start = 0
             endif
-            GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalConnectivitySize()
+            GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalTopologySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            Count = this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=GridID)
+            Count = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID)
 
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
