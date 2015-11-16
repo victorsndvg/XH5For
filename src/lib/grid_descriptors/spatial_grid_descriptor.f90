@@ -13,7 +13,7 @@ implicit none
 
 private
 
-    type spatial_grid_attribute_t
+    type, abstract :: spatial_grid_attribute_t
         integer(I4P)                          :: NumberOfAttributes = 0
         type(xh5for_metadata_t),  allocatable :: attributes_info(:)
     end type spatial_grid_attribute_t

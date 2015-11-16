@@ -237,10 +237,10 @@ contains
     !-----------------------------------------------------------------
     !< Initialize the HDF5 handler
     !----------------------------------------------------------------- 
-        class(hdf5_handler_t),                   intent(INOUT) :: this                  !< HDF5 handler type
-        type(mpi_env_t),                 target, intent(IN)    :: MPIEnvironment        !< MPI environment
-        type(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor 
-        type(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_handler_t),                    intent(INOUT) :: this                  !< HDF5 handler type
+        type(mpi_env_t),                  target, intent(IN)    :: MPIEnvironment        !< MPI environment
+        class(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor 
+        class(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         this%MPIEnvironment        => MPIEnvironment
         this%SpatialGridDescriptor => SpatialGridDescriptor

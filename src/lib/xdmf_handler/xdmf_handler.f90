@@ -151,8 +151,8 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_handler_t),                   intent(INOUT) :: this               !< XMDF handler
         type(mpi_env_t),                 target, intent(IN) :: MPIEnvironment        !< MPI environment
-        type(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
-        type(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
+        class(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
+        class(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
         call this%Free()
         this%MPIEnvironment        => MPIEnvironment

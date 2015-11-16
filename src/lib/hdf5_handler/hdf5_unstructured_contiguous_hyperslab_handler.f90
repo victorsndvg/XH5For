@@ -178,6 +178,8 @@ contains
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
         LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
@@ -206,6 +208,8 @@ contains
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
+        call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
         LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)

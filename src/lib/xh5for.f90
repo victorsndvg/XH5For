@@ -1,12 +1,13 @@
 module xh5for
 
-use xh5for_handler
 use mpi_environment
 use xh5for_utils
 use xh5for_parameters
-use xh5for_handler_factory
 use uniform_grid_descriptor
 use spatial_grid_descriptor
+use xdmf_handler
+use hdf5_handler
+use unstructured_contiguous_hyperslab_factory
 use IR_Precision, only: I4P, I8P, str
 
 
@@ -20,7 +21,8 @@ implicit none
         type(mpi_env_t)                               :: MPIEnvironment
         class(uniform_grid_descriptor_t), allocatable :: UniformGridDescriptor
         class(spatial_grid_descriptor_t), allocatable :: SpatialGridDescriptor
-        class(xh5for_handler_t), allocatable :: Handler
+        class(xdmf_handler_t),            allocatable :: LightData
+        class(hdf5_handler_t),            allocatable :: HeavyData
     contains
     private
         procedure         :: xh5for_Initialize_Reader
@@ -100,7 +102,6 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this
     !----------------------------------------------------------------- 
-        if(allocated(this%Handler)) call this%Handler%Free()
         this%Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
         call this%MPIEnvironment%Free()
         if(allocated(this%UniformGridDescriptor)) then
@@ -110,6 +111,14 @@ contains
         if(allocated(this%SpatialGridDescriptor)) then
             call this%SpatialGridDescriptor%Free()
             deallocate(this%SpatialGridDescriptor)
+        endif
+        if(allocated(this%LightData)) then
+            call this%LightData%Free()
+            deallocate(this%LightData)
+        endif
+        if(allocated(this%HeavyData)) then
+            call this%HeavyData%Free()
+            deallocate(this%HeavyData)
         endif
     end subroutine xh5for_Free
 
@@ -121,7 +130,6 @@ contains
         class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
         integer, optional, intent(IN)     :: comm                     !< MPI communicator
         integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
@@ -134,19 +142,22 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
-        ! Grid descriptors allocation
-        allocate(this%UniformGridDescriptor)
-        allocate(this%SpatialGridDescriptor)
-        ! Spatial grid descriptor initialization
+        ! Build components from factory
+        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
+        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
-        ! Get the concrete handler
-        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
-        ! XH5For handler initialization
-        call this%Handler%Initialize(                             &
-                MPIEnvironment=this%MPIEnvironment,               &
-                SpatialGridDescriptor=this%SpatialGridDescriptor, &
-                UniformGridDescriptor=this%UniformGridDescriptor)
-
+        ! Light data initialization
+        call this%LightData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+        ! Heavy data initialization
+        call this%HeavyData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Reader
 
 
@@ -161,7 +172,6 @@ contains
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
         integer, optional, intent(IN)     :: comm                     !< MPI communicator
         integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
@@ -174,30 +184,35 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
-        ! Grid descriptors allocation
-        allocate(this%UniformGridDescriptor)
-        allocate(this%SpatialGridDescriptor)
+        ! Build components from factory
+        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
+        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
-                NumberOfNodes = int(NumberOfNodes,I8P),       &
+                NumberOfNodes    = int(NumberOfNodes,I8P),    &
                 NumberOfElements = int(NumberOfElements,I8P), &
-                TopologyType = TopologyType,                  &
-                GeometryType = GeometryType)
+                TopologyType     = TopologyType,              &
+                GeometryType     = GeometryType)
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(            &
-                MPIEnvironment = this%MPIEnvironment,          &
-                NumberOfNodes = int(NumberOfNodes,I8P),        &
+                MPIEnvironment   = this%MPIEnvironment,        &
+                NumberOfNodes    = int(NumberOfNodes,I8P),     &
                 NumberOfElements = int(NumberOfElements,I8P),  &
-                TopologyType = TopologyType,                   &
-                GeometryType = GeometryType)
-        ! Get the concrete handler
-        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
-        ! XH5For handler initialization
-        call this%Handler%Initialize(                             &
-                MPIEnvironment=this%MPIEnvironment,               &
-                SpatialGridDescriptor=this%SpatialGridDescriptor, &
-                UniformGridDescriptor=this%UniformGridDescriptor)
-
+                TopologyType     = TopologyType,               &
+                GeometryType     = GeometryType)
+        ! Light data initialization
+        call this%LightData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+        ! Heavy data initialization
+        call this%HeavyData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Writer_I4P
 
 
@@ -212,7 +227,6 @@ contains
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
         integer, optional, intent(IN)     :: comm                     !< MPI communicator
         integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        type(xh5for_handler_factory_t)    :: XH5ForHandlerFactory     !< Handler factory to get the concrete strategy implementation
         integer                           :: error                    !< Error variable
         integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
@@ -225,29 +239,35 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
-        ! Grid descriptors allocation
-        allocate(this%UniformGridDescriptor)
-        allocate(this%SpatialGridDescriptor)
+        ! Build components from factory
+        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
+        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
-        call this%UniformGridDescriptor%Initialize(  &
-                NumberOfNodes = NumberOfNodes,       &
-                NumberOfElements = NumberOfElements, &
-                TopologyType = TopologyType,         &
-                GeometryType = GeometryType)
+        call this%UniformGridDescriptor%Initialize(           &
+                NumberOfNodes    = int(NumberOfNodes,I8P),    &
+                NumberOfElements = int(NumberOfElements,I8P), &
+                TopologyType     = TopologyType,              &
+                GeometryType     = GeometryType)
         ! Spatial grid descriptor initialization
-        call this%SpatialGridDescriptor%Initialize(&
-                MPIEnvironment = this%MPIEnvironment, &
-                NumberOfNodes = NumberOfNodes,        &
-                NumberOfElements = NumberOfElements,  &
-                TopologyType = TopologyType,          &
-                GeometryType = GeometryType)
-        ! Get the concrete handler
-        call XH5ForHandlerFactory%GetHandler(Strategy=this%Strategy, Handler=this%Handler)
-        ! XH5For handler initialization
-        call this%Handler%Initialize(                              &
-                MPIEnvironment=this%MPIEnvironment,               &
-                SpatialGridDescriptor=this%SpatialGridDescriptor, &
-                UniformGridDescriptor=this%UniformGridDescriptor)
+        call this%SpatialGridDescriptor%Initialize(           &
+                MPIEnvironment   = this%MPIEnvironment,       &
+                NumberOfNodes    = int(NumberOfNodes,I8P),    &
+                NumberOfElements = int(NumberOfElements,I8P), &
+                TopologyType     = TopologyType,              &
+                GeometryType     = GeometryType)
+        ! Light data initialization
+        call this%LightData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+        ! Heavy data initialization
+        call this%HeavyData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Writer_I8P
 
 
@@ -260,7 +280,8 @@ contains
         integer(I4P), optional, intent(IN)    :: action               !< XDMF Open file action (Read or Write)
     !-----------------------------------------------------------------
         if(present(action)) this%action = action
-        call this%Handler%Open(action=this%action, fileprefix=fileprefix)
+        call this%HeavyData%OpenFile(action=this%action, fileprefix=fileprefix)
+        call this%LightData%OpenFile(action=this%action, fileprefix=fileprefix)
     end subroutine xh5for_Open
 
 
@@ -270,7 +291,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        if(this%Action == XDMF_ACTION_READ) call this%Handler%Parse()
+        if(this%Action == XDMF_ACTION_READ) call this%LightData%ParseFile()
     end subroutine xh5for_Parse
 
 
@@ -280,7 +301,12 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        call this%Handler%Close(action = this%action)
+        call this%HeavyData%CloseFile()
+        if(this%action == XDMF_ACTION_WRITE) then
+            !< XDMF deferred writing when hdf5 closes    
+            call this%LightData%Serialize()
+            call this%LightData%CloseFile()
+        endif
     end subroutine xh5for_Close
 
 
@@ -293,9 +319,11 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
+            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = Name)
         else
-            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
         endif
     end subroutine xh5for_WriteGeometry_R4P
 
@@ -309,9 +337,11 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
+            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = Name)
         else
-            call this%Handler%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
         endif
     end subroutine xh5for_WriteGeometry_R8P
 
@@ -325,9 +355,11 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name = Name )
+            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
         else
-            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name ='Coordinates')
+            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
         endif
     end subroutine xh5for_ReadGeometry_R4P
 
@@ -341,11 +373,12 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name = Name )
+            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
         else
-            call this%Handler%ReadGeometry(Coordinates = Coordinates, Name ='Coordinates')
+            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
         endif
-
     end subroutine xh5for_ReadGeometry_R8P
 
 
@@ -360,9 +393,11 @@ contains
         call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
         call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
-            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
+            call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)
         else
-            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
     end subroutine xh5for_WriteTopology_I4P
 
@@ -378,9 +413,11 @@ contains
         call this%UniformGridDescriptor%SetConnectivitySize(int(size(connectivities,dim=1),I8P))
         call this%SpatialGridDescriptor%AllgatherConnectivitySize(int(size(connectivities,dim=1),I8P))
         if(present(Name)) then
-            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = Name)
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
+            call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)
         else
-            call this%Handler%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
     end subroutine xh5for_WriteTopology_I8P
 
@@ -394,9 +431,11 @@ contains
         character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = Name)
+            call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
         else
-            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
     end subroutine xh5for_ReadTopology_I4P
 
@@ -410,9 +449,11 @@ contains
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = Name)
+            call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
         else
-            call this%Handler%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
+            call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
     end subroutine xh5for_ReadTopology_I8P
 
@@ -427,7 +468,8 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I4P
 
 
@@ -441,7 +483,8 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I8P
 
 
@@ -455,7 +498,8 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R4P
 
 
@@ -469,7 +513,8 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R8P
 
 
@@ -483,7 +528,8 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_I4P
 
 
@@ -497,7 +543,8 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_I8P
 
 
@@ -511,7 +558,8 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_R4P
 
 
@@ -525,7 +573,8 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
     !-----------------------------------------------------------------
-        call this%Handler%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_R8P
 
 end module xh5for
