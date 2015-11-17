@@ -23,11 +23,13 @@ private
     !----------------------------------------------------------------- 
     contains
     private
-        procedure         :: SetGeometry_R4P              => xdmf_unst_contiguous_hyperslab_SetGeometry_R4P
-        procedure         :: SetGeometry_R8P              => xdmf_unst_contiguous_hyperslab_SetGeometry_R8P
+        procedure         :: SetGeometry_R4P          => xdmf_unst_contiguous_hyperslab_SetGeometry_R4P
+        procedure         :: SetGeometry_R8P          => xdmf_unst_contiguous_hyperslab_SetGeometry_R8P
         procedure         :: SetTopology_I4P              => xdmf_unst_contiguous_hyperslab_SetTopology_I4P
         procedure         :: SetTopology_I8P              => xdmf_unst_contiguous_hyperslab_SetTopology_I8P
         procedure         :: WriteGeometry                => xdmf_unst_contiguous_hyperslab_WriteGeometry
+        procedure         :: WriteGeometry_XYZ            => xdmf_unst_contiguous_hyperslab_WriteGeometry_XYZ
+        procedure         :: WriteGeometry_X_Y_Z          => xdmf_unst_contiguous_hyperslab_WriteGeometry_X_Y_Z
         procedure         :: WriteTopology                => xdmf_unst_contiguous_hyperslab_WriteTopology
         procedure         :: FillSpatialGridTopology      => xdmf_unst_contiguous_hyperslab_FillSpatialGridTopology
         procedure         :: FillSpatialGridGeometry      => xdmf_unst_contiguous_hyperslab_FillSpatialGridGeometry
@@ -39,25 +41,25 @@ public :: xdmf_unstructured_contiguous_hyperslab_handler_t
 
 contains
 
-    subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R4P(this, Coordinates, Name)
+    subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R4P(this, XYZ, Name)
     !-----------------------------------------------------------------
     !< Add R4P geometry info to the handler. Used for deferred writing 
     !----------------------------------------------------------------- 
-        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
-        real(R4P),                                  intent(IN)    :: Coordinates(:)    !< Grid coordinates
-        character(len=*),                           intent(IN)    :: Name              !< Topology name
+        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler for Unstructured Grids
+        real(R4P),                                               intent(IN)    :: XYZ(:) !< Grid coordinates
+        character(len=*),                                        intent(IN)    :: Name   !< Topology name
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%SetGeometryMetadata(Name = Name, Precision=4, ArrayDimensions=1)
     end subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R4P
 
 
-    subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R8P(this, Coordinates, Name)
+    subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R8P(this, XYZ, Name)
     !-----------------------------------------------------------------
     !< Add R8P geometry info to the handler. Used in deferred writing 
     !----------------------------------------------------------------- 
-        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
-        real(R8P),                                  intent(IN)    :: Coordinates(:)    !< Grid coordinates
-        character(len=*),                           intent(IN)    :: Name              !< Geometry name
+        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler for Unstructured Grids
+        real(R8P),                                               intent(IN)    :: XYZ(:) !< Grid coordinates
+        character(len=*),                                        intent(IN)    :: Name   !< Geometry name
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%SetGeometryMetadata(Name=Name, Precision=8, ArrayDimensions=1)
     end subroutine xdmf_unst_contiguous_hyperslab_SetGeometry_R8P
@@ -134,18 +136,24 @@ contains
         type(Node), pointer                                       :: DataItemNode      !< Fox DOM Dataitem node
         integer(I8P)                                              :: auxDims(1)        !< Aux dimensions variable
         integer(I4P)                                              :: spacedims         !< Space dimensions
+        integer(I4P)                                              :: GeometryType      !< GeometryType
     !----------------------------------------------------------------- 
         if(.not. associated(GeometryNode)) return
         call Geometry%Parse(DOMNode = GeometryNode)
         ! Set GeometryType
-        call this%SpatialGridDescriptor%SetGeometryTypePerGridID(&
-                    GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()),ID=ID)
+        GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType())
+        call this%SpatialGridDescriptor%SetGeometryTypePerGridID(GeometryType,ID=ID)
         ! Set NumberOfNodes
         DataItemNode => this%GetFirstChildByTag(FatherNode = GeometryNode, Tag = 'DataItem')
         call DataItem%Parse(DomNode = DataItemNode)
         auxDims = DataItem%get_Dimensions()
         spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
-        call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
+        select case (GeometryType)
+            case (XDMF_GEOMETRY_TYPE_XY, XDMF_GEOMETRY_TYPE_XYZ)
+                call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
+            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
+                call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1),ID=ID)
+        end select
         ! Free
         nullify(DataItemNode)
         call Geometry%Free()
@@ -283,6 +291,22 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
         integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+    !----------------------------------------------------------------- 
+        select case(this%UniformGridDescriptor%GetGeometryType())
+            case (XDMF_GEOMETRY_TYPE_XY, XDMF_GEOMETRY_TYPE_XYZ)
+                call this%WriteGeometry_XYZ(GridID=GridID)
+            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
+                call this%WriteGeometry_X_Y_Z(GridID=GridID)
+        end select
+    end subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry
+
+
+    subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry_XYZ(this, GridID)
+    !-----------------------------------------------------------------
+    !< Write a XDMF XY[Z] Geometry into a opened file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
+        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry                     !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                     !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                     !< XDMF Character Data type
@@ -330,6 +354,114 @@ contains
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
         endif                    
-    end subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry
+    end subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry_XYZ
+
+
+    subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry_X_Y_Z(this, GridID)
+    !-----------------------------------------------------------------
+    !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
+        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+        type(xdmf_geometry_t)                          :: geometry                     !< XDMF Geometry type
+        type(xdmf_dataitem_t)                          :: dataitem                     !< XDMF Dataitem ttype
+        type(xdmf_character_data_t)                    :: chardata                     !< XDMF Character Data type
+        integer(I8P)                                   :: LocalNumberOfNodes           !< Number of nodes of the uniform grid
+        integer(I8P)                                   :: GlobalNumberOfNodes          !< Number of nodes of the spatial grid
+        integer(I4P)                                   :: SpaceDimension               !< Space dimension
+        integer(I8P)                                   :: Start                        !< Hyperslab start
+        integer(I8P)                                   :: Count                        !< Hyperslab count
+        character(len=:), allocatable                  :: XDMFGeometryTypeName         !< String geometry type identifier
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            if(present(GridID)) then
+                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
+            else
+                LocalNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
+                Start = 0
+            endif
+            GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
+            Count = LocalNumberOfNodes
+            call geometry%open( xml_handler  = this%file%xml_handler, &
+                    GeometryType = XDMFGeometryTypeName)
+    !-----------------------------------------------------------------
+    !< X
+    !----------------------------------------------------------------- 
+            call dataitem%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/LocalNumberOfNodes/), &   
+                    ItemType    = 'HyperSlab', &
+                    Format      = 'HDF')
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryArrayDimensions()/), &
+                    NumberType = 'Int', &
+                    Format     = 'XML', &
+                    Precision  = 4) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = (/Start,1_I8P,Count/) )
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/GlobalNumberOfNodes/), &
+                    NumberType = 'Float', &
+                    Format     = 'HDF', &
+                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%file%xml_handler)
+    !-----------------------------------------------------------------
+    !< Y
+    !----------------------------------------------------------------- 
+            call dataitem%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/LocalNumberOfNodes/), &   
+                    ItemType    = 'HyperSlab', &
+                    Format      = 'HDF')
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryArrayDimensions()/), &
+                    NumberType = 'Int', &
+                    Format     = 'XML', &
+                    Precision  = 4) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = (/Start,1_I8P,Count/) )
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/GlobalNumberOfNodes/), &
+                    NumberType = 'Float', &
+                    Format     = 'HDF', &
+                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%file%xml_handler)
+    !-----------------------------------------------------------------
+    !< Z
+    !----------------------------------------------------------------- 
+            call dataitem%open( xml_handler = this%file%xml_handler, &
+                    Dimensions  = (/LocalNumberOfNodes/), &   
+                    ItemType    = 'HyperSlab', &
+                    Format      = 'HDF')
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/3_I4P,this%UniformGridDescriptor%GetGeometryArrayDimensions()/), &
+                    NumberType = 'Int', &
+                    Format     = 'XML', &
+                    Precision  = 4) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = (/Start,1_I8P,Count/) )
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%open(xml_handler = this%file%xml_handler, &
+                    Dimensions = (/GlobalNumberOfNodes/), &
+                    NumberType = 'Float', &
+                    Format     = 'HDF', &
+                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+            call chardata%write( xml_handler = this%file%xml_handler, &
+                    Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName())
+            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%file%xml_handler)
+
+            call geometry%close(xml_handler = this%file%xml_handler)
+        endif                    
+    end subroutine xdmf_unst_contiguous_hyperslab_WriteGeometry_X_Y_Z
+
 
 end module xdmf_unstructured_contiguous_hyperslab_handler

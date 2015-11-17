@@ -34,8 +34,9 @@ implicit none
     integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_GLOBALID = 205
     integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_NOTYPE   = 206
 
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XYZ  = 301
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XY   = 302
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XYZ    = 301
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XY     = 302
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_X_Y_Z  = 303
 
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_SPATIAL  = 400
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_TEMPORAL = 401
@@ -92,8 +93,9 @@ implicit none
     integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
 
     integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
-                                                                XDMF_GEOMETRY_TYPE_XYZ, &
-                                                                XDMF_GEOMETRY_TYPE_XY   &
+                                                                XDMF_GEOMETRY_TYPE_XYZ,    &
+                                                                XDMF_GEOMETRY_TYPE_XY,     &
+                                                                XDMF_GEOMETRY_TYPE_X_Y_Z   &
                                                              /)
 
     integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(*)  = (/ &

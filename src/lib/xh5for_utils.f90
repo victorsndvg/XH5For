@@ -240,8 +240,8 @@ contains
                 GeometryName = 'XYZ'; return
             case (XDMF_GEOMETRY_TYPE_XY)
                 GeometryName = 'XY'; return
-!            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
-!                GeometryName = 'X_Y_Z'; return
+            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
+                GeometryName = 'X_Y_Z'; return
 !            case (XDMF_GEOMETRY_TYPE_VxVyVz)
 !                GeometryName = 'VxVyVz'; return
 !            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
@@ -266,8 +266,8 @@ contains
                 GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
             case ('XY')
                 GeometryType = XDMF_GEOMETRY_TYPE_XY; return
-!            case ('X_Y_Z')
-!                GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
+            case ('X_Y_Z')
+                GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
 !            case ('VxVyVz')
 !                GeometryType = XDMF_GEOMETRY_TYPE_VxVyVz; return
 !            case ('Origin_DxDyDz')
@@ -290,8 +290,8 @@ contains
                 SpaceDimension = 3; return
             case(XDMF_GEOMETRY_TYPE_XY)
                 SpaceDimension = 2; return
-!            case(XDMF_GEOMETRY_TYPE_X_Y_Z)
-!                SpaceDimension = 3; return
+            case(XDMF_GEOMETRY_TYPE_X_Y_Z)
+                SpaceDimension = 3; return
 !            case (XDMF_GEOMETRY_TYPE_VxVyVz)
 !                SpaceDimension = 3; return
 !            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)

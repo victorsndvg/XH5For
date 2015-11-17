@@ -28,10 +28,14 @@ implicit none
         procedure         :: xh5for_Initialize_Reader
         procedure         :: xh5for_Initialize_Writer_I4P
         procedure         :: xh5for_Initialize_Writer_I8P
-        procedure         :: xh5for_WriteGeometry_R4P
-        procedure         :: xh5for_WriteGeometry_R8P
-        procedure         :: xh5for_ReadGeometry_R4P
-        procedure         :: xh5for_ReadGeometry_R8P
+        procedure         :: xh5for_WriteGeometry_XYZ_R4P
+        procedure         :: xh5for_WriteGeometry_XYZ_R8P
+        procedure         :: xh5for_WriteGeometry_X_Y_Z_R4P
+        procedure         :: xh5for_WriteGeometry_X_Y_Z_R8P
+        procedure         :: xh5for_ReadGeometry_XYZ_R4P
+        procedure         :: xh5for_ReadGeometry_XYZ_R8P
+        procedure         :: xh5for_ReadGeometry_X_Y_Z_R4P
+        procedure         :: xh5for_ReadGeometry_X_Y_Z_R8P
         procedure         :: xh5for_WriteTopology_I4P
         procedure         :: xh5for_WriteTopology_I8P
         procedure         :: xh5for_ReadTopology_I4P
@@ -57,10 +61,14 @@ implicit none
                                                       xh5for_WriteTopology_I8P
         generic,   public :: ReadTopology          => xh5for_ReadTopology_I4P, &
                                                       xh5for_ReadTopology_I8P
-        generic,   public :: WriteGeometry         => xh5for_WriteGeometry_R4P, &
-                                                      xh5for_WriteGeometry_R8P
-        generic,   public :: ReadGeometry          => xh5for_ReadGeometry_R4P, &
-                                                      xh5for_ReadGeometry_R8P
+        generic,   public :: WriteGeometry         => xh5for_WriteGeometry_XYZ_R4P,   &
+                                                      xh5for_WriteGeometry_XYZ_R8P,   &
+                                                      xh5for_WriteGeometry_X_Y_Z_R4P, &
+                                                      xh5for_WriteGeometry_X_Y_Z_R8P
+        generic,   public :: ReadGeometry          => xh5for_ReadGeometry_XYZ_R4P,   &
+                                                      xh5for_ReadGeometry_XYZ_R8P,   &
+                                                      xh5for_ReadGeometry_X_Y_Z_R4P, &
+                                                      xh5for_ReadGeometry_X_Y_Z_R8P
         generic,   public :: WriteAttribute        => xh5for_WriteAttribute_I4P, &
                                                       xh5for_WriteAttribute_I8P, &
                                                       xh5for_WriteAttribute_R4P, &
@@ -310,76 +318,156 @@ contains
     end subroutine xh5for_Close
 
 
-    subroutine xh5for_WriteGeometry_R4P(this, Coordinates, Name)
+    subroutine xh5for_WriteGeometry_XYZ_R4P(this, XYZ, Name)
     !----------------------------------------------------------------- 
     !< Write R4P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R4P),                  intent(IN)    :: Coordinates(:)   !< R4P grid geometry coordinates
+        real(R4P),                  intent(IN)    :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
-            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
+            call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = Name)
         else
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
-            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
-    end subroutine xh5for_WriteGeometry_R4P
+    end subroutine xh5for_WriteGeometry_XYZ_R4P
 
 
-    subroutine xh5for_WriteGeometry_R8P(this, Coordinates, Name)
+    subroutine xh5for_WriteGeometry_XYZ_R8P(this, XYZ, Name)
     !----------------------------------------------------------------- 
     !< Write R8P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type                        
-        real(R8P),                  intent(IN)    :: Coordinates(:)   !< R8P grid geometry coordinates
+        real(R8P),                  intent(IN)    :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
-            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
+            call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = Name)
         else
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
-            call this%HeavyData%WriteGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
-    end subroutine xh5for_WriteGeometry_R8P
+    end subroutine xh5for_WriteGeometry_XYZ_R8P
 
 
-    subroutine xh5for_ReadGeometry_R4P(this, Coordinates, Name)
+    subroutine xh5for_WriteGeometry_X_Y_Z_R4P(this, X, Y, Z, Name)
     !----------------------------------------------------------------- 
-    !< Read R4P Geometry
+    !< Write R4P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R4P), allocatable,     intent(OUT)   :: Coordinates(:)   !< R4P grid geometry coordinates
+        real(R4P),                  intent(IN)    :: X(:)             !< X R4P grid geometry coordinates
+        real(R4P),                  intent(IN)    :: Y(:)             !< Y R4P grid geometry coordinates
+        real(R4P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = Name)
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(XYZ = X, Name = Name)
+            call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = Name)
         else
-            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = 'Coordinates')
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
         endif
-    end subroutine xh5for_ReadGeometry_R4P
+    end subroutine xh5for_WriteGeometry_X_Y_Z_R4P
 
 
-    subroutine xh5for_ReadGeometry_R8P(this, Coordinates, Name)
+    subroutine xh5for_WriteGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
     !----------------------------------------------------------------- 
-    !< Read R8P Geometry
+    !< Write R8P X_Y_Z Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R8P), allocatable,     intent(OUT)   :: Coordinates(:)   !< R8P grid geometry coordinates
+        real(R8P),                  intent(IN)    :: X(:)             !< X R4P grid geometry coordinates
+        real(R8P),                  intent(IN)    :: Y(:)             !< Y R4P grid geometry coordinates
+        real(R8P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         if(present(Name)) then
-            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = Name)
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = Name)
+            call this%LightData%SetGeometry(XYZ = X, Name = Name)
+            call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = Name)
         else
-            call this%HeavyData%ReadGeometry(Coordinates = Coordinates, Name = 'Coordinates')
-            call this%LightData%SetGeometry(Coordinates = Coordinates, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
         endif
-    end subroutine xh5for_ReadGeometry_R8P
+    end subroutine xh5for_WriteGeometry_X_Y_Z_R8P
+
+
+    subroutine xh5for_ReadGeometry_XYZ_R4P(this, XYZ, Name)
+    !----------------------------------------------------------------- 
+    !< Read XY[Z] R4P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P), allocatable,     intent(OUT)   :: XYZ(:)           !< R4P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_XYZ_R4P
+
+
+    subroutine xh5for_ReadGeometry_XYZ_R8P(this, XYZ, Name)
+    !----------------------------------------------------------------- 
+    !< Read XY[Z] R8P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R8P), allocatable,     intent(OUT)   :: XYZ(:)   !< R8P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_XYZ_R8P
+
+
+    subroutine xh5for_ReadGeometry_X_Y_Z_R4P(this, X, Y, Z, Name)
+    !----------------------------------------------------------------- 
+    !< Read X_Y_Z R4P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P), allocatable,     intent(OUT)   :: X(:)             !< X R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(OUT)   :: Y(:)             !< Y R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(OUT)   :: Z(:)             !< Z R4P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
+            call this%LightData%SetGeometry(XYZ = X, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_X_Y_Z_R4P
+
+
+    subroutine xh5for_ReadGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
+    !----------------------------------------------------------------- 
+    !< Read X_Y_Z R8P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R8P), allocatable,     intent(OUT)   :: X(:)             !< X R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(OUT)   :: Y(:)             !< Y R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(OUT)   :: Z(:)             !< Z R8P grid geometry coordinates
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
+            call this%LightData%SetGeometry(XYZ = X, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_X_Y_Z_R8P
 
 
     subroutine xh5for_WriteTopology_I4P(this, Connectivities, Name)

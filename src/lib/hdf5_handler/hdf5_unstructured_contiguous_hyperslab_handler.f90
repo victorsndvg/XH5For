@@ -16,22 +16,26 @@ private
     !< HDF5 contiguous hyperslab handler for Unstructured grids
     !----------------------------------------------------------------- 
     contains
-        procedure :: WriteGeometry_R4P  => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R4P
-        procedure :: WriteGeometry_R8P  => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R8P
-        procedure :: ReadGeometry_R4P   => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R4P
-        procedure :: ReadGeometry_R8P   => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R8P
-        procedure :: WriteTopology_I4P  => hdf5_unstructured_contiguous_hyperslab_WriteTopology_I4P
-        procedure :: WriteTopology_I8P  => hdf5_unstructured_contiguous_hyperslab_WriteTopology_I8P
-        procedure :: ReadTopology_I4P   => hdf5_unstructured_contiguous_hyperslab_ReadTopology_I4P
-        procedure :: ReadTopology_I8P   => hdf5_unstructured_contiguous_hyperslab_ReadTopology_I8P
-        procedure :: WriteAttribute_I4P => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_I4P
-        procedure :: WriteAttribute_I8P => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_I8P
-        procedure :: WriteAttribute_R4P => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_R4P
-        procedure :: WriteAttribute_R8P => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_R8P
-        procedure :: ReadAttribute_I4P  => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_I4P
-        procedure :: ReadAttribute_I8P  => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_I8P
-        procedure :: ReadAttribute_R4P  => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_R4P
-        procedure :: ReadAttribute_R8P  => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_R8P
+        procedure :: WriteGeometry_XYZ_R4P   => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R4P
+        procedure :: WriteGeometry_XYZ_R8P   => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R8P
+        procedure :: WriteGeometry_X_Y_Z_R4P => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R4P
+        procedure :: WriteGeometry_X_Y_Z_R8P => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R8P
+        procedure :: ReadGeometry_XYZ_R4P    => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R4P
+        procedure :: ReadGeometry_XYZ_R8P    => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R8P
+        procedure :: ReadGeometry_X_Y_Z_R4P  => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R4P
+        procedure :: ReadGeometry_X_Y_Z_R8P  => hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R8P
+        procedure :: WriteTopology_I4P       => hdf5_unstructured_contiguous_hyperslab_WriteTopology_I4P
+        procedure :: WriteTopology_I8P       => hdf5_unstructured_contiguous_hyperslab_WriteTopology_I8P
+        procedure :: ReadTopology_I4P        => hdf5_unstructured_contiguous_hyperslab_ReadTopology_I4P
+        procedure :: ReadTopology_I8P        => hdf5_unstructured_contiguous_hyperslab_ReadTopology_I8P
+        procedure :: WriteAttribute_I4P      => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_I4P
+        procedure :: WriteAttribute_I8P      => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_I8P
+        procedure :: WriteAttribute_R4P      => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_R4P
+        procedure :: WriteAttribute_R8P      => hdf5_unstructured_contiguous_hyperslab_WriteAttribute_R8P
+        procedure :: ReadAttribute_I4P       => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_I4P
+        procedure :: ReadAttribute_I8P       => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_I8P
+        procedure :: ReadAttribute_R4P       => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_R4P
+        procedure :: ReadAttribute_R8P       => hdf5_unstructured_contiguous_hyperslab_ReadAttribute_R8P
     end type hdf5_unstructured_contiguous_hyperslab_handler_t
 
 public :: hdf5_unstructured_contiguous_hyperslab_handler_t
@@ -104,12 +108,12 @@ contains
     end subroutine hdf5_unstructured_contiguous_hyperslab_ReadHyperSlab_R8P
 
 
-    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R4P(this, Coordinates, Name)
+    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R4P(this, XYZ, Name)
     !-----------------------------------------------------------------
     !< Writes R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R4P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
+        real(R4P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
@@ -126,18 +130,17 @@ contains
                 DatasetDims     = (/GlobalGeometrySize/), &
                 HyperSlabOffset = (/GeometrySizeOffset/), &
                 HyperSlabSize   = (/LocalGeometrySize/),  &
-                Values          = Coordinates)
+                Values          = XYZ)
 #endif
-    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R4P
+    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R4P
 
 
-
-    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R8P(this, Coordinates, Name)
+    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R8P(this, XYZ, Name)
     !-----------------------------------------------------------------
     !< Writes R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R8P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
+        real(R8P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
@@ -154,9 +157,89 @@ contains
                 DatasetDims     = (/GlobalGeometrySize/), &
                 HyperSlabOffset = (/GeometrySizeOffset/), &
                 HyperSlabSize   = (/LocalGeometrySize/),  &
-                Values          = Coordinates)
+                Values          = XYZ)
 #endif
-    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R8P
+    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R8P
+
+
+    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R4P(this, X, Y, Z, Name)
+    !-----------------------------------------------------------------
+    !< Writes R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
+        real(R4P),                                  intent(IN) :: X(:)                !< X Grid coordinates
+        real(R4P),                                  intent(IN) :: Y(:)                !< Y Grid coordinates
+        real(R4P),                                  intent(IN) :: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                       :: GlobalNumberOfNodes !< Total number of nodes
+        integer(HSIZE_T)                                       :: LocalNumberOfNodes  !< Local number of nodes
+        integer(HSIZE_T)                                       :: NodeOffset          !< Node offset for a particular grid
+    !-----------------------------------------------------------------
+        !< @Note: Fixed rank 1?
+        !< @Note: Fixed dataset name?
+        !< @Note: Fixed rank 1?
+#ifdef ENABLE_HDF5
+        GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+print*, GlobalNumberOfNodes, NodeOffset, LocalNumberOfNodes
+        call this%WriteHyperSlab(DatasetName='X_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = X)
+        call this%WriteHyperSlab(DatasetName='Y_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = Y)
+        call this%WriteHyperSlab(DatasetName='Z_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = Z)
+#endif
+    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R4P
+
+
+    subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
+    !-----------------------------------------------------------------
+    !< Writes R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
+        real(R8P),                                  intent(IN) :: X(:)                !< X Grid coordinates
+        real(R8P),                                  intent(IN) :: Y(:)                !< Y Grid coordinates
+        real(R8P),                                  intent(IN) :: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                       :: GlobalNumberOfNodes !< Total number of nodes
+        integer(HSIZE_T)                                       :: LocalNumberOfNodes  !< Local number of nodes
+        integer(HSIZE_T)                                       :: NodeOffset          !< Node offset for a particular grid
+    !-----------------------------------------------------------------
+        !< @Note: Fixed rank 1?
+        !< @Note: Fixed dataset name?
+        !< @Note: Fixed rank 1?
+#ifdef ENABLE_HDF5
+        GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+print*, GlobalNumberOfNodes, NodeOffset, LocalNumberOfNodes
+        call this%WriteHyperSlab(DatasetName='X_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = X)
+        call this%WriteHyperSlab(DatasetName='Y_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = Y)
+        call this%WriteHyperSlab(DatasetName='Z_'//Name,   &
+                DatasetDims     = (/GlobalNumberOfNodes/), &
+                HyperSlabOffset = (/NodeOffset/),          &
+                HyperSlabSize   = (/LocalNumberOfNodes/),  &
+                Values          = Z)
+#endif
+    end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R8P
 
 
     subroutine hdf5_unstructured_contiguous_hyperslab_WriteTopology_I4P(this, Connectivities, Name)
@@ -354,12 +437,12 @@ contains
     end subroutine hdf5_unstructured_contiguous_hyperslab_WriteAttribute_R8P
 
 
-    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R4P(this, Coordinates, Name)
+    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R4P(this, XYZ, Name)
     !-----------------------------------------------------------------
-    !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !< Read XY[Z] R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R4P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
@@ -378,17 +461,17 @@ contains
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
+                Values          = XYZ)
 #endif
-    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R4P
+    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R4P
 
 
-    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R8P(this, Coordinates, Name)
+    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R8P(this, XYZ, Name)
     !-----------------------------------------------------------------
-    !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !< Read XY[Z] R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R8P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
         integer(HSIZE_T)                                       :: spacedim            !< Space dimension
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
@@ -407,9 +490,105 @@ contains
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
                 HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
+                Values          = XYZ)
 #endif
-    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_R8P
+    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_XYZ_R8P
+
+
+    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R4P(this, X, Y, Z, Name)
+    !-----------------------------------------------------------------
+    !< Read R4P X_Y_Z coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
+        real(R4P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+    !-----------------------------------------------------------------
+        !< @Note: Fixed rank 1?
+        !< @Note: Fixed dataset name?
+        !< @Note: Fixed rank 1?
+#ifdef ENABLE_HDF5
+        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+    !-----------------------------------------------------------------
+    !< X
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'X_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = X)
+    !-----------------------------------------------------------------
+    !< Y
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = Y)
+    !-----------------------------------------------------------------
+    !< Z
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'Z_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = Z)
+#endif
+    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R4P
+
+
+    subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
+    !-----------------------------------------------------------------
+    !< Read X_Y_Z R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
+    !----------------------------------------------------------------- 
+        class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
+        real(R8P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+    !-----------------------------------------------------------------
+        !< @Note: Fixed rank 1?
+        !< @Note: Fixed dataset name?
+        !< @Note: Fixed rank 1?
+#ifdef ENABLE_HDF5
+        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+    !-----------------------------------------------------------------
+    !< X
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'X_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = X)
+    !-----------------------------------------------------------------
+    !< Y
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = Y)
+    !-----------------------------------------------------------------
+    !< Z
+    !----------------------------------------------------------------- 
+        call this%ReadHyperSlab(DatasetName = 'Z_'//Name,  &
+                DatasetDims     = (/globalnumberofnodes/), &
+                HyperSlabOffset = (/nodeoffset/),          &
+                HyperSlabSize   = (/localnumberofnodes/),  &
+                Values          = Z)
+#endif
+    end subroutine hdf5_unstructured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R8P
 
 
     subroutine hdf5_unstructured_contiguous_hyperslab_ReadTopology_I4P(this, Connectivities, Name)

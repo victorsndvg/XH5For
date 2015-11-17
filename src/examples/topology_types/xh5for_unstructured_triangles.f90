@@ -15,11 +15,11 @@ implicit none
     !----------------------------------------------------------------- 
     type(xh5for_t)             :: xh5
     real(R4P), dimension(8)    :: geometry = (/0.0, 0.0, &
-                                                       1.0, 0.0, &
-                                                       0.0, 1.0, &
-                                                       1.0, 1.0/)
+                                               1.0, 0.0, &
+                                               0.0, 1.0, &
+                                               1.0, 1.0/)
     integer(I4P), dimension(6) :: topology = (/0, 1, 2, &
-                                                       1, 2, 3/)
+                                               1, 2, 3/)
     integer(I4P), dimension(2) :: cellfield = (/0, 1/)
     real(R4P),    allocatable  :: out_geometry(:)
     integer(I4P), allocatable  :: out_topology(:)
@@ -49,7 +49,7 @@ implicit none
     call xh5%Initialize(NumberOfNodes=4, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
     call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='contiguous_hyperslab_triangles')
     call xh5%WriteTopology(Connectivities = topology)
-    call xh5%WriteGeometry(Coordinates = geometry)
+    call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='GridNumber', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_GRID , Values=(/int(rank,I4P)/))
     call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield)
     call xh5%Close()
@@ -61,7 +61,7 @@ implicit none
     call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_triangles')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
-    call xh5%ReadGeometry(Coordinates = out_geometry)
+    call xh5%ReadGeometry(XYZ = out_geometry)
     call xh5%ReadAttribute(Name='GridNumber', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_GRID , Values=out_gridfield)
     call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
     call xh5%Close()

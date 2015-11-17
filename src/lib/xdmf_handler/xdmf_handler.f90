@@ -54,19 +54,19 @@ private
     end type xdmf_handler_t
 
     abstract interface
-        subroutine xdmf_handler_SetGeometry_R4P(this, Coordinates, Name)
+        subroutine xdmf_handler_SetGeometry_R4P(this, XYZ, Name)
             import xdmf_handler_t
             import R4P
             class(xdmf_handler_t), intent(INOUT) :: this
-            real(R4P),             intent(IN)    :: Coordinates(:)
+            real(R4P),             intent(IN)    :: XYZ(:)
             character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R4P
 
-        subroutine xdmf_handler_SetGeometry_R8P(this, Coordinates, Name)
+        subroutine xdmf_handler_SetGeometry_R8P(this, XYZ, Name)
             import xdmf_handler_t
             import R8P
             class(xdmf_handler_t), intent(INOUT) :: this
-            real(R8P),             intent(IN)    :: Coordinates(:)
+            real(R8P),             intent(IN)    :: XYZ(:)
             character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R8P
 

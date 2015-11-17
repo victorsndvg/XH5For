@@ -37,7 +37,7 @@ implicit none
     call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
     call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_hyperslab')
     call lightdata%SetTopology(Connectivities=topology, Name='Connectivities')
-    call lightdata%SetGeometry(Coordinates=geometry, Name='Coordinates')
+    call lightdata%SetGeometry(XYZ=geometry, Name='Coordinates')
     call lightdata%AppendAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Attribute=values)
     call lightdata%Serialize()
     call lightdata%CloseFile()
