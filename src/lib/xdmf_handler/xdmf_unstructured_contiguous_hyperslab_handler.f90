@@ -286,29 +286,29 @@ contains
         type(xdmf_geometry_t)                          :: geometry                     !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                     !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                     !< XDMF Character Data type
-        integer(I8P)                                   :: LocalNumberOfNodes           !< Local number of nodes
-        integer(I8P)                                   :: GlobalNumberOfNodes          !< Global number of nodes
+        integer(I8P)                                   :: LocalGeometrySize            !< Local geometry size
+        integer(I8P)                                   :: GlobalGeometrySize           !< Global geometrySize
         integer(I4P)                                   :: SpaceDimension               !< Space dimension
         integer(I8P)                                   :: Start                        !< Hyperslab start
         integer(I8P)                                   :: Count                        !< Hyperslab count
         character(len=:), allocatable                  :: XDMFGeometryTypeName         !< String geometry type identifier
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
             if(present(GridID)) then
-                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)*SpaceDimension
+                LocalGeometrySize = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID)
+                Start = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID)
             else
-                localNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
+                SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
+                LocalGeometrySize = this%UniformGridDescriptor%GetNumberOfNodes()*SpaceDimension
                 Start = 0
             endif
-            GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
+            GlobalGeometrySize = this%SpatialGridDescriptor%GetGlobalGeometrySize()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
-            Count = LocalNumberOfNodes*SpaceDimension
+            Count = LocalGeometrySize
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/localNumberOfNodes*SpaceDimension/), &   
+                    Dimensions  = (/LocalGeometrySize/), &   
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
             call dataitem%open(xml_handler = this%file%xml_handler, &
@@ -320,7 +320,7 @@ contains
                     Data = (/Start,1_I8P,Count/) )
             call dataitem%close(xml_handler = this%file%xml_handler)
             call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/GlobalNumberOfNodes*SpaceDimension/), &
+                    Dimensions = (/GlobalGeometrySize/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 

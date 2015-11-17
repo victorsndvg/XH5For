@@ -111,23 +111,21 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
         real(R4P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
+        integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
+        integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName=Name,                  &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%WriteHyperSlab(DatasetName=Name,        &
+                DatasetDims     = (/GlobalGeometrySize/), &
+                HyperSlabOffset = (/GeometrySizeOffset/), &
+                HyperSlabSize   = (/LocalGeometrySize/),  &
                 Values          = Coordinates)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R4P
@@ -141,23 +139,21 @@ contains
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
         real(R8P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
+        integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
+        integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName=Name,                  &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
+        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call this%WriteHyperSlab(DatasetName=Name,        &
+                DatasetDims     = (/GlobalGeometrySize/), &
+                HyperSlabOffset = (/GeometrySizeOffset/), &
+                HyperSlabSize   = (/LocalGeometrySize/),  &
                 Values          = Coordinates)
 #endif
     end subroutine hdf5_unstructured_contiguous_hyperslab_WriteGeometry_R8P
