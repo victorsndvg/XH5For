@@ -54,35 +54,38 @@ contains
     end subroutine unst_spatial_grid_descriptor_Allocate
 
 
-    subroutine unst_spatial_grid_descriptor_SetGlobalTopologySize(this, GlobalTopologySize)
+    subroutine unst_spatial_grid_descriptor_SetGlobalTopologySize(this, GlobalTopologySize, Dimension)
     !-----------------------------------------------------------------
     !< Set the total topology size of the spatial grid
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this                !< Unstructured Spatial grid descriptor type
         integer(I8P),                                  intent(IN)    :: GlobalTopologySize  !< Total size of connectivities of the spatial grid
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the topology (1=X,2=Y,3=Z)
     !----------------------------------------------------------------- 
         this%GlobalTopologySize = GlobalTopologySize
     end subroutine unst_spatial_grid_descriptor_SetGlobalTopologySize
 
 
-    function unst_spatial_grid_descriptor_GetGlobalTopologySize(this) result(GlobalTopologySize)
+    function unst_spatial_grid_descriptor_GetGlobalTopologySize(this, Dimension) result(GlobalTopologySize)
     !-----------------------------------------------------------------
     !< Get the total topology size of the spatial grid
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this                !< Unstructured Spatial grid descriptor type
+        integer(I4P), optional,                        intent(IN) :: Dimension           !< Dimension of the topology (1=X,2=Y,3=Z)
         integer(I8P)                                              :: GlobalTopologySize  !< Total size of connectivities of the spatial grid
     !----------------------------------------------------------------- 
         GlobalTopologySize = this%GlobalTopologySize
     end function unst_spatial_grid_descriptor_GetGlobalTopologySize
 
 
-    subroutine unst_spatial_grid_descriptor_SetTopologySizePerGridID(this, TopologySize, ID)
+    subroutine unst_spatial_grid_descriptor_SetTopologySizePerGridID(this, TopologySize, ID, Dimension)
     !-----------------------------------------------------------------
     !< Set the topology size of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< Unstructured Spatial grid descriptor type
         integer(I8P),                                  intent(IN)    :: TopologySize   !< Topology size of the grid ID
         integer(I4P),                                  intent(IN)    :: ID             !< Grid identifier
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the topology (1=X,2=Y,3=Z)
         type(mpi_env_t), pointer                                     :: MPIEnvironment !< MPI Environment pointer
     !-----------------------------------------------------------------
         if(.not. allocated(this%TopologySizePerGrid)) then
@@ -95,49 +98,53 @@ contains
     end subroutine unst_spatial_grid_descriptor_SetTopologySizePerGridID
 
 
-    function unst_spatial_grid_descriptor_GetTopologySizePerGridID(this, ID)
+    function unst_spatial_grid_descriptor_GetTopologySizePerGridID(this, ID, Dimension) result(TopologySize)
     !-----------------------------------------------------------------
     !< Return the topology size of a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< Unstructured Spatial grid descriptor type
-        integer(I4P),                                  intent(IN)    :: ID    !< Grid identifier
-        integer(I8P) :: unst_spatial_grid_descriptor_GetTopologySizePerGridID !< Topology Size of a grid
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this         !< Unstructured Spatial grid descriptor type
+        integer(I4P),                                  intent(IN)    :: ID           !< Grid identifier
+        integer(I4P), optional,                        intent(IN)    :: Dimension    !< Dimension of the topology (1=X,2=Y,3=Z)
+        integer(I8P)                                                 :: TopologySize !< Topology Size of a grid
     !-----------------------------------------------------------------
-        unst_spatial_grid_descriptor_GetTopologySizePerGridID = this%TopologySizePerGrid(ID+1)
+        TopologySize = this%TopologySizePerGrid(ID+1)
     end function unst_spatial_grid_descriptor_GetTopologySizePerGridID
 
 
-    function unst_spatial_grid_descriptor_GetTopologySizeOffsetPerGridID(this, ID)
+    function unst_spatial_grid_descriptor_GetTopologySizeOffsetPerGridID(this, ID, Dimension) result(Offset)
     !-----------------------------------------------------------------
     !< Return the topology size offset of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this   !< Unstructured Spatial grid descriptor type
         integer(I4P),                                  intent(IN)    :: ID     !< Grid identifier
-        integer(I8P) :: unst_spatial_grid_descriptor_GetTopologySizeOffsetPerGridID !< Topology size offset of a grid
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the topology (1=X,2=Y,3=Z)
+        integer(I8P)                                                 :: Offset !< Topology size offset of a grid
     !-----------------------------------------------------------------
-        unst_spatial_grid_descriptor_GetTopologySizeOffsetPerGridID = sum(this%TopologySizePerGrid(:ID))
+        Offset = sum(this%TopologySizePerGrid(:ID))
     end function unst_spatial_grid_descriptor_GetTopologySizeOffsetPerGridID
 
 
-    subroutine unst_spatial_grid_descriptor_SetGlobalGeometrySize(this, GlobalGeometrySize)
+    subroutine unst_spatial_grid_descriptor_SetGlobalGeometrySize(this, GlobalGeometrySize, Dimension)
     !-----------------------------------------------------------------
     !< Set the total Geometry size of the spatial grid
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this                !< Unstructured Spatial grid descriptor type
         integer(I8P),                                  intent(IN)    :: GlobalGeometrySize  !< Total size of coordinates of the spatial grid
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the geometry (1=X,2=Y,3=Z)
     !----------------------------------------------------------------- 
         this%GlobalGeometrySize = GlobalGeometrySize
     end subroutine unst_spatial_grid_descriptor_SetGlobalGeometrySize
 
 
-    function unst_spatial_grid_descriptor_GetGlobalGeometrySize(this) result(GlobalGeometrySize)
+    function unst_spatial_grid_descriptor_GetGlobalGeometrySize(this, Dimension) result(GlobalGeometrySize)
     !-----------------------------------------------------------------
     !< Get the total geometry size of the spatial grid
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this                !< Unstructured Spatial grid descriptor type
+        integer(I4P), optional,                        intent(IN) :: Dimension           !< Dimension of the geometry (1=X,2=Y,3=Z)
         integer(I8P)                                              :: GlobalGeometrySize  !< Total size of coordinates of the spatial grid
         integer(I8P)                                              :: SpaceDimension      !< Space dimension
-        type(mpi_env_t), pointer                                  :: MPIEnvironment !< MPI Environmnet pointer
+        type(mpi_env_t), pointer                                  :: MPIEnvironment      !< MPI Environmnet pointer
     !----------------------------------------------------------------- 
         MPIEnvironment => this%GetMPIEnvironment()
         SpaceDimension = GetSpaceDimension(this%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
@@ -145,11 +152,12 @@ contains
     end function unst_spatial_grid_descriptor_GetGlobalGeometrySize
 
 
-    subroutine unst_spatial_grid_descriptor_SetGeometrySizePerGridID(this, GeometrySize, ID)
+    subroutine unst_spatial_grid_descriptor_SetGeometrySizePerGridID(this, GeometrySize, ID, Dimension)
     !-----------------------------------------------------------------
     !< Set the geometry size of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this             !< Unstructured Spatial grid descriptor type
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the geometry (1=X,2=Y,3=Z)
         integer(I8P),                                  intent(IN)    :: GeometrySize     !< Geometry size of the grid ID
         integer(I4P),                                  intent(IN)    :: ID               !< Grid identifier
         integer(I8P)                                                 :: SpaceDimension   !< Space dimension
@@ -159,12 +167,13 @@ contains
     end subroutine unst_spatial_grid_descriptor_SetGeometrySizePerGridID
 
 
-    function unst_spatial_grid_descriptor_GetGeometrySizePerGridID(this, ID)
+    function unst_spatial_grid_descriptor_GetGeometrySizePerGridID(this, ID, Dimension)
     !-----------------------------------------------------------------
     !< Return the Geometry size of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< Unstructured Spatial grid descriptor type
         integer(I4P),                                  intent(IN)    :: ID             !< Grid identifier
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the geometry (1=X,2=Y,3=Z)
         integer(I8P)                                                 :: SpaceDimension !< Space dimension
         integer(I8P) :: unst_spatial_grid_descriptor_GetGeometrySizePerGridID          !< Geometry Size of a grid
     !-----------------------------------------------------------------
@@ -173,12 +182,13 @@ contains
     end function unst_spatial_grid_descriptor_GetGeometrySizePerGridID
 
 
-    function unst_spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID(this, ID)
+    function unst_spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID(this, ID, Dimension)
     !-----------------------------------------------------------------
     !< Return the geometry size offset of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this   !< Unstructured Spatial grid descriptor type
         integer(I4P),                                  intent(IN)    :: ID     !< Grid identifier
+        integer(I4P), optional,                        intent(IN)    :: Dimension           !< Dimension of the geometry (1=X,2=Y,3=Z)
         integer(I8P)                                                 :: SpaceDimension !< Space dimension
         integer(I8P) :: unst_spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID !< Geometry size offset of a grid
     !-----------------------------------------------------------------

@@ -101,85 +101,99 @@ private
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
         end subroutine spatial_grid_descriptor_BroadcastMetadata
 
-        subroutine spatial_grid_descriptor_SetGlobalTopologySize(this, GlobalTopologySize)
+        subroutine spatial_grid_descriptor_SetGlobalTopologySize(this, GlobalTopologySize, Dimension)
             import spatial_grid_descriptor_t
             import I8P
+            import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I8P),                     intent(IN)    :: GlobalTopologySize
+            integer(I4P), optional,           intent(IN)    :: Dimension
         end subroutine spatial_grid_descriptor_SetGlobalTopologySize
 
-        function spatial_grid_descriptor_GetGlobalTopologySize(this) result(GlobalTopologySize)
+        function spatial_grid_descriptor_GetGlobalTopologySize(this, Dimension) result(GlobalTopologySize)
             import spatial_grid_descriptor_t
             import I8P
+            import I4P
             class(spatial_grid_descriptor_t), intent(IN) :: this
-            integer(I8P)                                :: GlobalTopologySize
+            integer(I8P)                                 :: GlobalTopologySize
+            integer(I4P), optional,           intent(IN) :: Dimension
         end function spatial_grid_descriptor_GetGlobalTopologySize
 
-        subroutine spatial_grid_descriptor_SetTopologySizePerGridID(this, TopologySize, ID)
+        subroutine spatial_grid_descriptor_SetTopologySizePerGridID(this, TopologySize, ID, Dimension)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I8P),                     intent(IN)    :: TopologySize
             integer(I4P),                     intent(IN)    :: ID
+            integer(I4P), optional,           intent(IN)    :: Dimension
         end subroutine spatial_grid_descriptor_SetTopologySizePerGridID
 
-        function spatial_grid_descriptor_GetTopologySizePerGridID(this, ID) result(TopologySize)
+        function spatial_grid_descriptor_GetTopologySizePerGridID(this, ID, Dimension) result(TopologySize)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I4P),                     intent(IN)    :: ID
             integer(I8P)                                    :: TopologySize
+            integer(I4P), optional,           intent(IN)    :: Dimension
         end function spatial_grid_descriptor_GetTopologySizePerGridID
 
-        function spatial_grid_descriptor_GetTopologySizeOffsetPerGridID(this, ID) result(TopologySizeOffset)
+        function spatial_grid_descriptor_GetTopologySizeOffsetPerGridID(this, ID, Dimension) result(TopologySizeOffset)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I4P),                     intent(IN)    :: ID
+            integer(I4P), optional,           intent(IN)    :: Dimension
             integer(I8P)                                    :: TopologySizeOffset
         end function spatial_grid_descriptor_GetTopologySizeOffsetPerGridID
 
-        subroutine spatial_grid_descriptor_SetGlobalGeometrySize(this, GlobalGeometrySize)
+        subroutine spatial_grid_descriptor_SetGlobalGeometrySize(this, GlobalGeometrySize, Dimension)
             import spatial_grid_descriptor_t
             import I8P
+            import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I8P),                     intent(IN)    :: GlobalGeometrySize
+            integer(I4P), optional,           intent(IN)    :: Dimension
         end subroutine spatial_grid_descriptor_SetGlobalGeometrySize
 
-        function spatial_grid_descriptor_GetGlobalGeometrySize(this) result(GlobalGeometrySize)
+        function spatial_grid_descriptor_GetGlobalGeometrySize(this, Dimension) result(GlobalGeometrySize)
             import spatial_grid_descriptor_t
             import I8P
+            import I4P
             class(spatial_grid_descriptor_t), intent(IN) :: this
-            integer(I8P)                                :: GlobalGeometrySize
+            integer(I8P)                                 :: GlobalGeometrySize
+            integer(I4P), optional,           intent(IN) :: Dimension
         end function spatial_grid_descriptor_GetGlobalGeometrySize
 
-        subroutine spatial_grid_descriptor_SetGeometrySizePerGridID(this, GeometrySize, ID)
+        subroutine spatial_grid_descriptor_SetGeometrySizePerGridID(this, GeometrySize, ID, Dimension)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I8P),                     intent(IN)    :: GeometrySize
             integer(I4P),                     intent(IN)    :: ID
+            integer(I4P), optional,           intent(IN)    :: Dimension
         end subroutine spatial_grid_descriptor_SetGeometrySizePerGridID
 
-        function spatial_grid_descriptor_GetGeometrySizePerGridID(this, ID) result(GeometrySize)
+        function spatial_grid_descriptor_GetGeometrySizePerGridID(this, ID, Dimension) result(GeometrySize)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I4P),                     intent(IN)    :: ID
+            integer(I4P), optional,           intent(IN)    :: Dimension
             integer(I8P)                                    :: GeometrySize
         end function spatial_grid_descriptor_GetGeometrySizePerGridID
 
-        function spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID(this, ID) result(GeometrySizeOffset)
+        function spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID(this, ID, Dimension) result(GeometrySizeOffset)
             import spatial_grid_descriptor_t
             import I8P
             import I4P
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
             integer(I4P),                     intent(IN)    :: ID
+            integer(I4P), optional,           intent(IN)    :: Dimension
             integer(I8P)                                    :: GeometrySizeOffset
         end function spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID
     end interface
