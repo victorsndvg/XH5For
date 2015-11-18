@@ -25,9 +25,11 @@ implicit none
         class(hdf5_handler_t),            allocatable :: HeavyData
     contains
     private
-        procedure         :: xh5for_Initialize_Reader
-        procedure         :: xh5for_Initialize_Writer_I4P
-        procedure         :: xh5for_Initialize_Writer_I8P
+        procedure         :: xh5for_Initialize_Unstructured_Reader
+        procedure         :: xh5for_Initialize_Unstructured_Writer_I4P
+        procedure         :: xh5for_Initialize_Unstructured_Writer_I8P
+        procedure         :: xh5for_Initialize_Structured_Writer_I4P
+        procedure         :: xh5for_Initialize_Structured_Writer_I8P
         procedure         :: xh5for_WriteGeometry_XYZ_R4P
         procedure         :: xh5for_WriteGeometry_XYZ_R8P
         procedure         :: xh5for_WriteGeometry_X_Y_Z_R4P
@@ -50,9 +52,11 @@ implicit none
         procedure         :: xh5for_ReadAttribute_R8P
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         procedure, public :: SetGridType           => xh5for_SetGridType
-        generic,   public :: Initialize            => xh5for_Initialize_Writer_I4P, &
-                                                      xh5for_Initialize_Writer_I8P, &
-                                                      xh5for_Initialize_Reader
+        generic,   public :: Initialize            => xh5for_Initialize_Unstructured_Writer_I4P, &
+                                                      xh5for_Initialize_Unstructured_Writer_I8P, &
+                                                      xh5for_Initialize_Structured_Writer_I4P,   &
+                                                      xh5for_Initialize_Structured_Writer_I8P,   &
+                                                      xh5for_Initialize_Unstructured_Reader
         procedure, public :: Free                  => xh5for_Free
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Parse                 => xh5for_Parse
@@ -77,8 +81,8 @@ implicit none
                                                       xh5for_ReadAttribute_I8P, &
                                                       xh5for_ReadAttribute_R4P, &
                                                       xh5for_ReadAttribute_R8P
-
     end type xh5for_t
+
 
 contains
 
@@ -131,7 +135,7 @@ contains
     end subroutine xh5for_Free
 
 
-    subroutine xh5for_Initialize_Reader(this, comm, root)
+    subroutine xh5for_Initialize_Unstructured_Reader(this, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
@@ -166,10 +170,10 @@ contains
                 MPIEnvironment        = this%MPIEnvironment,        &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-    end subroutine xh5for_Initialize_Reader
+    end subroutine xh5for_Initialize_Unstructured_Reader
 
 
-    subroutine xh5for_Initialize_Writer_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+    subroutine xh5for_Initialize_Unstructured_Writer_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
@@ -203,7 +207,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
                 NumberOfElements = int(NumberOfElements,I8P), &
                 TopologyType     = TopologyType,              &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,              &
+                GridType         = this%GridType)
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(            &
                 MPIEnvironment   = this%MPIEnvironment,        &
@@ -221,10 +226,10 @@ contains
                 MPIEnvironment        = this%MPIEnvironment,        &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-    end subroutine xh5for_Initialize_Writer_I4P
+    end subroutine xh5for_Initialize_Unstructured_Writer_I4P
 
 
-    subroutine xh5for_Initialize_Writer_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+    subroutine xh5for_Initialize_Unstructured_Writer_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
     !----------------------------------------------------------------- 
     !< Apply strategy and initialize lightdata and heavydata handlers
     !----------------------------------------------------------------- 
@@ -258,7 +263,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
                 NumberOfElements = int(NumberOfElements,I8P), &
                 TopologyType     = TopologyType,              &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,              &
+                GridType         = this%GridType)
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(           &
                 MPIEnvironment   = this%MPIEnvironment,       &
@@ -276,7 +282,119 @@ contains
                 MPIEnvironment        = this%MPIEnvironment,        &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-    end subroutine xh5for_Initialize_Writer_I8P
+    end subroutine xh5for_Initialize_Unstructured_Writer_I8P
+
+
+    subroutine xh5for_Initialize_Structured_Writer_I4P(this, GridShape, comm, root)
+    !----------------------------------------------------------------- 
+    !< Apply strategy and initialize lightdata and heavydata handlers
+    !----------------------------------------------------------------- 
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+        integer(I4P),      intent(IN)     :: GridShape(3)             !< Shape of the grid
+        integer, optional, intent(IN)     :: comm                     !< MPI communicator
+        integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        integer(I8P)                      :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
+        integer(I8P)                      :: NumberOfElements         !< Number of elements of the current grid (I4P)
+        integer(I4P)                      :: TopologyType             !< Topology type of the current grid
+        integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
+        integer                           :: error                    !< Error variable
+        integer                           :: r_root = 0               !< Real MPI root procesor
+    !----------------------------------------------------------------- 
+        this%Action = XDMF_ACTION_WRITE
+        if(present(root)) r_root = root
+        call this%Free()
+        ! MPI environment initialization
+        if(present(comm)) then
+            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
+        else
+            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
+        endif
+        ! Build components from factory
+        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
+        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
+        ! Uniform grid descriptor initialization
+        call this%UniformGridDescriptor%Initialize(                   &
+                                    XDim     = int(GridShape(1),I8P), &
+                                    YDim     = int(GridShape(2),I8P), &
+                                    ZDim     = int(GridShape(3),I8P), &
+                                    GridType = this%GridType)
+        ! Spatial grid descriptor initialization
+        call this%SpatialGridDescriptor%Initialize(            &
+                MPIEnvironment   = this%MPIEnvironment,        &
+                NumberOfNodes    = int(NumberOfNodes,I8P),     &
+                NumberOfElements = int(NumberOfElements,I8P),  &
+                TopologyType     = TopologyType,               &
+                GeometryType     = GeometryType)
+        ! Light data initialization
+        call this%LightData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+        ! Heavy data initialization
+        call this%HeavyData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+    end subroutine xh5for_Initialize_Structured_Writer_I4P
+
+
+    subroutine xh5for_Initialize_Structured_Writer_I8P(this, GridShape, comm, root)
+    !----------------------------------------------------------------- 
+    !< Apply strategy and initialize lightdata and heavydata handlers
+    !----------------------------------------------------------------- 
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+        integer(I8P),      intent(IN)     :: GridShape(3)             !< GridShape
+        integer, optional, intent(IN)     :: comm                     !< MPI communicator
+        integer, optional, intent(IN)     :: root                     !< MPI root procesor
+        integer(I8P)                      :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
+        integer(I8P)                      :: NumberOfElements         !< Number of elements of the current grid (I4P)
+        integer(I4P)                      :: TopologyType             !< Topology type of the current grid
+        integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
+        integer                           :: error                    !< Error variable
+        integer                           :: r_root = 0               !< Real MPI root procesor
+    !----------------------------------------------------------------- 
+        this%Action = XDMF_ACTION_WRITE
+        if(present(root)) r_root = root
+        call this%Free()
+        ! MPI environment initialization
+        if(present(comm)) then
+            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
+        else
+            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
+        endif
+        ! Build components from factory
+        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
+        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
+        ! Uniform grid descriptor initialization
+        call this%UniformGridDescriptor%Initialize( &
+                XDim = GridShape(1),                &
+                YDim = GridShape(2),                &
+                ZDim = GridShape(3),                &
+                GridType = this%GridType)
+        ! Spatial grid descriptor initialization
+        call this%SpatialGridDescriptor%Initialize(            &
+                MPIEnvironment   = this%MPIEnvironment,        &
+                NumberOfNodes    = int(NumberOfNodes,I8P),     &
+                NumberOfElements = int(NumberOfElements,I8P),  &
+                TopologyType     = TopologyType,               &
+                GeometryType     = GeometryType)
+        ! Light data initialization
+        call this%LightData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+        ! Heavy data initialization
+        call this%HeavyData%Initialize(                             &
+                MPIEnvironment        = this%MPIEnvironment,        &
+                UniformGridDescriptor = this%UniformGridDescriptor, &
+                SpatialGridDescriptor = this%SpatialGridDescriptor)
+    end subroutine xh5for_Initialize_Structured_Writer_I8P
 
 
     subroutine xh5for_Open(this, action, fileprefix)

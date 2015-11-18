@@ -117,7 +117,12 @@ contains
         integer(I4P),                               intent(IN)    :: Attribute(:) !< I4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=4, ArrayDimensions=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+                        Name=trim(adjustl(Name)),                 &
+                        Type=Type, DataType='Int',                &
+                        Center=Center,                            &
+                        Precision=4,                              &
+                        ArrayDimensions=(/size(Attribute, dim=1)/))
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I4P
 
 
@@ -132,7 +137,13 @@ contains
         integer(I8P),                               intent(IN)    :: Attribute(:) !< I8P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Int', Center=Center, Precision=8, ArrayDimensions=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+                        Name=trim(adjustl(Name)),                 &
+                        Type=Type, DataType='Int',                &
+                        Center=Center,                            &
+                        Precision=8,                              &
+                        ArrayDimensions=(/size(Attribute, dim=1)/))
+
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_I8P
 
 
@@ -147,7 +158,13 @@ contains
         real(R4P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+                        Name=trim(adjustl(Name)),                 &
+                        Type=Type, DataType='Float',              &
+                        Center=Center,                            &
+                        Precision=4,                              &
+                        ArrayDimensions=(/size(Attribute, dim=1)/))
+
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R4P
 
 
@@ -162,7 +179,13 @@ contains
         real(R8P),                                  intent(IN)    :: Attribute(:) !< R4P Grid attribute
     !-----------------------------------------------------------------
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata(Name=trim(adjustl(Name)), Type=Type, DataType='Float', Center=Center, Precision=8, ArrayDimensions=1)
+        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+                        Name=trim(adjustl(Name)),                 &
+                        Type=Type, DataType='Float',              &
+                        Center=Center,                            &
+                        Precision=8,                              &
+                        ArrayDimensions=(/size(Attribute, dim=1)/))
+
     end subroutine xdmf_contiguous_hyperslab_handler_AppendAttribute_R8P
 
 
@@ -353,6 +376,7 @@ contains
         integer(I4P)                                              :: NumberOfComponents     !< Number of components given attribute type
         character(len=:), allocatable                             :: XDMFAttributeTypeName  !< String Attibute type identifier
         character(len=:), allocatable                             :: XDMFCenterTypeName     !< String Attribute Center identifier
+        integer(I4P)                                              :: DimensionsSize         !< Size of the attribute shape
         integer(I4P)                                              :: indx           
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
@@ -378,6 +402,7 @@ contains
                                         this%UniformGridDescriptor%GetAttributeType(AttributeNumber=indx))
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
+                DimensionsSize = size(this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx), dim=1)
                 call attribute%open(xml_handler = this%file%xml_handler,                                   &
                         Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
@@ -387,7 +412,7 @@ contains
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = this%file%xml_handler,              &
-                        Dimensions = (/3_I4P,this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx)/), &
+                        Dimensions = (/3_I4P, DimensionsSize/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision=4) 
