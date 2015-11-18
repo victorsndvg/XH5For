@@ -79,6 +79,9 @@ contains
         integer(I4P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
+        call this%SpatialGridDescriptor%SetTopologySizePerGridID(                               &
+                                            TopologySize = int(size(connectivities,dim=1),I8P), &
+                                            ID           = this%MPIEnvironment%get_rank())
         call this%UniformGridDescriptor%SetTopologyMetadata(        &
                                             Name            = Name, &
                                             Precision       = 4,    &
@@ -94,6 +97,9 @@ contains
         integer(I8P),                               intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                           intent(IN)    :: Name              !< Topology name
     !-----------------------------------------------------------------
+        call this%SpatialGridDescriptor%SetTopologySizePerGridID(                               &
+                                            TopologySize = int(size(connectivities,dim=1),I8P), &
+                                            ID           = this%MPIEnvironment%get_rank())
         call this%UniformGridDescriptor%SetTopologyMetadata(        &
                                             Name            = Name, &
                                             Precision       = 8,    &

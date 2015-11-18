@@ -13,13 +13,13 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gfortran-5
+      - gfortran-4.9
 
 before_install:
   - git submodule update --init --recursive
 
 install:
-  - export FC=/usr/bin/gfortran-5
+  - export FC=/usr/bin/gfortran-4.9
 
 before_script:
   - mkdir build
