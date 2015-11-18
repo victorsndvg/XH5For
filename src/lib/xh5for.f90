@@ -7,7 +7,8 @@ use uniform_grid_descriptor
 use spatial_grid_descriptor
 use xdmf_handler
 use hdf5_handler
-use unstructured_contiguous_hyperslab_factory
+use xh5for_abstract_factory
+use xh5for_factory
 use IR_Precision, only: I4P, I8P, str
 
 
@@ -83,6 +84,9 @@ implicit none
                                                       xh5for_ReadAttribute_R8P
     end type xh5for_t
 
+    class(xh5for_abstract_factory_t), allocatable :: TheFactory
+
+public :: xh5for_t
 
 contains
 
@@ -155,10 +159,11 @@ contains
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
         ! Build components from factory
-        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
-        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
+        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheFactory%CreateXDMFHandler(this%LightData)
+        call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
@@ -197,10 +202,11 @@ contains
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
         ! Build components from factory
-        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
-        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
+        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheFactory%CreateXDMFHandler(this%LightData)
+        call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
@@ -253,10 +259,11 @@ contains
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
         ! Build components from factory
-        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
-        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
+        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheFactory%CreateXDMFHandler(this%LightData)
+        call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
@@ -310,10 +317,11 @@ contains
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
         ! Build components from factory
-        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
-        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
+        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheFactory%CreateXDMFHandler(this%LightData)
+        call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(                   &
@@ -366,10 +374,11 @@ contains
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
         ! Build components from factory
-        call TheUnstructuredContiguousHyperslabFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheUnstructuredContiguousHyperslabFactory%CreateXDMFHandler(this%LightData)
-        call TheUnstructuredContiguousHyperslabFactory%CreateHDF5Handler(this%HeavyData)
+        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
+        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
+        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
+        call TheFactory%CreateXDMFHandler(this%LightData)
+        call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &

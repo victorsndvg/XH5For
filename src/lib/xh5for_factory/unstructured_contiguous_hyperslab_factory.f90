@@ -1,6 +1,6 @@
 module unstructured_contiguous_hyperslab_factory
 
-use xh5for_factory
+use xh5for_abstract_factory
 use xdmf_handler
 use hdf5_handler
 use uniform_grid_descriptor
@@ -13,7 +13,7 @@ use hdf5_unstructured_contiguous_hyperslab_handler
 implicit none
 private
 
-    type, extends(xh5for_factory_t) :: unstructured_contiguous_hyperslab_factory_t
+    type, extends(xh5for_abstract_factory_t) :: unstructured_contiguous_hyperslab_factory_t
     contains
         procedure :: CreateUniformGridDescriptor => unstructured_contiguous_hyperslab_CreateUniformGridDescriptor
         procedure :: CreateSpatialGridDescriptor => unstructured_contiguous_hyperslab_CreateSpatialGridDescriptor
@@ -21,7 +21,7 @@ private
         procedure :: CreateHDF5Handler           => unstructured_contiguous_hyperslab_CreateHDF5Handler
     end type unstructured_contiguous_hyperslab_factory_t
 
-type(unstructured_contiguous_hyperslab_factory_t), public :: TheUnstructuredContiguousHyperslabFactory
+public :: unstructured_contiguous_hyperslab_factory_t
 
 contains
 

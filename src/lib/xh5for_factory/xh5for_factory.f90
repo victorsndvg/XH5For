@@ -1,51 +1,42 @@
 module xh5for_factory
 
-use xdmf_handler
-use hdf5_handler
-use uniform_grid_descriptor
-use spatial_grid_descriptor
+use IR_Precision, only: I4P
+use xh5for_parameters
+use xh5for_abstract_factory
+use unstructured_contiguous_hyperslab_factory
 
 implicit none
 private
 
-    type, abstract :: xh5for_factory_t
+    type :: xh5for_factory_t
     contains
-        procedure(xh5for_factory_CreateUniformGridDescriptor), deferred :: CreateUniformGridDescriptor 
-        procedure(xh5for_factory_CreateSpatialGridDescriptor), deferred :: CreateSpatialGridDescriptor 
-        procedure(xh5for_factory_CreateXDMFHandler), deferred :: CreateXDMFHandler
-        procedure(xh5for_factory_CreateHDF5Handler), deferred :: CreateHDF5Handler
+        procedure :: CreateFactory => xh5for_factory_CreateFactory
     end type xh5for_factory_t
 
-    abstract interface
-        subroutine xh5for_factory_CreateUniformGridDescriptor(this, UniformGridDescriptor)
-            import xh5for_factory_t
-            import uniform_grid_descriptor_t
-            class(xh5for_factory_t),                       intent(IN)  :: this
-            class(uniform_grid_descriptor_t), allocatable, intent(OUT) :: UniformGridDescriptor
-        end subroutine
+type(xh5for_factory_t), public :: TheXH5ForFactoryCreator
 
-        subroutine xh5for_factory_CreateSpatialGridDescriptor(this, SpatialGridDescriptor)
-            import xh5for_factory_t
-            import spatial_grid_descriptor_t
-            class(xh5for_factory_t),                       intent(IN)  :: this
-            class(spatial_grid_descriptor_t), allocatable, intent(OUT) :: SpatialGridDescriptor
-        end subroutine
+contains
 
-        subroutine xh5for_factory_CreateXDMFHandler(this, XDMFHandler)
-            import xh5for_factory_t
-            import xdmf_handler_t
-            class(xh5for_factory_t),              intent(IN)  :: this
-            class(xdmf_handler_t), allocatable, intent(OUT) :: XDMFHandler
-        end subroutine
-
-        subroutine xh5for_factory_CreateHDF5Handler(this, HDF5Handler)
-            import xh5for_factory_t
-            import hdf5_handler_t
-            class(xh5for_factory_t),            intent(IN)  :: this
-            class(hdf5_handler_t), allocatable, intent(OUT) :: HDF5Handler
-        end subroutine
-    end interface
-
-public :: xh5for_factory_t
+    subroutine xh5for_factory_CreateFactory(this, GridType, Strategy, AbstractFactory)
+    !-----------------------------------------------------------------
+    !< Return a concrete factory given Strategy and GridType
+    !----------------------------------------------------------------- 
+        class(xh5for_factory_t),                       intent(IN)  :: this
+        integer(I4P),                                  intent(IN)  :: GridType
+        integer(I4P),                                  intent(IN)  :: Strategy
+        class(xh5for_abstract_factory_t), allocatable, intent(OUT) :: AbstractFactory
+    !----------------------------------------------------------------- 
+        select case (GridType)
+            case (XDMF_GRID_TYPE_UNSTRUCTURED)
+                select case (Strategy)
+                    case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+                        allocate(unstructured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case DEFAULT
+                        print*, 'Strategy not Implemented yet!', Strategy
+                end select
+            case DEFAULT
+                print*, 'GridType not Implemented yet!', Strategy            
+        end select
+    end subroutine xh5for_factory_CreateFactory
 
 end module xh5for_factory
