@@ -207,7 +207,6 @@ contains
         call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
-        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
@@ -221,7 +220,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),     &
                 NumberOfElements = int(NumberOfElements,I8P),  &
                 TopologyType     = TopologyType,               &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,               &
+                GridType         = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -264,7 +264,6 @@ contains
         call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
-        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
@@ -278,7 +277,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
                 NumberOfElements = int(NumberOfElements,I8P), &
                 TopologyType     = TopologyType,              &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,              &
+                GridType         = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -322,7 +322,6 @@ contains
         call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
-        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(                   &
                                     XDim     = int(GridShape(1),I8P), &
@@ -335,7 +334,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),     &
                 NumberOfElements = int(NumberOfElements,I8P),  &
                 TopologyType     = TopologyType,               &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,              &
+                GridType         = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -379,7 +379,6 @@ contains
         call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
-        call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &
                 XDim = GridShape(1),                &
@@ -392,7 +391,8 @@ contains
                 NumberOfNodes    = int(NumberOfNodes,I8P),     &
                 NumberOfElements = int(NumberOfElements,I8P),  &
                 TopologyType     = TopologyType,               &
-                GeometryType     = GeometryType)
+                GeometryType     = GeometryType,              &
+                GridType         = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &

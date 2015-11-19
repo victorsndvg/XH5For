@@ -148,8 +148,20 @@ contains
 !                topologyName = 'Hexahedron_1331'; return
             case (XDMF_TOPOLOGY_TYPE_MIXED)
                 topologyName = 'Mixed'; return
+            case (XDMF_TOPOLOGY_TYPE_2DSMESH)
+                topologyName = '2DSMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DSMESH)
+                topologyName = '3DSMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_2DRECTMESH)
+                topologyName = '2DRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DRECTMESH)
+                topologyName = '3DRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_2DCORECTMESH)
+                topologyName = '2DCoRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DCORECTMESH)
+                topologyName = '2DCoRectMesh'; return
             case DEFAULT
-                topologyName = 'Triangle'; return
+                topologyName = 'Mixed'; return
         end select
     end function GetXDMFTopologyTypeName
 
@@ -242,12 +254,12 @@ contains
                 GeometryName = 'XY'; return
             case (XDMF_GEOMETRY_TYPE_X_Y_Z)
                 GeometryName = 'X_Y_Z'; return
-!            case (XDMF_GEOMETRY_TYPE_VxVyVz)
-!                GeometryName = 'VxVyVz'; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
-!                GeometryName = 'Origin_DxDyDz'; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
-!                GeometryName = 'Origin_DxDy'; return
+            case (XDMF_GEOMETRY_TYPE_VxVyVz)
+                GeometryName = 'VxVyVz'; return
+            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
+                GeometryName = 'Origin_DxDyDz'; return
+            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
+                GeometryName = 'Origin_DxDy'; return
             case DEFAULT
                 GeometryName='XYZ'; return
         end select

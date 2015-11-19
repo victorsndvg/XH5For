@@ -8,6 +8,7 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
 use mpi_environment
 use xdmf_utils
 use XH5For_metadata
+use XH5For_parameters
 
 implicit none
 
@@ -28,11 +29,15 @@ private
         integer(I8P)                                :: GlobalNumberOfElements = 0  !< Total number of elements of the spatial grid
         integer(I8P),                   allocatable :: NumberOfNodesPerGrid(:)     !< Array of number of nodes per grid
         integer(I8P),                   allocatable :: NumberOfElementsPerGrid(:)  !< Array of number of elements per grid
+        integer(I4P),                   allocatable :: GridTypePerGrid(:)          !< Array of grid type per grid
         integer(I4P),                   allocatable :: GeometryTypePerGrid(:)      !< Array of geometry type per grid
         integer(I4P),                   allocatable :: TopologyTypePerGrid(:)      !< Array of topology type per grid
         type(mpi_env_t), pointer                    :: MPIEnvironment => null()    !< MPI environment 
 
     contains
+
+        procedure(spatial_grid_descriptor_InitializeUnstructuredWriter),  deferred :: InitializeUnstructuredWriter
+        procedure(spatial_grid_descriptor_InitializeStructuredWriter),    deferred :: InitializeStructuredWriter
 
         procedure(spatial_grid_descriptor_BroadcastMetadata),              deferred :: BroadcastMetadata
 
@@ -47,6 +52,8 @@ private
         procedure(spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID), deferred :: GetGeometrySizeOffsetPerGridID
         procedure(spatial_grid_descriptor_SetGlobalGeometrySize),          deferred :: SetGlobalGeometrySize
         procedure(spatial_grid_descriptor_GetGlobalGeometrySize),          deferred :: GetGlobalGeometrySize
+
+        procedure :: DefaultInitializeWriter            => spatial_grid_descriptor_DefaultInitializeWriter
 
         procedure :: SetNumberOfGrids                   => spatial_grid_descriptor_SetNumberOfGrids
         procedure :: GetNumberOfGrids                   => spatial_grid_descriptor_GetNumberOfGrids
@@ -79,16 +86,21 @@ private
         procedure :: SetGeometryTypePerGridID           => spatial_grid_descriptor_SetGeometryTypePerGridID
         procedure :: GetGeometryTypePerGridID           => spatial_grid_descriptor_GetGeometryTypePerGridID
 
-        procedure :: Initialize_Writer                  => spatial_grid_descriptor_Initialize_Writer
-        procedure :: Initialize_Reader                  => spatial_grid_descriptor_Initialize_Reader
+        procedure :: AllocateGridTypePerGrid            => spatial_grid_descriptor_AllocateGridTypePerGrid
+        procedure :: DeallocateGridTypePerGrid          => spatial_grid_descriptor_DeallocateGridTypePerGrid
+        procedure :: SetGridTypePerGridID               => spatial_grid_descriptor_SetGridTypePerGridID
+        procedure :: GetGridTypePerGridID               => spatial_grid_descriptor_GetGridTypePerGridID
+
+        procedure :: InitializeReader                   => spatial_grid_descriptor_InitializeReader
 
         procedure :: DefaultBroadcastMetadata           => spatial_grid_descriptor_DefaultBroadcastMetadata
 
         procedure :: GetNodeOffsetPerGridID             => spatial_grid_descriptor_GetNodeOffsetPerGridID
         procedure :: GetElementOffsetPerGridID          => spatial_grid_descriptor_GetElementOffsetPerGridID
 
-        generic   :: Initialize                         => Initialize_Writer, &
-                                                           Initialize_Reader
+        generic   :: Initialize                         => InitializeUnstructuredWriter, &
+                                                           InitializeStructuredWriter,   &
+                                                           InitializeReader
 
         procedure :: Allocate                           => spatial_grid_descriptor_Allocate
         procedure :: Free                               => spatial_grid_descriptor_Free
@@ -96,6 +108,33 @@ private
 
 
     abstract interface
+        subroutine spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+            import spatial_grid_descriptor_t
+            import mpi_env_t
+            import I4P
+            import I8P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment
+            integer(I8P),                     intent(IN)    :: NumberOfNodes
+            integer(I8P),                     intent(IN)    :: NumberOfElements
+            integer(I4P),                     intent(IN)    :: TopologyType
+            integer(I4P),                     intent(IN)    :: GeometryType
+            integer(I4P),                     intent(IN)    :: GridType
+        end subroutine spatial_grid_descriptor_InitializeUnstructuredWriter
+
+        subroutine spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType)
+            import spatial_grid_descriptor_t
+            import mpi_env_t
+            import I4P
+            import I8P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment
+            integer(I8P),                     intent(IN)    :: XDim
+            integer(I8P),                     intent(IN)    :: YDim
+            integer(I8P),                     intent(IN)    :: ZDim
+            integer(I4P),                     intent(IN)    :: GridType
+        end subroutine spatial_grid_descriptor_InitializeStructuredWriter
+
         subroutine spatial_grid_descriptor_BroadcastMetadata(this)
             import spatial_grid_descriptor_t
             class(spatial_grid_descriptor_t), intent(INOUT) :: this
@@ -286,10 +325,11 @@ contains
         integer(I4P),                     intent(IN)    :: NumberOfGrids !< Total number of grids of the spatial grid
     !----------------------------------------------------------------- 
         this%NumberOfGrids = NumberOfGrids
-        allocate(this%NumberOfNodesPerGrid(NumberOfGrids))
-        allocate(this%NumberOfElementsPerGrid(NumberOfGrids))
-        allocate(this%TopologyTypePerGrid(NumberOfGrids))
-        allocate(this%GeometryTypePerGrid(NumberOfGrids))
+        call this%AllocateNumberOfNodesPerGrid(NumberOfGrids=NumberOfGrids)
+        call this%AllocateNumberOfElementsPerGrid(NumberOfGrids=NumberOfGrids)
+        call this%AllocateTopologyTypePerGrid(NumberOfGrids=NumberOfGrids)
+        call this%AllocateGeometryTypePerGrid(NumberOfGrids=NumberOfGrids)
+        call this%AllocateGridTypePerGrid(NumberOfGrids=NumberOfGrids)
     end subroutine spatial_grid_descriptor_Allocate
 
 
@@ -455,7 +495,7 @@ contains
 
     subroutine spatial_grid_descriptor_DeallocateGeometryTypePerGrid(this)
     !-----------------------------------------------------------------
-    !< Deallocate TopologyTypePerGrid
+    !< Deallocate GeometryTypePerGrid
     !----------------------------------------------------------------- 
         class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
     !-----------------------------------------------------------------
@@ -465,7 +505,7 @@ contains
 
     subroutine spatial_grid_descriptor_AllocateGeometryTypePerGrid(this, NumberOfGrids)
     !-----------------------------------------------------------------
-    !< Set the topology type of a particular grid given its ID
+    !< Set the geometry type of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
         integer(I4P),                     intent(IN)    :: NumberOfGrids!< Number of grids
@@ -477,7 +517,7 @@ contains
 
     subroutine spatial_grid_descriptor_SetGeometryTypePerGridID(this, GeometryType, ID)
     !-----------------------------------------------------------------
-    !< Set the topology type of a particular grid given its ID
+    !< Set the geometry type of a particular grid given its ID
     !----------------------------------------------------------------- 
         class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
         integer(I4P),                     intent(IN)    :: GeometryType !< Geometry type of the grid ID
@@ -497,6 +537,52 @@ contains
     !-----------------------------------------------------------------
         spatial_grid_descriptor_GetGeometryTypePerGridID = this%GeometryTypePerGrid(ID+1)
     end function spatial_grid_descriptor_GetGeometryTypePerGridID
+
+
+    subroutine spatial_grid_descriptor_DeallocateGridTypePerGrid(this)
+    !-----------------------------------------------------------------
+    !< Deallocate GridTypePerGrid
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
+    !-----------------------------------------------------------------
+        if(allocated(this%GridTypePerGrid)) deallocate(this%GridTypePerGrid)
+    end subroutine spatial_grid_descriptor_DeallocateGridTypePerGrid
+
+
+    subroutine spatial_grid_descriptor_AllocateGridTypePerGrid(this, NumberOfGrids)
+    !-----------------------------------------------------------------
+    !< Set the grid type of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this         !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: NumberOfGrids!< Number of grids
+    !-----------------------------------------------------------------
+        call this%DeallocateGridTypePerGrid()
+        allocate(this%GridTypePerGrid(NumberOfGrids))
+    end subroutine spatial_grid_descriptor_AllocateGridTypePerGrid
+
+
+    subroutine spatial_grid_descriptor_SetGridTypePerGridID(this, GridType, ID)
+    !-----------------------------------------------------------------
+    !< Set the grid type of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this       !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN)    :: GridType   !< Grid type of the grid ID
+        integer(I4P),                     intent(IN)    :: ID         !< Grid identifier
+    !-----------------------------------------------------------------
+        this%GridTypePerGrid(ID+1) = GridType
+    end subroutine spatial_grid_descriptor_SetGridTypePerGridID
+
+
+    function spatial_grid_descriptor_GetGridTypePerGridID(this, ID)
+    !-----------------------------------------------------------------
+    !< Return the Grid type of a particular grid given its ID
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(IN) :: this          !< Spatial grid descriptor type
+        integer(I4P),                     intent(IN) :: ID            !< Grid identifier
+        integer(I4P) :: spatial_grid_descriptor_GetGridTypePerGridID  !< Grid type of a grid
+    !-----------------------------------------------------------------
+        spatial_grid_descriptor_GetGridTypePerGridID = this%GridTypePerGrid(ID+1)
+    end function spatial_grid_descriptor_GetGridTypePerGridID
 
 
     function spatial_grid_descriptor_GetNodeOffsetPerGridID(this, ID)
@@ -523,7 +609,7 @@ contains
     end function spatial_grid_descriptor_GetElementOffsetPerGridID
 
 
-    subroutine spatial_grid_descriptor_Initialize_Writer(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
+    subroutine spatial_grid_descriptor_DefaultInitializeWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
@@ -533,21 +619,23 @@ contains
         integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of elements of the current grid
         integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the current grid
         integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the current grid
+        integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the current grid
         integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
         call this%Free()
-        this%MPIEnvironment => MPIEnvironment
-        call this%MPIEnvironment%mpi_allgather(NumberOfNodes, this%NumberOfNodesPerGrid)
-        call this%MPIEnvironment%mpi_allgather(NumberOfElements, this%NumberOfElementsPerGrid)
-        call this%MPIEnvironment%mpi_allgather(TopologyType, this%TopologyTypePerGrid)
-        call this%MPIEnvironment%mpi_allgather(GeometryType, this%GeometryTypePerGrid)
+        call MPIEnvironment%mpi_allgather(NumberOfNodes, this%NumberOfNodesPerGrid)
+        call MPIEnvironment%mpi_allgather(NumberOfElements, this%NumberOfElementsPerGrid)
+        call MPIEnvironment%mpi_allgather(TopologyType, this%TopologyTypePerGrid)
+        call MPIEnvironment%mpi_allgather(GeometryType, this%GeometryTypePerGrid)
+        call MPIEnvironment%mpi_allgather(GridType, this%GridTypePerGrid)
+        call this%SetMPIEnvironment(MPIEnvironment = MPIEnvironment)
         call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
-    end subroutine spatial_grid_descriptor_Initialize_Writer
+    end subroutine spatial_grid_descriptor_DefaultInitializeWriter
 
 
-    subroutine spatial_grid_descriptor_Initialize_Reader(this, MPIEnvironment)
+    subroutine spatial_grid_descriptor_InitializeReader(this, MPIEnvironment)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
@@ -556,8 +644,7 @@ contains
     !-----------------------------------------------------------------
         call this%Free()
         this%MPIEnvironment => MPIEnvironment
-    end subroutine spatial_grid_descriptor_Initialize_Reader
-
+    end subroutine spatial_grid_descriptor_InitializeReader
 
 
     subroutine spatial_grid_descriptor_DefaultBroadcastMetadata(this)
@@ -572,6 +659,7 @@ contains
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         call this%MPIEnvironment%mpi_broadcast(this%TopologyTypePerGrid)
         call this%MPIEnvironment%mpi_broadcast(this%GeometryTypePerGrid)
+        call this%MPIEnvironment%mpi_broadcast(this%GridTypePerGrid)
 		this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
     end subroutine spatial_grid_descriptor_DefaultBroadcastMetadata
 

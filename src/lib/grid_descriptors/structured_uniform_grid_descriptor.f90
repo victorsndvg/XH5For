@@ -30,6 +30,7 @@ contains
         integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the local grid
     !-----------------------------------------------------------------
         ! Not supported
+        call this%Free()
         call this%SetGridType(GridType = GridType)
     end subroutine str_uniform_grid_descriptor_unstructured_initialize
 
@@ -45,6 +46,7 @@ contains
         integer(I8P)                                    :: NumberOfNodes    !< Number of nodes of the local grid
         integer(I8P)                                    :: NumberOfElements !< Number of elements of the local gri
     !-----------------------------------------------------------------
+        call this%Free()
         call this%SetGridType(GridType = GridType)
         select case(GridType)
             case (XDMF_GRID_TYPE_CURVILINEAR)
@@ -67,7 +69,7 @@ contains
                     call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
                 else
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_3DCORECTMESH)
-                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
+                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 endif
         end select
         NumberOfNodes = MAX(1,XDim)*MAX(1,YDim)*MAX(1,ZDim)

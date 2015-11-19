@@ -108,13 +108,18 @@ implicit none
     integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
 
     integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
-                                                                XDMF_GEOMETRY_TYPE_XYZ,           &
+                                                                ! Unstructured
                                                                 XDMF_GEOMETRY_TYPE_XY,            &
+                                                                XDMF_GEOMETRY_TYPE_XYZ,           &
                                                                 XDMF_GEOMETRY_TYPE_X_Y_Z,         &
+                                                                ! Structured
+                                                                XDMF_GEOMETRY_TYPE_VXVYVZ,        &
+                                                                XDMF_GEOMETRY_TYPE_ORIGIN_DXDY,   &
                                                                 XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  &
                                                              /)
 
     integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(*)  = (/ &
+                                                                ! Unstructured
 !                                                               XDMF_TOPOLOGY_TYPE_POLYVERTEX,      &
 !                                                               XDMF_TOPOLOGY_TYPE_POLYLINE,        &
 !                                                               XDMF_TOPOLOGY_TYPE_POLYGON,         &
@@ -143,7 +148,14 @@ implicit none
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
-                                                                XDMF_TOPOLOGY_TYPE_MIXED            &
+                                                                XDMF_TOPOLOGY_TYPE_MIXED,           &
+                                                                ! Structured
+                                                                XDMF_TOPOLOGY_TYPE_2DSMESH,         &
+                                                                XDMF_TOPOLOGY_TYPE_3DSMESH,         &
+                                                                XDMF_TOPOLOGY_TYPE_2DRECTMESH,      &
+                                                                XDMF_TOPOLOGY_TYPE_3DRECTMESH,      &
+                                                                XDMF_TOPOLOGY_TYPE_2DCORECTMESH,    &
+                                                                XDMF_TOPOLOGY_TYPE_3DCORECTMESH     &
                                                              /)
 
     integer(I4P), parameter :: SUPPORTED_GRIDTYPES(*)  = (/ &

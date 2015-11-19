@@ -1,4 +1,4 @@
-# XdmfHdf5Fortran
+# XH5For
 The Fortran way to easy write partitioned XDMF/HDF5 meshes
 
 [![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)

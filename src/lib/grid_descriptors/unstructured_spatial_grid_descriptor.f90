@@ -15,6 +15,9 @@ private
         integer(I8P)                                :: GlobalTopologySize     = 0  !< Total size of the connectivities of the spatial grid
         integer(I8P),                   allocatable :: TopologySizePerGrid(:)      !< Array of sizes of array connectivities per grid
     contains
+        procedure, public :: InitializeUnstructuredWriter       => unst_spatial_grid_descriptor_InitializeUnstructuredWriter
+        procedure, public :: InitializeStructuredWriter         => unst_spatial_grid_descriptor_InitializeStructuredWriter
+
         procedure, public :: Allocate                           => unst_spatial_grid_descriptor_Allocate
         procedure, public :: SetGlobalTopologySize              => unst_spatial_grid_descriptor_SetGlobalTopologySize
         procedure, public :: GetGlobalTopologySize              => unst_spatial_grid_descriptor_GetGlobalTopologySize
@@ -36,6 +39,68 @@ public:: unstructured_spatial_grid_descriptor_t
 
 
 contains
+
+
+    subroutine unst_spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+    !-----------------------------------------------------------------
+    !< Initilized the spatial grid descriptor type
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment    !< MPI environment type
+        integer(I8P),                     intent(IN)    :: NumberOfNodes     !< Number of nodes of the current grid
+        integer(I8P),                     intent(IN)    :: NumberOfElements  !< Number of elements of the current grid
+        integer(I4P),                     intent(IN)    :: TopologyType      !< Topology type of the current grid
+        integer(I4P),                     intent(IN)    :: GeometryType      !< Geometry type of the current grid
+        integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the current grid
+        integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
+    !-----------------------------------------------------------------
+        call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
+                                          NumberOfNodes = NumberOfNodes,       &
+                                          NumberOfElements = NumberOfElements, &
+                                          TopologyType = TopologyType,         &
+                                          GeometryType = GeometryType,         &
+                                          GridType = GridType)
+    end subroutine unst_spatial_grid_descriptor_InitializeUnstructuredWriter
+
+
+    subroutine unst_spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType)
+    !-----------------------------------------------------------------
+    !< Initilized the spatial grid descriptor type
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment    !< MPI environment type
+        integer(I8P),                     intent(IN)    :: XDim              !< Number of points of the X axis
+        integer(I8P),                     intent(IN)    :: YDim              !< Number of points of the Y axis
+        integer(I8P),                     intent(IN)    :: ZDim              !< Number of points of the Z axis
+        integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the current grid
+        integer(I8P)                                    :: NumberOfNodes     !< Number of nodes of the current grid
+        integer(I8P)                                    :: NumberOfElements  !< Number of elements of the current grid
+        integer(I4P)                                    :: TopologyType      !< Topology type of the current grid
+        integer(I4P)                                    :: GeometryType      !< Geometry type of the current grid
+        integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
+    !-----------------------------------------------------------------
+        select case(GridType)
+            case (XDMF_GRID_TYPE_UNSTRUCTURED)
+                if(ZDim == 0_I8P) then
+                    TopologyType=XDMF_TOPOLOGY_TYPE_QUADRILATERAL
+                    GeometryType=XDMF_GEOMETRY_TYPE_XY
+                else
+                    TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON
+                    GeometryType=XDMF_GEOMETRY_TYPE_XYZ
+                endif
+            case DEFAULT
+                ! Error
+        end select
+        NumberOfNodes = MAX(1,XDim)*MAX(1,YDim)*MAX(1,ZDim)
+        NumberOfElements = (MAX(2,XDim)-1)*(MAX(2,YDim)-1)*(MAX(2,ZDim)-1)
+        call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
+                                          NumberOfNodes = NumberOfNodes,       &
+                                          NumberOfElements = NumberOfElements, &
+                                          TopologyType = TopologyType,         &
+                                          GeometryType = GeometryType,         &
+                                          GridType = GridType)  
+    end subroutine unst_spatial_grid_descriptor_InitializeStructuredWriter
+
 
     subroutine unst_spatial_grid_descriptor_Allocate(this, NumberOfGrids)
     !-----------------------------------------------------------------

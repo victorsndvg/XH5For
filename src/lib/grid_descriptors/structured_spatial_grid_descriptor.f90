@@ -18,6 +18,9 @@ private
         integer(I8P),                   allocatable :: YSizePerGrid(:)  !< Array of sizes of Y coordinates per grid
         integer(I8P),                   allocatable :: ZSizePerGrid(:)  !< Array of sizes of Z coordinates per grid
     contains
+        procedure, public :: InitializeUnstructuredWriter   => str_spatial_grid_descriptor_InitializeUnstructuredWriter
+        procedure, public :: InitializeStructuredWriter     => str_spatial_grid_descriptor_InitializeStructuredWriter
+
         procedure, public :: Allocate                       => str_spatial_grid_descriptor_Allocate
         procedure, public :: SetGlobalXSize                 => str_spatial_grid_descriptor_SetGlobalXSize
         procedure, public :: SetGlobalYSize                 => str_spatial_grid_descriptor_SetGlobalYSize
@@ -52,6 +55,89 @@ public:: structured_spatial_grid_descriptor_t
 
 
 contains
+
+
+    subroutine str_spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+    !-----------------------------------------------------------------
+    !< Initilized the spatial grid descriptor type
+    !----------------------------------------------------------------- 
+        class(structured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment   !< MPI environment type
+        integer(I8P),                     intent(IN)    :: NumberOfNodes    !< Number of nodes of the current grid
+        integer(I8P),                     intent(IN)    :: NumberOfElements !< Number of elements of the current grid
+        integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the current grid
+        integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the current grid
+        integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the current grid
+        integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
+    !-----------------------------------------------------------------
+        call this%Free()
+        ! Error. Not supported
+    end subroutine str_spatial_grid_descriptor_InitializeUnstructuredWriter
+
+
+    subroutine str_spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType)
+    !-----------------------------------------------------------------
+    !< Initilized the spatial grid descriptor type
+    !----------------------------------------------------------------- 
+        class(structured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< Spatial grid descriptor type
+        type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment   !< MPI environment type
+        integer(I8P),                     intent(IN)    :: XDim             !< Number of points of the X axis
+        integer(I8P),                     intent(IN)    :: YDim             !< Number of points of the Y axis
+        integer(I8P),                     intent(IN)    :: ZDim             !< Number of points of the Z axis
+        integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the current grid
+        integer(I8P)                                    :: NumberOfNodes    !< Number of nodes of the current grid
+        integer(I8P)                                    :: NumberOfElements !< Number of elements of the current grid
+        integer(I4P)                                    :: TopologyType     !< Topology type of the current grid
+        integer(I4P)                                    :: GeometryType     !< Geometry type of the current grid
+        integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
+    !-----------------------------------------------------------------
+        call this%Free()
+        select case(GridType)
+            case (XDMF_GRID_TYPE_CURVILINEAR)
+                if(ZDim == 0_I8P) then
+                    TopologyType=XDMF_TOPOLOGY_TYPE_2DSMESH
+                else
+                    TopologyType=XDMF_TOPOLOGY_TYPE_3DSMESH
+                endif
+                GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
+            case (XDMF_GRID_TYPE_RECTILINEAR)
+                if(ZDim == 0_I8P) then
+                    TopologyType=XDMF_TOPOLOGY_TYPE_2DRECTMESH
+                else
+                    TopologyType=XDMF_TOPOLOGY_TYPE_3DRECTMESH
+                endif
+                GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
+            case (XDMF_GRID_TYPE_REGULAR)
+print*, 'is resgular'
+                if(ZDim == 0_I8P) then
+print*, 'z=0'
+                    TopologyType=XDMF_TOPOLOGY_TYPE_2DCORECTMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDY
+                else
+print*, 'z/=0'
+                    TopologyType=XDMF_TOPOLOGY_TYPE_3DCORECTMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ
+                endif
+            case DEFAULT
+                ! Error
+        end select
+print*, GeometryType, TopologyType
+        NumberOfNodes = MAX(1,XDim)*MAX(1,YDim)*MAX(1,ZDim)
+        NumberOfElements = (MAX(2,XDim)-1)*(MAX(2,YDim)-1)*(MAX(2,ZDim)-1)
+        call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
+                                          NumberOfNodes = NumberOfNodes,       &
+                                          NumberOfElements = NumberOfElements, &
+                                          TopologyType = TopologyType,         &
+                                          GeometryType = GeometryType,         &
+                                          GridType = GridType)
+        call MPIEnvironment%mpi_allgather(XDim, this%XSizePerGrid)
+        call MPIEnvironment%mpi_allgather(YDim, this%YSizePerGrid)
+        call MPIEnvironment%mpi_allgather(ZDim, this%ZSizePerGrid)
+        call this%SetGlobalXsize(sum(this%XSizePerGrid))
+        call this%SetGlobalYsize(sum(this%YSizePerGrid))
+        call this%SetGlobalZsize(sum(this%ZSizePerGrid))
+    end subroutine str_spatial_grid_descriptor_InitializeStructuredWriter
+
 
     subroutine str_spatial_grid_descriptor_Allocate(this, NumberOfGrids)
     !-----------------------------------------------------------------
