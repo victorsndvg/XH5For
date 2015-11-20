@@ -3,6 +3,7 @@ module xh5for_factory
 use IR_Precision, only: I4P
 use xh5for_parameters
 use xh5for_abstract_factory
+use structured_contiguous_hyperslab_factory
 use unstructured_contiguous_hyperslab_factory
 
 implicit none
@@ -34,8 +35,15 @@ contains
                     case DEFAULT
                         print*, 'Strategy not Implemented yet!', Strategy
                 end select
+            case (XDMF_GRID_TYPE_RECTILINEAR)
+                select case (Strategy)
+                    case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+                        allocate(structured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case DEFAULT
+                        print*, 'Strategy not Implemented yet!', Strategy
+                end select
             case DEFAULT
-                print*, 'GridType not Implemented yet!', Strategy            
+                print*, 'GridType not Implemented yet!', GridType            
         end select
     end subroutine xh5for_factory_CreateFactory
 

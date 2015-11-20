@@ -35,10 +35,14 @@ private
         procedure(hdf5_handler_WriteGeometry_XYZ_R8P),   deferred :: WriteGeometry_XYZ_R8P
         procedure(hdf5_handler_WriteGeometry_X_Y_Z_R4P), deferred :: WriteGeometry_X_Y_Z_R4P
         procedure(hdf5_handler_WriteGeometry_X_Y_Z_R8P), deferred :: WriteGeometry_X_Y_Z_R8P
+        procedure(hdf5_handler_WriteGeometry_DXDYDZ_R4P),deferred :: WriteGeometry_DXDYDZ_R4P
+        procedure(hdf5_handler_WriteGeometry_DXDYDZ_R8P),deferred :: WriteGeometry_DXDYDZ_R8P
         procedure(hdf5_handler_ReadGeometry_XYZ_R4P),    deferred :: ReadGeometry_XYZ_R4P
         procedure(hdf5_handler_ReadGeometry_XYZ_R8P),    deferred :: ReadGeometry_XYZ_R8P
         procedure(hdf5_handler_ReadGeometry_X_Y_Z_R4P),  deferred :: ReadGeometry_X_Y_Z_R4P
         procedure(hdf5_handler_ReadGeometry_X_Y_Z_R8P),  deferred :: ReadGeometry_X_Y_Z_R8P
+        procedure(hdf5_handler_ReadGeometry_DXDYDZ_R4P), deferred :: ReadGeometry_DXDYDZ_R4P
+        procedure(hdf5_handler_ReadGeometry_DXDYDZ_R8P), deferred :: ReadGeometry_DXDYDZ_R8P
         procedure(hdf5_handler_WriteTopology_I4P),       deferred :: WriteTopology_I4P
         procedure(hdf5_handler_WriteTopology_I8P),       deferred :: WriteTopology_I8P
         procedure(hdf5_handler_ReadTopology_I4P),        deferred :: ReadTopology_I4P
@@ -62,11 +66,15 @@ private
         generic,   public   :: WriteGeometry  => WriteGeometry_XYZ_R4P,   &
                                                  WriteGeometry_XYZ_R8P,   &
                                                  WriteGeometry_X_Y_Z_R4P, &
-                                                 WriteGeometry_X_Y_Z_R8P
+                                                 WriteGeometry_X_Y_Z_R8P, &
+                                                 WriteGeometry_DXDYDZ_R4P,&
+                                                 WriteGeometry_DXDYDZ_R8P
         generic,   public   :: ReadGeometry   => ReadGeometry_XYZ_R4P,   &
                                                  ReadGeometry_XYZ_R8P,   &
                                                  ReadGeometry_X_Y_Z_R4P, &
-                                                 ReadGeometry_X_Y_Z_R8P
+                                                 ReadGeometry_X_Y_Z_R8P, &
+                                                 ReadGeometry_DXDYDZ_R4P, &
+                                                 ReadGeometry_DXDYDZ_R8P
         generic,   public   :: WriteAttribute => WriteAttribute_I4P, &
                                                  WriteAttribute_I8P, &
                                                  WriteAttribute_R4P, &
@@ -115,6 +123,24 @@ private
             character(len=*),      intent(IN) :: Name
         end subroutine hdf5_handler_WriteGeometry_X_Y_Z_R8P
 
+        subroutine hdf5_handler_WriteGeometry_DXDYDZ_R4P(this, Origin, DxDyDz, Name)
+            import hdf5_handler_t
+            import R4P
+            class(hdf5_handler_t), intent(IN) :: this
+            real(R4P),             intent(IN) :: Origin(:)
+            real(R4P),             intent(IN) :: DxDyDz(:)
+            character(len=*),      intent(IN) :: Name
+        end subroutine hdf5_handler_WriteGeometry_DXDYDZ_R4P
+
+        subroutine hdf5_handler_WriteGeometry_DXDYDZ_R8P(this, Origin, DxDyDz, Name)
+            import hdf5_handler_t
+            import R8P
+            class(hdf5_handler_t), intent(IN) :: this
+            real(R8P),             intent(IN) :: Origin(:)
+            real(R8P),             intent(IN) :: DxDyDz(:)
+            character(len=*),      intent(IN) :: Name
+        end subroutine hdf5_handler_WriteGeometry_DXDYDZ_R8P
+
         subroutine hdf5_handler_ReadGeometry_XYZ_R4P(this, XYZ, Name)
             import hdf5_handler_t
             import R4P
@@ -150,6 +176,24 @@ private
             real(R8P), allocatable, intent(OUT) :: Z(:)
             character(len=*),       intent(IN)  :: Name
         end subroutine hdf5_handler_ReadGeometry_X_Y_Z_R8P
+
+        subroutine hdf5_handler_ReadGeometry_DXDYDZ_R4P(this, Origin, DxDyDz, Name)
+            import hdf5_handler_t
+            import R4P
+            class(hdf5_handler_t),  intent(IN)  :: this
+            real(R4P), allocatable, intent(OUT) :: Origin(:)
+            real(R4P), allocatable, intent(OUT) :: DxDyDz(:)
+            character(len=*),       intent(IN)  :: Name
+        end subroutine hdf5_handler_ReadGeometry_DXDYDZ_R4P
+
+        subroutine hdf5_handler_ReadGeometry_DXDYDZ_R8P(this, Origin, DxDyDz, Name)
+            import hdf5_handler_t
+            import R8P
+            class(hdf5_handler_t),  intent(IN)  :: this
+            real(R8P), allocatable, intent(OUT) :: Origin(:)
+            real(R8P), allocatable, intent(OUT) :: DxDyDz(:)
+            character(len=*),       intent(IN)  :: Name
+        end subroutine hdf5_handler_ReadGeometry_DXDYDZ_R8P
 
         subroutine hdf5_handler_WriteTopology_I4P(this, Connectivities, Name)
             import hdf5_handler_t

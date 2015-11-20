@@ -35,10 +35,14 @@ implicit none
         procedure         :: xh5for_WriteGeometry_XYZ_R8P
         procedure         :: xh5for_WriteGeometry_X_Y_Z_R4P
         procedure         :: xh5for_WriteGeometry_X_Y_Z_R8P
+        procedure         :: xh5for_WriteGeometry_DXDYDZ_R4P
+        procedure         :: xh5for_WriteGeometry_DXDYDZ_R8P
         procedure         :: xh5for_ReadGeometry_XYZ_R4P
         procedure         :: xh5for_ReadGeometry_XYZ_R8P
         procedure         :: xh5for_ReadGeometry_X_Y_Z_R4P
         procedure         :: xh5for_ReadGeometry_X_Y_Z_R8P
+        procedure         :: xh5for_ReadGeometry_DXDYDZ_R4P
+        procedure         :: xh5for_ReadGeometry_DXDYDZ_R8P
         procedure         :: xh5for_WriteTopology_I4P
         procedure         :: xh5for_WriteTopology_I8P
         procedure         :: xh5for_ReadTopology_I4P
@@ -69,11 +73,15 @@ implicit none
         generic,   public :: WriteGeometry         => xh5for_WriteGeometry_XYZ_R4P,   &
                                                       xh5for_WriteGeometry_XYZ_R8P,   &
                                                       xh5for_WriteGeometry_X_Y_Z_R4P, &
-                                                      xh5for_WriteGeometry_X_Y_Z_R8P
+                                                      xh5for_WriteGeometry_X_Y_Z_R8P, &
+                                                      xh5for_WriteGeometry_DXDYDZ_R4P,&
+                                                      xh5for_WriteGeometry_DXDYDZ_R8P
         generic,   public :: ReadGeometry          => xh5for_ReadGeometry_XYZ_R4P,   &
                                                       xh5for_ReadGeometry_XYZ_R8P,   &
                                                       xh5for_ReadGeometry_X_Y_Z_R4P, &
-                                                      xh5for_ReadGeometry_X_Y_Z_R8P
+                                                      xh5for_ReadGeometry_X_Y_Z_R8P, &
+                                                      xh5for_ReadGeometry_DXDYDZ_R4P,&
+                                                      xh5for_ReadGeometry_DXDYDZ_R8P
         generic,   public :: WriteAttribute        => xh5for_WriteAttribute_I4P, &
                                                       xh5for_WriteAttribute_I8P, &
                                                       xh5for_WriteAttribute_R4P, &
@@ -323,19 +331,18 @@ contains
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
         ! Uniform grid descriptor initialization
-        call this%UniformGridDescriptor%Initialize(                   &
-                                    XDim     = int(GridShape(1),I8P), &
-                                    YDim     = int(GridShape(2),I8P), &
-                                    ZDim     = int(GridShape(3),I8P), &
-                                    GridType = this%GridType)
+        call this%UniformGridDescriptor%Initialize( &
+                XDim     = int(GridShape(1),I8P),   &
+                YDim     = int(GridShape(2),I8P),   &
+                ZDim     = int(GridShape(3),I8P),   &
+                GridType = this%GridType)
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(            &
                 MPIEnvironment   = this%MPIEnvironment,        &
-                NumberOfNodes    = int(NumberOfNodes,I8P),     &
-                NumberOfElements = int(NumberOfElements,I8P),  &
-                TopologyType     = TopologyType,               &
-                GeometryType     = GeometryType,              &
-                GridType         = this%GridType)
+                XDim     = int(GridShape(1),I8P),              &
+                YDim     = int(GridShape(2),I8P),              &
+                ZDim     = int(GridShape(3),I8P),              &
+                GridType = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -388,11 +395,10 @@ contains
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(            &
                 MPIEnvironment   = this%MPIEnvironment,        &
-                NumberOfNodes    = int(NumberOfNodes,I8P),     &
-                NumberOfElements = int(NumberOfElements,I8P),  &
-                TopologyType     = TopologyType,               &
-                GeometryType     = GeometryType,              &
-                GridType         = this%GridType)
+                XDim     = int(GridShape(1),I8P),              &
+                YDim     = int(GridShape(2),I8P),              &
+                ZDim     = int(GridShape(3),I8P),              &
+                GridType = this%GridType)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -501,6 +507,43 @@ contains
     end subroutine xh5for_WriteGeometry_X_Y_Z_R4P
 
 
+    subroutine xh5for_WriteGeometry_DXDYDZ_R4P(this, Origin, DxDyDz, Name)
+    !----------------------------------------------------------------- 
+    !< Write R8P X_Y_Z Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P),                  intent(IN)    :: Origin(:)        !< Origin of the grid coordinates
+        real(R4P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
+            call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
+        else
+            call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_WriteGeometry_DXDYDZ_R4P
+
+
+    subroutine xh5for_WriteGeometry_DXDYDZ_R8P(this, Origin, DxDyDz, Name)
+    !----------------------------------------------------------------- 
+    !< Write R8P DXDYDZ Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R8P),                  intent(IN)    :: Origin(:)        !< Origin of the grid coordinates
+        real(R8P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
+            call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
+        else
+            call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
+            call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_WriteGeometry_DXDYDZ_R8P
+
     subroutine xh5for_WriteGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
     !----------------------------------------------------------------- 
     !< Write R8P X_Y_Z Geometry
@@ -595,6 +638,44 @@ contains
             call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
         endif
     end subroutine xh5for_ReadGeometry_X_Y_Z_R8P
+
+
+    subroutine xh5for_ReadGeometry_DXDYDZ_R4P(this, Origin, DxDyDz, Name)
+    !----------------------------------------------------------------- 
+    !< Read DXDYDZ R4P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R4P), allocatable,     intent(OUT)   :: Origin(:)        !< Origin of the grid coordinates
+        real(R4P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
+            call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_DXDYDZ_R4P
+
+
+    subroutine xh5for_ReadGeometry_DXDYDZ_R8P(this, Origin, DxDyDz, Name)
+    !----------------------------------------------------------------- 
+    !< Read DXDYDZ R8P Geometry
+    !----------------------------------------------------------------- 
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        real(R8P), allocatable,     intent(OUT)   :: Origin(:)        !< Origin of the grid coordinates
+        real(R8P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
+        character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
+    !-----------------------------------------------------------------
+        if(present(Name)) then
+            call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
+            call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
+        else
+            call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
+            call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
+        endif
+    end subroutine xh5for_ReadGeometry_DXDYDZ_R8P
 
 
     subroutine xh5for_WriteTopology_I4P(this, Connectivities, Name)

@@ -397,14 +397,14 @@ contains
                         Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
-                call dataitem%open(xml_handler = this%file%xml_handler,                           &
-                        Dimensions = (/int(LocalNumberOfData*int(NumberOfComponents,I8P),I8P), 1_I8P, 1_I8P/),  &
-                        ItemType   = 'HyperSlab',                                                 &
+                call dataitem%open(xml_handler = this%file%xml_handler,                                                     &
+                        Dimensions = (/int(LocalNumberOfData,I8P), int(NumberOfComponents,I8P), int(DimensionsSize,I8P)/),  &
+                        ItemType   = 'HyperSlab',                                                                           &
                         Format     = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler,              &
-                        Dimensions = (/3_I4P, DimensionsSize/), &
-                        NumberType = 'Int', &
-                        Format     = 'XML', &
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/3_I4P, DimensionsSize/),         &
+                        NumberType = 'Int',                             &
+                        Format     = 'XML',                             &
                         Precision=4) 
                 call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))

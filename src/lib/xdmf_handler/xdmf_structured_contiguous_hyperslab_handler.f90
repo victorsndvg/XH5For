@@ -29,8 +29,8 @@ private
         procedure         :: SetTopology_I4P              => xdmf_str_contiguous_hyperslab_SetTopology_I4P
         procedure         :: SetTopology_I8P              => xdmf_str_contiguous_hyperslab_SetTopology_I8P
         procedure         :: WriteGeometry                => xdmf_str_contiguous_hyperslab_WriteGeometry
-        procedure         :: WriteGeometry_ORIGIN_DXDYDZ  => xdmf_str_contiguous_hyperslab_WriteGeometry_ORIGIN_DXDYDZ
         procedure         :: WriteGeometry_VXVYVZ         => xdmf_str_contiguous_hyperslab_WriteGeometry_VXVYVZ
+        procedure         :: WriteGeometry_DXDYDZ         => xdmf_str_contiguous_hyperslab_WriteGeometry_DXDYDZ
         procedure         :: WriteTopology                => xdmf_str_contiguous_hyperslab_WriteTopology
         procedure         :: FillSpatialGridTopology      => xdmf_str_contiguous_hyperslab_FillSpatialGridTopology
         procedure         :: FillSpatialGridGeometry      => xdmf_str_contiguous_hyperslab_FillSpatialGridGeometry
@@ -274,14 +274,14 @@ contains
         select case(this%UniformGridDescriptor%GetGeometryType())
 
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY, XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
-                call this%WriteGeometry_ORIGIN_DXDYDZ(GridID=GridID)
+                call this%WriteGeometry_DXDYDZ(GridID=GridID)
             case (XDMF_GEOMETRY_TYPE_VXVYVZ)
                 call this%WriteGeometry_VXVYVZ(GridID=GridID)
         end select
     end subroutine xdmf_str_contiguous_hyperslab_WriteGeometry
 
 
-    subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_ORIGIN_DXDYDZ(this, GridID)
+    subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_DXDYDZ(this, GridID)
     !-----------------------------------------------------------------
     !< Write a XDMF XY[Z] Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -347,7 +347,7 @@ contains
             call dataitem%close(xml_handler = this%file%xml_handler)
             call geometry%close(xml_handler = this%file%xml_handler)
         endif                    
-    end subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_ORIGIN_DXDYDZ
+    end subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_DXDYDZ
 
 
     subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_VXVYVZ(this, GridID)
