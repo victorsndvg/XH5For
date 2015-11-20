@@ -251,7 +251,7 @@ contains
     !< Write a XDMF Topology into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this       !< XDMF contiguous hyperslab handler for Unstructured Grids
-        integer(I4P),          optional,            intent(IN)    :: GridID                  !< Grid ID number
+        integer(I4P),                               intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_topology_t)                                     :: topology                !< XDMF Topology type
         type(xdmf_dataitem_t)                                     :: dataitem                !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata                !< XDMF Character Data type
@@ -264,13 +264,8 @@ contains
     !-----------------------------------------------------------------
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=GridID)
-            else
-                LocalNumberOfElements = this%UniformGridDescriptor%GetNumberOfElements()
-                Start = 0
-            endif
+            LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
+            Start = this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=GridID)
             GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalTopologySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
             Count = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID)
@@ -308,8 +303,8 @@ contains
     !-----------------------------------------------------------------
     !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+        class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler for Unstructured Grids
+        integer(I4P),                                            intent(IN)    :: GridID !< Grid ID number
     !----------------------------------------------------------------- 
         select case(this%UniformGridDescriptor%GetGeometryType())
             case (XDMF_GEOMETRY_TYPE_XY, XDMF_GEOMETRY_TYPE_XYZ)
@@ -325,7 +320,7 @@ contains
     !< Write a XDMF XY[Z] Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+        integer(I4P),                    intent(IN)    :: GridID                       !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry                     !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                     !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                     !< XDMF Character Data type
@@ -338,14 +333,8 @@ contains
         integer(I4P)                                   :: DimensionsSize               !< Size of the geometry shape
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                LocalGeometrySize = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID)
-            else
-                SpaceDimension = GetSpaceDimension(this%UniformGridDescriptor%getGeometryType())
-                LocalGeometrySize = this%UniformGridDescriptor%GetNumberOfNodes()*SpaceDimension
-                Start = 0
-            endif
+            LocalGeometrySize = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID)
+            Start = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID)
             GlobalGeometrySize = this%SpatialGridDescriptor%GetGlobalGeometrySize()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
             Count = LocalGeometrySize
@@ -383,7 +372,7 @@ contains
     !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_unstructured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for Unstructured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+        integer(I4P),                    intent(IN)    :: GridID                       !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry                     !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                     !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                     !< XDMF Character Data type
@@ -396,13 +385,8 @@ contains
         integer(I4P)                                   :: DimensionsSize               !< Size of the geometry shape
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
-                Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
-            else
-                LocalNumberOfNodes = this%UniformGridDescriptor%GetNumberOfNodes()
-                Start = 0
-            endif
+            LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
+            Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
             GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
             Count = LocalNumberOfNodes

@@ -242,7 +242,7 @@ contains
     !< Write a XDMF Topology into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_structured_contiguous_hyperslab_handler_t), intent(INOUT) :: this         !< XDMF contiguous hyperslab handler for structured Grids
-        integer(I4P),          optional,            intent(IN)    :: GridID                  !< Grid ID number
+        integer(I4P),                               intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_topology_t)                                     :: topology                !< XDMF Topology type
         integer(I8P)                                              :: GridShape(3)            !< Local number of elements
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
@@ -250,15 +250,11 @@ contains
     !-----------------------------------------------------------------
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                GridShape(1) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=1)
-                GridShape(2) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=2)
-                GridShape(3) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=3)
-                XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%SpatialGridDescriptor%getTopologyTypePerGridID(id=GridID))
-            else
-                GridShape(:) = this%UniformGridDescriptor%GetTopologyArrayDimensions()
-                XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            endif
+            ! Topology Grid shape is expressed in ZYX order in structured grids
+            GridShape(1) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=3)
+            GridShape(2) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=2)
+            GridShape(3) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=1)
+            XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%SpatialGridDescriptor%getTopologyTypePerGridID(id=GridID))
 
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = GridShape,                         &
@@ -272,8 +268,8 @@ contains
     !-----------------------------------------------------------------
     !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(xdmf_structured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for structured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                       !< Grid ID number
+        class(xdmf_structured_contiguous_hyperslab_handler_t), intent(INOUT) :: this   !< XDMF contiguous hyperslab handler for structured Grids
+        integer(I4P),                                          intent(IN)    :: GridID !< Grid ID number
     !----------------------------------------------------------------- 
         select case(this%UniformGridDescriptor%GetGeometryType())
 
@@ -290,7 +286,7 @@ contains
     !< Write a XDMF XY[Z] Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_structured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for structured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                  !< Grid ID number
+        integer(I4P),                    intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry                !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                !< XDMF Character Data type
@@ -300,13 +296,8 @@ contains
         integer(I4P)                                   :: DimensionsSize          !< Size of the GeometryDimensions
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
-                GridNumber = GridID
-            else
-                XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
-                GridNumber = 0
-            endif
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
+            GridNumber = GridID
             NumberOfGrids = this%SpatialGridDescriptor%GetNumberOfGrids()
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
@@ -364,7 +355,7 @@ contains
     !< Write a XDMF Geometry into a opened file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(xdmf_structured_contiguous_hyperslab_handler_t), intent(INOUT) :: this !< XDMF contiguous hyperslab handler for structured Grids
-        integer(I4P), optional,          intent(IN)    :: GridID                  !< Grid ID number
+        integer(I4P),                    intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_geometry_t)                          :: geometry                !< XDMF Geometry type
         type(xdmf_dataitem_t)                          :: dataitem                !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                    :: chardata                !< XDMF Character Data type
@@ -375,23 +366,16 @@ contains
         Integer(I4P)                                   :: DimensionsSize          !< Size of the Geometry shape
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            if(present(GridID)) then
-                LocalGridShape(1) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1)
-                LocalGridShape(2) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2)
-                LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
-                GlobalGridShape(1) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1)
-                GlobalGridShape(2) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2)
-                GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
-                GridShapeOffset(1) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=1)
-                GridShapeOffset(2) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=2)
-                GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
-                XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
-            else
-                LocalGridShape(:) = this%UniformGridDescriptor%GetGeometryArrayDimensions()
-                GlobalGridShape(:) = this%UniformGridDescriptor%GetGeometryArrayDimensions()
-                GridShapeOffset(:) = 0
-                XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
-            endif
+            LocalGridShape(1) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1)
+            LocalGridShape(2) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2)
+            LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
+            GlobalGridShape(1) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1)
+            GlobalGridShape(2) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2)
+            GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
+            GridShapeOffset(1) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=1)
+            GridShapeOffset(2) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=2)
+            GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
             call geometry%open( xml_handler  = this%file%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------

@@ -47,14 +47,14 @@ private
             import I4P
             import xdmf_contiguous_hyperslab_handler_t
             class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this    !< XDMF contiguous hyperslab handler
-            integer(I4P), optional,                     intent(IN) :: GridID     !< Grid ID number
+            integer(I4P),                               intent(IN) :: GridID     !< Grid ID number
         end subroutine xdmf_contiguous_hyperslab_handler_WriteGeometry
 
         subroutine xdmf_contiguous_hyperslab_handler_WriteTopology(this, GridID)
             import I4P
             import xdmf_contiguous_hyperslab_handler_t
             class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this    !< XDMF contiguous hyperslab handler
-            integer(I4P), optional,                     intent(IN) :: GridID     !< Grid ID number
+            integer(I4P),                               intent(IN) :: GridID     !< Grid ID number
         end subroutine xdmf_contiguous_hyperslab_handler_WriteTopology
     end interface
 
@@ -67,7 +67,7 @@ contains
     !< Open a XDMF grid
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
-        integer(I4P),                     optional, intent(IN)    :: GridID      !< Grid ID number
+        integer(I4P),                               intent(IN)    :: GridID      !< Grid ID number
         type(xdmf_grid_t)                                         :: grid        !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
@@ -77,12 +77,11 @@ contains
     end subroutine xdmf_contiguous_hyperslab_handler_OpenGrid
 
 
-    subroutine xdmf_contiguous_hyperslab_handler_CloseGrid(this, GridID)
+    subroutine xdmf_contiguous_hyperslab_handler_CloseGrid(this)
     !-----------------------------------------------------------------
     !< Close a XDMF grid
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this        !< XDMF contiguous hyperslab handler
-        integer(I4P),                     optional, intent(IN)    :: GridID      !< Grid ID number
         type(xdmf_grid_t)                                         :: grid        !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
@@ -354,7 +353,7 @@ contains
             call this%WriteTopology(GridID = IDidx)
             call this%WriteGeometry(GridID = IDidx)
             call this%WriteAttributes(GridID = IDidx)
-            call this%CloseGrid(GridID = IDidx)
+            call this%CloseGrid()
         enddo
     end subroutine xdmf_contiguous_hyperslab_handler_Serialize
 
@@ -366,7 +365,7 @@ contains
     !< @TODO: add cell, face and grid centered attributes
     !----------------------------------------------------------------- 
         class(xdmf_contiguous_hyperslab_handler_t), intent(INOUT) :: this                   !< XDMF contiguous hyperslab handler
-        integer(I4P), optional,                     intent(IN)    :: GridID                 !< Grid ID number
+        integer(I4P),                               intent(IN)    :: GridID                 !< Grid ID number
         type(xdmf_attribute_t)                                    :: attribute              !< XDMF Attribute type
         type(xdmf_dataitem_t)                                     :: dataitem               !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata               !< XDMF Character Data type
@@ -381,21 +380,12 @@ contains
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             do indx = 1, this%UniformGridDescriptor%GetNumberOfAttributes()
-                if(present(GridID)) then
-                    call this%CalculateAttributeDimensions(                                           & 
-                        GridID = GridID,                                                              &
-                        Center = this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx), &
-                        GlobalNumberOfData = GlobalNumberOfData,                                      &
-                        LocalNumberOfData = LocalNumberOfData,                                        &
-                        DataOffset = DataOffset)
-                else
-                    call this%CalculateAttributeDimensions(                                           &
-                        GridID = this%MPIEnvironment%get_rank(),                                      &
-                        Center = this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx), &
-                        GlobalNumberOfData = GlobalNumberOfData,                                      &
-                        LocalNumberOfData = LocalNumberOfData,                                        &
-                        DataOffset = DataOffset)
-                endif
+                call this%CalculateAttributeDimensions(                                           & 
+                    GridID = GridID,                                                              &
+                    Center = this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx), &
+                    GlobalNumberOfData = GlobalNumberOfData,                                      &
+                    LocalNumberOfData = LocalNumberOfData,                                        &
+                    DataOffset = DataOffset)
                 NumberOfComponents = GetNumberOfComponentsFromAttributeType( &
                                         this%UniformGridDescriptor%GetAttributeType(AttributeNumber=indx))
                 XDMFAttributeTypeName = GetXDMFAttributeTypeName( &
