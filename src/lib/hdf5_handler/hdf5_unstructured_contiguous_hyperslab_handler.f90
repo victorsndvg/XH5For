@@ -182,7 +182,6 @@ contains
         GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-print*, GlobalNumberOfNodes, NodeOffset, LocalNumberOfNodes
         call this%WriteHyperSlab(DatasetName='X_'//Name,   &
                 DatasetDims     = (/GlobalNumberOfNodes/), &
                 HyperSlabOffset = (/NodeOffset/),          &
@@ -222,7 +221,6 @@ print*, GlobalNumberOfNodes, NodeOffset, LocalNumberOfNodes
         GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-print*, GlobalNumberOfNodes, NodeOffset, LocalNumberOfNodes
         call this%WriteHyperSlab(DatasetName='X_'//Name,   &
                 DatasetDims     = (/GlobalNumberOfNodes/), &
                 HyperSlabOffset = (/NodeOffset/),          &

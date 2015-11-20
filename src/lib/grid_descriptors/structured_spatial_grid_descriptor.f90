@@ -108,20 +108,16 @@ contains
                 endif
                 GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
             case (XDMF_GRID_TYPE_REGULAR)
-print*, 'is resgular'
                 if(ZDim == 0_I8P) then
-print*, 'z=0'
                     TopologyType=XDMF_TOPOLOGY_TYPE_2DCORECTMESH
                     GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDY
                 else
-print*, 'z/=0'
                     TopologyType=XDMF_TOPOLOGY_TYPE_3DCORECTMESH
                     GeometryType=XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ
                 endif
             case DEFAULT
                 ! Error
         end select
-print*, GeometryType, TopologyType
         NumberOfNodes = MAX(1,XDim)*MAX(1,YDim)*MAX(1,ZDim)
         NumberOfElements = (MAX(2,XDim)-1)*(MAX(2,YDim)-1)*(MAX(2,ZDim)-1)
         call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
