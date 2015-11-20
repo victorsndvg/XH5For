@@ -398,7 +398,7 @@ contains
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = this%file%xml_handler,                           &
-                        Dimensions = (/int(LocalNumberOfData*int(NumberOfComponents,I8P),I8P)/),  &
+                        Dimensions = (/int(LocalNumberOfData*int(NumberOfComponents,I8P),I8P), 1_I8P, 1_I8P/),  &
                         ItemType   = 'HyperSlab',                                                 &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = this%file%xml_handler,              &
