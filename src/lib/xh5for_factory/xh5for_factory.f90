@@ -42,6 +42,14 @@ contains
                     case DEFAULT
                         print*, 'Strategy not Implemented yet!', Strategy
                 end select
+            case (XDMF_GRID_TYPE_REGULAR)
+                select case (Strategy)
+                    case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+                        allocate(structured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case DEFAULT
+                        print*, 'Strategy not Implemented yet!', Strategy
+                end select
+
             case DEFAULT
                 print*, 'GridType not Implemented yet!', GridType            
         end select

@@ -159,7 +159,7 @@ contains
             case (XDMF_TOPOLOGY_TYPE_2DCORECTMESH)
                 topologyName = '2DCoRectMesh'; return
             case (XDMF_TOPOLOGY_TYPE_3DCORECTMESH)
-                topologyName = '2DCoRectMesh'; return
+                topologyName = '3DCoRectMesh'; return
             case DEFAULT
                 topologyName = 'Mixed'; return
         end select
