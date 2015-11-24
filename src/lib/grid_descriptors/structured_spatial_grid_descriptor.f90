@@ -96,17 +96,19 @@ contains
             case (XDMF_GRID_TYPE_CURVILINEAR)
                 if(ZDim == 0_I8P) then
                     TopologyType=XDMF_TOPOLOGY_TYPE_2DSMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_VXVY
                 else
                     TopologyType=XDMF_TOPOLOGY_TYPE_3DSMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
                 endif
-                GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
             case (XDMF_GRID_TYPE_RECTILINEAR)
                 if(ZDim == 0_I8P) then
                     TopologyType=XDMF_TOPOLOGY_TYPE_2DRECTMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_VXVY
                 else
                     TopologyType=XDMF_TOPOLOGY_TYPE_3DRECTMESH
+                    GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
                 endif
-                GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ
             case (XDMF_GRID_TYPE_REGULAR)
                 if(ZDim == 0_I8P) then
                     TopologyType=XDMF_TOPOLOGY_TYPE_2DCORECTMESH

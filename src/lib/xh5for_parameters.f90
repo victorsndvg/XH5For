@@ -40,9 +40,10 @@ implicit none
     integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_X_Y_Z          = 303
 
     ! Structured
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_VXVYVZ         = 304
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDY    = 305
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  = 306
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_VXVY           = 304
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_VXVYVZ         = 305
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDY    = 306
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  = 307
 
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_SPATIAL  = 400
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_TEMPORAL = 401
@@ -113,6 +114,7 @@ implicit none
                                                                 XDMF_GEOMETRY_TYPE_XYZ,           &
                                                                 XDMF_GEOMETRY_TYPE_X_Y_Z,         &
                                                                 ! Structured
+                                                                XDMF_GEOMETRY_TYPE_VXVY,          &
                                                                 XDMF_GEOMETRY_TYPE_VXVYVZ,        &
                                                                 XDMF_GEOMETRY_TYPE_ORIGIN_DXDY,   &
                                                                 XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  &

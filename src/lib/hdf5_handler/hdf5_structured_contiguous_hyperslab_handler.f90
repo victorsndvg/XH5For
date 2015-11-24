@@ -170,6 +170,7 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize(3) !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
+        integer(I4P)                                           :: SpaceDimension        !< Space dimension
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -184,6 +185,7 @@ contains
         GeometrySizeOffset(1) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
         GeometrySizeOffset(2) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
         GeometrySizeOffset(3) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
+        SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
         call this%WriteHyperSlab(DatasetName='X_'//Name,     &
                 DatasetDims     = (/GlobalGeometrySize(1)/), &
                 HyperSlabOffset = (/GeometrySizeOffSet(1)/), &
@@ -194,11 +196,13 @@ contains
                 HyperSlabOffset = (/GeometrySizeOffSet(2)/), &
                 HyperSlabSize   = (/LocalGeometrySize(2)/),  &
                 Values          = Y)
-        call this%WriteHyperSlab(DatasetName='Z_'//Name,     &
-                DatasetDims     = (/GlobalGeometrySize(3)/), &
-                HyperSlabOffset = (/GeometrySizeOffSet(3)/), &
-                HyperSlabSize   = (/LocalGeometrySize(3)/),  &
-                Values          = Z)
+        if(SpaceDimension == 3) then
+            call this%WriteHyperSlab(DatasetName='Z_'//Name,     &
+                    DatasetDims     = (/GlobalGeometrySize(3)/), &
+                    HyperSlabOffset = (/GeometrySizeOffSet(3)/), &
+                    HyperSlabSize   = (/LocalGeometrySize(3)/),  &
+                    Values          = Z)
+        endif
 #endif
     end subroutine hdf5_structured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R4P
 
@@ -215,6 +219,7 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize(3) !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
+        integer(I4P)                                           :: SpaceDimension        !< Space dimension
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -229,6 +234,7 @@ contains
         GeometrySizeOffset(1) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
         GeometrySizeOffset(2) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
         GeometrySizeOffset(3) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
+        SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
         call this%WriteHyperSlab(DatasetName='X_'//Name,     &
                 DatasetDims     = (/GlobalGeometrySize(1)/), &
                 HyperSlabOffset = (/GeometrySizeOffSet(1)/), &
@@ -239,11 +245,13 @@ contains
                 HyperSlabOffset = (/GeometrySizeOffSet(2)/), &
                 HyperSlabSize   = (/LocalGeometrySize(2)/),  &
                 Values          = Y)
-        call this%WriteHyperSlab(DatasetName='Z_'//Name,     &
-                DatasetDims     = (/GlobalGeometrySize(3)/), &
-                HyperSlabOffset = (/GeometrySizeOffSet(3)/), &
-                HyperSlabSize   = (/LocalGeometrySize(3)/),  &
-                Values          = Z)
+        if(SpaceDimension == 3) then
+            call this%WriteHyperSlab(DatasetName='Z_'//Name,     &
+                    DatasetDims     = (/GlobalGeometrySize(3)/), &
+                    HyperSlabOffset = (/GeometrySizeOffSet(3)/), &
+                    HyperSlabSize   = (/LocalGeometrySize(3)/),  &
+                    Values          = Z)
+        endif
 #endif
     end subroutine hdf5_structured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R8P
 

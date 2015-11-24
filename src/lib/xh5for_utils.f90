@@ -254,11 +254,13 @@ contains
                 GeometryName = 'XY'; return
             case (XDMF_GEOMETRY_TYPE_X_Y_Z)
                 GeometryName = 'X_Y_Z'; return
-            case (XDMF_GEOMETRY_TYPE_VxVyVz)
+            case (XDMF_GEOMETRY_TYPE_VXVYVZ)
                 GeometryName = 'VxVyVz'; return
-            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
+            case (XDMF_GEOMETRY_TYPE_VXVY)
+                GeometryName = 'VxVy'; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 GeometryName = 'Origin_DxDyDz'; return
-            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
                 GeometryName = 'Origin_DxDy'; return
             case DEFAULT
                 GeometryName='XYZ'; return
@@ -280,12 +282,14 @@ contains
                 GeometryType = XDMF_GEOMETRY_TYPE_XY; return
             case ('X_Y_Z')
                 GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
-!            case ('VxVyVz')
-!                GeometryType = XDMF_GEOMETRY_TYPE_VxVyVz; return
-!            case ('Origin_DxDyDz')
-!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDyDz; return
-!            case ('Origin_DxDy')
-!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDy; return
+            case ('VxVy')
+                GeometryType = XDMF_GEOMETRY_TYPE_VXVY; return
+            case ('VxVyVz')
+                GeometryType = XDMF_GEOMETRY_TYPE_VXVYVZ; return
+            case ('Origin_DxDyDz')
+                GeometryType = XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ; return
+            case ('Origin_DxDy')
+                GeometryType = XDMF_GEOMETRY_TYPE_ORIGIN_DXDY; return
             case DEFAULT
                 GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
         end select
@@ -304,12 +308,14 @@ contains
                 SpaceDimension = 2; return
             case(XDMF_GEOMETRY_TYPE_X_Y_Z)
                 SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_VxVyVz)
-!                SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
-!                SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
-!                SpaceDimension = 2; return
+            case (XDMF_GEOMETRY_TYPE_VXVYVZ)
+                SpaceDimension = 3; return
+            case (XDMF_GEOMETRY_TYPE_VXVY)
+                SpaceDimension = 2; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
+                SpaceDimension = 3; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
+                SpaceDimension = 2; return
             case DEFAULT
                 SpaceDimension = 3; return
         end select

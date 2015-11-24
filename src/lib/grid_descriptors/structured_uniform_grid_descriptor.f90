@@ -52,17 +52,19 @@ contains
             case (XDMF_GRID_TYPE_CURVILINEAR)
                 if(ZDim == 0_I8P) then
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_2DSMESH)
+                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVY)
                 else
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_3DSMESH)
+                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ)
                 endif
-                call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ)
             case (XDMF_GRID_TYPE_RECTILINEAR)
                 if(ZDim == 0_I8P) then
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_2DRECTMESH)
+                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVY)
                 else
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_3DRECTMESH)
+                    call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ)
                 endif
-                call this%SetGeometryType(GeometryType=XDMF_GEOMETRY_TYPE_VXVYVZ)
             case (XDMF_GRID_TYPE_REGULAR)
                 if(ZDim == 0_I8P) then
                     call this%SetTopologyType(TopologyType=XDMF_TOPOLOGY_TYPE_2DCORECTMESH)
