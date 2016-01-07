@@ -21,9 +21,8 @@ implicit none
     type(structured_spatial_grid_descriptor_t)                        :: spatialgrid
     type(structured_uniform_grid_descriptor_t)                        :: uniformgrid
     type(hdf5_structured_contiguous_hyperslab_handler_t)              :: heavydata
-    real(R4P),    dimension(3)                                        :: Xpoints  = (/1,2,3/)
-    real(R4P),    dimension(4)                                        :: Ypoints  = (/2,3,4,5/)
-    real(R4P),    dimension(5)                                        :: Zpoints  = (/3,4,5,6,7/)
+    real(R4P),    dimension(3)                                        :: Origin  = (/0,0,0/)
+    real(R4P),    dimension(3)                                        :: DxDyDz  = (/1,1,1/)
     real(R4P),    dimension(:), allocatable                           :: values  
     integer                                                           :: mpierr
     integer                                                           :: i
@@ -33,14 +32,14 @@ implicit none
     call MPI_INIT(mpierr)
 #endif
 
-    values = (/(i,i=0,size(Xpoints)*size(Ypoints)*size(Zpoints))/)
+    values = (/(i,i=0,10*20*30)/)
 
     call mpienv%initialize()
-    call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
-    call uniformgrid%initialize(XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
+    call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=10_I8P, YDim=20_I8P, ZDim=30_I8P, GridType=XDMF_GRID_TYPE_REGULAR)
+    call uniformgrid%initialize(XDim=10_I8P, YDim=20_I8P, ZDim=30_I8P, GridType=XDMF_GRID_TYPE_REGULAR)
     call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_structured_hyperslab')
-    call heavydata%WriteGeometry(X=Xpoints,Y=Ypoints,Z=Zpoints, Name='Coordinates')
+    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_regular_hyperslab')
+    call heavydata%WriteGeometry(Origin=Origin,DxDyDz=DxDyDz, Name='Coordinates')
     call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)
     call heavydata%CloseFile()
 #ifdef ENABLE_MPI

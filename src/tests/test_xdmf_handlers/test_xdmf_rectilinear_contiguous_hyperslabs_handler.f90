@@ -39,7 +39,7 @@ implicit none
     call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call uniformgrid%initialize(XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_structured_hyperslab')
+    call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_rectilinear_hyperslab')
     call lightdata%SetGeometry(XYZ=Xpoints, Name='Coordinates')
     call lightdata%AppendAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Attribute=values)
     call lightdata%Serialize()
