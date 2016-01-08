@@ -20,14 +20,13 @@ private
     !-----------------------------------------------------------------
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
-        character(len=:),            allocatable :: prefix                          !< Name prefix of the XDMF file
-        character(len=4)                         :: ext = '.xmf'                    !< XDMF file extension
-        type(xdmf_file_t)                        :: file                            !< XDMF file handler
-        integer(I4P)                             :: action                          !< XDMF purpose (Read or Write)
-        type(mpi_env_t),                 pointer :: MPIEnvironment        => null() !< MPI environment 
-        type(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
-        type(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
-        logical                                  :: warn = .true.                   !< Flag to show warnings on screen
+        character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
+        character(len=4)                          :: ext = '.xmf'                    !< XDMF file extension
+        type(xdmf_file_t)                         :: file                            !< XDMF file handler
+        integer(I4P)                              :: action                          !< XDMF purpose (Read or Write)
+        type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
     contains
     private
         procedure(xdmf_handler_SetGeometry_R4P),     deferred :: SetGeometry_R4P
@@ -55,19 +54,19 @@ private
     end type xdmf_handler_t
 
     abstract interface
-        subroutine xdmf_handler_SetGeometry_R4P(this, Coordinates, Name)
+        subroutine xdmf_handler_SetGeometry_R4P(this, XYZ, Name)
             import xdmf_handler_t
             import R4P
             class(xdmf_handler_t), intent(INOUT) :: this
-            real(R4P),             intent(IN)    :: Coordinates(:)
+            real(R4P),             intent(IN)    :: XYZ(:)
             character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R4P
 
-        subroutine xdmf_handler_SetGeometry_R8P(this, Coordinates, Name)
+        subroutine xdmf_handler_SetGeometry_R8P(this, XYZ, Name)
             import xdmf_handler_t
             import R8P
             class(xdmf_handler_t), intent(INOUT) :: this
-            real(R8P),             intent(IN)    :: Coordinates(:)
+            real(R8P),             intent(IN)    :: XYZ(:)
             character(len=*),      intent(IN)    :: Name
         end subroutine xdmf_handler_SetGeometry_R8P
 
@@ -152,8 +151,8 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_handler_t),                   intent(INOUT) :: this               !< XMDF handler
         type(mpi_env_t),                 target, intent(IN) :: MPIEnvironment        !< MPI environment
-        type(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
-        type(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
+        class(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
+        class(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
         call this%Free()
         this%MPIEnvironment        => MPIEnvironment

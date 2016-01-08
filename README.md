@@ -1,10 +1,10 @@
-# XdmfHdf5Fortran
+# XH5For
 The Fortran way to easy write partitioned XDMF/HDF5 meshes
 
 [![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)
                  
 
-## What is XdmfHdf5Fortran?
+## What is XH5For?
 Is a library to read and write partitioned FEM meshes taking advantage of the collective/independent IO provided by the HDF5 library. 
 
 ## Some concepts
@@ -22,7 +22,7 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
 
 ### Exporters:
   * Mesh:
-    * [ ] Structured
+    * [x] Structured
     * [x] Unstructured
   * Element:
     * Linear
@@ -63,9 +63,9 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
     * [x] DataSets
     * [x] HyperSlabs
 
-### Exporters:
+### Importers:
   * Mesh:
-    * [ ] Structured
+    * [x] Structured
     * [x] Unstructured
   * Element:
     * Linear

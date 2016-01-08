@@ -34,12 +34,21 @@ implicit none
     integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_GLOBALID = 205
     integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_NOTYPE   = 206
 
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XYZ  = 301
-    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XY   = 302
+    ! Unstructured
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XY             = 301
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_XYZ            = 302
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_X_Y_Z          = 303
+
+    ! Structured
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_VXVY           = 304
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_VXVYVZ         = 305
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDY    = 306
+    integer(I4P), parameter :: XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  = 307
 
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_SPATIAL  = 400
     integer(I4P), parameter :: XDMF_GRID_COLLECTION_TYPE_TEMPORAL = 401
 
+    ! Unstructured
     integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_POLYVERTEX       = 500
     integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_POLYLINE         = 501
     integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_POLYGON          = 502
@@ -70,6 +79,14 @@ implicit none
     integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331  = 527
     integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_MIXED            = 528
 
+    ! Structured
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_2DSMESH          = 529
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_3DSMESH          = 530
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_2DRECTMESH       = 531
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_3DRECTMESH       = 532
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_2DCORECTMESH     = 533
+    integer(I4P), parameter :: XDMF_TOPOLOGY_TYPE_3DCORECTMESH     = 534
+
     integer(I4P), parameter :: XDMF_SET_TYPE_NODE = 601
     integer(I4P), parameter :: XDMF_SET_TYPE_CELL = 602
     integer(I4P), parameter :: XDMF_SET_TYPE_FACE = 603
@@ -92,11 +109,19 @@ implicit none
     integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
 
     integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
-                                                                XDMF_GEOMETRY_TYPE_XYZ, &
-                                                                XDMF_GEOMETRY_TYPE_XY   &
+                                                                ! Unstructured
+                                                                XDMF_GEOMETRY_TYPE_XY,            &
+                                                                XDMF_GEOMETRY_TYPE_XYZ,           &
+                                                                XDMF_GEOMETRY_TYPE_X_Y_Z,         &
+                                                                ! Structured
+                                                                XDMF_GEOMETRY_TYPE_VXVY,          &
+                                                                XDMF_GEOMETRY_TYPE_VXVYVZ,        &
+                                                                XDMF_GEOMETRY_TYPE_ORIGIN_DXDY,   &
+                                                                XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  &
                                                              /)
 
     integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(*)  = (/ &
+                                                                ! Unstructured
 !                                                               XDMF_TOPOLOGY_TYPE_POLYVERTEX,      &
 !                                                               XDMF_TOPOLOGY_TYPE_POLYLINE,        &
 !                                                               XDMF_TOPOLOGY_TYPE_POLYGON,         &
@@ -125,7 +150,21 @@ implicit none
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_729,  &
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1000, &
                                                                 XDMF_TOPOLOGY_TYPE_HEXAHEDRON_1331, &
-                                                                XDMF_TOPOLOGY_TYPE_MIXED            &
+                                                                XDMF_TOPOLOGY_TYPE_MIXED,           &
+                                                                ! Structured
+                                                                XDMF_TOPOLOGY_TYPE_2DSMESH,         &
+                                                                XDMF_TOPOLOGY_TYPE_3DSMESH,         &
+                                                                XDMF_TOPOLOGY_TYPE_2DRECTMESH,      &
+                                                                XDMF_TOPOLOGY_TYPE_3DRECTMESH,      &
+                                                                XDMF_TOPOLOGY_TYPE_2DCORECTMESH,    &
+                                                                XDMF_TOPOLOGY_TYPE_3DCORECTMESH     &
                                                              /)
+
+    integer(I4P), parameter :: SUPPORTED_GRIDTYPES(*)  = (/ &
+                                                            XDMF_GRID_TYPE_CURVILINEAR , &
+                                                            XDMF_GRID_TYPE_RECTILINEAR , &
+                                                            XDMF_GRID_TYPE_REGULAR     , &
+                                                            XDMF_GRID_TYPE_UNSTRUCTURED  &
+                                                         /)
 
 end module xh5for_parameters

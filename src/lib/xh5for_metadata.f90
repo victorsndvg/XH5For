@@ -13,7 +13,7 @@ private
         integer(I4P)                  :: Center           = XDMF_NO_VALUE
         character(len=:), allocatable :: DataType
         integer(I4P)                  :: Precision        = XDMF_NO_VALUE
-        integer(I4P)                  :: ArrayDimensions  = XDMF_NO_VALUE
+        integer(I4P),     allocatable :: ArrayDimensions(:)
     contains
         procedure, public :: SetName            => xh5for_metadata_SetName
         procedure, public :: SetType            => xh5for_metadata_SetType
@@ -94,9 +94,11 @@ contains
     !< Set the Dimension
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(INOUT) :: this               !< XH5For metadata type
-        integer(I4P),             intent(IN)    :: ArrayDimensions    !< Array Dimensions
+        integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Array Dimensions
     !----------------------------------------------------------------- 
-        this%ArrayDimensions = ArrayDimensions
+        if(allocated(this%ArrayDimensions)) deallocate(this%ArrayDimensions)
+        allocate(this%ArrayDimensions(size(ArrayDimensions, dim=1)))
+        this%ArrayDimensions(:) = ArrayDimensions(:)
     end subroutine xh5for_metadata_SetArrayDimensions
 
 
@@ -155,15 +157,18 @@ contains
     end function xh5for_metadata_GetPrecision
 
 
-    function xh5for_metadata_GetArrayDimensions(this)
+    subroutine xh5for_metadata_GetArrayDimensions(this, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Return the Dimension
     !----------------------------------------------------------------- 
-        class(xh5for_metadata_t), intent(IN) :: this                  !< XH5For metadata type
-        integer(I4P) :: xh5for_metadata_GetArrayDimensions                  !< Returned Dimension
+        class(xh5for_metadata_t),  intent(IN)  :: this                  !< XH5For metadata type
+        integer(I4P), allocatable, intent(OUT) :: ArrayDimensions(:)    !< Returned Dimension
     !----------------------------------------------------------------- 
-        xh5for_metadata_GetArrayDimensions = this%ArrayDimensions
-    end function xh5for_metadata_GetArrayDimensions
+        if(allocated(this%arrayDimensions)) then
+            allocate(ArrayDimensions(size(this%ArrayDimensions, dim=1)))
+            ArrayDimensions(:) = this%ArrayDimensions(:)
+        endif
+    end subroutine xh5for_metadata_GetArrayDimensions
 
 
     subroutine xh5for_metadata_Free(this)
@@ -174,10 +179,10 @@ contains
     !----------------------------------------------------------------- 
         if(allocated(this%Name)) deallocate(this%Name)
         if(allocated(this%DataType)) deallocate(this%DataType)
+        if(allocated(this%ArrayDimensions)) deallocate(this%ArrayDimensions)
         this%Type       = XDMF_NO_VALUE
         this%Center     = XDMF_NO_VALUE
         this%Precision  = XDMF_NO_VALUE
-        this%ArrayDimensions  = XDMF_NO_VALUE
     end subroutine
 
 

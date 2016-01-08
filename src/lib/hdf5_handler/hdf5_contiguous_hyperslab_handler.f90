@@ -11,12 +11,12 @@ implicit none
 
 private
 
-    type, extends(hdf5_handler_t) :: hdf5_contiguous_hyperslab_handler_t
+    type, abstract, extends(hdf5_handler_t) :: hdf5_contiguous_hyperslab_handler_t
     !-----------------------------------------------------------------
     !< HDF5 contiguous hyperslab handler
     !----------------------------------------------------------------- 
     contains
-        procedure :: CalculateHyperSlabDimensions => hdf5_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
+        procedure :: CalculateAttributeDimensions => hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
         procedure :: WriteHyperSlab_I4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
         procedure :: WriteHyperSlab_I8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
         procedure :: WriteHyperSlab_R4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
@@ -25,14 +25,6 @@ private
         procedure :: ReadHyperSlab_I8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
         procedure :: ReadHyperSlab_R4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
         procedure :: ReadHyperSlab_R8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
-        procedure :: WriteGeometry_R4P  => hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P
-        procedure :: WriteGeometry_R8P  => hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P
-        procedure :: ReadGeometry_R4P   => hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P
-        procedure :: ReadGeometry_R8P   => hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P
-        procedure :: WriteTopology_I4P  => hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
-        procedure :: WriteTopology_I8P  => hdf5_contiguous_hyperslab_handler_WriteTopology_I8P
-        procedure :: ReadTopology_I4P   => hdf5_contiguous_hyperslab_handler_ReadTopology_I4P
-        procedure :: ReadTopology_I8P   => hdf5_contiguous_hyperslab_handler_ReadTopology_I8P
         procedure :: WriteAttribute_I4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
         procedure :: WriteAttribute_I8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
         procedure :: WriteAttribute_R4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
@@ -54,10 +46,15 @@ private
 
 public :: hdf5_contiguous_hyperslab_handler_t
 
+#ifndef ENABLE_HDF5
+public :: HID_T
+public :: HSIZE_T
+#endif
+
 contains
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_CalculateHyperSlabDimensions(this, Center, GlobalNumberOfData, LocalNumberOfData, DataOffset)
+    subroutine hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions(this, Center, GlobalNumberOfData, LocalNumberOfData, DataOffset)
     !-----------------------------------------------------------------
     !< Calculate hyperslab dimensions for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
@@ -88,7 +85,7 @@ contains
                 DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         end select
 #endif
-    end subroutine hdf5_contiguous_hyperslab_handler_CalculateHyperSlabDimensions
+    end subroutine hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
 
 
     subroutine hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
@@ -616,125 +613,11 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P(this, Coordinates, Name)
-    !-----------------------------------------------------------------
-    !< Writes R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R4P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName=Name,                  &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R4P
-
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P(this, Coordinates, Name)
-    !-----------------------------------------------------------------
-    !< Writes R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R8P),                                  intent(IN) :: Coordinates(:)      !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%UniformGridDescriptor%GetNumberOfNodes(),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName=Name,                  &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteGeometry_R8P
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P(this, Connectivities, Name)
-    !-----------------------------------------------------------------
-    !< Writes I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
-        integer(I4P),                               intent(IN) :: Connectivities(:)      !< I4P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-
-        call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
-                Values          = Connectivities)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I4P
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P(this, Connectivities, Name)
-    !-----------------------------------------------------------------
-    !< Writes I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
-        integer(I8P),                               intent(IN) :: Connectivities(:)      !< I8P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%SpatialGridDescriptor%GetConnectivitySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(DatasetName=Name,                            &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
-                Values          = Connectivities)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_WriteTopology_I8P
-
-
     subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -749,7 +632,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -768,7 +651,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes I8P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -783,7 +666,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -802,7 +685,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes R4P attribute values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -817,7 +700,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -836,7 +719,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes R8P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -851,7 +734,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -866,123 +749,11 @@ contains
     end subroutine hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
 
 
-    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P(this, Coordinates, Name)
-    !-----------------------------------------------------------------
-    !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R4P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,                 &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R4P
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P(this, Coordinates, Name)
-    !-----------------------------------------------------------------
-    !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        real(R8P), allocatable,                     intent(OUT):: Coordinates(:)      !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,                 &
-                DatasetDims     = (/spacedim*globalnumberofnodes/), &
-                HyperSlabOffset = (/spacedim*nodeoffset/),          &
-                HyperSlabSize   = (/spacedim*localnumberofnodes/),  &
-                Values          = Coordinates)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_ReadGeometry_R8P
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P(this, Connectivities, Name)
-    !-----------------------------------------------------------------
-    !< Read I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
-        integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,           &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
-                Values          = Connectivities)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I4P
-
-
-    subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P(this, Connectivities, Name)
-    !-----------------------------------------------------------------
-    !< Read I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                   !< HDF5 contiguous hyperslab handler
-        integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalConnectivitySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalConnectivitySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: ConnectivitySizeOffset !< Connectivity Size offset for a particular grid
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        GlobalConnectivitySize = int(this%SpatialGridDescriptor%GetGlobalConnectivitySize(),HSIZE_T)
-        LocalConnectivitySize = int(this%UniformGridDescriptor%GetConnectivitySize(),HSIZE_T)
-        ConnectivitySizeOffset = int(this%SpatialGridDescriptor%GetConnectivitySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(DatasetName = Name,           &
-                DatasetDims     = (/GlobalConnectivitySize/), &
-                HyperSlabOffset = (/ConnectivitySizeOffset/), &
-                HyperSlabSize   = (/LocalConnectivitySize/),  &
-                Values          = Connectivities)
-#endif
-    end subroutine hdf5_contiguous_hyperslab_handler_ReadTopology_I8P
-
-
     subroutine hdf5_contiguous_hyperslab_handler_ReadAttribute_I4P(this, Name, Type, Center, Values)
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -997,7 +768,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -1016,7 +787,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -1031,7 +802,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -1050,7 +821,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -1065,7 +836,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &
@@ -1084,7 +855,7 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
         character(len=*),                           intent(IN) :: Name                !< Attribute name
         integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
@@ -1099,7 +870,7 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        call this%CalculateHyperSlabDimensions(          &
+        call this%CalculateAttributeDimensions(          &
                 Center             = Center,             &
                 GlobalNumberOfData = GlobalNumberOfData, &
                 LocalNumberOfData  = LocalNumberOfData,  &

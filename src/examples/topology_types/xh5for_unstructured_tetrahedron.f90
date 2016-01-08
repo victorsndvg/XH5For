@@ -14,19 +14,21 @@ implicit none
     !< Variable definition
     !----------------------------------------------------------------- 
     type(xh5for_t)             :: xh5
-    real(R4P), dimension(15)   :: geometry = (/0.0, 0.0, 0.0, &
-                                               1.0, 0.0, 0.0, &
-                                               0.0, 1.0, 0.0, &
-                                               0.0, 0.0, 1.0, &
-                                               1.0, 1.0, 1.0/)
+
+    real(R4P), dimension(5)    :: X = (/0.0, 1.0, 0.0, 0.0, 1.0/)
+    real(R4P), dimension(5)    :: Y = (/0.0, 0.0, 1.0, 0.0, 1.0/)
+    real(R4P), dimension(5)    :: Z = (/0.0, 0.0, 0.0, 1.0, 1.0/)
     integer(I4P), dimension(8) :: topology = (/0, 1, 2, 3,&
                                                1, 2, 3, 4/)
     real(R4P),    dimension(15) :: vectorvelocity = (/0,0,0, &
-                                                     1,0,0, &
-                                                     2,0,0, &
-                                                     3,0,0, &
-                                                     4,0,0/)
-    real(R4P),    allocatable  :: out_geometry(:)
+                                                      1,0,0, &
+                                                      2,0,0, &
+                                                      3,0,0, &
+                                                      4,0,0/)
+
+    real(R4P),    allocatable  :: out_X(:)
+    real(R4P),    allocatable  :: out_Y(:)
+    real(R4P),    allocatable  :: out_Z(:)
     integer(I4P), allocatable  :: out_topology(:)
     real(R4P),    allocatable  :: out_vectorvelocity(:)
 
@@ -45,15 +47,15 @@ implicit none
 #endif
 
     !< Initialize some values depending on the mpi rank
-    geometry = geometry+rank
+    X=X+rank; Y=Y+rank; Z=Z+rank
     vectorvelocity = vectorvelocity+rank
 
     !< Write XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
+    call xh5%Initialize(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_X_Y_Z)
     call xh5%Open(fileprefix='contiguous_hyperslab_tetrahedron')
     call xh5%WriteTopology(Connectivities = topology)
-    call xh5%WriteGeometry(Coordinates = geometry)
+    call xh5%WriteGeometry(X = X, Y = Y, Z = Z)
     call xh5%WriteAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=vectorvelocity)
     call xh5%Close()
     call xh5%Free()
@@ -64,14 +66,16 @@ implicit none
     call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_tetrahedron')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
-    call xh5%ReadGeometry(Coordinates = out_geometry)
+    call xh5%ReadGeometry(X = out_X, Y = out_Y, Z = out_Z)
     call xh5%ReadAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_vectorvelocity)
     call xh5%Close()
     call xh5%Free()
 
 #ifdef ENABLE_HDF5
     !< Check results
-    if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_X - X)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_Y - Y)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_Z - Z)<=epsilon(0._R4P))) exitcode = -1
     if(.not. (sum(out_topology - topology)==0)) exitcode = -1
     if(.not. (sum(out_vectorVelocity - vectorvelocity)<=epsilon(0._R4P))) exitcode = -1
 #else

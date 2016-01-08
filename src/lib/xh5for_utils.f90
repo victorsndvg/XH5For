@@ -148,8 +148,20 @@ contains
 !                topologyName = 'Hexahedron_1331'; return
             case (XDMF_TOPOLOGY_TYPE_MIXED)
                 topologyName = 'Mixed'; return
+            case (XDMF_TOPOLOGY_TYPE_2DSMESH)
+                topologyName = '2DSMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DSMESH)
+                topologyName = '3DSMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_2DRECTMESH)
+                topologyName = '2DRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DRECTMESH)
+                topologyName = '3DRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_2DCORECTMESH)
+                topologyName = '2DCoRectMesh'; return
+            case (XDMF_TOPOLOGY_TYPE_3DCORECTMESH)
+                topologyName = '3DCoRectMesh'; return
             case DEFAULT
-                topologyName = 'Triangle'; return
+                topologyName = 'Mixed'; return
         end select
     end function GetXDMFTopologyTypeName
 
@@ -240,14 +252,16 @@ contains
                 GeometryName = 'XYZ'; return
             case (XDMF_GEOMETRY_TYPE_XY)
                 GeometryName = 'XY'; return
-!            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
-!                GeometryName = 'X_Y_Z'; return
-!            case (XDMF_GEOMETRY_TYPE_VxVyVz)
-!                GeometryName = 'VxVyVz'; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
-!                GeometryName = 'Origin_DxDyDz'; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
-!                GeometryName = 'Origin_DxDy'; return
+            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
+                GeometryName = 'X_Y_Z'; return
+            case (XDMF_GEOMETRY_TYPE_VXVYVZ)
+                GeometryName = 'VxVyVz'; return
+            case (XDMF_GEOMETRY_TYPE_VXVY)
+                GeometryName = 'VxVy'; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
+                GeometryName = 'Origin_DxDyDz'; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
+                GeometryName = 'Origin_DxDy'; return
             case DEFAULT
                 GeometryName='XYZ'; return
         end select
@@ -266,14 +280,16 @@ contains
                 GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
             case ('XY')
                 GeometryType = XDMF_GEOMETRY_TYPE_XY; return
-!            case ('X_Y_Z')
-!                GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
-!            case ('VxVyVz')
-!                GeometryType = XDMF_GEOMETRY_TYPE_VxVyVz; return
-!            case ('Origin_DxDyDz')
-!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDyDz; return
-!            case ('Origin_DxDy')
-!                GeometryType = XDMF_GEOMETRY_TYPE_Origin_DxDy; return
+            case ('X_Y_Z')
+                GeometryType = XDMF_GEOMETRY_TYPE_X_Y_Z; return
+            case ('VxVy')
+                GeometryType = XDMF_GEOMETRY_TYPE_VXVY; return
+            case ('VxVyVz')
+                GeometryType = XDMF_GEOMETRY_TYPE_VXVYVZ; return
+            case ('Origin_DxDyDz')
+                GeometryType = XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ; return
+            case ('Origin_DxDy')
+                GeometryType = XDMF_GEOMETRY_TYPE_ORIGIN_DXDY; return
             case DEFAULT
                 GeometryType = XDMF_GEOMETRY_TYPE_XYZ; return
         end select
@@ -290,14 +306,16 @@ contains
                 SpaceDimension = 3; return
             case(XDMF_GEOMETRY_TYPE_XY)
                 SpaceDimension = 2; return
-!            case(XDMF_GEOMETRY_TYPE_X_Y_Z)
-!                SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_VxVyVz)
-!                SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDyDz)
-!                SpaceDimension = 3; return
-!            case (XDMF_GEOMETRY_TYPE_Origin_DxDy)
-!                SpaceDimension = 2; return
+            case(XDMF_GEOMETRY_TYPE_X_Y_Z)
+                SpaceDimension = 3; return
+            case (XDMF_GEOMETRY_TYPE_VXVYVZ)
+                SpaceDimension = 3; return
+            case (XDMF_GEOMETRY_TYPE_VXVY)
+                SpaceDimension = 2; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
+                SpaceDimension = 3; return
+            case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
+                SpaceDimension = 2; return
             case DEFAULT
                 SpaceDimension = 3; return
         end select
@@ -444,6 +462,18 @@ contains
         supported = MINVAL(ABS(SUPPORTED_STRATEGIES - Strategy)) == 0_I4P
         if(.not. supported) call warning_message('Not supported Strategy: "'//trim(str(no_sign=.true., n=Strategy))//'"')
     end function isSupportedStrategy
+
+
+    function isSupportedGridType(GridType) result(supported)
+    !-----------------------------------------------------------------
+    !< Return True if is a supported GridType
+    !----------------------------------------------------------------- 
+        integer(I4P),    intent(IN)  :: GridType
+        logical                      :: supported
+    !----------------------------------------------------------------- 
+        supported = MINVAL(ABS(SUPPORTED_GRIDTYPES - GridType)) == 0_I4P
+        if(.not. supported) call warning_message('Not supported Grid Type: "'//trim(str(no_sign=.true., n=GridType))//'"')
+    end function isSupportedGridType
 
 
     function isSupportedTopologyType(TopologyType) result(supported)
