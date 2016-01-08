@@ -444,46 +444,58 @@ contains
     !-----------------------------------------------------------------
     !< Read R4P X_Y_Z coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
-        real(R4P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
-        real(R4P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
-        real(R4P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        class(hdf5_structured_contiguous_hyperslab_handler_t), intent(IN) :: this       !< HDF5 contiguous hyperslab handler for structured grids
+        real(R4P), allocatable,                     intent(OUT):: X(:)                  !< X Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: Y(:)                  !< Y Grid coordinates
+        real(R4P), allocatable,                     intent(OUT):: Z(:)                  !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: spacedim              !< Space dimension
+        integer(HSIZE_T)                                       :: globalnodesperdim(3)  !< Global number of nodes per dimension
+        integer(HSIZE_T)                                       :: localnodesperdim(3)   !< Local number of nodes per dimension
+        integer(HSIZE_T)                                       :: nodeoffsetperdim(3)   !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        globalnodesperdim(1) = int(this%SpatialGridDescriptor%GetGlobalXsize(),HSIZE_T)
+        globalnodesperdim(2) = int(this%SpatialGridDescriptor%GetGlobalYsize(),HSIZE_T)
+        localnodesperdim(1)  = int(this%SpatialGridDescriptor%GetXSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        localnodesperdim(2)  = int(this%SpatialGridDescriptor%GetYSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffsetperdim(1) = int(this%SpatialGridDescriptor%GetXSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffsetperdim(2) = int(this%SpatialGridDescriptor%GetYSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'X_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
+        call this%ReadHyperSlab(DatasetName = 'X_'//Name,   &
+                DatasetDims     = (/globalnodesperdim(1)/), &
+                HyperSlabOffset = (/nodeoffsetperdim(1)/),  &
+                HyperSlabSize   = (/localnodesperdim(1)/),  &
                 Values          = X)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
+        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,   &
+                DatasetDims     = (/globalnodesperdim(2)/), &
+                HyperSlabOffset = (/nodeoffsetperdim(2)/),  &
+                HyperSlabSize   = (/localnodesperdim(2)/),  &
                 Values          = Y)
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'Z_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
-                Values          = Z)
+        if(spacedim == 3) then
+            globalnodesperdim(3) = int(this%SpatialGridDescriptor%GetGlobalZsize(),HSIZE_T)
+            localnodesperdim(3)  = int(this%SpatialGridDescriptor%GetZSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+            nodeoffsetperdim(3) = int(this%SpatialGridDescriptor%GetZSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+            call this%ReadHyperSlab(DatasetName = 'Z_'//Name,   &
+                    DatasetDims     = (/globalnodesperdim(3)/), &
+                    HyperSlabOffset = (/nodeoffsetperdim(3)/),  &
+                    HyperSlabSize   = (/localnodesperdim(3)/),  &
+                    Values          = Z)
+        else
+            if(allocated(Z)) deallocate(Z); allocate(Z(1)); Z = 0.0_R4P
+        endif
 #endif
     end subroutine hdf5_structured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R4P
 
@@ -497,41 +509,53 @@ contains
         real(R8P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
         real(R8P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        integer(HSIZE_T)                                       :: spacedim              !< Space dimension
+        integer(HSIZE_T)                                       :: globalnodesperdim(3)  !< Global number of nodes per dimension
+        integer(HSIZE_T)                                       :: localnodesperdim(3)   !< Local number of nodes per dimension
+        integer(HSIZE_T)                                       :: nodeoffsetperdim(3)   !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
+        globalnodesperdim(1) = int(this%SpatialGridDescriptor%GetGlobalXsize(),HSIZE_T)
+        globalnodesperdim(2) = int(this%SpatialGridDescriptor%GetGlobalYsize(),HSIZE_T)
+        localnodesperdim(1)  = int(this%SpatialGridDescriptor%GetXSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        localnodesperdim(2)  = int(this%SpatialGridDescriptor%GetYSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffsetperdim(1) = int(this%SpatialGridDescriptor%GetXSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffsetperdim(2) = int(this%SpatialGridDescriptor%GetYSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'X_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
+        call this%ReadHyperSlab(DatasetName = 'X_'//Name,   &
+                DatasetDims     = (/globalnodesperdim(1)/), &
+                HyperSlabOffset = (/nodeoffsetperdim(1)/),  &
+                HyperSlabSize   = (/localnodesperdim(1)/),  &
                 Values          = X)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
+        call this%ReadHyperSlab(DatasetName = 'Y_'//Name,   &
+                DatasetDims     = (/globalnodesperdim(2)/), &
+                HyperSlabOffset = (/nodeoffsetperdim(2)/),  &
+                HyperSlabSize   = (/localnodesperdim(2)/),  &
                 Values          = Y)
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(DatasetName = 'Z_'//Name,  &
-                DatasetDims     = (/globalnumberofnodes/), &
-                HyperSlabOffset = (/nodeoffset/),          &
-                HyperSlabSize   = (/localnumberofnodes/),  &
-                Values          = Z)
+        if(spacedim == 3) then
+            globalnodesperdim(3) = int(this%SpatialGridDescriptor%GetGlobalZsize(),HSIZE_T)
+            localnodesperdim(3)  = int(this%SpatialGridDescriptor%GetZSizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+            nodeoffsetperdim(3) = int(this%SpatialGridDescriptor%GetZSizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+            call this%ReadHyperSlab(DatasetName = 'Z_'//Name,   &
+                    DatasetDims     = (/globalnodesperdim(3)/), &
+                    HyperSlabOffset = (/nodeoffsetperdim(3)/),  &
+                    HyperSlabSize   = (/localnodesperdim(3)/),  &
+                    Values          = Z)
+        else
+            if(allocated(Z)) deallocate(Z); allocate(Z(1)); Z = 0.0_R8P
+        endif
 #endif
     end subroutine hdf5_structured_contiguous_hyperslab_ReadGeometry_X_Y_Z_R8P
 

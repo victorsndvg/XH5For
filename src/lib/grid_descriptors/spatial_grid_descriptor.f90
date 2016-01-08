@@ -36,8 +36,8 @@ private
 
     contains
 
-        procedure(spatial_grid_descriptor_InitializeUnstructuredWriter),  deferred :: InitializeUnstructuredWriter
-        procedure(spatial_grid_descriptor_InitializeStructuredWriter),    deferred :: InitializeStructuredWriter
+        procedure(spatial_grid_descriptor_InitializeUnstructuredWriter),   deferred :: InitializeUnstructuredWriter
+        procedure(spatial_grid_descriptor_InitializeStructuredWriter),     deferred :: InitializeStructuredWriter
 
         procedure(spatial_grid_descriptor_BroadcastMetadata),              deferred :: BroadcastMetadata
 
@@ -46,6 +46,25 @@ private
         procedure(spatial_grid_descriptor_GetTopologySizeOffsetPerGridID), deferred :: GetTopologySizeOffsetPerGridID
         procedure(spatial_grid_descriptor_SetGlobalTopologySize),          deferred :: SetGlobalTopologySize
         procedure(spatial_grid_descriptor_GetGlobalTopologySize),          deferred :: GetGlobalTopologySize
+
+        procedure(spatial_grid_descriptor_SetXSizePerGridID),              deferred :: SetXSizePerGridID
+        procedure(spatial_grid_descriptor_SetYSizePerGridID),              deferred :: SetYSizePerGridID
+        procedure(spatial_grid_descriptor_SetZSizePerGridID),              deferred :: SetZSizePerGridID
+        procedure(spatial_grid_descriptor_GetXSizePerGridID),              deferred :: GetXSizePerGridID
+        procedure(spatial_grid_descriptor_GetYSizePerGridID),              deferred :: GetYSizePerGridID
+        procedure(spatial_grid_descriptor_GetZSizePerGridID),              deferred :: GetZSizePerGridID
+
+        procedure(spatial_grid_descriptor_SetGlobalXSize),                 deferred :: SetGlobalXSize
+        procedure(spatial_grid_descriptor_SetGlobalYSize),                 deferred :: SetGlobalYSize
+        procedure(spatial_grid_descriptor_SetGlobalZSize),                 deferred :: SetGlobalZSize
+        procedure(spatial_grid_descriptor_GetGlobalXSize),                 deferred :: GetGlobalXSize
+        procedure(spatial_grid_descriptor_GetGlobalYSize),                 deferred :: GetGlobalYSize
+        procedure(spatial_grid_descriptor_GetGlobalZSize),                 deferred :: GetGlobalZSize
+
+        procedure(spatial_grid_descriptor_GetXSizeOffsetPerGridID),        deferred :: GetXSizeOffsetPerGridID
+        procedure(spatial_grid_descriptor_GetYSizeOffsetPerGridID),        deferred :: GetYSizeOffsetPerGridID
+        procedure(spatial_grid_descriptor_GetZSizeOffsetPerGridID),        deferred :: GetZSizeOffsetPerGridID
+
 
         procedure(spatial_grid_descriptor_SetGeometrySizePerGridID),       deferred :: SetGeometrySizePerGridID
         procedure(spatial_grid_descriptor_GetGeometrySizePerGridID),       deferred :: GetGeometrySizePerGridID
@@ -205,6 +224,136 @@ private
             integer(I8P)                                 :: GlobalGeometrySize
             integer(I4P), optional,           intent(IN) :: Dimension
         end function spatial_grid_descriptor_GetGlobalGeometrySize
+
+        subroutine spatial_grid_descriptor_SetXSizePerGridID(this, XSize, ID)
+            import spatial_grid_descriptor_t
+            import I8P  
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: XSize
+            integer(I4P),                     intent(IN)    :: ID
+        end subroutine spatial_grid_descriptor_SetXSizePerGridID
+
+        subroutine spatial_grid_descriptor_SetYSizePerGridID(this, YSize, ID)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: YSize
+            integer(I4P),                     intent(IN)    :: ID
+        end subroutine spatial_grid_descriptor_SetYSizePerGridID
+
+        subroutine spatial_grid_descriptor_SetZSizePerGridID(this, ZSize, ID)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: ZSize
+            integer(I4P),                     intent(IN)    :: ID
+        end subroutine spatial_grid_descriptor_SetZSizePerGridID
+
+        function spatial_grid_descriptor_GetXSizePerGridID(this, ID) result(XSize)
+            import spatial_grid_descriptor_t
+            import I8P  
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I4P),                     intent(IN) :: ID
+            integer(I8P)                                 :: XSize
+        end function spatial_grid_descriptor_GetXSizePerGridID
+
+        function spatial_grid_descriptor_GetYSizePerGridID(this, ID) result(YSize)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I4P),                     intent(IN) :: ID
+            integer(I8P)                                 :: YSize
+        end function spatial_grid_descriptor_GetYSizePerGridID
+
+        function spatial_grid_descriptor_GetZSizePerGridID(this, ID) result(ZSize)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I4P),                     intent(IN) :: ID
+            integer(I8P)                                 :: ZSize
+        end function spatial_grid_descriptor_GetZSizePerGridID
+
+        subroutine spatial_grid_descriptor_SetGlobalXSize(this, GlobalXSize)
+            import spatial_grid_descriptor_t
+            import I8P  
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: GlobalXSize
+        end subroutine spatial_grid_descriptor_SetGlobalXSize
+
+        subroutine spatial_grid_descriptor_SetGlobalYSize(this, GlobalYSize)
+            import spatial_grid_descriptor_t
+            import I8P  
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: GlobalYSize
+        end subroutine spatial_grid_descriptor_SetGlobalYSize
+
+        subroutine spatial_grid_descriptor_SetGlobalZSize(this, GlobalZSize)
+            import spatial_grid_descriptor_t
+            import I8P  
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I8P),                     intent(IN)    :: GlobalZSize
+        end subroutine spatial_grid_descriptor_SetGlobalZSize
+
+        function spatial_grid_descriptor_GetGlobalXSize(this) result(GlobalXSize)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I8P)                                 :: GlobalXSize
+        end function spatial_grid_descriptor_GetGlobalXSize
+
+        function spatial_grid_descriptor_GetGlobalYSize(this) result(GlobalYSize)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I8P)                                 :: GlobalYSize
+        end function spatial_grid_descriptor_GetGlobalYSize
+
+        function spatial_grid_descriptor_GetGlobalZSize(this) result(GlobalZSize)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(IN) :: this
+            integer(I8P)                                 :: GlobalZSize
+        end function spatial_grid_descriptor_GetGlobalZSize
+
+
+        function spatial_grid_descriptor_GetXSizeOffsetPerGridID(this, ID) result(XSizeOffset)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I4P),                     intent(IN)    :: ID
+            integer(I8P)                                    :: XSizeOffset
+        end function spatial_grid_descriptor_GetXSizeOffsetPerGridID
+
+        function spatial_grid_descriptor_GetYSizeOffsetPerGridID(this, ID) result(YSizeOffset)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I4P),                     intent(IN)    :: ID
+            integer(I8P)                                    :: YSizeOffset
+        end function spatial_grid_descriptor_GetYSizeOffsetPerGridID
+
+        function spatial_grid_descriptor_GetZSizeOffsetPerGridID(this, ID) result(ZSizeOffset)
+            import spatial_grid_descriptor_t
+            import I8P
+            import I4P
+            class(spatial_grid_descriptor_t), intent(INOUT) :: this
+            integer(I4P),                     intent(IN)    :: ID
+            integer(I8P)                                    :: ZSizeOffset
+        end function spatial_grid_descriptor_GetZSizeOffsetPerGridID
 
         subroutine spatial_grid_descriptor_SetGeometrySizePerGridID(this, GeometrySize, ID, Dimension)
             import spatial_grid_descriptor_t

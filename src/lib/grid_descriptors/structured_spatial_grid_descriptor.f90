@@ -22,15 +22,21 @@ private
         procedure, public :: InitializeStructuredWriter     => str_spatial_grid_descriptor_InitializeStructuredWriter
 
         procedure, public :: Allocate                       => str_spatial_grid_descriptor_Allocate
+
         procedure, public :: SetGlobalXSize                 => str_spatial_grid_descriptor_SetGlobalXSize
         procedure, public :: SetGlobalYSize                 => str_spatial_grid_descriptor_SetGlobalYSize
         procedure, public :: SetGlobalZSize                 => str_spatial_grid_descriptor_SetGlobalZSize
+        procedure, public :: GetGlobalXSize                 => str_spatial_grid_descriptor_GetGlobalXSize
+        procedure, public :: GetGlobalYSize                 => str_spatial_grid_descriptor_GetGlobalYSize
+        procedure, public :: GetGlobalZSize                 => str_spatial_grid_descriptor_GetGlobalZSize
+
         procedure, public :: SetXSizePerGridID              => str_spatial_grid_descriptor_SetXSizePerGridID
         procedure, public :: SetYSizePerGridID              => str_spatial_grid_descriptor_SetYSizePerGridID
         procedure, public :: SetZSizePerGridID              => str_spatial_grid_descriptor_SetZSizePerGridID
         procedure, public :: GetXSizePerGridID              => str_spatial_grid_descriptor_GetXSizePerGridID
         procedure, public :: GetYSizePerGridID              => str_spatial_grid_descriptor_GetYSizePerGridID
         procedure, public :: GetZSizePerGridID              => str_spatial_grid_descriptor_GetZSizePerGridID
+
         procedure, public :: GetXSizeOffsetPerGridID        => str_spatial_grid_descriptor_GetXSizeOffsetPerGridID
         procedure, public :: GetYSizeOffsetPerGridID        => str_spatial_grid_descriptor_GetYSizeOffsetPerGridID
         procedure, public :: GetZSizeOffsetPerGridID        => str_spatial_grid_descriptor_GetZSizeOffsetPerGridID
@@ -168,6 +174,7 @@ contains
         this%GlobalXSize = GlobalXSize
     end subroutine str_spatial_grid_descriptor_SetGlobalXSize
 
+
     subroutine str_spatial_grid_descriptor_SetGlobalYSize(this, GlobalYSize)
     !-----------------------------------------------------------------
     !< Set the total number Y of points of the spatial grid
@@ -177,6 +184,7 @@ contains
     !----------------------------------------------------------------- 
         this%GlobalYSize = GlobalYSize
     end subroutine str_spatial_grid_descriptor_SetGlobalYSize
+
 
     subroutine str_spatial_grid_descriptor_SetGlobalZSize(this, GlobalZSize)
     !-----------------------------------------------------------------
@@ -209,6 +217,7 @@ contains
     !----------------------------------------------------------------- 
         GlobalYSize = this%GlobalYSize
     end function str_spatial_grid_descriptor_GetGlobalYSize
+
 
     function str_spatial_grid_descriptor_GetGlobalZSize(this) result(GlobalZSize)
     !-----------------------------------------------------------------
@@ -282,9 +291,9 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of X points for a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(structured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< structured Spatial grid descriptor type
-        integer(I4P),                                intent(IN)    :: ID    !< Grid identifier
-        integer(I8P) :: str_spatial_grid_descriptor_GetXSizePerGridID       !< Number of X points of the grid ID
+        class(structured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: str_spatial_grid_descriptor_GetXSizePerGridID    !< Number of X points of the grid ID
     !-----------------------------------------------------------------
         str_spatial_grid_descriptor_GetXSizePerGridID = this%XSizePerGrid(ID+1)
     end function str_spatial_grid_descriptor_GetXSizePerGridID
@@ -294,9 +303,9 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of Y points for a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(structured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< structured Spatial grid descriptor type
-        integer(I4P),                                intent(IN)    :: ID    !< Grid identifier
-        integer(I8P) :: str_spatial_grid_descriptor_GetYSizePerGridID       !< Number of Y points of the grid ID
+        class(structured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: str_spatial_grid_descriptor_GetYSizePerGridID    !< Number of Y points of the grid ID
     !-----------------------------------------------------------------
         str_spatial_grid_descriptor_GetYSizePerGridID = this%YSizePerGrid(ID+1)
     end function str_spatial_grid_descriptor_GetYSizePerGridID
@@ -306,9 +315,9 @@ contains
     !-----------------------------------------------------------------
     !< Return the number of Z points for a particular grid given its ID
     !----------------------------------------------------------------- 
-        class(structured_spatial_grid_descriptor_t), intent(INOUT) :: this  !< structured Spatial grid descriptor type
-        integer(I4P),                                intent(IN)    :: ID    !< Grid identifier
-        integer(I8P) :: str_spatial_grid_descriptor_GetZSizePerGridID       !< Number of Z points of the grid ID
+        class(structured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: str_spatial_grid_descriptor_GetZSizePerGridID    !< Number of Z points of the grid ID
     !-----------------------------------------------------------------
         str_spatial_grid_descriptor_GetZSizePerGridID = this%ZSizePerGrid(ID+1)
     end function str_spatial_grid_descriptor_GetZSizePerGridID
@@ -566,7 +575,7 @@ contains
         MPIEnvironment => this%GetMPIEnvironment()
         call MPIEnvironment%mpi_broadcast(this%XSizePerGrid)
         call MPIEnvironment%mpi_broadcast(this%YSizePerGrid)
-        call MPIEnvironment%mpi_broadcast(this%YSizePerGrid)
+        call MPIEnvironment%mpi_broadcast(this%ZSizePerGrid)
         call this%SetGlobalXSize(sum(this%XSizePerGrid))
         call this%SetGlobalYSize(sum(this%YSizePerGrid))
         call this%SetGlobalZSize(sum(this%ZSizePerGrid))

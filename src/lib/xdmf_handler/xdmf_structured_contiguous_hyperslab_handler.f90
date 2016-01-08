@@ -109,7 +109,7 @@ contains
         type(xdmf_topology_t)                                                :: Topology     !< XDMF Topology derived type
         type(xdmf_dataitem_t)                                                :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                                  :: DataItemNode !< Fox DOM Dataitem node
-        integer(I8P)                                                         :: auxDims(1)   !< Aux dimensions variable
+        integer(I8P), allocatable                                            :: auxDims(:)   !< Aux dimensions variable
         character(len=:), allocatable                                        :: XPath        !< Topology XPath
     !----------------------------------------------------------------- 
         if(.not. associated(TopologyNode)) return
@@ -118,16 +118,22 @@ contains
         call this%SpatialGridDescriptor%SetTopologyTypePerGridID(&
                     TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=ID)
         ! Set NumberOfElements
+        allocate(auxDims(size(Topology%get_Dimensions(),1)))
         auxDims = Topology%get_Dimensions()
-        call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(AuxDims(1),ID=ID)
-        ! Set ConnectivitySize
-        DataItemNode => this%GetFirstChildByTag(FatherNode = TopologyNode, Tag = 'DataItem')
-        call DataItem%Parse(DomNode = DataItemNode)
-        auxDims = DataItem%get_Dimensions()
-        call this%SpatialGridDescriptor%SetTopologySizePerGridID(AuxDims(1),ID=ID)
+        ! Dimensions are specified with the slowest varying dimension first (i.e. KJI order)
+        auxDims(:) = auxDims(size(auxDims,dim=1):1:-1)
+        call this%SpatialGridDescriptor%SetXSizePerGridID(AuxDims(1),ID=ID)
+        call this%SpatialGridDescriptor%SetYSizePerGridID(AuxDims(2),ID=ID)
+        if(size(AuxDims,1) == 3) then
+            call this%SpatialGridDescriptor%SetZSizePerGridID(AuxDims(3),ID=ID)
+            call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2))*max(1,AuxDims(3)),ID=ID)
+            call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1)*max(1,AuxDims(3)-1),ID=ID)
+        else
+            call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2)),ID=ID)
+            call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1),ID=ID)
+        endif
         ! Free
         call Topology%Free()
-        call DataItem%Free()
         nullify(DataItemNode)
     end subroutine xdmf_str_contiguous_hyperslab_FillSpatialGridTopology
 
@@ -378,69 +384,69 @@ contains
         if(this%MPIEnvironment%is_root()) then
             LocalGridShape(1) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1)
             LocalGridShape(2) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2)
-            LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
             GlobalGridShape(1) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1)
             GlobalGridShape(2) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2)
-            GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
             GridShapeOffset(1) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=1)
             GridShapeOffset(2) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=2)
-            GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
             SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
-            call geometry%open( xml_handler  = this%file%xml_handler, &
-                    GeometryType = XDMFGeometryTypeName)
+            if (SpaceDimension == 3) then
+                LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
+                GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
+                GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
+                call geometry%open( xml_handler  = this%file%xml_handler, &
+                        GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-            call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/LocalGridShape(1)/), &   
-                    ItemType    = 'HyperSlab', &
-                    Format      = 'HDF')
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P, 1/), &
-                    NumberType = 'Int', &
-                    Format     = 'XML', &
-                    Precision  = 4) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = (/GridShapeOffset(1),1_I8P,LocalGridShape(1)/) )
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/GlobalGridShape(1)/), &
-                    NumberType = 'Float', &
-                    Format     = 'HDF', &
-                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open( xml_handler = this%file%xml_handler, &
+                        Dimensions  = (/LocalGridShape(1)/), &   
+                        ItemType    = 'HyperSlab', &
+                        Format      = 'HDF')
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/3_I4P, 1/), &
+                        NumberType = 'Int', &
+                        Format     = 'XML', &
+                        Precision  = 4) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = (/GridShapeOffset(1),1_I8P,LocalGridShape(1)/) )
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/GlobalGridShape(1)/), &
+                        NumberType = 'Float', &
+                        Format     = 'HDF', &
+                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%file%xml_handler)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-            call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/LocalGridShape(2)/), &   
-                    ItemType    = 'HyperSlab', &
-                    Format      = 'HDF')
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/3_I4P, 1/), &
-                    NumberType = 'Int', &
-                    Format     = 'XML', &
-                    Precision  = 4) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = (/GridShapeOffset(2),1_I8P,LocalGridShape(2)/) )
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
-                    Dimensions = (/GlobalGridShape(2)/), &
-                    NumberType = 'Float', &
-                    Format     = 'HDF', &
-                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open( xml_handler = this%file%xml_handler, &
+                        Dimensions  = (/LocalGridShape(2)/), &   
+                        ItemType    = 'HyperSlab', &
+                        Format      = 'HDF')
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/3_I4P, 1/), &
+                        NumberType = 'Int', &
+                        Format     = 'XML', &
+                        Precision  = 4) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = (/GridShapeOffset(2),1_I8P,LocalGridShape(2)/) )
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/GlobalGridShape(2)/), &
+                        NumberType = 'Float', &
+                        Format     = 'HDF', &
+                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%file%xml_handler)
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-            if (SpaceDimension == 3) then
                 call dataitem%open( xml_handler = this%file%xml_handler, &
                         Dimensions  = (/LocalGridShape(3)/), &   
                         ItemType    = 'HyperSlab', &
@@ -462,7 +468,60 @@ contains
                         Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%file%xml_handler)
                 call dataitem%close(xml_handler = this%file%xml_handler)
-    
+            elseif (SpaceDimension == 2) then
+            ! Why paraview need to put in inverse order?? YX
+            ! 2D VXVY does not apper in the standard Model&Format
+                call geometry%open( xml_handler  = this%file%xml_handler, &
+                        GeometryType = XDMFGeometryTypeName)
+    !-----------------------------------------------------------------
+    !< Y
+    !----------------------------------------------------------------- 
+                call dataitem%open( xml_handler = this%file%xml_handler, &
+                        Dimensions  = (/LocalGridShape(2)/), &   
+                        ItemType    = 'HyperSlab', &
+                        Format      = 'HDF')
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/3_I4P, 1/), &
+                        NumberType = 'Int', &
+                        Format     = 'XML', &
+                        Precision  = 4) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = (/GridShapeOffset(2),1_I8P,LocalGridShape(2)/) )
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/GlobalGridShape(2)/), &
+                        NumberType = 'Float', &
+                        Format     = 'HDF', &
+                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%file%xml_handler)
+    !-----------------------------------------------------------------
+    !< X
+    !----------------------------------------------------------------- 
+                call dataitem%open( xml_handler = this%file%xml_handler, &
+                        Dimensions  = (/LocalGridShape(1)/), &   
+                        ItemType    = 'HyperSlab', &
+                        Format      = 'HDF')
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/3_I4P, 1/), &
+                        NumberType = 'Int', &
+                        Format     = 'XML', &
+                        Precision  = 4) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = (/GridShapeOffset(1),1_I8P,LocalGridShape(1)/) )
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%open(xml_handler = this%file%xml_handler, &
+                        Dimensions = (/GlobalGridShape(1)/), &
+                        NumberType = 'Float', &
+                        Format     = 'HDF', &
+                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%file%xml_handler, &
+                        Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
+                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%file%xml_handler)
+
             endif
             call geometry%close(xml_handler = this%file%xml_handler)
         endif                    

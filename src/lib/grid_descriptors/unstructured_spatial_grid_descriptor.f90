@@ -31,6 +31,24 @@ private
         procedure, public :: GetGeometrySizePerGridID           => unst_spatial_grid_descriptor_GetGeometrySizePerGridID
         procedure, public :: GetGeometrySizeOffsetPerGridID     => unst_spatial_grid_descriptor_GetGeometrySizeOffsetPerGridID
 
+        procedure, public :: SetXSizePerGridID                  => unst_spatial_grid_descriptor_SetXSizePerGridID
+        procedure, public :: SetYSizePerGridID                  => unst_spatial_grid_descriptor_SetYSizePerGridID
+        procedure, public :: SetZSizePerGridID                  => unst_spatial_grid_descriptor_SetZSizePerGridID
+        procedure, public :: GetXSizePerGridID                  => unst_spatial_grid_descriptor_GetXSizePerGridID
+        procedure, public :: GetYSizePerGridID                  => unst_spatial_grid_descriptor_GetYSizePerGridID
+        procedure, public :: GetZSizePerGridID                  => unst_spatial_grid_descriptor_GetZSizePerGridID
+
+        procedure, public :: SetGlobalXSize                     => unst_spatial_grid_descriptor_SetGlobalXSize
+        procedure, public :: SetGlobalYSize                     => unst_spatial_grid_descriptor_SetGlobalYSize
+        procedure, public :: SetGlobalZSize                     => unst_spatial_grid_descriptor_SetGlobalZSize
+        procedure, public :: GetGlobalXSize                     => unst_spatial_grid_descriptor_GetGlobalXSize
+        procedure, public :: GetGlobalYSize                     => unst_spatial_grid_descriptor_GetGlobalYSize
+        procedure, public :: GetGlobalZSize                     => unst_spatial_grid_descriptor_GetGlobalZSize
+
+        procedure, public :: GetXSizeOffsetPerGridID            => unst_spatial_grid_descriptor_GetXSizeOffsetPerGridID
+        procedure, public :: GetYSizeOffsetPerGridID            => unst_spatial_grid_descriptor_GetYSizeOffsetPerGridID
+        procedure, public :: GetZSizeOffsetPerGridID            => unst_spatial_grid_descriptor_GetZSizeOffsetPerGridID
+
         procedure, public :: BroadcastMetadata                  => unst_spatial_grid_descriptor_BroadcastMetadata
         procedure, public :: Free                               => unst_spatial_grid_descriptor_Free
     end type unstructured_spatial_grid_descriptor_t
@@ -117,6 +135,202 @@ contains
         if(allocated(this%TopologySizePerGrid)) deallocate(this%TopologySizePerGrid)
         allocate(this%TopologySizePerGrid(NumberOfGrids))
     end subroutine unst_spatial_grid_descriptor_Allocate
+
+
+    subroutine unst_spatial_grid_descriptor_SetXSizePerGridID(this, XSize, ID)
+    !-----------------------------------------------------------------
+    !< Set the the number of X points for a particular grid given its ID.
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: XSize          !< Number Of X points of the grid ID
+        integer(I4P),                                  intent(IN)    :: ID             !< Grid identifier
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetXSizePerGridID
+
+
+    subroutine unst_spatial_grid_descriptor_SetYSizePerGridID(this, YSize, ID)
+    !-----------------------------------------------------------------
+    !< Set the the number of Y points for a particular grid given its ID.
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: YSize          !< Number Of Y points of the grid ID
+        integer(I4P),                                  intent(IN)    :: ID             !< Grid identifier
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetYSizePerGridID
+
+
+    subroutine unst_spatial_grid_descriptor_SetZSizePerGridID(this, ZSize, ID)
+    !-----------------------------------------------------------------
+    !< Set the the number of Z points for a particular grid given its ID.
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: ZSize          !< Number Of Z points of the grid ID
+        integer(I4P),                                  intent(IN)    :: ID             !< Grid identifier
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetZSizePerGridID
+
+
+    function unst_spatial_grid_descriptor_GetXSizePerGridID(this, ID)
+    !-----------------------------------------------------------------
+    !< Return the number of X points for a particular grid given its ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                  intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: unst_spatial_grid_descriptor_GetXSizePerGridID     !< Number of X points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetXSizePerGridID = -1_I8P
+    end function unst_spatial_grid_descriptor_GetXSizePerGridID
+
+
+    function unst_spatial_grid_descriptor_GetYSizePerGridID(this, ID)
+    !-----------------------------------------------------------------
+    !< Return the number of Y points for a particular grid given its ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                  intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: unst_spatial_grid_descriptor_GetYSizePerGridID     !< Number of Y points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetYSizePerGridID = -1_I8P
+    end function unst_spatial_grid_descriptor_GetYSizePerGridID
+
+
+    function unst_spatial_grid_descriptor_GetZSizePerGridID(this, ID)
+    !-----------------------------------------------------------------
+    !< Return the number of Z points for a particular grid given its ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I4P),                                  intent(IN) :: ID    !< Grid identifier
+        integer(I8P) :: unst_spatial_grid_descriptor_GetZSizePerGridID     !< Number of Z points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetZSizePerGridID = -1_I8P
+    end function unst_spatial_grid_descriptor_GetZSizePerGridID
+
+
+    subroutine unst_spatial_grid_descriptor_SetGlobalXSize(this, GlobalXSize)
+    !-----------------------------------------------------------------
+    !< Set the the global number of X points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: GlobalXSize    !< Global number Of X points of the spatial grid 
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetGlobalXSize
+
+
+    subroutine unst_spatial_grid_descriptor_SetGlobalYSize(this, GlobalYSize)
+    !-----------------------------------------------------------------
+    !< Set the the global number of Y points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: GlobalYSize    !< Global number Of Y points of the spatial grid 
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetGlobalYSize
+
+
+    subroutine unst_spatial_grid_descriptor_SetGlobalZSize(this, GlobalZSize)
+    !-----------------------------------------------------------------
+    !< Set the the global number of Z points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this           !< structured Spatial grid descriptor type
+        integer(I8P),                                  intent(IN)    :: GlobalZSize    !< Global number Of Z points of the spatial grid 
+    !-----------------------------------------------------------------
+    end subroutine unst_spatial_grid_descriptor_SetGlobalZSize
+
+    function unst_spatial_grid_descriptor_GetGlobalXSize(this)
+    !-----------------------------------------------------------------
+    !< Return the global number of X points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I8P) :: unst_spatial_grid_descriptor_GetGlobalXSize        !< Global number of X points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetGlobalXSize = -1_I8P
+    end function unst_spatial_grid_descriptor_GetGlobalXSize
+
+
+    function unst_spatial_grid_descriptor_GetGlobalYSize(this)
+    !-----------------------------------------------------------------
+    !< Return the global number of Y points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I8P) :: unst_spatial_grid_descriptor_GetGlobalYSize        !< Global number of Y points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetGlobalYSize = -1_I8P
+    end function unst_spatial_grid_descriptor_GetGlobalYSize
+
+
+    function unst_spatial_grid_descriptor_GetGlobalZSize(this)
+    !-----------------------------------------------------------------
+    !< Return the global number of Z points for the spatial grid
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(IN) :: this  !< structured Spatial grid descriptor type
+        integer(I8P) :: unst_spatial_grid_descriptor_GetGlobalZSize        !< Global number of Z points of the grid ID
+    !-----------------------------------------------------------------
+        unst_spatial_grid_descriptor_GetGlobalZSize = 1_I8P
+    end function unst_spatial_grid_descriptor_GetGlobalZSize
+
+
+    function unst_spatial_grid_descriptor_GetXSizeOffsetPerGridID(this, ID) result(XSizeOffset)
+    !-----------------------------------------------------------------
+    !< Return the offset of X size given a grid ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this
+        integer(I4P),                                  intent(IN)    :: ID
+        integer(I8P)                                                 :: XSizeOffset
+    !----------------------------------------------------------------- 
+        XSizeOffset = 1_I8P
+    end function unst_spatial_grid_descriptor_GetXSizeOffsetPerGridID
+
+    function unst_spatial_grid_descriptor_GetYSizeOffsetPerGridID(this, ID) result(YSizeOffset)
+    !----------------------------------------------------------------- 
+    !< Return the offset of Y size given a grid ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this
+        integer(I4P),                                  intent(IN)    :: ID
+        integer(I8P)                                                 :: YSizeOffset
+    !----------------------------------------------------------------- 
+        YSizeOffset = 1_I8P
+    end function unst_spatial_grid_descriptor_GetYSizeOffsetPerGridID
+
+
+    function unst_spatial_grid_descriptor_GetZSizeOffsetPerGridID(this, ID) result(ZSizeOffset)
+    !----------------------------------------------------------------- 
+    !< Return the offset of Z size given a grid ID
+    !< Not used with unstructured grids
+    !< TODO: Implement in the parent class and raise an exception
+    !----------------------------------------------------------------- 
+        class(unstructured_spatial_grid_descriptor_t), intent(INOUT) :: this
+        integer(I4P),                                  intent(IN)    :: ID
+        integer(I8P)                                                 :: ZSizeOffset
+    !----------------------------------------------------------------- 
+        ZSizeOffset = 1_I8P
+    end function unst_spatial_grid_descriptor_GetZSizeOffsetPerGridID
 
 
     subroutine unst_spatial_grid_descriptor_SetGlobalTopologySize(this, GlobalTopologySize, Dimension)
