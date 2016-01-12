@@ -411,8 +411,8 @@ contains
         integer                              :: hdferror              !< HDF5 error code
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
-        call h5fclose_f(file_id = this%file_id, hdferr = hdferror)
-        call h5close_f(error = hdferror) 
+        call H5Fclose_f(file_id = this%file_id, hdferr = hdferror)
+        call H5close_f(error = hdferror) 
 #endif
     end subroutine hdf5_handler_CloseFile
 

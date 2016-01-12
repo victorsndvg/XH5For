@@ -258,7 +258,7 @@ contains
         integer(I8P)                                              :: LocalNumberOfElements   !< Local number of elements
         integer(I8P)                                              :: GlobalConnectivitySize  !< Global connectivity size
         integer(I8P)                                              :: Start                   !< Hyperslab start
-        integer(I8P)                                              :: Count                   !< Hyperslab count
+        integer(I8P)                                              :: TopologySize            !< Topology size
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
         integer(I4P)                                              :: DimensionsSize          !< Size of the topology shape
     !-----------------------------------------------------------------
@@ -268,15 +268,15 @@ contains
             Start = this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=GridID)
             GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalTopologySize()
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
-            Count = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID)
+            TopologySize = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID)
             DimensionsSize = size(this%UniformGridDescriptor%GetTopologyArrayDimensions(), dim=1)
             call topology%open( xml_handler = this%file%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
                     TopologyType=XMDFTopologyTypeName)
             call dataitem%open( xml_handler = this%file%xml_handler, &
-                    Dimensions  = (/LocalNumberOfElements*Count/),&
-                    NumberType  = 'Int',&
-                    Format      = 'HDF',& 
+                    Dimensions  = (/TopologySize/),                  &
+                    NumberType  = 'Int',                             &
+                    Format      = 'HDF',                             & 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%write( xml_handler = this%file%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyName()//&

@@ -38,91 +38,31 @@ public :: hdf5_structured_dataset_per_process_handler_t
 
 contains
 
-    subroutine hdf5_structured_dataset_per_process_ReadHyperSlab_R8P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
-    !-----------------------------------------------------------------
-    !< read R8P dataset to a HDF5 file for the dataset per process strategy
-    !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this       !< HDF5 dataset per process handler for structured grids
-        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
-        real(R8P), allocatable,                     intent(OUT) :: Values(:)           !< R8P Dataset values
-        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                 :: hdferror            !< HDF5 error code
-        integer                                                 :: rank                !< Hyperslab rank 
-    !-----------------------------------------------------------------
-        !< @Note: Fixed rank 1?
-        !< @Note: Fixed dataset name?
-        !< @Note: Fixed rank 1?
-#ifdef ENABLE_HDF5
-        rank = 1
-        allocate(Values(HyperSlabSize(rank)))
-        ! Create filespace
-        call H5Screate_simple_f(rank = rank,                  &
-                dims     = DatasetDims,                       &
-                space_id = filespace,                         &
-                hdferr   = hdferror)
-        ! Create the dataset with default properties.
-        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
-        ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
-        ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
-                name     = '/'//trim(adjustl(DatasetName)), &
-                dset_id  = dset_id,                         & 
-                hdferr   = hdferror)
-        ! Select hyperslab
-        call H5Sselect_hyperslab_f (space_id = filespace,   &
-                operator = H5S_SELECT_SET_F,                &
-                start    = HyperSlabOffset,                 &
-                count    = HyperSlabSize,                   &
-                hdferr   = hdferror)
-        ! Create memspace
-        call H5Screate_simple_f(rank = 1,                   &
-                dims     = HyperSlabSize,                   &
-                space_id = memspace,                        &
-                hdferr   = hdferror) 
-        ! Read data
-        call H5Dread_f(dset_id = dset_id,           &
-                mem_type_id   = H5T_NATIVE_DOUBLE,  &
-                buf           = Values,             &
-                dims          = HyperSlabSize,      &
-                hdferr        = hdferror,           &
-                file_space_id = filespace,          &
-                mem_space_id  = memspace,           &
-                xfer_prp      = plist_id)
-        ! Close data space, dataset, property list .
-        call H5Sclose_f(space_id = memspace,  hdferr = hdferror) 
-        call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
-        call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
-        call H5Sclose_f(space_id = filespace, hdferr = hdferror)
-#endif
-    end subroutine hdf5_structured_dataset_per_process_ReadHyperSlab_R8P
-
-
     subroutine hdf5_structured_dataset_per_process_WriteGeometry_XYZ_R4P(this, XYZ, Name)
     !-----------------------------------------------------------------
     !< Writes R4P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for Unstructured grids
         real(R4P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
-        integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
+        integer(I4P)                                           :: GridID              !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+            LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID),HSIZE_T)
+            call this%WriteMetadata(                                                           &
+                    DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize/),                                   &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                           &
+                    HyperSlabSize   = (/LocalGeometrySize/),                                   &
+                    Values          = XYZ)
+        enddo
         LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(                                                                                  &
+        call this%WriteData(                                                                                       &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalGeometrySize/),                                                           &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -139,18 +79,24 @@ contains
         class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
         real(R8P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
         character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
-        integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
+        integer(I4P)                                           :: GridID              !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+            LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID),HSIZE_T)
+            call this%WriteMetadata(                                                           &
+                    DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize/),                                   &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                           &
+                    HyperSlabSize   = (/LocalGeometrySize/),                                   &
+                    Values          = XYZ)
+        enddo
         LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%WriteHyperSlab(                                                                                  &
+        call this%WriteData(                                                                                       &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalGeometrySize/),                                                           &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -169,43 +115,62 @@ contains
         real(R4P),                                  intent(IN) :: Y(:)                  !< Y Grid coordinates
         real(R4P),                                  intent(IN) :: Z(:)                  !< Z Grid coordinates
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
-        integer(HSIZE_T)                                       :: GlobalGeometrySize(3) !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
-        integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
-        GlobalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
-        GlobalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
+        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+            LocalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1),HSIZE_T)
+            LocalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2),HSIZE_T)
+            LocalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3),HSIZE_T)
+            SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
+            call this%WriteMetadata(                                                                 &
+                    DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize(1)/),                                      &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                    HyperSlabSize   = (/LocalGeometrySize(1)/),                                      &
+                    Values          = X)
+            call this%WriteMetadata(                                                                 &
+                    DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize(2)/),                                      &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                    HyperSlabSize   = (/LocalGeometrySize(2)/),                                      &
+                    Values          = Y)
+            if(SpaceDimension == 3) then
+                call this%WriteMetadata(                                                                 &
+                        DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                        DatasetDims     = (/LocalGeometrySize(3)/),                                      &
+                        HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                        HyperSlabSize   = (/LocalGeometrySize(3)/),                                      &
+                        Values          = Z)
+            endif
+        enddo
         LocalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
         LocalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
         LocalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
-        GeometrySizeOffset(1) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
-        GeometrySizeOffset(2) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
-        GeometrySizeOffset(3) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
         SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
-        call this%WriteHyperSlab(                                                                                        &
+        call this%WriteData(                                                                                         &
                 DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
                 HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
                 Values          = X)
-        call this%WriteHyperSlab(                                                                                        &
+        call this%WriteData(                                                                                         &
                 DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
-                DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
+                DatasetDims     = (/LocalGeometrySize(2)/),                                                              &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
-                HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
+                HyperSlabSize   = (/LocalGeometrySize(2)/),                                                              &
                 Values          = Y)
         if(SpaceDimension == 3) then
-            call this%WriteHyperSlab(                                                                                        &
+            call this%WriteData(                                                                                         &
                     DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
-                    DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
+                    DatasetDims     = (/LocalGeometrySize(3)/),                                                              &
                     HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
-                    HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
+                    HyperSlabSize   = (/LocalGeometrySize(3)/),                                                              &
                     Values          = Z)
         endif
 #endif
@@ -221,43 +186,62 @@ contains
         real(R8P),                                  intent(IN) :: Y(:)                  !< Y Grid coordinates
         real(R8P),                                  intent(IN) :: Z(:)                  !< Z Grid coordinates
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
-        integer(HSIZE_T)                                       :: GlobalGeometrySize(3) !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
-        integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
-        GlobalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
-        GlobalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
+        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+            LocalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1),HSIZE_T)
+            LocalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2),HSIZE_T)
+            LocalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3),HSIZE_T)
+            SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
+            call this%WriteMetadata(                                                                 &
+                    DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize(1)/),                                      &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                    HyperSlabSize   = (/LocalGeometrySize(1)/),                                      &
+                    Values          = X)
+            call this%WriteMetadata(                                                                 &
+                    DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                    DatasetDims     = (/LocalGeometrySize(2)/),                                      &
+                    HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                    HyperSlabSize   = (/LocalGeometrySize(2)/),                                      &
+                    Values          = Y)
+            if(SpaceDimension == 3) then
+                call this%WriteMetadata(                                                                 &
+                        DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                        DatasetDims     = (/LocalGeometrySize(3)/),                                      &
+                        HyperSlabOffset = (/0_HSIZE_T/),                                                 &
+                        HyperSlabSize   = (/LocalGeometrySize(3)/),                                      &
+                        Values          = Z)
+            endif
+        enddo
         LocalGeometrySize(1) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
         LocalGeometrySize(2) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
         LocalGeometrySize(3) = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
-        GeometrySizeOffset(1) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=1),HSIZE_T)
-        GeometrySizeOffset(2) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=2),HSIZE_T)
-        GeometrySizeOffset(3) = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank(), Dimension=3),HSIZE_T)
         SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
-        call this%WriteHyperSlab(                                                                                        &
+        call this%WriteData(                                                                                         &
                 DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
                 HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
                 Values          = X)
-        call this%WriteHyperSlab(                                                                                        &
+        call this%WriteData(                                                                                         &
                 DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
-                DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
+                DatasetDims     = (/LocalGeometrySize(2)/),                                                              &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
-                HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
+                HyperSlabSize   = (/LocalGeometrySize(2)/),                                                              &
                 Values          = Y)
         if(SpaceDimension == 3) then
-            call this%WriteHyperSlab(                                                                                        &
+            call this%WriteData(                                                                                         &
                     DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
-                    DatasetDims     = (/LocalGeometrySize(1)/),                                                              &
+                    DatasetDims     = (/LocalGeometrySize(3)/),                                                              &
                     HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
-                    HyperSlabSize   = (/LocalGeometrySize(1)/),                                                              &
+                    HyperSlabSize   = (/LocalGeometrySize(3)/),                                                              &
                     Values          = Z)
         endif
 #endif
@@ -272,6 +256,7 @@ contains
         real(R4P),                                  intent(IN) :: Origin(:)             !< Origin coordinates
         real(R4P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -280,27 +265,56 @@ contains
         select case (this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
-                call this%WriteHyperSlab(                                                                                             &
+                do GridID=0, this%MPIEnvironment%get_comm_size()-1
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/3_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/3_I8P/),                                                          &
+                            Values          = Origin(3:1:-1))
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/3_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/3_I8P/),                                                          &
+                            Values          = DxDyDz(3:1:-1))
+                enddo
+                call this%WriteData(                                                                                             &
                         DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/3_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/3_I8P/),                                                                                  &
                         Values          = Origin(3:1:-1))
-                call this%WriteHyperSlab(                                                                                             &
+                call this%WriteData(                                                                                             &
                         DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/3_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/3_I8P/),                                                                                  &
                         Values          = DxDyDz(3:1:-1))
+
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
                 ! Origin and DxDyDz size must be 2
-                call this%WriteHyperSlab(                                                                                             &
+                do GridID=0, this%MPIEnvironment%get_comm_size()-1
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/2_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/2_I8P/),                                                          &
+                            Values          = Origin(2:1:-1))
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/2_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/2_I8P/),                                                          &
+                            Values          = DxDyDz(2:1:-1))
+                enddo
+                call this%WriteData(                                                                                              &
                         DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/2_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/2_I8P/),                                                                                  &
                         Values          = Origin(2:1:-1))
-                call this%WriteHyperSlab(                                                                                             &
+                call this%WriteData(                                                                                              &
                         DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/2_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
@@ -319,6 +333,7 @@ contains
         real(R8P),                                  intent(IN) :: Origin(:)             !< Origin coordinates
         real(R8P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -327,27 +342,56 @@ contains
         select case (this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
-                call this%WriteHyperSlab(                                                                                             &
+                do GridID=0, this%MPIEnvironment%get_comm_size()-1
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/3_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/3_I8P/),                                                          &
+                            Values          = Origin(3:1:-1))
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/3_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/3_I8P/),                                                          &
+                            Values          = DxDyDz(3:1:-1))
+                enddo
+                call this%WriteData(                                                                                             &
                         DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/3_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/3_I8P/),                                                                                  &
                         Values          = Origin(3:1:-1))
-                call this%WriteHyperSlab(                                                                                             &
+                call this%WriteData(                                                                                             &
                         DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/3_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/3_I8P/),                                                                                  &
                         Values          = DxDyDz(3:1:-1))
+
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY)
                 ! Origin and DxDyDz size must be 2
-                call this%WriteHyperSlab(                                                                                             &
+                do GridID=0, this%MPIEnvironment%get_comm_size()-1
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/2_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/2_I8P/),                                                          &
+                            Values          = Origin(2:1:-1))
+                    call this%WriteMetadata(                                                                      &
+                            DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
+                            DatasetDims     = (/2_I8P/),                                                          &
+                            HyperSlabOffset = (/0_HSIZE_T/),                                                      &
+                            HyperSlabSize   = (/2_I8P/),                                                          &
+                            Values          = DxDyDz(2:1:-1))
+                enddo
+                call this%WriteData(                                                                                              &
                         DatasetName     = 'Origin_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/2_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
                         HyperSlabSize   = (/2_I8P/),                                                                                  &
                         Values          = Origin(2:1:-1))
-                call this%WriteHyperSlab(                                                                                             &
+                call this%WriteData(                                                                                              &
                         DatasetName     = 'DxDyDz_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                         DatasetDims     = (/2_I8P/),                                                                                  &
                         HyperSlabOffset = (/0_HSIZE_T/),                                                                              &
@@ -365,9 +409,6 @@ contains
         class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this     !< HDF5 dataset per process handler for structured grids
         integer(I4P),                               intent(IN) :: Connectivities(:)  !< I4P Grid connectivities
         character(len=*),                           intent(IN) :: Name               !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -385,9 +426,6 @@ contains
         class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this     !< HDF5 dataset per process handler for structured grids
         integer(I8P),                               intent(IN) :: Connectivities(:)  !< I8P Grid connectivities
         character(len=*),                           intent(IN) :: Name               !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
