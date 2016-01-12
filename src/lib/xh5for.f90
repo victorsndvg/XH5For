@@ -159,7 +159,6 @@ contains
     !----------------------------------------------------------------- 
         this%Action = XDMF_ACTION_READ
         if(present(root)) r_root = root
-        call this%Free()
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -202,7 +201,6 @@ contains
     !----------------------------------------------------------------- 
         this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
-        call this%Free()
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -259,7 +257,6 @@ contains
     !----------------------------------------------------------------- 
         this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
-        call this%Free()
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -317,7 +314,6 @@ contains
     !----------------------------------------------------------------- 
         this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
-        call this%Free()
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
@@ -373,7 +369,6 @@ contains
     !----------------------------------------------------------------- 
         this%Action = XDMF_ACTION_WRITE
         if(present(root)) r_root = root
-        call this%Free()
         ! MPI environment initialization
         if(present(comm)) then
             call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)

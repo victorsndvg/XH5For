@@ -98,6 +98,7 @@ implicit none
     integer(I4P), parameter :: XDMF_GRID_TYPE_UNSTRUCTURED  = 704
 
     integer(I4P), parameter :: XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB  = 800
+    integer(I4P), parameter :: XDMF_STRATEGY_DATASET_PER_PROCESS   = 801
 
     integer(I4P), parameter :: XDMF_ACTION_READ   = 900
     integer(I4P), parameter :: XDMF_ACTION_WRITE  = 901
@@ -106,7 +107,10 @@ implicit none
     !< ACTUALLY SUPPORTED PARAMETERS
     !----------------------------------------------------------------- 
 
-    integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB/)
+    integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/ &
+                                                                XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, &
+                                                                XDMF_STRATEGY_DATASET_PER_PROCESS   &
+                                                          /)
 
     integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
                                                                 ! Unstructured

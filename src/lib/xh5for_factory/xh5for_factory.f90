@@ -5,6 +5,8 @@ use xh5for_parameters
 use xh5for_abstract_factory
 use structured_contiguous_hyperslab_factory
 use unstructured_contiguous_hyperslab_factory
+use structured_dataset_per_process_factory
+use unstructured_dataset_per_process_factory
 
 implicit none
 private
@@ -32,6 +34,8 @@ contains
                 select case (Strategy)
                     case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
                         allocate(unstructured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case (XDMF_STRATEGY_DATASET_PER_PROCESS)
+                        allocate(unstructured_dataset_per_process_factory_t :: AbstractFactory)
                     case DEFAULT
                         print*, 'Strategy not Implemented yet!', Strategy
                 end select
@@ -39,6 +43,8 @@ contains
                 select case (Strategy)
                     case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
                         allocate(structured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case (XDMF_STRATEGY_DATASET_PER_PROCESS)
+                        allocate(structured_dataset_per_process_factory_t :: AbstractFactory)
                     case DEFAULT
                         print*, 'Strategy not Implemented yet!', Strategy
                 end select
@@ -46,6 +52,8 @@ contains
                 select case (Strategy)
                     case (XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
                         allocate(structured_contiguous_hyperslab_factory_t :: AbstractFactory)
+                    case (XDMF_STRATEGY_DATASET_PER_PROCESS)
+                        allocate(structured_dataset_per_process_factory_t :: AbstractFactory)
                     case DEFAULT
                         print*, 'Strategy not Implemented yet!', Strategy
                 end select

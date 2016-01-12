@@ -149,8 +149,8 @@ contains
     !-----------------------------------------------------------------
     !< XDMF file handler initialization procedure
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t),                   intent(INOUT) :: this               !< XMDF handler
-        type(mpi_env_t),                 target, intent(IN) :: MPIEnvironment        !< MPI environment
+        class(xdmf_handler_t),                    intent(INOUT) :: this               !< XMDF handler
+        type(mpi_env_t),                  target, intent(IN) :: MPIEnvironment        !< MPI environment
         class(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
         class(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
