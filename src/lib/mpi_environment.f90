@@ -26,31 +26,31 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
         integer :: size = 1                                           !< MPI communicator size
     contains
     private
-        procedure         :: mpi_allgather_single_int_value_I4P
-        procedure         :: mpi_allgather_single_int_value_I8P
-        procedure         :: mpi_broadcast_int_I4P_array
-        procedure         :: mpi_broadcast_int_I8P_array
-        procedure         :: mpi_broadcast_string
-        procedure, public :: Initialize                   => mpi_Initialize
-        procedure, public :: Free                         => mpi_Free
-        procedure, public :: get_comm                     => mpi_get_comm
-        procedure, public :: get_root                     => mpi_get_root
-        procedure, public :: get_rank                     => mpi_get_rank
-        procedure, public :: get_info                     => mpi_get_info
-        procedure, public :: get_comm_size                => mpi_get_comm_size
-        procedure, public :: is_root                      => mpi_is_root
-        generic, public :: mpi_allgather                  => mpi_allgather_single_int_value_I4P, &
-                                                             mpi_allgather_single_int_value_I8P
-        generic, public :: mpi_broadcast                  => mpi_broadcast_int_I4P_array, &
-                                                             mpi_broadcast_int_I8P_array, &
-                                                             mpi_broadcast_string
+        procedure         :: mpi_env_allgather_single_int_value_I4P
+        procedure         :: mpi_env_allgather_single_int_value_I8P
+        procedure         :: mpi_env_broadcast_int_I4P_array
+        procedure         :: mpi_env_broadcast_int_I8P_array
+        procedure         :: mpi_env_broadcast_string
+        procedure, public :: Initialize                   => mpi_env_Initialize
+        procedure, public :: Free                         => mpi_env_Free
+        procedure, public :: get_comm                     => mpi_env_get_comm
+        procedure, public :: get_root                     => mpi_env_get_root
+        procedure, public :: get_rank                     => mpi_env_get_rank
+        procedure, public :: get_info                     => mpi_env_get_info
+        procedure, public :: get_comm_size                => mpi_env_get_comm_size
+        procedure, public :: is_root                      => mpi_env_is_root
+        generic,   public :: mpi_allgather                => mpi_env_allgather_single_int_value_I4P, &
+                                                             mpi_env_allgather_single_int_value_I8P
+        generic,   public :: mpi_broadcast                => mpi_env_broadcast_int_I4P_array, &
+                                                             mpi_env_broadcast_int_I8P_array, &
+                                                             mpi_env_broadcast_string
     end type mpi_env_t
 
 public :: mpi_env_t
 
 contains
 
-    subroutine mpi_initialize(this, comm, root, mpierror)
+    subroutine mpi_env_initialize(this, comm, root, mpierror)
     !-----------------------------------------------------------------
     !< Default MPI values initialization
     !----------------------------------------------------------------- 
@@ -91,9 +91,9 @@ contains
         endif
         if(present(mpierror)) mpierror = mpierr
 #endif
-    end subroutine mpi_initialize
+    end subroutine mpi_env_initialize
 
-    subroutine mpi_Free(this)
+    subroutine mpi_env_Free(this)
     !-----------------------------------------------------------------
     !< Free MPI derived type
     !----------------------------------------------------------------- 
@@ -101,9 +101,9 @@ contains
     !----------------------------------------------------------------- 
         ! No allocatable variables. Default initialization
         call this%Initialize()
-    end subroutine mpi_Free
+    end subroutine mpi_env_Free
 
-    function mpi_get_comm(this)
+    function mpi_env_get_comm(this)
     !-----------------------------------------------------------------
     !< Return MPI communicator
     !----------------------------------------------------------------- 
@@ -111,9 +111,9 @@ contains
         integer                      :: mpi_get_comm                  !< MPI communicator
     !----------------------------------------------------------------- 
         mpi_get_comm = this%comm
-    end function mpi_get_comm
+    end function mpi_env_get_comm
 
-    function mpi_get_root(this)
+    function mpi_env_get_root(this)
     !-----------------------------------------------------------------
     !< Return MPI root processor
     !----------------------------------------------------------------- 
@@ -121,9 +121,9 @@ contains
         integer                      :: mpi_get_root                  !< MPI root processor
     !----------------------------------------------------------------- 
         mpi_get_root = this%root
-    end function mpi_get_root
+    end function mpi_env_get_root
 
-    function mpi_get_rank(this)
+    function mpi_env_get_rank(this)
     !-----------------------------------------------------------------
     !< Return MPI rank
     !----------------------------------------------------------------- 
@@ -131,9 +131,9 @@ contains
         integer                      :: mpi_get_rank                  !< MPI rank
     !----------------------------------------------------------------- 
         mpi_get_rank = this%rank
-    end function mpi_get_rank
+    end function mpi_env_get_rank
 
-    function mpi_get_info(this)
+    function mpi_env_get_info(this)
     !-----------------------------------------------------------------
     !< Return MPI info
     !----------------------------------------------------------------- 
@@ -141,9 +141,9 @@ contains
         integer                      :: mpi_get_info                  !< MPI info
     !----------------------------------------------------------------- 
         mpi_get_info = this%info
-    end function mpi_get_info
+    end function mpi_env_get_info
 
-    function mpi_get_comm_size(this)
+    function mpi_env_get_comm_size(this)
     !----------------------------------------------------------------- 
     !< Return MPI communicator size
     !----------------------------------------------------------------- 
@@ -151,9 +151,10 @@ contains
         integer                      :: mpi_get_comm_size             !< MPI communicator size
     !----------------------------------------------------------------- 
         mpi_get_comm_size = this%size
-    end function mpi_get_comm_size
+    end function mpi_env_get_comm_size
 
-    subroutine mpi_allgather_single_int_value_I4P(this, send_data, recv_data, mpierror)
+
+    subroutine mpi_env_allgather_single_int_value_I4P(this, send_data, recv_data, mpierror)
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I4P value per task
     !----------------------------------------------------------------- 
@@ -173,9 +174,9 @@ contains
         recv_data(:comm_size) = send_data
 #endif
         if(present(mpierror)) mpierror = mpierr
-    end subroutine mpi_allgather_single_int_value_I4P
+    end subroutine mpi_env_allgather_single_int_value_I4P
 
-    subroutine mpi_allgather_single_int_value_I8P(this, send_data, recv_data, mpierror)
+    subroutine mpi_env_allgather_single_int_value_I8P(this, send_data, recv_data, mpierror)
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I8P value per task
     !----------------------------------------------------------------- 
@@ -195,10 +196,10 @@ contains
         recv_data(:comm_size) = send_data
 #endif
         if(present(mpierror)) mpierror = mpierr
-    end subroutine mpi_allgather_single_int_value_I8P
+    end subroutine mpi_env_allgather_single_int_value_I8P
 
 
-    subroutine mpi_broadcast_int_I4P_array(this, send_data, mpierror)
+    subroutine mpi_env_broadcast_int_I4P_array(this, send_data, mpierror)
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I4P value per task
     !----------------------------------------------------------------- 
@@ -216,10 +217,10 @@ contains
         call MPI_BCAST (send_data, data_size, MPI_INTEGER, this%root, this%comm, mpierr)
 #endif
         if(present(mpierror)) mpierror = mpierr
-    end subroutine mpi_broadcast_int_I4P_array
+    end subroutine mpi_env_broadcast_int_I4P_array
 
 
-    subroutine mpi_broadcast_int_I8P_array(this, send_data, mpierror)
+    subroutine mpi_env_broadcast_int_I8P_array(this, send_data, mpierror)
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I4P value per task
     !----------------------------------------------------------------- 
@@ -237,18 +238,18 @@ contains
         call MPI_BCAST (send_data, data_size, MPI_LONG, this%root, this%comm, mpierr)
 #endif
         if(present(mpierror)) mpierror = mpierr
-    end subroutine mpi_broadcast_int_I8P_array
+    end subroutine mpi_env_broadcast_int_I8P_array
 
 
-    subroutine mpi_broadcast_string(this, send_data, mpierror)
+    subroutine mpi_env_broadcast_string(this, send_data, mpierror)
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a deferred length character array
     !----------------------------------------------------------------- 
         class(mpi_env_t),              intent(IN)    :: this          !< MPI environment
         character(len=:), allocatable, intent(INOUT) :: send_data     !< MPI_broadcast send data
         integer(I4P),     optional,    intent(OUT)   :: mpierror      !< MPI error
-        integer(I4P)                             :: data_size         !< Send data size
-        integer(I4P)                             :: mpierr            !< Aux variable for MPI error
+        integer(I4P)                                 :: data_size     !< Send data size
+        integer(I4P)                                 :: mpierr        !< Aux variable for MPI error
     !----------------------------------------------------------------- 
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
@@ -258,18 +259,18 @@ contains
         call MPI_BCAST (send_data, data_size, MPI_CHAR, this%root, this%comm, mpierr)
 #endif
         if(present(mpierror)) mpierror = mpierr
-    end subroutine mpi_broadcast_string
+    end subroutine mpi_env_broadcast_string
 
 
-    function mpi_is_root(this)
+    function mpi_env_is_root(this)
     !-----------------------------------------------------------------
     !< Is the current task the root processor?
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN)  :: this                         !< MPI environment
-        logical                       :: mpi_is_root                  !< Boolean variable, True if is root task   
+        logical                       :: mpi_env_is_root              !< Boolean variable, True if is root task   
     !----------------------------------------------------------------- 
-        mpi_is_root = this%get_rank() == this%get_root()
-    end function mpi_is_root
+        mpi_env_is_root = this%get_rank() == this%get_root()
+    end function mpi_env_is_root
 
 
 

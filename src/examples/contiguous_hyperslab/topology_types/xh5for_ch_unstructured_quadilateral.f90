@@ -1,4 +1,4 @@
-program example_unstructured_quadrilateral
+program xh5for_ch_unstructured_quadrilateral
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -51,7 +51,7 @@ implicit none
     !< Write XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize(NumberOfNodes=6, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_QUADRILATERAL, GeometryType=XDMF_GEOMETRY_TYPE_XY)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='contiguous_hyperslab_quadrilateral')
+    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_quadrilateral')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='Temperature_R4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=realtempR4P)
@@ -62,7 +62,7 @@ implicit none
     !< Read XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_quadrilateral')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_quadrilateral')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(XYZ = out_geometry)
@@ -87,4 +87,4 @@ implicit none
 
     call exit(exitcode)
 
-end program example_unstructured_quadrilateral
+end program xh5for_ch_unstructured_quadrilateral

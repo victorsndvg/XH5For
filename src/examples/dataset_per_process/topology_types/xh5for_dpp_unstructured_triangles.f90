@@ -1,4 +1,4 @@
-program example_unstructured_triangles
+program xh5for_dpp_unstructured_triangles
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -45,9 +45,9 @@ implicit none
     cellfield = cellfield + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%Initialize(NumberOfNodes=4, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='contiguous_hyperslab_triangles')
+    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_dpp_unstructured_triangles')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='GridNumber', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_GRID , Values=(/int(rank,I4P)/))
@@ -56,9 +56,9 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_triangles')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_unstructured_triangles')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(XYZ = out_geometry)
@@ -83,4 +83,4 @@ implicit none
 
     call exit(exitcode)
 
-end program example_unstructured_triangles
+end program xh5for_dpp_unstructured_triangles
