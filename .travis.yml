@@ -13,7 +13,6 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gfortran-4.9
       - libhdf5-serial-dev
 
 before_install:
@@ -25,7 +24,7 @@ install:
 before_script:
   - mkdir build
   - cd build
-  - cmake -DHDF5_C_INCLUDE_DIR=/usr/include/ ..
+  - cmake ..
 
 script:
   - ctest -VV -T Start -T Build -T Test
