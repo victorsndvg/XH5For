@@ -8,7 +8,7 @@ use spatial_grid_descriptor
 use structured_uniform_grid_descriptor
 use structured_spatial_grid_descriptor
 use xdmf_structured_dataset_per_process_handler
-use hdf5_structured_contiguous_hyperslab_handler
+use hdf5_structured_dataset_per_process_handler
 
 implicit none
 private
@@ -65,7 +65,7 @@ contains
         class(structured_dataset_per_process_factory_t), intent(IN)  :: this        !< structured contiguous hyperslab factory
         class(hdf5_handler_t), allocatable,              intent(OUT) :: HDF5Handler !< HDF5 handler
     !----------------------------------------------------------------- 
-        allocate(hdf5_structured_contiguous_hyperslab_handler_t :: HDF5Handler)
+        allocate(hdf5_structured_dataset_per_process_handler_t :: HDF5Handler)
     end subroutine structured_dataset_per_process_CreateHDF5Handler
 
 end module structured_dataset_per_process_factory

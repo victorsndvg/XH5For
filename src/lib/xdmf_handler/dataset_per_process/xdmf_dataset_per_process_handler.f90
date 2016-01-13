@@ -397,10 +397,10 @@ contains
                         Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
-                call dataitem%open(xml_handler = this%file%xml_handler,                                    &
-                        Dimensions = (/int(LocalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),          &
+                call dataitem%open(xml_handler = this%file%xml_handler,                                     &
+                        Dimensions = (/int(LocalNumberOfData,I8P),int(NumberOfComponents,I8P),1_I8P/),      &
                         NumberType = this%UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
-                        Format     = 'HDF',                                                                &
+                        Format     = 'HDF',                                                                 &
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
                 call chardata%write( xml_handler = this%file%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&

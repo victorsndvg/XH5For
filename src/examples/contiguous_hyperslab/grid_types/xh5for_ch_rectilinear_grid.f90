@@ -1,4 +1,4 @@
-program example_unstructured_hexahedron
+program xh5for_ch_rectilinear_grid
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -49,7 +49,7 @@ implicit none
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%SetGridType(GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call xh5%Initialize(GridShape=(/size(X), size(Y), size(Z)/))
-    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='rectilinear_grid')
+    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_ch_rectilinear_grid')
     call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P)  
     call xh5%Close()
@@ -58,7 +58,7 @@ implicit none
     !< Read XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='rectilinear_grid')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_rectilinear_grid')
     call xh5%Parse()
     call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
@@ -80,4 +80,4 @@ implicit none
 #endif
 
     call exit( status=exitcode)
-end program example_unstructured_hexahedron
+end program xh5for_ch_rectilinear_grid

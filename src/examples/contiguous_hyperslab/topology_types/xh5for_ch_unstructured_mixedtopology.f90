@@ -1,4 +1,4 @@
-program example_unstructured_triangles
+program xh5for_ch_unstructured_mixedtopology
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -64,7 +64,7 @@ implicit none
     !< Write XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='contiguous_hyperslab_mixedtopology')
+    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixedtopology')
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield)
@@ -75,7 +75,7 @@ implicit none
     !< Read XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_mixedtopology')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixedtopology')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(XYZ = out_geometry)
@@ -100,4 +100,4 @@ implicit none
 
     call exit(exitcode)
 
-end program example_unstructured_triangles
+end program xh5for_ch_unstructured_mixedtopology

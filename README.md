@@ -18,7 +18,9 @@ Is a library to read and write partitioned FEM meshes taking advantage of the co
 * As starting point XML syntax will be based on XDMF v2.x.
 * The handling of XML files is developed on top of [FoX](https://github.com/andreww/fox) (Fortran XML library) for reading/writing XDMF files. Particularly, *FoX_wxml* library is used for writing XDMF files and *FoX_dom* will be used for parsing.
 
-## Under development (Contiguous hyperslab strategy)
+## Under development strategies:
+  * Contiguous hyperslab
+  * One dataset per process strategy)
 
 ### Exporters:
   * Mesh:
