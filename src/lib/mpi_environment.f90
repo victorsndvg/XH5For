@@ -39,7 +39,6 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
         procedure, public :: get_info                     => mpi_env_get_info
         procedure, public :: get_comm_size                => mpi_env_get_comm_size
         procedure, public :: is_root                      => mpi_env_is_root
-        procedure, public :: barrier                      => mpi_env_barrier
         generic,   public :: mpi_allgather                => mpi_env_allgather_single_int_value_I4P, &
                                                              mpi_env_allgather_single_int_value_I8P
         generic,   public :: mpi_broadcast                => mpi_env_broadcast_int_I4P_array, &
@@ -153,17 +152,6 @@ contains
     !----------------------------------------------------------------- 
         mpi_get_comm_size = this%size
     end function mpi_env_get_comm_size
-
-
-    subroutine mpi_env_barrier(this)
-    !-----------------------------------------------------------------
-    !< MPI Barrier
-    !----------------------------------------------------------------- 
-        class(mpi_env_t), intent(INOUT) :: this                       !< MPI environment
-        integer                         :: ierr
-    !----------------------------------------------------------------- 
-        call MPI_BARRIER (this%comm, ierr)
-    end subroutine mpi_env_barrier
 
 
     subroutine mpi_env_allgather_single_int_value_I4P(this, send_data, recv_data, mpierror)
