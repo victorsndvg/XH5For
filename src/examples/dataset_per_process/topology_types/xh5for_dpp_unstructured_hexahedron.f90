@@ -1,4 +1,4 @@
-program example_unstructured_hexahedron
+program xh5for_dpp_unstructured_hexahedron
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -49,9 +49,9 @@ implicit none
     scalartempI8P = scalartempI8P+rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%Initialize(NumberOfNodes=8, NumberOfElements=1,TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='contiguous_hyperslab_hexahedron')
+    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_dpp_unstructured_hexahedron')
     call xh5%WriteTopology(Connectivities=topology)
     call xh5%WriteGeometry(XYZ=geometry)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
@@ -60,9 +60,9 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='contiguous_hyperslab_hexahedron')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_unstructured_hexahedron')
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities=out_topology)
     call xh5%ReadGeometry(XYZ=out_geometry)
@@ -86,4 +86,4 @@ implicit none
 #endif
 
     call exit( status=exitcode)
-end program example_unstructured_hexahedron
+end program xh5for_dpp_unstructured_hexahedron
