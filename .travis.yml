@@ -14,6 +14,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - gfortran-4.9
+      - libhdf5-serial-dev
 
 before_install:
   - git submodule update --init --recursive
