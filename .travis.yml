@@ -13,13 +13,14 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - gfortran-4.8
       - libhdf5-serial-dev
 
 before_install:
   - git submodule update --init --recursive
 
 install:
-
+  - export FC=/usr/bin/gfortran-4.8
 
 before_script:
   - mkdir build
