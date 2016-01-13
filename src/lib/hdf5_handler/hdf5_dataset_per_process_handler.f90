@@ -25,10 +25,10 @@ private
         procedure :: WriteData_I8P      => hdf5_dataset_per_process_handler_WriteData_I8P
         procedure :: WriteData_R4P      => hdf5_dataset_per_process_handler_WriteData_R4P
         procedure :: WriteData_R8P      => hdf5_dataset_per_process_handler_WriteData_R8P
-        procedure :: ReadHyperSlab_I4P  => hdf5_dataset_per_process_handler_ReadHyperSlab_I4P
-        procedure :: ReadHyperSlab_I8P  => hdf5_dataset_per_process_handler_ReadHyperSlab_I8P
-        procedure :: ReadHyperSlab_R4P  => hdf5_dataset_per_process_handler_ReadHyperSlab_R4P
-        procedure :: ReadHyperSlab_R8P  => hdf5_dataset_per_process_handler_ReadHyperSlab_R8P
+        procedure :: ReadDataset_I4P    => hdf5_dataset_per_process_handler_ReadDataset_I4P
+        procedure :: ReadDataset_I8P    => hdf5_dataset_per_process_handler_ReadDataset_I8P
+        procedure :: ReadDataset_R4P    => hdf5_dataset_per_process_handler_ReadDataset_R4P
+        procedure :: ReadDataset_R8P    => hdf5_dataset_per_process_handler_ReadDataset_R8P
         procedure :: WriteAttribute_I4P => hdf5_dataset_per_process_handler_WriteAttribute_I4P
         procedure :: WriteAttribute_I8P => hdf5_dataset_per_process_handler_WriteAttribute_I8P
         procedure :: WriteAttribute_R4P => hdf5_dataset_per_process_handler_WriteAttribute_R4P
@@ -45,10 +45,10 @@ private
                                            WriteData_I8P, &
                                            WriteData_R4P, &
                                            WriteData_R8P
-        generic   :: ReadHyperSlab      => ReadHyperSlab_I4P, &
-                                           ReadHyperSlab_I8P, &
-                                           ReadHyperSlab_R4P, &
-                                           ReadHyperSlab_R8P
+        generic   :: ReadDataset        => ReadDataset_I4P, &
+                                           ReadDataset_I8P, &
+                                           ReadDataset_R4P, &
+                                           ReadDataset_R8P
 
     end type hdf5_dataset_per_process_handler_t
 
@@ -411,7 +411,7 @@ contains
     end subroutine hdf5_dataset_per_process_handler_WriteData_R8P
 
 
-    subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_I4P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
+    subroutine hdf5_dataset_per_process_handler_ReadDataset_I4P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
     !-----------------------------------------------------------------
     !< Read I4P dataset to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
@@ -461,10 +461,10 @@ contains
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_I4P
+    end subroutine hdf5_dataset_per_process_handler_ReadDataset_I4P
 
 
-    subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_I8P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
+    subroutine hdf5_dataset_per_process_handler_ReadDataset_I8P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
     !-----------------------------------------------------------------
     !< Read I8P dataset to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
@@ -513,10 +513,10 @@ contains
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_I8P
+    end subroutine hdf5_dataset_per_process_handler_ReadDataset_I8P
 
 
-    subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_R4P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
+    subroutine hdf5_dataset_per_process_handler_ReadDataset_R4P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
     !-----------------------------------------------------------------
     !< Read R4P dataset to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
@@ -566,10 +566,10 @@ contains
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_R4P
+    end subroutine hdf5_dataset_per_process_handler_ReadDataset_R4P
 
 
-    subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_R8P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
+    subroutine hdf5_dataset_per_process_handler_ReadDataset_R8P(this, DatasetName, DatasetDims, HyperSlabOffset, HyperSlabSize, Values)
     !-----------------------------------------------------------------
     !< read R8P dataset to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
@@ -619,7 +619,7 @@ contains
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
 #endif
-    end subroutine hdf5_dataset_per_process_handler_ReadHyperSlab_R8P
+    end subroutine hdf5_dataset_per_process_handler_ReadDataset_R8P
 
 
     subroutine hdf5_dataset_per_process_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
@@ -805,7 +805,7 @@ contains
                 GridID             = this%MPIEnvironment%get_rank(), &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -838,7 +838,7 @@ contains
                 GridID             = this%MPIEnvironment%get_rank(), &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -871,7 +871,7 @@ contains
                 GridID             = this%MPIEnvironment%get_rank(), &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -904,7 +904,7 @@ contains
                 GridID             = this%MPIEnvironment%get_rank(), &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &

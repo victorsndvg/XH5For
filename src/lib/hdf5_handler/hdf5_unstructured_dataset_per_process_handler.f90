@@ -354,7 +354,7 @@ contains
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/spacedim*localnumberofnodes/),                                                 &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -384,7 +384,7 @@ contains
         globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/spacedim*localnumberofnodes/),                                                 &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -417,7 +417,7 @@ contains
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -426,7 +426,7 @@ contains
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -435,7 +435,7 @@ contains
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -468,7 +468,7 @@ contains
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'X_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -477,7 +477,7 @@ contains
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'Y_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -486,7 +486,7 @@ contains
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-        call this%ReadHyperSlab(                                                                                         &
+        call this%ReadDataset(                                                                                           &
                 DatasetName     = 'Z_'//Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/localnumberofnodes/),                                                                &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                         &
@@ -550,7 +550,7 @@ contains
         GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
         LocalTopologySize  =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalTopologySize/),                                                           &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
@@ -578,7 +578,7 @@ contains
         GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
         LocalTopologySize =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
         TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadHyperSlab(                                                                                   &
+        call this%ReadDataset(                                                                                     &
                 DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
                 DatasetDims     = (/LocalTopologySize/),                                                           &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
