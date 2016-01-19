@@ -116,7 +116,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%file_id,             &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -181,7 +183,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%file_id,             &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -247,7 +251,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%file_id,             &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -312,7 +318,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%file_id,             &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -380,7 +388,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%file_id,               &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -446,7 +456,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%file_id,               &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -512,7 +524,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%file_id,               &
                 name     = '/'//trim(adjustl(DatasetName)), &
@@ -578,7 +592,9 @@ contains
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Set MPIO data transfer mode to COLLECTIVE
+#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+#endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%file_id,               &
                 name     = '/'//trim(adjustl(DatasetName)), &
