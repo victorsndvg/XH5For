@@ -27,7 +27,6 @@ install:
   - export FC=/usr/bin/gfortran-4.9
   - $FC --version
   - |
-      # HDF5
       cd $TRAVIS_BUILD_DIR;
       tar -xzf hdf5-1.8.14.tar.gz;
       cd hdf5-1.8.14;
