@@ -33,7 +33,7 @@ install:
   - tar -xzf hdf5-1.8.14.tar.gz
   - cd hdf5-1.8.14
   - mkdir $TRAVIS_BUILD_DIR/hdf5
-  - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules" > /dev/null
+  - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules > /dev/null
   - make -j2 #> /dev/null 2>&1
   - make install > /dev/null 2>&1
   ##################
