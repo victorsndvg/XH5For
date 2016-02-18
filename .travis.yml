@@ -17,19 +17,30 @@ addons:
       - gfortran-4.9
       - cmake
       - cmake-data
-      - hdf5-tools 
-      - libhdf5-serial-dev
 
 before_install:
   - pip install codecov
   - git submodule update --init --recursive
+  - travis_retry wget --quiet https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz;
 
 install:
   - export FC=/usr/bin/gfortran-4.9
   - $FC --version
+  - |
+      # HDF5
+      cd $TRAVIS_BUILD_DIR;
+      tar -xzf hdf5-1.8.14.tar.gz;
+      cd hdf5-1.8.14;
+      mkdir $TRAVIS_BUILD_DIR/hdf5;
+      ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules" > /dev/null;
+      make -j2 #> /dev/null 2>&1;
+      make install > /dev/null 2>&1;
+  - export PATH=$TRAVIS_BUILD_DIR/hdf5/bin:$PATH
+  - echo $PATH
   - cmake --version
 
 before_script:
+  - cd $TRAVIS_BUILD_DIR;
   - mkdir build
   - cd build
   - cmake ..
