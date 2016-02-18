@@ -17,6 +17,8 @@ addons:
       - gfortran-4.9
       - cmake
       - cmake-data
+      - hdf5-tools 
+      - libhdf5-serial-dev
 
 before_install:
   - pip install codecov
