@@ -62,6 +62,9 @@ ENDIF()
 
 SET(EXT_LIBS  MPI HDF5)
 
+# HDF5 components to search
+SET(HDF5_FIND_COMPONENTS C Fortran HL Fortran_HL)
+
 #################################################################
 # Find packages
 #################################################################

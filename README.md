@@ -2,7 +2,11 @@
 The Fortran way to easy write partitioned XDMF/HDF5 meshes
 
 [![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)
-                 
+[![codecov.io](https://codecov.io/github/victorsndvg/XH5For/coverage.svg?branch=master)](https://codecov.io/github/victorsndvg/XH5For?branch=master)
+
+##License
+
+[![License](https://img.shields.io/badge/license-GNU%20LESSER%20GENERAL%20PUBLIC%20LICENSE%20v3%2C%20LGPLv3-red.svg)](http://www.gnu.org/licenses/lgpl-3.0.txt)                 
 
 ## What is XH5For?
 Is a library to read and write partitioned FEM meshes taking advantage of the collective/independent IO provided by the HDF5 library. 
