@@ -154,7 +154,7 @@ contains
     !----------------------------------------------------------------- 
         xdmf_element_node_is_topology = (getTagName(DOMNode) == 'Topology')
     end function xdmf_element_node_is_topology
-/tmp/git-difftool.XB3ft/left
+
 
     function xdmf_element_node_is_geometry(this, DOMNode)
     !-----------------------------------------------------------------
