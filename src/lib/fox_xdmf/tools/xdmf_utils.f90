@@ -57,6 +57,7 @@ contains
         Count_tokens = k
     end function Count_tokens
 
+
     function Next_token(s1, pos, separator)
     !-----------------------------------------------------------------
     !< Return the next token given a initial position. The position
@@ -234,6 +235,7 @@ contains
         if(.not. supported) call warning_message('Not supported NumberType Name: "'//NumberTypeName//'" (Note: Case sensitive)')
     end function isSupportedDataItemNumberTypeName
 
+
     function isSupportedDataItemFormatName(FormatName) result(supported)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem Format Name
@@ -256,7 +258,5 @@ contains
         supported = MINVAL(ABS(SUPPORTED_DATAITEMPRECISIONS - Precision)) == 0_I4P
         if(.not. supported) call warning_message('Not supported Precision: "'//trim(str(no_sign=.true., n=Precision))//'"')
     end function isSupportedDataItemPrecision
-
-
 
 end module xdmf_utils
