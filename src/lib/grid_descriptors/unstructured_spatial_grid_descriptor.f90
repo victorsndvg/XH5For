@@ -4,6 +4,7 @@ use IR_Precision, only : I4P, I8P
 use spatial_grid_descriptor
 use mpi_environment
 use xh5for_utils
+use xh5for_parameters
 
 implicit none
 

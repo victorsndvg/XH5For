@@ -5,6 +5,24 @@ USE IR_Precision, only: I4P, str
 USE xdmf_parameters
 
 implicit none
+private
+
+public :: Upper_Case
+public :: Count_tokens
+public :: Next_token
+public :: is_in_option_list
+public :: warning_message
+public :: isSupportedTopologyTypeName
+public :: isSupportedTimeTypeName
+public :: isSupportedGridTypeName
+public :: isSupportedGridCollectionTypeName
+public :: isSupportedGridSectionName
+public :: isSupportedAttributeTypeNAme
+public :: isSupportedDataItemTypeName
+public :: isSupportedAttributeCenterName
+public :: isSupportedDataItemNumberTypeName
+public :: isSupportedDataItemFormatName
+public :: isSupportedDataItemPrecision
 
 contains
 

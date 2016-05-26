@@ -1,22 +1,19 @@
 module xdmf_structured_dataset_per_process_handler
 !--------------------------------------------------------------------- -----------------------------------------------------------
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
-!< XDMF Time handling module
+!< XDMF File handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
-use xh5for_parameters
-use xh5for_utils
 use fox_xdmf
-use fox_dom,      only: Node, NodeList, ParseFile, GetDocumentElement, Item, GetLength, GetChildNodes, getAttribute, &
-                        HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, getTextContent, &
-                        TEXT_NODE, DOCUMENT_NODE
+use xh5for_utils
+use xh5for_parameters
 use xdmf_dataset_per_process_handler
+use fox_dom,      only: Node
+use IR_Precision, only: I4P, I8P, R4P, R8P, str
 
 implicit none
 
 private
-
 
     type, extends(xdmf_dataset_per_process_handler_t) :: xdmf_structured_dataset_per_process_handler_t
     !-----------------------------------------------------------------
@@ -24,51 +21,18 @@ private
     !----------------------------------------------------------------- 
     contains
     private
-        procedure         :: SetGeometry_R4P              => xdmf_str_dataset_per_process_SetGeometry_R4P
-        procedure         :: SetGeometry_R8P              => xdmf_str_dataset_per_process_SetGeometry_R8P
         procedure         :: SetTopology_I4P              => xdmf_str_dataset_per_process_SetTopology_I4P
         procedure         :: SetTopology_I8P              => xdmf_str_dataset_per_process_SetTopology_I8P
+        procedure         :: FillSpatialGridTopology      => xdmf_str_dataset_per_process_FillSpatialGridTopology
         procedure         :: WriteGeometry                => xdmf_str_dataset_per_process_WriteGeometry
         procedure         :: WriteGeometry_VXVYVZ         => xdmf_str_dataset_per_process_WriteGeometry_VXVYVZ
         procedure         :: WriteGeometry_DXDYDZ         => xdmf_str_dataset_per_process_WriteGeometry_DXDYDZ
         procedure         :: WriteTopology                => xdmf_str_dataset_per_process_WriteTopology
-        procedure         :: FillSpatialGridTopology      => xdmf_str_dataset_per_process_FillSpatialGridTopology
-        procedure         :: FillSpatialGridGeometry      => xdmf_str_dataset_per_process_FillSpatialGridGeometry
-        procedure         :: FillSpatialGridDescriptor    => xdmf_str_dataset_per_process_FillSpatialGridDescriptor
-        procedure, public :: ParseFile                    => xdmf_str_dataset_per_process_ParseFile
     end type xdmf_structured_dataset_per_process_handler_t
 
 public :: xdmf_structured_dataset_per_process_handler_t
 
 contains
-
-    subroutine xdmf_str_dataset_per_process_SetGeometry_R4P(this, XYZ, Name)
-    !-----------------------------------------------------------------
-    !< Add R4P geometry info to the handler. Used for deferred writing 
-    !----------------------------------------------------------------- 
-        class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this   !< XDMF dataset per process handler for structured Grids
-        real(R4P),                                            intent(IN)    :: XYZ(:) !< Grid coordinates
-        character(len=*),                                     intent(IN)    :: Name   !< Topology name
-    !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
-                                                            Precision       = 4,    &
-                                                            ArrayDimensions = (/size(XYZ, dim=1)/))
-    end subroutine xdmf_str_dataset_per_process_SetGeometry_R4P
-
-
-    subroutine xdmf_str_dataset_per_process_SetGeometry_R8P(this, XYZ, Name)
-    !-----------------------------------------------------------------
-    !< Add R8P geometry info to the handler. Used in deferred writing 
-    !----------------------------------------------------------------- 
-        class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this   !< XDMF dataset per process handler for structured Grids
-        real(R8P),                                            intent(IN)    :: XYZ(:) !< Grid coordinates
-        character(len=*),                                     intent(IN)    :: Name   !< Geometry name
-    !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
-                                                            Precision       = 8,    &
-                                                            ArrayDimensions = (/size(XYZ, dim=1)/))
-    end subroutine xdmf_str_dataset_per_process_SetGeometry_R8P
-
 
     subroutine xdmf_str_dataset_per_process_SetTopology_I4P(this, Connectivities, Name)
     !-----------------------------------------------------------------
@@ -136,111 +100,6 @@ contains
         call Topology%Free()
         nullify(DataItemNode)
     end subroutine xdmf_str_dataset_per_process_FillSpatialGridTopology
-
-
-    subroutine xdmf_str_dataset_per_process_FillSpatialGridGeometry(this, GeometryNode, ID)
-    !----------------------------------------------------------------- 
-    !< Fill the Spatial grid geometry metainfo from a Topology
-    !< FoX DOM Node
-    !----------------------------------------------------------------- 
-        class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this !< XDMF dataset per process handler for structured Grids
-        type(Node), pointer,                                  intent(IN)    :: GeometryNode !< Fox DOM Geometry node
-        integer(I4P),                                         intent(IN)    :: ID           !< Grid IDentifier
-        type(xdmf_geometry_t)                                               :: Geometry     !< XDMF Geometry derived type
-        type(xdmf_dataitem_t)                                               :: DataItem     !< XDMF DataItem derived type
-        type(Node), pointer                                                 :: DataItemNode !< Fox DOM Dataitem node
-        integer(I8P)                                                        :: auxDims(1)   !< Aux dimensions variable
-        integer(I4P)                                                        :: spacedims    !< Space dimensions
-        integer(I4P)                                                        :: GeometryType !< GeometryType
-    !----------------------------------------------------------------- 
-        if(.not. associated(GeometryNode)) return
-        call Geometry%Parse(DOMNode = GeometryNode)
-        ! Set GeometryType
-        GeometryType = GetXDMFGeometryTypeFromName(Geometry%get_GeometryType())
-        call this%SpatialGridDescriptor%SetGeometryTypePerGridID(GeometryType,ID=ID)
-        ! Set NumberOfNodes
-        DataItemNode => this%GetFirstChildByTag(FatherNode = GeometryNode, Tag = 'DataItem')
-        call DataItem%Parse(DomNode = DataItemNode)
-        auxDims = DataItem%get_Dimensions()
-        spacedims = GetSpaceDimension(GetXDMFGeometryTypeFromName(Geometry%get_GeometryType()))
-        select case (GeometryType)
-            case (XDMF_GEOMETRY_TYPE_XY, XDMF_GEOMETRY_TYPE_XYZ)
-                call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1)/spacedims,ID=ID)
-            case (XDMF_GEOMETRY_TYPE_X_Y_Z)
-                call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(AuxDims(1),ID=ID)
-        end select
-        ! Free
-        nullify(DataItemNode)
-        call Geometry%Free()
-        call DataItem%Free()
-    end subroutine xdmf_str_dataset_per_process_FillSpatialGridGeometry
-
-
-    subroutine xdmf_str_dataset_per_process_FillSpatialGridDescriptor(this, UniformGridNodes)
-    !-----------------------------------------------------------------
-    !< Fill Spatial Grid Descriptor From a FoX DOM UniformGrid node list
-    !< given the Spatial Grid Node
-    !----------------------------------------------------------------- 
-        class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this   !< XDMF dataset per process handler for structured Grids
-        type(NodeList), pointer,                              intent(IN)    :: UniformGridNodes  !< Fox DOM Grid node list
-        type(Node),     pointer                                             :: UniformGridNode   !< Fox DOM Grid node
-        type(Node),     pointer                                             :: ChildNode         !< Fox DOM node
-        type(NodeList), pointer                                             :: AttributeNodes    !< Fox DOM Attribute node list
-        type(xdmf_grid_t)                                                   :: Grid              !< XDMF Grid derived type
-        type(xdmf_geometry_t)                                               :: Geometry          !< XDMF Topology derived type
-        type(xdmf_attribute_t)                                              :: Attribute         !< XDMF Attribute derived type
-        integer(I4P)                                                        :: i                 !< Index for a loop in UniformGridNodes
-    !----------------------------------------------------------------- 
-        if(associated(UniformGridNodes)) then
-            call this%SpatialGridDescriptor%Allocate(NumberOfGrids=getLength(UniformGridNodes))
-            do i = 0, getLength(UniformGridNodes) - 1
-                UniformGridNode => item(UniformGridNodes, i)
-                ! Fill each Spatial Grid Topology
-                ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Topology')
-                call this%FillSpatialGridTopology(TopologyNode = ChildNode, ID = i)
-                ! Fill each Spatial Grid Geometry
-                ChildNode => this%GetUniqueNodeByTag(FatherNode = UniformGridNode, Tag = 'Geometry')
-                call this%FillSpatialGridGeometry(GeometryNode = Childnode, ID = i)
-            enddo
-            nullify(UniformGridNode)
-            nullify(ChildNode)
-            nullify(Attributenodes)
-            call Grid%Free()
-            call Geometry%Free()
-            call Attribute%Free()
-        endif
-    end subroutine xdmf_str_dataset_per_process_FillSpatialGridDescriptor
-
-
-    subroutine xdmf_str_dataset_per_process_ParseFile(this)
-    !-----------------------------------------------------------------
-    !< Parse a readed file and distribute the information
-    !----------------------------------------------------------------- 
-        class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this   !< XDMF dataset per process handler for structured Grids
-        type(Node),     pointer                                             :: DocumentRootNode  !< Fox DOM Document Root node
-        type(Node),     pointer                                             :: DomainNode        !< Fox DOM Domain node
-        type(Node),     pointer                                             :: SpatialGridNode   !< Fox DOM SpatialGrid node
-        type(NodeList), pointer                                             :: UniformGridNodes  !< Fox DOM UniformGrid node list
-    !----------------------------------------------------------------- 
-        if(this%MPIEnvironment%is_root()) then
-            call this%file%parsefile()
-            if(getNodeType(this%file%get_document_root())==DOCUMENT_NODE) then
-                DocumentRootNode => getDocumentElement(this%file%get_document_root())
-                DomainNode => this%GetUniqueNodeByTag(FatherNode = DocumentRootNode, Tag = 'Domain')
-                ! Get Domain Node
-                if(.not. associated(DomainNode)) return
-                SpatialGridNode => this%GetFirstChildByTag(FatherNode = DomainNode, Tag = 'Grid')
-                ! Get Spatial Grid Node
-                if(.not. associated(SpatialGridNode)) return
-                UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
-                ! Get Fill Spatial Grid metainfo
-                if(.not. associated(UniformGridNodes)) return
-                call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
-            endif
-            call destroy(this%file%get_document_root())
-        endif
-        call this%SpatialGridDescriptor%BroadcastMetadata()
-    end subroutine xdmf_str_dataset_per_process_ParseFile
 
 
     subroutine xdmf_str_dataset_per_process_WriteTopology(this, GridID)

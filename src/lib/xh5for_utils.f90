@@ -7,7 +7,23 @@ use IR_Precision, only: I4P, str
 use xdmf_utils,   only : warning_message
 use xh5for_parameters
 
-implicit none 
+implicit none
+private
+
+public :: GetNumberOfNodesPerElement
+public :: GetXDMFTopologyTypeName
+public :: GetXDMFTopologyTypeFromName
+public :: GetXDMFGeometryTypeName
+public :: GetXDMFGeometryTypeFromName
+public :: GetSpaceDimension
+public :: GetXDMFCenterTypeName
+public :: GetXDMFCenterTypeFromName
+public :: GetXDMFAttributeTypeName
+public :: GetNumberOfComponentsFromAttributeType
+public :: isSupportedStrategy
+public :: isSupportedGridType
+public :: isSupportedTopologyType
+public :: isSupportedGeometryType
 
 contains
 
@@ -241,7 +257,6 @@ contains
     end function GetXDMFTopologyTypeFromName
 
 
-
     function GetXDMFGeometryTypeName(GeometryType) result(GeometryName)
         integer(I4P), intent(IN)     :: GeometryType
         character(len=:), allocatable :: GeometryName
@@ -320,6 +335,7 @@ contains
                 SpaceDimension = 3; return
         end select
     end function GetSpaceDimension
+
 
     function GetXDMFCenterTypeName(CenterType) result(CenterName)
         integer(I4P), intent(IN)     :: CenterType
