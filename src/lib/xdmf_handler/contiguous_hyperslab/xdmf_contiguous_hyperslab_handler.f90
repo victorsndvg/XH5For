@@ -62,33 +62,33 @@ contains
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
                 DimensionsSize = size(this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx), dim=1)
-                call attribute%open(xml_handler = this%file%xml_handler,                                   &
+                call attribute%open(xml_handler = this%SpatialFile%xml_handler,                                   &
                         Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
-                call dataitem%open(xml_handler = this%file%xml_handler,                                                     &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler,                                                     &
                         Dimensions = (/int(LocalNumberOfData,I8P), int(NumberOfComponents,I8P), int(DimensionsSize,I8P)/),  &
                         ItemType   = 'HyperSlab',                                                                           &
                         Format     = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, DimensionsSize/),         &
                         NumberType = 'Int',                             &
                         Format     = 'XML',                             &
                         Precision=4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler,                                    &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler,                                    &
                         Dimensions = (/int(GlobalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),          &
                         NumberType = this%UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
                         Format     = 'HDF',                                                                &
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&
                                         this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx))
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call attribute%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call attribute%close(xml_handler = this%SpatialFile%xml_handler)
             enddo
         endif                    
     end subroutine xdmf_contiguous_hyperslab_handler_WriteAttributes

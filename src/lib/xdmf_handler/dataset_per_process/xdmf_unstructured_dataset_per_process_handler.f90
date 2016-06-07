@@ -128,19 +128,19 @@ contains
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%UniformGridDescriptor%getTopologyType())
             TopologySize = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID)
             DimensionsSize = size(this%UniformGridDescriptor%GetTopologyArrayDimensions(), dim=1)
-            call topology%open( xml_handler = this%file%xml_handler, &
+            call topology%open( xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions  = (/LocalNumberOfelements/),         &
                     TopologyType=XMDFTopologyTypeName)
-            call dataitem%open( xml_handler = this%file%xml_handler, &
+            call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions  = (/TopologySize/),                  &
                     NumberType  = 'Int',                             &
                     Format      = 'HDF',                             & 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-            call dataitem%close(xml_handler=this%file%xml_handler)
-            call topology%close(xml_handler=this%file%xml_handler)
+            call dataitem%close(xml_handler=this%SpatialFile%xml_handler)
+            call topology%close(xml_handler=this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_unst_dataset_per_process_WriteTopology
 
@@ -185,18 +185,18 @@ contains
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
             Count = LocalGeometrySize
             DimensionsSize = size(this%UniformGridDescriptor%GetGeometryArrayDimensions(), dim=1)
-            call geometry%open( xml_handler  = this%file%xml_handler, &
+            call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/LocalGeometrySize/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call geometry%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_unst_dataset_per_process_WriteGeometry_XYZ
 
@@ -224,47 +224,47 @@ contains
             GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
             XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%UniformGridDescriptor%GetGeometryType())
             Count = LocalNumberOfNodes
-            call geometry%open( xml_handler  = this%file%xml_handler, &
+            call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
             DimensionsSize = size(this%UniformGridDescriptor%GetGeometryArrayDimensions(), dim=1)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/LocalNumberOfNodes/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/LocalNumberOfNodes/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/LocalNumberOfNodes/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
 
-            call geometry%close(xml_handler = this%file%xml_handler)
+            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_unst_dataset_per_process_WriteGeometry_X_Y_Z
 

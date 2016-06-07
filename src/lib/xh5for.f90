@@ -9,7 +9,7 @@ use xdmf_handler
 use hdf5_handler
 use xh5for_abstract_factory
 use xh5for_factory
-use IR_Precision, only: I4P, I8P, str
+use IR_Precision, only: I4P, I8P, R8P, str
 
 
 implicit none

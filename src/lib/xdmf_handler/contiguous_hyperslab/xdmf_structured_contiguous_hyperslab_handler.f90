@@ -123,15 +123,15 @@ contains
             XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%SpatialGridDescriptor%GetTopologyTypePerGridID(id=GridID))
             SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
             if (SpaceDimension == 2) then
-                call topology%open( xml_handler = this%file%xml_handler, &
+                call topology%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = GridShape(2:3),                    &
                         TopologyType=XMDFTopologyTypeName)
             else
-                call topology%open( xml_handler = this%file%xml_handler, &
+                call topology%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = GridShape,                         &
                         TopologyType=XMDFTopologyTypeName)
             endif
-            call topology%close(xml_handler=this%file%xml_handler)
+            call topology%close(xml_handler=this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_str_contiguous_hyperslab_WriteTopology
 
@@ -173,53 +173,53 @@ contains
             GridNumber = GridID
             NumberOfGrids = this%SpatialGridDescriptor%GetNumberOfGrids()
             SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
-            call geometry%open( xml_handler  = this%file%xml_handler, &
+            call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
                     GeometryType = XDMFGeometryTypeName)
             ! Origin
-            call dataitem%open( xml_handler = this%file%xml_handler, &
+            call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions  = (/SpaceDimension/), &   
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/3_I4P, 1/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = (/int(SpaceDimension,I8P)*int(GridNumber,I8P),1_I8P, int(SpaceDimension,I8P)/) )
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/int(SpaceDimension,I8P)*int(NumberOfGrids,I8P)/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//'Origin_'//this%UniformGridDescriptor%GetGeometryName())
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             ! DXDYXDZ
-            call dataitem%open( xml_handler = this%file%xml_handler, &
+            call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions  = (/SpaceDimension/), &   
                     ItemType    = 'HyperSlab', &
                     Format      = 'HDF')
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/3_I4P, 1/), &
                     NumberType = 'Int', &
                     Format     = 'XML', &
                     Precision  = 4) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = (/int(SpaceDimension,I8P)*int(GridNumber,I8P),1_I8P, int(SpaceDimension,I8P)/) )
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%open(xml_handler = this%file%xml_handler, &
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                     Dimensions = (/int(SpaceDimension,I8P)*int(NumberOfGrids,I8P)/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%file%xml_handler, &
+            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                     Data = trim(adjustl(this%prefix))//'.h5'//':'//'DxDyDz_'//this%UniformGridDescriptor%GetGeometryName())
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call dataitem%close(xml_handler = this%file%xml_handler)
-            call geometry%close(xml_handler = this%file%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_DXDYDZ
 
@@ -253,136 +253,136 @@ contains
                 LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
                 GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
                 GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
-                call geometry%open( xml_handler  = this%file%xml_handler, &
+                call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
                         GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-                call dataitem%open( xml_handler = this%file%xml_handler, &
+                call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = (/LocalGridShape(1)/), &   
                         ItemType    = 'HyperSlab', &
                         Format      = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, 1/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision  = 4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/GridShapeOffset(1),1_I8P,LocalGridShape(1)/) )
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/GlobalGridShape(1)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-                call dataitem%open( xml_handler = this%file%xml_handler, &
+                call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = (/LocalGridShape(2)/), &   
                         ItemType    = 'HyperSlab', &
                         Format      = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, 1/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision  = 4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/GridShapeOffset(2),1_I8P,LocalGridShape(2)/) )
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/GlobalGridShape(2)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-                call dataitem%open( xml_handler = this%file%xml_handler, &
+                call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = (/LocalGridShape(3)/), &   
                         ItemType    = 'HyperSlab', &
                         Format      = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, 1/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision  = 4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/GridShapeOffset(3),1_I8P,LocalGridShape(3)/) )
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/GlobalGridShape(3)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName())
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             elseif (SpaceDimension == 2) then
             ! Why paraview need to put in inverse order?? YX
             ! 2D VXVY does not apper in the standard Model&Format
-                call geometry%open( xml_handler  = this%file%xml_handler, &
+                call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
                         GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-                call dataitem%open( xml_handler = this%file%xml_handler, &
+                call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = (/LocalGridShape(2)/), &   
                         ItemType    = 'HyperSlab', &
                         Format      = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, 1/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision  = 4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/GridShapeOffset(2),1_I8P,LocalGridShape(2)/) )
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/GlobalGridShape(2)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-                call dataitem%open( xml_handler = this%file%xml_handler, &
+                call dataitem%open( xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions  = (/LocalGridShape(1)/), &   
                         ItemType    = 'HyperSlab', &
                         Format      = 'HDF')
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/3_I4P, 1/), &
                         NumberType = 'Int', &
                         Format     = 'XML', &
                         Precision  = 4) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = (/GridShapeOffset(1),1_I8P,LocalGridShape(1)/) )
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%open(xml_handler = this%file%xml_handler, &
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
                         Dimensions = (/GlobalGridShape(1)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call dataitem%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
 
             endif
-            call geometry%close(xml_handler = this%file%xml_handler)
+            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
         endif                    
     end subroutine xdmf_str_contiguous_hyperslab_WriteGeometry_VXVYVZ
 

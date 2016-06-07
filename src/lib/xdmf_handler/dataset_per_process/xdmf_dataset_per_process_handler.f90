@@ -63,21 +63,21 @@ contains
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         this%UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
                 DimensionsSize = size(this%UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx), dim=1)
-                call attribute%open(xml_handler = this%file%xml_handler,                                   &
+                call attribute%open(xml_handler = this%SpatialFile%xml_handler,                                   &
                         Name          = this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                             &
                         Center        = XDMFCenterTypeName)
-                call dataitem%open(xml_handler = this%file%xml_handler,                                     &
+                call dataitem%open(xml_handler = this%SpatialFile%xml_handler,                                     &
                         Dimensions = (/int(LocalNumberOfData,I8P),int(NumberOfComponents,I8P),1_I8P/),      &
                         NumberType = this%UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
                         Format     = 'HDF',                                                                 &
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
-                call chardata%write( xml_handler = this%file%xml_handler, &
+                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
                         Data = trim(adjustl(this%prefix))//'.h5'//':'//&
                                         this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx)//&
                                         '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%file%xml_handler)
-                call attribute%close(xml_handler = this%file%xml_handler)
+                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call attribute%close(xml_handler = this%SpatialFile%xml_handler)
             enddo
         endif                    
     end subroutine xdmf_dataset_per_process_handler_WriteAttributes

@@ -8,7 +8,7 @@ use xh5for_utils
 use xh5for_parameters
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use fox_xdmf
-use fox_dom,      only: Node, NodeList, ParseFile, GetDocumentElement, Item, GetLength, GetChildNodes, getAttribute, &
+use fox_dom,      only: Node, NodeList, GetDocumentElement, Item, GetLength, GetChildNodes, getAttribute, &
                         HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, getTextContent, &
                         TEXT_NODE, DOCUMENT_NODE
 use mpi_environment
@@ -25,7 +25,8 @@ private
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
         character(len=4)                          :: ext = '.xmf'                    !< XDMF file extension
-        type(xdmf_file_t)                         :: file                            !< XDMF file handler
+        type(xdmf_file_t)                         :: TemporalFile                    !< XDMF file handler for temporal collections
+        type(xdmf_file_t)                         :: SpatialFile                     !< XDMF file handler for spatial collections
         integer(I4P)                              :: action                          !< XDMF purpose (Read or Write)
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
@@ -46,10 +47,10 @@ private
 
         ! File IO procedures
         procedure, public :: OpenFile                     => xdmf_handler_OpenFile
-        procedure         :: OpenGrid                     => xdmf_handler_OpenGrid
+        procedure         :: OpenSpatialGrid              => xdmf_handler_OpenSpatialGrid
         procedure, public :: Serialize                    => xdmf_handler_Serialize
         procedure, public :: ParseFile                    => xdmf_handler_ParseFile
-        procedure         :: CloseGrid                    => xdmf_handler_CloseGrid
+        procedure         :: CloseSpatialGrid             => xdmf_handler_CloseSpatialGrid
         procedure, public :: CloseFile                    => xdmf_handler_CloseFile
 
         ! XML DOM aux procedures for parsing XDMF
@@ -154,7 +155,8 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
     !----------------------------------------------------------------- 
         if(allocated(this%prefix)) deallocate(this%prefix)
-        !call this%file%Free()
+        call this%TemporalFile%Free()
+        call this%SpatialFile%Free()
         nullify(this%MPIEnvironment)
         nullify(this%SpatialGridDescriptor)
         nullify(this%UniformGridDescriptor)
@@ -170,16 +172,24 @@ contains
         character(len=*),      intent(IN)    :: fileprefix            !< XDMF filename prefix
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
         type(xdmf_domain_t)                  :: domain                !< XDMF Domain type
+        type(xdmf_xinclude_t)                :: xinclude              !< XDMF Xinclude type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             this%prefix = trim(adjustl(fileprefix))
             this%action = action
-            call this%file%set_filename(trim(adjustl(fileprefix))//this%ext)
+            call this%TemporalFile%set_filename(trim(adjustl(fileprefix))//this%ext)
+            call this%SpatialFile%set_filename(trim(adjustl(fileprefix))//'_spatial'//this%ext)
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
-                    call this%file%openfile()
-                    call domain%open(xml_handler = this%file%xml_handler)
-                    call grid%open(xml_handler = this%file%xml_handler, &
+                    call this%TemporalFile%openfile()
+                    call domain%open(xml_handler = this%TemporalFile%xml_handler)
+                    call grid%open(xml_handler = this%TemporalFile%xml_handler, &
+                            GridType='Collection', &
+                            CollectionType='Temporal')
+                    call xinclude%open(xml_handler = this%TemporalFile%xml_handler, &
+                            HRef=this%SpatialFile%get_filename())
+                    call this%SpatialFile%openfile(write_header=.false.)
+                    call grid%open(xml_handler = this%SpatialFile%xml_handler, &
                             GridType='Collection', &
                             CollectionType='Spatial')
             end select
@@ -187,7 +197,7 @@ contains
     end subroutine xdmf_handler_OpenFile
 
 
-    subroutine xdmf_handler_OpenGrid(this, GridID)
+    subroutine xdmf_handler_OpenSpatialGrid(this, GridID)
     !-----------------------------------------------------------------
     !< Open a XDMF grid
     !----------------------------------------------------------------- 
@@ -196,10 +206,10 @@ contains
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call grid%open(xml_handler=this%file%xml_handler, &
+            call grid%open(xml_handler=this%SpatialFile%xml_handler, &
                 Name='Grid'//trim(adjustl(str(no_sign=.true.,n=GridID))))
         endif
-    end subroutine xdmf_handler_OpenGrid
+    end subroutine xdmf_handler_OpenSpatialGrid
 
 
     subroutine xdmf_handler_ParseFile(this)
@@ -209,25 +219,41 @@ contains
         class(xdmf_handler_t),  intent(INOUT) :: this                 !< XDMF handler
         type(Node),     pointer               :: DocumentRootNode     !< Fox DOM Document Root node
         type(Node),     pointer               :: DomainNode           !< Fox DOM Domain node
+        type(Node),     pointer               :: TemporalGridNode     !< Fox DOM TemporalGrid node
+        type(NodeList), pointer               :: XIncludeNodes        !< Fox DOM Xinclude node list
+        type(Node),     pointer               :: XIncludeNode         !< Fox DOM Xinclude node 
         type(Node),     pointer               :: SpatialGridNode      !< Fox DOM SpatialGrid node
         type(NodeList), pointer               :: UniformGridNodes     !< Fox DOM UniformGrid node list
+        type(xdmf_xinclude_t)                 :: xinclude             !< XDMF Xinclude type
+        integer                               :: i
     !----------------------------------------------------------------- 
         if(this%MPIEnvironment%is_root()) then
-            call this%file%parsefile()
-            if(getNodeType(this%file%get_document_root())==DOCUMENT_NODE) then
-                DocumentRootNode => getDocumentElement(this%file%get_document_root())
+            call this%TemporalFile%ParseFile()
+            if(getNodeType(this%TemporalFile%get_document_root())==DOCUMENT_NODE) then
+                DocumentRootNode => getDocumentElement(this%TemporalFile%get_document_root())
                 DomainNode => this%GetUniqueNodeByTag(FatherNode = DocumentRootNode, Tag = 'Domain')
                 ! Get Domain Node
                 if(.not. associated(DomainNode)) return
-                SpatialGridNode => this%GetFirstChildByTag(FatherNode = DomainNode, Tag = 'Grid')
-                ! Get Spatial Grid Node
-                if(.not. associated(SpatialGridNode)) return
-                UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
-                ! Get Fill Spatial Grid metainfo
-                if(.not. associated(UniformGridNodes)) return
-                call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
+                ! Get Temporal Grid Node
+                TemporalGridNode => this%GetFirstChildByTag(FatherNode = DomainNode, Tag = 'Grid')
+                if(.not. associated(TemporalGridNode)) return
+                XIncludeNodes => getElementsByTagname(TemporalGridNode, 'xi:include')
+
+                do i = 0, getLength(XIncludeNodes) - 1
+                    XIncludeNode => item(XIncludeNodes, i)
+                    call xinclude%Parse(DOMNode = XIncludeNode)
+                    call this%SpatialFile%ParseFile()
+                    ! Get Spatial Grid Node
+                    SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
+                    if(.not. associated(SpatialGridNode)) return
+                    UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
+                    if(.not. associated(UniformGridNodes)) return
+                    ! Get Fill Spatial Grid metainfo
+                    call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
+                    call destroy(this%SpatialFile%get_document_root())
+                enddo
             endif
-            call destroy(this%file%get_document_root())
+            call destroy(this%TemporalFile%get_document_root())
         endif
         call this%SpatialGridDescriptor%BroadcastMetadata()
     end subroutine xdmf_handler_ParseFile
@@ -242,16 +268,16 @@ contains
         integer(I4P)                         :: IDidx                 !< GridID idex
     !----------------------------------------------------------------- 
         do IDidx=0, this%MPIEnvironment%get_comm_size()-1
-            call this%OpenGrid(GridID = IDidx)
+            call this%OpenSpatialGrid(GridID = IDidx)
             call this%WriteTopology(GridID = IDidx)
             call this%WriteGeometry(GridID = IDidx)
             call this%WriteAttributes(GridID = IDidx)
-            call this%CloseGrid()
+            call this%CloseSpatialGrid()
         enddo
     end subroutine xdmf_handler_Serialize
 
 
-    subroutine xdmf_handler_CloseGrid(this)
+    subroutine xdmf_handler_CloseSpatialGrid(this)
     !-----------------------------------------------------------------
     !< Close a XDMF grid
     !----------------------------------------------------------------- 
@@ -259,9 +285,9 @@ contains
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call grid%Close(xml_handler=this%file%xml_handler)
+            call grid%Close(xml_handler=this%SpatialFile%xml_handler)
         endif
-    end subroutine xdmf_handler_CloseGrid
+    end subroutine xdmf_handler_CloseSpatialGrid
 
 
     subroutine xdmf_handler_CloseFile(this)
@@ -271,13 +297,17 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
         type(xdmf_domain_t)                  :: domain                !< XDMF Domain type
+        type(xdmf_xinclude_t)                :: xinclude              !< XDMF Xinclude type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
-                    call grid%close(xml_handler=this%file%xml_handler)
-                    call domain%close(xml_handler = this%file%xml_handler)
-                    call this%file%closefile()
+                    call grid%close(xml_handler=this%SpatialFile%xml_handler)
+                    call this%SpatialFile%closefile()
+                    call xinclude%close(xml_handler = this%TemporalFile%xml_handler)
+                    call grid%close(xml_handler=this%TemporalFile%xml_handler)
+                    call domain%close(xml_handler = this%TemporalFile%xml_handler)
+                    call this%TemporalFile%closefile()
             end select
         endif
     end subroutine xdmf_handler_CloseFile
@@ -293,7 +323,7 @@ contains
     !----------------------------------------------------------------- 
         NodeIsDocumentRoot = .false.
         if(associated(DOMNode)) then
-            NodeIsDocumentRoot = (getNodeType(this%file%get_document_root())==DOCUMENT_NODE)
+            NodeIsDocumentRoot = (getNodeType(this%TemporalFile%get_document_root())==DOCUMENT_NODE)
         endif
     end function xdmf_handler_NodeIsDocumentRoot
 
@@ -327,6 +357,7 @@ contains
         character(len=*),           intent(IN)    :: Tag              !< Fox DOM Child node
         type(Node),        pointer                :: ChildNode        !< Fox DOM result Child node
         type(NodeList),    pointer                :: Childrens        !< List of childrens of the document root node
+        type(xdmf_grid_t) :: grid
         integer(I4P)                              :: i                !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
         nullify(ChildNode)
@@ -420,7 +451,6 @@ contains
         type(Node),     pointer                :: UniformGridNode     !< Fox DOM Grid node
         type(Node),     pointer                :: ChildNode           !< Fox DOM node
         type(NodeList), pointer                :: AttributeNodes      !< Fox DOM Attribute node list
-        type(xdmf_grid_t)                      :: Grid                !< XDMF Grid derived type
         type(xdmf_geometry_t)                  :: Geometry            !< XDMF Topology derived type
         type(xdmf_attribute_t)                 :: Attribute           !< XDMF Attribute derived type
         integer(I4P)                           :: i                   !< Index for a loop in UniformGridNodes
@@ -439,7 +469,6 @@ contains
             nullify(UniformGridNode)
             nullify(ChildNode)
             nullify(Attributenodes)
-            call Grid%Free()
             call Geometry%Free()
             call Attribute%Free()
         endif

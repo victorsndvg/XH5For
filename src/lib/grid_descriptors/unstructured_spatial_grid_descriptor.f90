@@ -73,6 +73,7 @@ contains
         integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the current grid
         integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
+        call this%Free()
         call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
                                           NumberOfNodes = NumberOfNodes,       &
                                           NumberOfElements = NumberOfElements, &
@@ -98,6 +99,7 @@ contains
         integer(I4P)                                    :: GeometryType      !< Geometry type of the current grid
         integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
+        call this%Free()
         select case(GridType)
             case (XDMF_GRID_TYPE_UNSTRUCTURED)
                 if(ZDim == 0_I8P) then
