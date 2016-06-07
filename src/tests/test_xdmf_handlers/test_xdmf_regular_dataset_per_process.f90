@@ -1,16 +1,16 @@
-program test_hdf5_reg_hyperslabs_handler
+program test_xdmf_reg_ddp_handler
 
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
-use hdf5_structured_contiguous_hyperslab_handler
+use Fox_xdmf
+use xdmf_structured_dataset_per_process_handler
 use mpi_environment
 use structured_spatial_grid_descriptor
 use structured_uniform_grid_descriptor
 #ifdef ENABLE_MPI
 #ifdef MPI_MOD
   use mpi
-#endif
-#ifdef MPI_H
+#else
   include 'mpif.h'
 #endif
 #endif
@@ -20,7 +20,7 @@ implicit none
     type(mpi_env_t)                                                   :: mpienv
     type(structured_spatial_grid_descriptor_t)                        :: spatialgrid
     type(structured_uniform_grid_descriptor_t)                        :: uniformgrid
-    type(hdf5_structured_contiguous_hyperslab_handler_t)              :: heavydata
+    type(xdmf_structured_dataset_per_process_handler_t)               :: lightdata
     real(R4P),    dimension(3)                                        :: Origin  = (/0,0,0/)
     real(R4P),    dimension(3)                                        :: DxDyDz  = (/1,1,1/)
     real(R4P),    dimension(:), allocatable                           :: values  
@@ -37,14 +37,15 @@ implicit none
     call mpienv%initialize()
     call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=10_I8P, YDim=20_I8P, ZDim=30_I8P, GridType=XDMF_GRID_TYPE_REGULAR)
     call uniformgrid%initialize(XDim=10_I8P, YDim=20_I8P, ZDim=30_I8P, GridType=XDMF_GRID_TYPE_REGULAR)
-    call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hdf5_regular_hyperslab')
-    call heavydata%WriteGeometry(Origin=Origin,DxDyDz=DxDyDz, Name='Coordinates')
-    call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)
-    call heavydata%CloseFile()
-#ifdef ENABLE_MPI
+    call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
+    call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_regular_ddp')
+    call lightdata%SetGeometry(XYZ=Origin, Name='Coordinates')
+    call lightdata%AppendAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Attribute=values)
+    call lightdata%Serialize()
+    call lightdata%CloseFile()
+#if defined(MPI_MOD) || defined(MPI_H)
     call MPI_FINALIZE(mpierr)
 #endif
 
 
-end program test_hdf5_reg_hyperslabs_handler
+end program test_xdmf_reg_ddp_handler

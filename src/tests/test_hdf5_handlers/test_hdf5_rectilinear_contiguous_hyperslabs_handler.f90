@@ -1,4 +1,4 @@
-program test_xdmf_hyperslabs_handler
+program test_hdf5_rect_hyperslabs_handler
 
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
@@ -39,7 +39,7 @@ implicit none
     call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call uniformgrid%initialize(XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_rectilinear_hyperslab')
+    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hdf5_rectilinear_hyperslab')
     call heavydata%WriteGeometry(X=Xpoints,Y=Ypoints,Z=Zpoints, Name='Coordinates')
     call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)
     call heavydata%CloseFile()
@@ -48,4 +48,4 @@ implicit none
 #endif
 
 
-end program test_xdmf_hyperslabs_handler
+end program test_hdf5_rect_hyperslabs_handler

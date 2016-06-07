@@ -1,4 +1,4 @@
-program test_xdmf_hyperslabs_handler
+program test_xdmf_reg_hyperslabs_handler
 
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
@@ -48,4 +48,4 @@ implicit none
 #endif
 
 
-end program test_xdmf_hyperslabs_handler
+end program test_xdmf_reg_hyperslabs_handler
