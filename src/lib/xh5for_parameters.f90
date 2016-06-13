@@ -8,6 +8,10 @@ use IR_Precision, only: I4P
 
 implicit none 
 
+    character(len=4), parameter :: XDMF_EXT = '.xmf'
+    character(len=3), parameter :: XI_EXT   = '.xi'
+    character(len=3), parameter :: HDF5_EXT = '.h5'
+
     integer(I4P), parameter :: XDMF_NO_VALUE  = -1
 
     integer(I4P), parameter :: XDMF_ARRAY_TYPE_INT8    = 0

@@ -194,7 +194,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//'Origin_'//this%UniformGridDescriptor%GetGeometryName())
+                    Data = this%GetHDF5FileName()//':'//'Origin_'//this%UniformGridDescriptor%GetGeometryName())
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             ! DXDYXDZ
@@ -216,7 +216,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//'DxDyDz_'//this%UniformGridDescriptor%GetGeometryName())
+                    Data = this%GetHDF5FileName()//':'//'DxDyDz_'//this%UniformGridDescriptor%GetGeometryName())
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             call geometry%close(xml_handler = this%SpatialFile%xml_handler)
@@ -276,7 +276,7 @@ contains
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
+                        Data = this%GetHDF5FileName()//':X_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -300,7 +300,7 @@ contains
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
+                        Data = this%GetHDF5Filename()//':Y_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -324,7 +324,7 @@ contains
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName())
+                        Data = this%GetHDF5FileName()//':Z_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             elseif (SpaceDimension == 2) then
@@ -353,7 +353,7 @@ contains
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName())
+                        Data = this%GetHDF5FileName()//':Y_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -377,7 +377,7 @@ contains
                         Format     = 'HDF', &
                         Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName())
+                        Data = this%GetHDF5FileName()//':X_'//this%UniformGridDescriptor%GetGeometryName())
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
 

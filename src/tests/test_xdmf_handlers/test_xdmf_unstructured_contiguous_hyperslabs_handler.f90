@@ -5,6 +5,7 @@ use xh5for_parameters
 use Fox_xdmf
 use xdmf_unstructured_contiguous_hyperslab_handler
 use mpi_environment
+use steps_handler
 use unstructured_spatial_grid_descriptor
 use unstructured_uniform_grid_descriptor
 #ifdef ENABLE_MPI
@@ -18,6 +19,7 @@ use unstructured_uniform_grid_descriptor
 implicit none
 
     type(mpi_env_t) :: mpienv
+    type(steps_handler_t)                                               :: stepshandler
     type(unstructured_spatial_grid_descriptor_t)                        :: spatialgrid
     type(unstructured_uniform_grid_descriptor_t)                        :: uniformgrid
     type(xdmf_unstructured_contiguous_hyperslab_handler_t)              :: lightdata
@@ -31,16 +33,17 @@ implicit none
     call MPI_INIT(mpierr)
 #endif
     call mpienv%initialize()
+    call stepshandler%initialize()
     call spatialgrid%initialize(MPIEnvironment=mpienv, NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY, GridType=XDMF_GRID_TYPE_UNSTRUCTURED)
     call spatialgrid%SetTopologySizePerGridID(TopologySize=int(size(topology,dim=1),I8P),ID=mpienv%get_rank())
     call uniformgrid%initialize(NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY, GridType=XDMF_GRID_TYPE_UNSTRUCTURED)
-    call lightdata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call lightdata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_uns_hyperslab')
+    call lightdata%initialize(MPIEnvironment=mpienv, StepsHandler=stepshandler, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
+    call lightdata%OpenTemporalFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_uns_hyperslab')
     call lightdata%SetTopology(Connectivities=topology, Name='Connectivities')
     call lightdata%SetGeometry(XYZ=geometry, Name='Coordinates')
     call lightdata%AppendAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Attribute=values)
     call lightdata%Serialize()
-    call lightdata%CloseFile()
+    call lightdata%CloseTemporalFile()
 #if defined(MPI_MOD) || defined(MPI_H)
     call MPI_FINALIZE(mpierr)
 #endif

@@ -2,11 +2,13 @@ module hdf5_handler
 
 #ifdef ENABLE_HDF5
 use HDF5
+use IR_Precision, only : str
 #else
-use IR_Precision, only : I4P
+use IR_Precision, only : I4P, str
 #endif
 use mpi_environment
 use xh5for_parameters
+use steps_handler
 use spatial_grid_descriptor
 use uniform_grid_descriptor
 
@@ -24,10 +26,10 @@ private
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: prefix                          !< Name prefix of the HDF5 file
-        character(len=3)                          :: ext = '.h5'                     !< HDF5 file extension
         integer(HID_T)                            :: file_id                         !< File identifier 
         integer(I4P)                              :: action                          !< HDF5 action to be perfomed (Read or Write)
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
+        type(steps_handler_t),            pointer :: StepsHandler          => null() !< Steps handler
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
         class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
     contains
@@ -325,16 +327,18 @@ public :: HSIZE_T
 contains
 
 
-    subroutine hdf5_handler_Initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
+    subroutine hdf5_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor)
     !-----------------------------------------------------------------
     !< Initialize the HDF5 handler
     !----------------------------------------------------------------- 
         class(hdf5_handler_t),                    intent(INOUT) :: this                  !< HDF5 handler type
         type(mpi_env_t),                  target, intent(IN)    :: MPIEnvironment        !< MPI environment
+        type(steps_handler_t),            target, intent(IN)    :: StepsHandler          !< Steps handler
         class(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor 
         class(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         this%MPIEnvironment        => MPIEnvironment
+        this%StepsHandler          => StepsHandler
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
     end subroutine hdf5_handler_Initialize
@@ -361,11 +365,12 @@ contains
         character(len=*),      intent(IN)    :: fileprefix            !< HDF5 file prefix
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
+        character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
 
         this%action = action
-
+        HDF5Filename = trim(adjustl(fileprefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
 #ifdef ENABLE_MPI
@@ -383,19 +388,19 @@ contains
                 ! opening. 
                 ! If file does not exist, it is created and opened with 
                 ! read-write access.
-                call H5fcreate_f(name = trim(adjustl(fileprefix))//this%ext, &
-                        access_flags = H5F_ACC_TRUNC_F,              &
-                        file_id      = this%file_id,                 &
-                        hdferr       = hdferror,                     &
-                        creation_prp = H5P_DEFAULT_F,                &
-                        access_prp   = plist_id)
+                call H5fcreate_f(name = HDF5FileName,                 &
+                        access_flags  = H5F_ACC_TRUNC_F,              &
+                        file_id       = this%file_id,                 &
+                        hdferr        = hdferror,                     &
+                        creation_prp  = H5P_DEFAULT_F,                &
+                        access_prp    = plist_id)
             case(XDMF_ACTION_READ)
                 ! Existing file is opened with read-only access. If file 
                 ! does not exist, H5Fopen fails.
-                call H5fopen_f(name = trim(adjustl(fileprefix))//this%ext, &
-                        access_flags = H5F_ACC_RDONLY_F,             &
-                        file_id      = this%file_id,                 &
-                        hdferr       = hdferror,                     &
+                call H5fopen_f(name  = HDF5FileName,                  &
+                        access_flags = H5F_ACC_RDONLY_F,              &
+                        file_id      = this%file_id,                  &
+                        hdferr       = hdferror,                      &
                         access_prp   = plist_id)
         end select
 

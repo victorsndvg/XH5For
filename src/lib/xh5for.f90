@@ -5,6 +5,7 @@ use xh5for_utils
 use xh5for_parameters
 use uniform_grid_descriptor
 use spatial_grid_descriptor
+use steps_handler
 use xdmf_handler
 use hdf5_handler
 use xh5for_abstract_factory
@@ -19,7 +20,9 @@ implicit none
         integer(I4P)                                  :: Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
         integer(I4P)                                  :: GridType = XDMF_GRID_TYPE_UNSTRUCTURED
         integer(I4P)                                  :: Action   = XDMF_ACTION_WRITE
+        character(len=:),                 allocatable :: Prefix
         type(mpi_env_t)                               :: MPIEnvironment
+        type(steps_handler_t)                         :: StepsHandler
         class(uniform_grid_descriptor_t), allocatable :: UniformGridDescriptor
         class(spatial_grid_descriptor_t), allocatable :: SpatialGridDescriptor
         class(xdmf_handler_t),            allocatable :: LightData
@@ -57,6 +60,7 @@ implicit none
         procedure         :: xh5for_ReadAttribute_R8P
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         procedure, public :: SetGridType           => xh5for_SetGridType
+        procedure, public :: AppendStep            => xh5for_AppendStep
         generic,   public :: Initialize            => xh5for_Initialize_Unstructured_Writer_I4P, &
                                                       xh5for_Initialize_Unstructured_Writer_I8P, &
                                                       xh5for_Initialize_Structured_Writer_I4P,   &
@@ -65,6 +69,7 @@ implicit none
         procedure, public :: Free                  => xh5for_Free
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Parse                 => xh5for_Parse
+        procedure, public :: Serialize             => xh5for_Serialize
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
@@ -120,6 +125,18 @@ contains
     end subroutine xh5for_SetGridType
 
 
+    subroutine xh5for_AppendStep(this, Value)
+    !----------------------------------------------------------------- 
+    !< Append an step value to the serie
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT)  :: this
+        real(R8P),       intent(IN)     :: Value
+    !----------------------------------------------------------------- 
+        call this%StepsHandler%Append(Value=Value)
+        call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
+    end subroutine xh5for_AppendStep
+
+
     subroutine xh5for_Free(this)
     !----------------------------------------------------------------- 
     !< Free XH5For derived type
@@ -128,6 +145,7 @@ contains
     !----------------------------------------------------------------- 
         this%Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
         call this%MPIEnvironment%Free()
+        call this%StepsHandler%Free()
         if(allocated(this%UniformGridDescriptor)) then
             call this%UniformGridDescriptor%Free()
             deallocate(this%UniformGridDescriptor)
@@ -172,14 +190,18 @@ contains
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
+        ! Steps initialization
+        call this%StepsHandler%Initialize()
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Unstructured_Reader
@@ -228,14 +250,18 @@ contains
                 TopologyType     = TopologyType,               &
                 GeometryType     = GeometryType,               &
                 GridType         = this%GridType)
+        ! Steps initialization
+        call this%StepsHandler%Initialize()
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Unstructured_Writer_I4P
@@ -284,14 +310,18 @@ contains
                 TopologyType     = TopologyType,              &
                 GeometryType     = GeometryType,              &
                 GridType         = this%GridType)
+        ! Steps initialization
+        call this%StepsHandler%Initialize()
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Unstructured_Writer_I8P
@@ -339,14 +369,18 @@ contains
                 YDim     = int(GridShape(2),I8P),              &
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
+        ! Steps initialization
+        call this%StepsHandler%Initialize()
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Structured_Writer_I4P
@@ -394,14 +428,18 @@ contains
                 YDim     = int(GridShape(2),I8P),              &
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
+        ! Steps initialization
+        call this%StepsHandler%Initialize()
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
+                StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
     end subroutine xh5for_Initialize_Structured_Writer_I8P
@@ -416,14 +454,27 @@ contains
         integer(I4P), optional, intent(IN)    :: action               !< XDMF Open file action (Read or Write)
     !-----------------------------------------------------------------
         if(present(action)) this%action = action
-        call this%HeavyData%OpenFile(action=this%action, fileprefix=fileprefix)
-        call this%LightData%OpenFile(action=this%action, fileprefix=fileprefix)
+        this%Prefix = trim(adjustl(Fileprefix))
+        call this%LightData%OpenTemporalFile(action=this%action, fileprefix=this%Prefix)
     end subroutine xh5for_Open
+
+
+    subroutine xh5for_Serialize(this)
+    !-----------------------------------------------------------------
+    !< Serialize a XDMF file
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
+    !-----------------------------------------------------------------
+        if(this%Action == XDMF_ACTION_Write) then
+            call this%HeavyData%CloseFile()
+            call this%LightData%Serialize()
+        endif
+    end subroutine xh5for_Serialize
 
 
     subroutine xh5for_Parse(this)
     !-----------------------------------------------------------------
-    !< Open a XDMF and HDF5 files
+    !< Parse a XDMF file
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
@@ -437,11 +488,8 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        call this%HeavyData%CloseFile()
         if(this%action == XDMF_ACTION_WRITE) then
-            !< XDMF deferred writing when hdf5 closes    
-            call this%LightData%Serialize()
-            call this%LightData%CloseFile()
+            call this%LightData%CloseTemporalFile()
         endif
     end subroutine xh5for_Close
 

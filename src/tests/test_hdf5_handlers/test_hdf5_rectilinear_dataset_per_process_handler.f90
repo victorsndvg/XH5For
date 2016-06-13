@@ -4,6 +4,7 @@ use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
 use hdf5_structured_dataset_per_process_handler
 use mpi_environment
+use steps_handler
 use structured_spatial_grid_descriptor
 use structured_uniform_grid_descriptor
 #ifdef ENABLE_MPI
@@ -18,13 +19,14 @@ use structured_uniform_grid_descriptor
 implicit none
 
     type(mpi_env_t)                                                   :: mpienv
+    type(steps_handler_t)                                             :: stepshandler
     type(structured_spatial_grid_descriptor_t)                        :: spatialgrid
     type(structured_uniform_grid_descriptor_t)                        :: uniformgrid
     type(hdf5_structured_dataset_per_process_handler_t)               :: heavydata
-    real(R4P),    dimension(3)                                        :: Xpoints  = (/1,2,3/)
-    real(R4P),    dimension(4)                                        :: Ypoints  = (/2,3,4,5/)
-    real(R4P),    dimension(5)                                        :: Zpoints  = (/3,4,5,6,7/)
-    real(R4P),    dimension(:), allocatable                           :: values  
+    real(R8P),    dimension(3)                                        :: Xpoints  = (/1,2,3/)
+    real(R8P),    dimension(4)                                        :: Ypoints  = (/2,3,4,5/)
+    real(R8P),    dimension(5)                                        :: Zpoints  = (/3,4,5,6,7/)
+    real(R8P),    dimension(:), allocatable                           :: values  
     integer                                                           :: mpierr
     integer                                                           :: i
 
@@ -36,9 +38,10 @@ implicit none
     values = (/(i,i=0,size(Xpoints)*size(Ypoints)*size(Zpoints))/)
 
     call mpienv%initialize()
+    call stepshandler%initialize()
     call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call uniformgrid%initialize(XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
-    call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
+    call heavydata%initialize(MPIEnvironment=mpienv, StepsHandler=stepshandler, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
     call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hdf5_rectilinear_dpp')
     call heavydata%WriteGeometry(X=Xpoints,Y=Ypoints,Z=Zpoints, Name='Coordinates')
     call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)

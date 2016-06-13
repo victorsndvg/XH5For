@@ -1,4 +1,4 @@
-program xh5for_ch_rectilinear_grid
+program xh5for_dpp_rectilinear_grid
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -24,10 +24,13 @@ implicit none
     integer(I4P), allocatable  :: out_scalartempI4P(:)
 !    integer(I8P), allocatable  :: out_scalartempI8P(:)
 
-    integer                    :: i
     integer                    :: rank = 0
     integer                    :: mpierr
     integer                    :: exitcode = 0
+
+    real(R8P)                  :: time = 0.0
+    integer                    :: num_steps = 5
+    integer                    :: i
 
 
     !-----------------------------------------------------------------
@@ -46,41 +49,26 @@ implicit none
     Z = Z + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%SetGridType(GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call xh5%Initialize(GridShape=(/size(X), size(Y), size(Z)/))
-    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_ch_rectilinear_grid')
-    call xh5%AppendStep(Value=0.0_R8P)
-    call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
-    call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P)  
-    call xh5%Serialize()
+    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_dpp_rectilinear_grid')
+
+    do i=1, num_steps
+        time = time + 1
+        call xh5%AppendStep(Value=time)
+        call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
+        call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P+i)  
+        call xh5%Serialize()
+    enddo
+
     call xh5%Close()
     call xh5%Free()
 
-    !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_rectilinear_grid')
-    call xh5%Parse()
-    call xh5%AppendStep(Value=0.0_R8P)
-    call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
-    call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
-    call xh5%Close()
-    call xh5%Free()
-
-#ifdef ENABLE_HDF5
-    !< Check results
-    if(.not. (sum(out_X - X)<=epsilon(0._R4P))) exitcode = -1
-    if(.not. (sum(out_Y - Y)<=epsilon(0._R4P))) exitcode = -1
-    if(.not. (sum(out_Z - Z)<=epsilon(0._R4P))) exitcode = -1
-    if(.not. (sum(out_scalartempI4P - scalartempI4P)==0._I4P)) exitcode = -1
-#else
-    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
-#endif
 
 #ifdef ENABLE_MPI
     call MPI_FINALIZE(mpierr)
 #endif
 
     call exit( status=exitcode)
-end program xh5for_ch_rectilinear_grid
+end program xh5for_dpp_rectilinear_grid

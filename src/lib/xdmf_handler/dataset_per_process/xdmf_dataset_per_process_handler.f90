@@ -73,7 +73,7 @@ contains
                         Format     = 'HDF',                                                                 &
                         Precision  = this%UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
                 call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = trim(adjustl(this%prefix))//'.h5'//':'//&
+                        Data = this%GetHDF5Filename()//':'//&
                                         this%UniformGridDescriptor%GetAttributeName(AttributeNumber=indx)//&
                                         '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
                 call dataitem%close(xml_handler = this%SpatialFile%xml_handler)

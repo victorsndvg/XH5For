@@ -29,6 +29,7 @@ implicit none
         procedure, public :: free                   => xdmf_xinclude_free
         generic,   public :: open                   => xdmf_xinclude_open
         procedure, public :: parse                  => xdmf_xinclude_parse
+        procedure, public :: GetHRef                => xdmf_xinclude_GetHRef
         procedure, public :: close                  => xdmf_xinclude_close
         procedure, public :: print                  => xdmf_xinclude_print
     end type xdmf_xinclude_t
@@ -101,6 +102,17 @@ contains
 
         endif
     end subroutine xdmf_xinclude_parse
+
+
+    function xdmf_xinclude_GetHRef(this) result(HRef)
+    !-----------------------------------------------------------------
+    !< Return HRef
+    !----------------------------------------------------------------- 
+        class(xdmf_xinclude_t),     intent(INOUT) :: this             !< XDMF XI:include type
+        character(len=:), allocatable             :: HRef             !< Return XInclude HRef
+    !----------------------------------------------------------------- 
+        if(allocated(this%HRef)) HRef = this%HRef
+    end function xdmf_xinclude_GetHRef
 
 
     subroutine xdmf_xinclude_close(this, xml_handler)

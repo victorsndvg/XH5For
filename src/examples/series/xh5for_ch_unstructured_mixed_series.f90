@@ -1,4 +1,4 @@
-program xh5for_dpp_unstructured_mixedtopology
+program xh5for_ch_unstructured_mixedtopology
 
 use xh5for
 #ifdef ENABLE_MPI
@@ -48,6 +48,10 @@ implicit none
     integer                    :: mpierr
     integer                    :: exitcode = 0
 
+    real(R8P)                  :: time = 0.0
+    integer                    :: num_steps = 5
+    integer                    :: i
+
 
     !-----------------------------------------------------------------
     !< Main program
@@ -62,40 +66,45 @@ implicit none
     geometry = geometry/2 + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_dpp_unstructured_mixedtopology')
-    call xh5%AppendStep(Value=0.0_R8P)
-    call xh5%WriteTopology(Connectivities = topology)
-    call xh5%WriteGeometry(XYZ = geometry)
-    call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield)
-    call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield)
-    call xh5%Serialize()
+    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixed_serie')
+
+    do i=1, num_steps
+        time = time+1.0
+        call xh5%AppendStep(Value=time)
+        call xh5%WriteTopology(Connectivities = topology)
+        call xh5%WriteGeometry(XYZ = geometry)
+        call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield+i)
+        call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield+i)
+        call xh5%Serialize()
+    enddo
+
     call xh5%Close()
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_unstructured_mixedtopology')
-    call xh5%Parse()
-    call xh5%AppendStep(Value=0.0_R8P)
-    call xh5%ReadTopology(Connectivities = out_topology)
-    call xh5%ReadGeometry(XYZ = out_geometry)
-    call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
-    call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
-    call xh5%Close()
-    call xh5%Free()
-
-#ifdef ENABLE_HDF5
-    !< Check results
-    if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
-    if(.not. (sum(out_topology - topology)==0)) exitcode = -1
-    if(.not. (sum(out_cellfield - cellfield)==0)) exitcode = -1
-    if(.not. (sum(out_nodefield - nodefield)<=epsilon(0._R8P))) exitcode = -1
-#else
-    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
-#endif
+!    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+!    call xh5%Initialize()
+!    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixedtopology')
+!    call xh5%Parse()
+!    call xh5%AppendStep(Value=0.0_R8P)
+!    call xh5%ReadTopology(Connectivities = out_topology)
+!    call xh5%ReadGeometry(XYZ = out_geometry)
+!    call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
+!    call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
+!    call xh5%Close()
+!    call xh5%Free()
+!
+!#ifdef ENABLE_HDF5
+!    !< Check results
+!    if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
+!    if(.not. (sum(out_topology - topology)==0)) exitcode = -1
+!    if(.not. (sum(out_cellfield - cellfield)==0)) exitcode = -1
+!    if(.not. (sum(out_nodefield - nodefield)<=epsilon(0._R8P))) exitcode = -1
+!#else
+!    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
+!#endif
 
 #ifdef ENABLE_MPI
     call MPI_FINALIZE(mpierr)
@@ -103,4 +112,4 @@ implicit none
 
     call exit(exitcode)
 
-end program xh5for_dpp_unstructured_mixedtopology
+end program xh5for_ch_unstructured_mixedtopology

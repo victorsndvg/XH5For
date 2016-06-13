@@ -137,7 +137,7 @@ contains
                     Format      = 'HDF',                             & 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetTopologyName()//&
+                    Data = this%GetHDF5Filename()//':'//this%UniformGridDescriptor%GetTopologyName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler=this%SpatialFile%xml_handler)
             call topology%close(xml_handler=this%SpatialFile%xml_handler)
@@ -193,7 +193,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = this%GetHDF5Filename()//':'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             call geometry%close(xml_handler = this%SpatialFile%xml_handler)
@@ -236,7 +236,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = this%GetHDF5Filename()//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -248,7 +248,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = this%GetHDF5Filename()//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -260,7 +260,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = trim(adjustl(this%prefix))//'.h5'//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = this%GetHDF5Filename()//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
 

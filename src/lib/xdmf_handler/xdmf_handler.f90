@@ -12,6 +12,7 @@ use fox_dom,      only: Node, NodeList, GetDocumentElement, Item, GetLength, Get
                         HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, getTextContent, &
                         TEXT_NODE, DOCUMENT_NODE
 use mpi_environment
+use steps_handler
 use spatial_grid_descriptor
 use uniform_grid_descriptor
 
@@ -24,10 +25,10 @@ private
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
-        character(len=4)                          :: ext = '.xmf'                    !< XDMF file extension
         type(xdmf_file_t)                         :: TemporalFile                    !< XDMF file handler for temporal collections
         type(xdmf_file_t)                         :: SpatialFile                     !< XDMF file handler for spatial collections
         integer(I4P)                              :: action                          !< XDMF purpose (Read or Write)
+        type(steps_handler_t),            pointer :: StepsHandler          => null() !< Steps handler
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
         class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Local grid info
@@ -45,13 +46,18 @@ private
         procedure, public :: Initialize                   => xdmf_handler_Initialize
         procedure, public :: Free                         => xdmf_handler_Free
 
+        ! Centralize HDF5 filename generation
+        procedure, public :: GetHDF5Filename              => xdmf_handler_GetHDF5Filename
+
         ! File IO procedures
-        procedure, public :: OpenFile                     => xdmf_handler_OpenFile
+        procedure, public :: OpenTemporalFile             => xdmf_handler_OpenTemporalFile
+        procedure, public :: OpenSpatialFile              => xdmf_handler_OpenSpatialFile
         procedure         :: OpenSpatialGrid              => xdmf_handler_OpenSpatialGrid
         procedure, public :: Serialize                    => xdmf_handler_Serialize
         procedure, public :: ParseFile                    => xdmf_handler_ParseFile
         procedure         :: CloseSpatialGrid             => xdmf_handler_CloseSpatialGrid
-        procedure, public :: CloseFile                    => xdmf_handler_CloseFile
+        procedure         :: CloseSpatialFile             => xdmf_handler_CloseSpatialFile
+        procedure, public :: CloseTemporalFile            => xdmf_handler_CloseTemporalFile
 
         ! XML DOM aux procedures for parsing XDMF
         procedure, public :: GetUniqueNodeByTag           => xdmf_handler_GetUniqueNodeByTag
@@ -132,17 +138,19 @@ public :: xdmf_handler_t
 
 contains
 
-    subroutine xdmf_handler_Initialize(this, MPIEnvironment, UniformGridDescriptor, SpatialGridDescriptor)
+    subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor)
     !-----------------------------------------------------------------
     !< XDMF file handler initialization procedure
     !----------------------------------------------------------------- 
         class(xdmf_handler_t),                    intent(INOUT) :: this               !< XMDF handler
         type(mpi_env_t),                  target, intent(IN) :: MPIEnvironment        !< MPI environment
+        type(steps_handler_t),            target, intent(IN) :: StepsHandler          !< Steps handler
         class(uniform_grid_descriptor_t), target, intent(IN) :: UniformGridDescriptor !< Local grid info
         class(spatial_grid_descriptor_t), target, intent(IN) :: SpatialGridDescriptor !< Global grid info
     !----------------------------------------------------------------- 
         call this%Free()
         this%MPIEnvironment        => MPIEnvironment
+        this%StepsHandler          => StepsHandler
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
     end subroutine xdmf_handler_Initialize
@@ -158,12 +166,24 @@ contains
         call this%TemporalFile%Free()
         call this%SpatialFile%Free()
         nullify(this%MPIEnvironment)
+        nullify(this%StepsHandler)
         nullify(this%SpatialGridDescriptor)
         nullify(this%UniformGridDescriptor)
     end subroutine xdmf_handler_Free
 
 
-    subroutine xdmf_handler_OpenFile(this, action, fileprefix)
+    function xdmf_handler_GetHDF5Filename(this) result (HDF5FileName)
+    !-----------------------------------------------------------------
+    !< Generate HDF5 Filename depending on time step
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
+        character(len=:), allocatable        :: HDF5FileName          !< Name of the current HDF5 file
+    !----------------------------------------------------------------- 
+        HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+    end function xdmf_handler_GetHDF5Filename
+
+
+    subroutine xdmf_handler_OpenTemporalFile(this, action, fileprefix)
     !-----------------------------------------------------------------
     !< Open a XDMF file 
     !----------------------------------------------------------------- 
@@ -173,12 +193,14 @@ contains
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
         type(xdmf_domain_t)                  :: domain                !< XDMF Domain type
         type(xdmf_xinclude_t)                :: xinclude              !< XDMF Xinclude type
+        type(xdmf_time_t)                    :: time                  !< XDMF Time type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             this%prefix = trim(adjustl(fileprefix))
             this%action = action
-            call this%TemporalFile%set_filename(trim(adjustl(fileprefix))//this%ext)
-            call this%SpatialFile%set_filename(trim(adjustl(fileprefix))//'_spatial'//this%ext)
+            call this%TemporalFile%set_filename(trim(adjustl(fileprefix))//XDMF_EXT)
+            call this%SpatialFile%set_filename(trim(adjustl(fileprefix))//'_'//&
+                trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
                     call this%TemporalFile%openfile()
@@ -186,15 +208,37 @@ contains
                     call grid%open(xml_handler = this%TemporalFile%xml_handler, &
                             GridType='Collection', &
                             CollectionType='Temporal')
+            end select
+        endif
+    end subroutine xdmf_handler_OpenTemporalFile
+
+
+    subroutine xdmf_handler_OpenSpatialFile(this)
+    !-----------------------------------------------------------------
+    !< Open a XI spatial file 
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
+        type(xdmf_grid_t)                    :: grid                  !< XDMF Grid 
+        type(xdmf_xinclude_t)                :: xinclude              !< XDMF Xinclude type
+        type(xdmf_time_t)                    :: time                  !< XDMF Time type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            call this%SpatialFile%set_filename(trim(adjustl(this%prefix))//'_'//&
+                trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
+            select case(this%action)
+                case(XDMF_ACTION_WRITE)
                     call xinclude%open(xml_handler = this%TemporalFile%xml_handler, &
                             HRef=this%SpatialFile%get_filename())
                     call this%SpatialFile%openfile(write_header=.false.)
                     call grid%open(xml_handler = this%SpatialFile%xml_handler, &
                             GridType='Collection', &
                             CollectionType='Spatial')
+                    call time%open(xml_handler=this%SpatialFile%xml_handler, &
+                        TimeType='Single',Value=this%StepsHandler%GetCurrentValue())
+                    call time%close(xml_handler=this%SpatialFile%xml_handler)
             end select
         endif
-    end subroutine xdmf_handler_OpenFile
+    end subroutine xdmf_handler_OpenSpatialFile
 
 
     subroutine xdmf_handler_OpenSpatialGrid(this, GridID)
@@ -242,6 +286,7 @@ contains
                 do i = 0, getLength(XIncludeNodes) - 1
                     XIncludeNode => item(XIncludeNodes, i)
                     call xinclude%Parse(DOMNode = XIncludeNode)
+                    call this%SpatialFile%set_filename(xinclude%GetHRef())
                     call this%SpatialFile%ParseFile()
                     ! Get Spatial Grid Node
                     SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
@@ -267,13 +312,17 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
         integer(I4P)                         :: IDidx                 !< GridID idex
     !----------------------------------------------------------------- 
-        do IDidx=0, this%MPIEnvironment%get_comm_size()-1
-            call this%OpenSpatialGrid(GridID = IDidx)
-            call this%WriteTopology(GridID = IDidx)
-            call this%WriteGeometry(GridID = IDidx)
-            call this%WriteAttributes(GridID = IDidx)
-            call this%CloseSpatialGrid()
-        enddo
+        if(this%MPIEnvironment%is_root()) then
+            call this%OpenSpatialFile()
+            do IDidx=0, this%MPIEnvironment%get_comm_size()-1
+                call this%OpenSpatialGrid(GridID = IDidx)
+                call this%WriteTopology(GridID = IDidx)
+                call this%WriteGeometry(GridID = IDidx)
+                call this%WriteAttributes(GridID = IDidx)
+                call this%CloseSpatialGrid()
+            enddo
+            call this%CloseSpatialFile()
+        endif
     end subroutine xdmf_handler_Serialize
 
 
@@ -290,9 +339,9 @@ contains
     end subroutine xdmf_handler_CloseSpatialGrid
 
 
-    subroutine xdmf_handler_CloseFile(this)
+    subroutine xdmf_handler_CloseSpatialFile(this)
     !-----------------------------------------------------------------
-    !< Close a XDMF file 
+    !< Close a XI spatial file 
     !----------------------------------------------------------------- 
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
@@ -305,12 +354,29 @@ contains
                     call grid%close(xml_handler=this%SpatialFile%xml_handler)
                     call this%SpatialFile%closefile()
                     call xinclude%close(xml_handler = this%TemporalFile%xml_handler)
+            end select
+        endif
+    end subroutine xdmf_handler_CloseSpatialFile
+
+
+    subroutine xdmf_handler_CloseTemporalFile(this)
+    !-----------------------------------------------------------------
+    !< Close a XDMF file 
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
+        type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
+        type(xdmf_domain_t)                  :: domain                !< XDMF Domain type
+        type(xdmf_xinclude_t)                :: xinclude              !< XDMF Xinclude type
+    !-----------------------------------------------------------------
+        if(this%MPIEnvironment%is_root()) then
+            select case(this%action)
+                case(XDMF_ACTION_WRITE)
                     call grid%close(xml_handler=this%TemporalFile%xml_handler)
                     call domain%close(xml_handler = this%TemporalFile%xml_handler)
                     call this%TemporalFile%closefile()
             end select
         endif
-    end subroutine xdmf_handler_CloseFile
+    end subroutine xdmf_handler_CloseTemporalFile
 
 
     function xdmf_handler_NodeIsDocumentRoot(this, DOMNode) result(NodeIsDocumentRoot)
