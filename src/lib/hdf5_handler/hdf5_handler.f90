@@ -337,6 +337,7 @@ contains
         class(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Uniform grid descriptor 
         class(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
+        call this%Free()
         this%MPIEnvironment        => MPIEnvironment
         this%StepsHandler          => StepsHandler
         this%SpatialGridDescriptor => SpatialGridDescriptor
@@ -368,7 +369,6 @@ contains
         character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
     !-----------------------------------------------------------------
 #ifdef ENABLE_HDF5
-
         this%action = action
         HDF5Filename = trim(adjustl(fileprefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
         call H5open_f(error=hdferror) 

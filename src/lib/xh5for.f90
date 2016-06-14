@@ -61,6 +61,8 @@ implicit none
         procedure, public :: SetStrategy           => xh5for_SetStrategy
         procedure, public :: SetGridType           => xh5for_SetGridType
         procedure, public :: AppendStep            => xh5for_AppendStep
+        procedure, public :: NextStep              => xh5for_NextStep
+        procedure, public :: GetNumberOfSteps      => xh5for_GetNumberOfSteps
         generic,   public :: Initialize            => xh5for_Initialize_Unstructured_Writer_I4P, &
                                                       xh5for_Initialize_Unstructured_Writer_I8P, &
                                                       xh5for_Initialize_Structured_Writer_I4P,   &
@@ -127,14 +129,41 @@ contains
 
     subroutine xh5for_AppendStep(this, Value)
     !----------------------------------------------------------------- 
-    !< Append an step value to the serie
+    !< Append an step value to the serie and open HeavyData file
+    !< for writing
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT)  :: this
         real(R8P),       intent(IN)     :: Value
     !----------------------------------------------------------------- 
         call this%StepsHandler%Append(Value=Value)
-        call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
+        if(this%Action == XDMF_ACTION_WRITE) call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
     end subroutine xh5for_AppendStep
+
+
+    subroutine xh5for_NextStep(this)
+    !----------------------------------------------------------------- 
+    !< Go to next step, read and comunicate metadata and open HeavyData 
+    !< file for reading
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT)  :: this
+    !----------------------------------------------------------------- 
+        call this%StepsHandler%Next()
+        if(this%Action == XDMF_ACTION_READ) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
+        endif
+    end subroutine xh5for_NextStep
+
+
+    function xh5for_GetNumberOfSteps(this) result(NumberOfSteps)
+    !----------------------------------------------------------------- 
+    !< Return the number of steps in XDMF temporal file
+    !----------------------------------------------------------------- 
+        class(xh5for_t), intent(INOUT)  :: this
+        integer(I4P)                    :: NumberOfSteps
+    !----------------------------------------------------------------- 
+        NumberOfSteps = this%StepsHandler%GetNumberOfSteps()
+    end function xh5for_GetNumberOfSteps
 
 
     subroutine xh5for_Free(this)
@@ -191,7 +220,7 @@ contains
         call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
         ! Steps initialization
-        call this%StepsHandler%Initialize()
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -251,7 +280,7 @@ contains
                 GeometryType     = GeometryType,               &
                 GridType         = this%GridType)
         ! Steps initialization
-        call this%StepsHandler%Initialize()
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -311,7 +340,7 @@ contains
                 GeometryType     = GeometryType,              &
                 GridType         = this%GridType)
         ! Steps initialization
-        call this%StepsHandler%Initialize()
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -370,7 +399,7 @@ contains
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
         ! Steps initialization
-        call this%StepsHandler%Initialize()
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -429,7 +458,7 @@ contains
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
         ! Steps initialization
-        call this%StepsHandler%Initialize()
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -478,7 +507,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        if(this%Action == XDMF_ACTION_READ) call this%LightData%ParseFile()
+        if(this%Action == XDMF_ACTION_READ) call this%LightData%ParseTemporalFile()
     end subroutine xh5for_Parse
 
 

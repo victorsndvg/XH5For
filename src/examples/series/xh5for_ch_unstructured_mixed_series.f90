@@ -84,27 +84,29 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-!    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-!    call xh5%Initialize()
-!    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixedtopology')
-!    call xh5%Parse()
-!    call xh5%AppendStep(Value=0.0_R8P)
-!    call xh5%ReadTopology(Connectivities = out_topology)
-!    call xh5%ReadGeometry(XYZ = out_geometry)
-!    call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
-!    call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
-!    call xh5%Close()
-!    call xh5%Free()
-!
-!#ifdef ENABLE_HDF5
-!    !< Check results
-!    if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
-!    if(.not. (sum(out_topology - topology)==0)) exitcode = -1
-!    if(.not. (sum(out_cellfield - cellfield)==0)) exitcode = -1
-!    if(.not. (sum(out_nodefield - nodefield)<=epsilon(0._R8P))) exitcode = -1
-!#else
-!    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
-!#endif
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
+    call xh5%Initialize()
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixed_serie')
+    call xh5%Parse()
+    do i=1, xh5%GetNumberOfSteps()
+        call xh5%NextStep()
+        call xh5%ReadTopology(Connectivities = out_topology)
+        call xh5%ReadGeometry(XYZ = out_geometry)
+        call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
+        call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
+#ifdef ENABLE_HDF5
+        !< Check results
+        if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
+        if(.not. (sum(out_topology - topology)==0)) exitcode = -1
+        if(.not. (sum(out_cellfield - (cellfield+i))==0)) exitcode = -1
+        if(.not. (sum(out_nodefield - (nodefield+i))<=epsilon(0._R8P))) exitcode = -1
+#else
+        if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
+#endif
+    enddo
+
+        call xh5%Close()
+        call xh5%Free()
 
 #ifdef ENABLE_MPI
     call MPI_FINALIZE(mpierr)

@@ -54,7 +54,8 @@ private
         procedure, public :: OpenSpatialFile              => xdmf_handler_OpenSpatialFile
         procedure         :: OpenSpatialGrid              => xdmf_handler_OpenSpatialGrid
         procedure, public :: Serialize                    => xdmf_handler_Serialize
-        procedure, public :: ParseFile                    => xdmf_handler_ParseFile
+        procedure, public :: ParseTemporalFile            => xdmf_handler_ParseTemporalFile
+        procedure, public :: ParseSpatialFile             => xdmf_handler_ParseSpatialFile
         procedure         :: CloseSpatialGrid             => xdmf_handler_CloseSpatialGrid
         procedure         :: CloseSpatialFile             => xdmf_handler_CloseSpatialFile
         procedure, public :: CloseTemporalFile            => xdmf_handler_CloseTemporalFile
@@ -256,7 +257,7 @@ contains
     end subroutine xdmf_handler_OpenSpatialGrid
 
 
-    subroutine xdmf_handler_ParseFile(this)
+    subroutine xdmf_handler_ParseTemporalFile(this)
     !-----------------------------------------------------------------
     !< Parse a readed file and distribute the information
     !----------------------------------------------------------------- 
@@ -266,8 +267,6 @@ contains
         type(Node),     pointer               :: TemporalGridNode     !< Fox DOM TemporalGrid node
         type(NodeList), pointer               :: XIncludeNodes        !< Fox DOM Xinclude node list
         type(Node),     pointer               :: XIncludeNode         !< Fox DOM Xinclude node 
-        type(Node),     pointer               :: SpatialGridNode      !< Fox DOM SpatialGrid node
-        type(NodeList), pointer               :: UniformGridNodes     !< Fox DOM UniformGrid node list
         type(xdmf_xinclude_t)                 :: xinclude             !< XDMF Xinclude type
         integer                               :: i
     !----------------------------------------------------------------- 
@@ -283,26 +282,44 @@ contains
                 if(.not. associated(TemporalGridNode)) return
                 XIncludeNodes => getElementsByTagname(TemporalGridNode, 'xi:include')
 
+                call this%StepsHandler%Initialize(this%MPIEnvironment, getLength(XIncludeNodes))
                 do i = 0, getLength(XIncludeNodes) - 1
                     XIncludeNode => item(XIncludeNodes, i)
                     call xinclude%Parse(DOMNode = XIncludeNode)
-                    call this%SpatialFile%set_filename(xinclude%GetHRef())
-                    call this%SpatialFile%ParseFile()
-                    ! Get Spatial Grid Node
-                    SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
-                    if(.not. associated(SpatialGridNode)) return
-                    UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
-                    if(.not. associated(UniformGridNodes)) return
-                    ! Get Fill Spatial Grid metainfo
-                    call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
-                    call destroy(this%SpatialFile%get_document_root())
+                    call this%StepsHandler%Append(Filename=xinclude%GetHRef())
                 enddo
+                call this%StepsHandler%Begin()
             endif
             call destroy(this%TemporalFile%get_document_root())
         endif
-        call this%SpatialGridDescriptor%BroadcastMetadata()
-    end subroutine xdmf_handler_ParseFile
+        call this%StepsHandler%BroadCastNumberOfSteps()
+    end subroutine xdmf_handler_ParseTemporalFile
 
+
+    subroutine xdmf_handler_ParseSpatialFile(this)
+    !-----------------------------------------------------------------
+    !< Parse a readed file and distribute the information
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),  intent(INOUT) :: this                 !< XDMF handler
+        type(Node),     pointer               :: SpatialGridNode      !< Fox DOM SpatialGrid node
+        type(NodeList), pointer               :: UniformGridNodes     !< Fox DOM UniformGrid node list
+        integer                               :: i
+    !----------------------------------------------------------------- 
+        if(this%MPIEnvironment%is_root()) then
+            call this%SpatialFile%Free()
+            call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
+            call this%SpatialFile%ParseFile()
+            ! Get Spatial Grid Node
+            SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
+            if(.not. associated(SpatialGridNode)) return
+            UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
+            if(.not. associated(UniformGridNodes)) return
+            ! Get Fill Spatial Grid metainfo
+            call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
+            call destroy(this%SpatialFile%get_document_root())
+        endif
+        call this%SpatialGridDescriptor%BroadcastMetadata()
+    end subroutine xdmf_handler_ParseSpatialFile
 
 
     subroutine xdmf_handler_Serialize(this)

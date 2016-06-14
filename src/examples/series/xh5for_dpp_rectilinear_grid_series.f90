@@ -52,7 +52,7 @@ implicit none
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
     call xh5%SetGridType(GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call xh5%Initialize(GridShape=(/size(X), size(Y), size(Z)/))
-    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_dpp_rectilinear_grid')
+    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_dpp_rectilinear_grid_series')
 
     do i=1, num_steps
         time = time + 1
@@ -65,6 +65,29 @@ implicit none
     call xh5%Close()
     call xh5%Free()
 
+    !< Read XDMF/HDF5 file
+    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
+    call xh5%Initialize()
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_rectilinear_grid_series')
+    call xh5%Parse()
+
+    do i=1, xh5%GetNumberOfSteps()
+        call xh5%NextStep()
+        call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
+        call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
+#ifdef ENABLE_HDF5
+    !< Check results
+    if(.not. (sum(out_X - X)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_Y - Y)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_Z - Z)<=epsilon(0._R4P))) exitcode = -1
+    if(.not. (sum(out_scalartempI4P - (scalartempI4P+i))==0._I4P)) exitcode = -1
+#else
+    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
+#endif
+    enddo
+
+    call xh5%Close()
+    call xh5%Free()
 
 #ifdef ENABLE_MPI
     call MPI_FINALIZE(mpierr)

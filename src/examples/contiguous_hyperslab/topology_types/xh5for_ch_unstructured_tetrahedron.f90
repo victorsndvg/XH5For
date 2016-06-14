@@ -67,7 +67,7 @@ implicit none
     call xh5%Initialize()
     call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_tetrahedron')
     call xh5%Parse()
-    call xh5%AppendStep(Value=0.0_R8P)
+    call xh5%NextStep()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(X = out_X, Y = out_Y, Z = out_Z)
     call xh5%ReadAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_vectorvelocity)
