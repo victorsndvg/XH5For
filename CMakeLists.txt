@@ -4,7 +4,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
-PROJECT(XH5For Fortran C)
+PROJECT(XH5For Fortran)
 
 SET(${PROJECT_NAME}_VERSION 0.0.1)
 SET(${PROJECT_NAME}_SOVERSION 1)
@@ -20,6 +20,7 @@ SET(SRC_PATH ${CMAKE_SOURCE_DIR}/src)
 SET(LIB_PATH ${SRC_PATH}/lib)
 SET(EXAMPLES_PATH ${SRC_PATH}/examples)
 SET(TESTS_PATH ${SRC_PATH}/tests)
+SET(INCLUDE_PATH ${SRC_PATH}/include)
 
 #SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
@@ -33,6 +34,12 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR}/modules)
 SET(THIRDPARTY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/thirdparty)
 INCLUDE_DIRECTORIES(${CMAKE_Fortran_MODULE_DIRECTORY})
+
+#################################################################
+# ADD INCLUDE DIRS
+#################################################################
+
+include_directories(${INCLUDE_PATH})
 
 #################################################################
 # CONFIGURATION TYPES & BUILD MODE

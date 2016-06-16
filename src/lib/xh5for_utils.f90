@@ -7,7 +7,13 @@ use IR_Precision, only: I4P, str
 use xdmf_utils,   only : warning_message
 use xh5for_parameters
 
-implicit none
+#ifdef MPI_MOD
+    use mpi
+#endif
+implicit none 
+#ifdef MPI_H
+include 'mpif.h'
+#endif	
 private
 
 public :: GetNumberOfNodesPerElement
@@ -26,6 +32,29 @@ public :: isSupportedTopologyType
 public :: isSupportedGeometryType
 
 contains
+
+    subroutine Abort()
+        integer :: code, info, ierror
+        logical :: initialized_mpi, finalized_mpi
+
+        code = -1
+        initialized_mpi = .false.
+        finalized_mpi   = .false.
+#ifdef __GFORTRAN__
+        call backtrace()
+#endif
+#ifdef ENABLE_MPI
+        call mpi_initialized(initialized_mpi, ierror)
+        call mpi_finalized(finalized_mpi, ierror)
+        if(initialized_mpi .and. .not. finalized_mpi) then
+            call mpi_abort(mpi_comm_world,code,info)
+        else
+#else
+        if(.true.) then
+#endif
+            stop -1
+        endif
+    end subroutine Abort
 
     function GetNumberOfNodesPerElement(TopologyType) result(NodesPerElement)
         integer(I4P), intent(IN) :: TopologyType
