@@ -481,7 +481,7 @@ contains
     !-----------------------------------------------------------------
         if(present(action)) this%action = action
         this%Prefix = trim(adjustl(Fileprefix))
-        call this%LightData%OpenTemporalFile(action=this%action, fileprefix=this%Prefix)
+        call this%LightData%Open(this%action, this%Prefix)
     end subroutine xh5for_Open
 
 
@@ -493,7 +493,7 @@ contains
     !-----------------------------------------------------------------
         if(this%Action == XDMF_ACTION_Write) then
             call this%HeavyData%CloseFile()
-            call this%LightData%Serialize()
+            call this%LightData%SerializeSpatialFile()
         endif
     end subroutine xh5for_Serialize
 
@@ -515,7 +515,7 @@ contains
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
         if(this%action == XDMF_ACTION_WRITE) then
-            call this%LightData%CloseTemporalFile()
+            call this%LightData%SerializeTemporalFile()
         endif
     end subroutine xh5for_Close
 
