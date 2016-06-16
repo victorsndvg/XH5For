@@ -10,6 +10,8 @@ use xh5for_parameters
 
 implicit none
 
+#include "assert.i90"
+
 private
 
     type, abstract, extends(hdf5_handler_t) :: hdf5_contiguous_hyperslab_handler_t
@@ -66,6 +68,7 @@ contains
         integer(HSIZE_T),                           intent(OUT) :: DataOffset          !< Data offset for current grid
     !----------------------------------------------------------------- 
     !< @TODO: face and edge attributes
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
@@ -108,6 +111,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -175,6 +179,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -243,6 +248,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -310,6 +316,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -378,6 +385,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -446,6 +454,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -514,6 +523,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -582,6 +592,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))

@@ -14,6 +14,8 @@ use uniform_grid_descriptor
 
 implicit none
 
+#include "assert.i90"
+
 private
 
 #ifndef ENABLE_HDF5
@@ -21,18 +23,55 @@ private
     integer, parameter :: HSIZE_T = I4P
 #endif
 
+    integer(I4P), parameter :: HDF5_HANDLER_STATE_START = 0
+    integer(I4P), parameter :: HDF5_HANDLER_STATE_INIT  = 1
+    integer(I4P), parameter :: HDF5_HANDLER_STATE_OPEN  = 2
+    integer(I4P), parameter :: HDF5_HANDLER_STATE_CLOSE = 3
+
+    !-----------------------------------------------------------------
+    ! HDF5_HANDLER State Transition Diagram
+    !-----------------------------------------------------------------
+    ! - This diagram controls the basic life cycle of the HDF5 file.
+    ! - Only a public procedure (FileIsOpen) is needed to check if the
+    !   handler is in the right state to perform I/O operations.
+    ! - Only the next hierarchy layer needs to ensure this status via
+    !   ReadHyperSlabs/WriteHyperSlabs/ReadDataset/WriteData/WriteMetadata
+    !   procedures
+    !----------------------------------------------------------------- 
+    !       INIT STATE      |     ACTION      |      FINAL STATE
+    !----------------------------------------------------------------- 
+    ! START                 | Free            | START
+    ! START                 | Initialize      | INIT
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free            | START
+    ! INIT                  | Initialize      | INIT
+    ! INIT                  | OpenFile        | OPEN
+    !----------------------------------------------------------------- 
+    ! OPEN                  | Free            | START
+    ! OPEN                  | Initialize      | INIT
+    ! OPEN                  | OpenFile        | OPEN
+    ! OPEN                  | CloseFile       | CLOSE
+    !----------------------------------------------------------------- 
+    ! CLOSE                 | Free            | START
+    ! CLOSE                 | Initialize      | INIT
+    ! CLOSE                 | OpenFile        | OPEN
+    ! CLOSE                 | CloseFile       | CLOSE
+    !----------------------------------------------------------------- 
+
     type, abstract :: hdf5_handler_t
     !-----------------------------------------------------------------
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
-        character(len=:),             allocatable :: prefix                          !< Name prefix of the HDF5 file
-        integer(HID_T)                            :: file_id                         !< File identifier 
-        integer(I4P)                              :: action                          !< HDF5 action to be perfomed (Read or Write)
-        type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
-        type(steps_handler_t),            pointer :: StepsHandler          => null() !< Steps handler
-        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Spatial grid descriptor
-        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null() !< Uniform grid descriptor
+        character(len=:),             allocatable :: prefix                           !< Name prefix of the HDF5 file
+        integer(HID_T)                            :: file_id = XDMF_NO_VALUE          !< File identifier 
+        integer(I4P)                              :: action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
+        integer(I4P)                              :: state = HDF5_HANDLER_STATE_START !< HDF5 state
+        type(mpi_env_t),                  pointer :: MPIEnvironment        => null()  !< MPI environment 
+        type(steps_handler_t),            pointer :: StepsHandler          => null()  !< Steps handler
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null()  !< Spatial grid descriptor
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor => null()  !< Uniform grid descriptor
     contains
+    private
         procedure(hdf5_handler_WriteGeometry_XYZ_R4P),   deferred :: WriteGeometry_XYZ_R4P
         procedure(hdf5_handler_WriteGeometry_XYZ_R8P),   deferred :: WriteGeometry_XYZ_R8P
         procedure(hdf5_handler_WriteGeometry_X_Y_Z_R4P), deferred :: WriteGeometry_X_Y_Z_R4P
@@ -57,34 +96,35 @@ private
         procedure(hdf5_handler_ReadAttribute_I8P),       deferred :: ReadAttribute_I8P
         procedure(hdf5_handler_ReadAttribute_R4P),       deferred :: ReadAttribute_R4P
         procedure(hdf5_handler_ReadAttribute_R8P),       deferred :: ReadAttribute_R8P
-        procedure           :: Initialize => hdf5_handler_Initialize
-        procedure           :: Free       => hdf5_handler_Free
-        procedure           :: OpenFile   => hdf5_handler_OpenFile
-        procedure           :: CloseFile  => hdf5_handler_CloseFile
-        generic,   public   :: WriteTopology  => WriteTopology_I4P, &
-                                                 WriteTopology_I8P
-        generic,   public   :: ReadTopology   => ReadTopology_I4P, &
-                                                 ReadTopology_I8P
-        generic,   public   :: WriteGeometry  => WriteGeometry_XYZ_R4P,   &
-                                                 WriteGeometry_XYZ_R8P,   &
-                                                 WriteGeometry_X_Y_Z_R4P, &
-                                                 WriteGeometry_X_Y_Z_R8P, &
-                                                 WriteGeometry_DXDYDZ_R4P,&
-                                                 WriteGeometry_DXDYDZ_R8P
-        generic,   public   :: ReadGeometry   => ReadGeometry_XYZ_R4P,   &
-                                                 ReadGeometry_XYZ_R8P,   &
-                                                 ReadGeometry_X_Y_Z_R4P, &
-                                                 ReadGeometry_X_Y_Z_R8P, &
-                                                 ReadGeometry_DXDYDZ_R4P, &
-                                                 ReadGeometry_DXDYDZ_R8P
-        generic,   public   :: WriteAttribute => WriteAttribute_I4P, &
-                                                 WriteAttribute_I8P, &
-                                                 WriteAttribute_R4P, &
-                                                 WriteAttribute_R8P
-        generic,   public   :: ReadAttribute  => ReadAttribute_I4P, &
-                                                 ReadAttribute_I8P, &
-                                                 ReadAttribute_R4P, &
-                                                 ReadAttribute_R8P
+        procedure, non_overridable, public   :: Initialize     => hdf5_handler_Initialize
+        procedure, non_overridable, public   :: Free           => hdf5_handler_Free
+        procedure, non_overridable, public   :: OpenFile       => hdf5_handler_OpenFile
+        procedure, non_overridable, public   :: FileIsOpen     => hdf5_handler_FileIsOpen
+        procedure, non_overridable, public   :: CloseFile      => hdf5_handler_CloseFile
+        generic,                    public   :: WriteTopology  => WriteTopology_I4P, &
+                                                                  WriteTopology_I8P
+        generic,                    public   :: ReadTopology   => ReadTopology_I4P, &
+                                                                  ReadTopology_I8P
+        generic,                    public   :: WriteGeometry  => WriteGeometry_XYZ_R4P,   &
+                                                                  WriteGeometry_XYZ_R8P,   &
+                                                                  WriteGeometry_X_Y_Z_R4P, &
+                                                                  WriteGeometry_X_Y_Z_R8P, &
+                                                                  WriteGeometry_DXDYDZ_R4P,&
+                                                                  WriteGeometry_DXDYDZ_R8P
+        generic,                    public   :: ReadGeometry   => ReadGeometry_XYZ_R4P,   &
+                                                                  ReadGeometry_XYZ_R8P,   &
+                                                                  ReadGeometry_X_Y_Z_R4P, &
+                                                                  ReadGeometry_X_Y_Z_R8P, &
+                                                                  ReadGeometry_DXDYDZ_R4P, &
+                                                                  ReadGeometry_DXDYDZ_R8P
+        generic,                    public   :: WriteAttribute => WriteAttribute_I4P, &
+                                                                  WriteAttribute_I8P, &
+                                                                  WriteAttribute_R4P, &
+                                                                  WriteAttribute_R8P
+        generic,                    public   :: ReadAttribute  => ReadAttribute_I4P, &
+                                                                  ReadAttribute_I8P, &
+                                                                  ReadAttribute_R4P, &
+                                                                  ReadAttribute_R8P
 
     end type hdf5_handler_t
 
@@ -342,6 +382,7 @@ contains
         this%StepsHandler          => StepsHandler
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
+        this%State                 =  HDF5_HANDLER_STATE_INIT
     end subroutine hdf5_handler_Initialize
 
 
@@ -351,10 +392,26 @@ contains
     !----------------------------------------------------------------- 
         class(hdf5_handler_t),  intent(INOUT) :: this                 !< HDF5 handler type
     !----------------------------------------------------------------- 
+        if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
+        this%file_id = XDMF_NO_VALUE
+        this%action  = XDMF_NO_VALUE
+        if(allocated(this%Prefix)) deallocate(this%Prefix)
         nullify(this%MPIEnvironment)
         nullify(this%UniformGridDescriptor)
         nullify(this%SpatialGridDescriptor)
+        this%State = HDF5_HANDLER_STATE_START
     end subroutine hdf5_handler_Free
+
+
+    function hdf5_handler_FileIsOpen(this) result(FileIsOpen)
+    !-----------------------------------------------------------------
+    !< Check if the HDF5 is already open. Needed to Write/Read
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
+        logical                           :: FileIsOpen               !< Check if file state is OPEN
+    !----------------------------------------------------------------- 
+        FileIsOpen = (this%State == HDF5_HANDLER_STATE_OPEN)
+    end function hdf5_handler_FileIsOpen
 
 
     subroutine hdf5_handler_OpenFile(this, action, fileprefix)
@@ -368,9 +425,11 @@ contains
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
         character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
     !-----------------------------------------------------------------
+        assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
 #ifdef ENABLE_HDF5
         this%action = action
         HDF5Filename = trim(adjustl(fileprefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
 #ifdef ENABLE_MPI
@@ -407,6 +466,7 @@ contains
         call h5pclose_f(prp_id = plist_id, hdferr = hdferror)
 
 #endif
+        this%State = HDF5_HANDLER_STATE_OPEN
     end subroutine hdf5_handler_OpenFile
 
 
@@ -417,10 +477,12 @@ contains
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
         integer                              :: hdferror              !< HDF5 error code
     !-----------------------------------------------------------------
+        assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
 #ifdef ENABLE_HDF5
         call H5Fclose_f(file_id = this%file_id, hdferr = hdferror)
         call H5close_f(error = hdferror) 
 #endif
+        this%State = HDF5_HANDLER_STATE_CLOSE
     end subroutine hdf5_handler_CloseFile
 
 end module hdf5_handler
