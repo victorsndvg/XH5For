@@ -68,7 +68,7 @@ implicit none
     !< Write XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixed_serie')
+    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixed_series')
 
     do i=1, num_steps
         time = time+1.0
@@ -86,14 +86,15 @@ implicit none
     !< Read XDMF/HDF5 file
     call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
     call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixed_serie')
+    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixed_series')
     call xh5%Parse()
+
     do i=1, xh5%GetNumberOfSteps()
-        call xh5%NextStep()
         call xh5%ReadTopology(Connectivities = out_topology)
         call xh5%ReadGeometry(XYZ = out_geometry)
         call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
         call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
+        call xh5%NextStep()
 #ifdef ENABLE_HDF5
         !< Check results
         if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1

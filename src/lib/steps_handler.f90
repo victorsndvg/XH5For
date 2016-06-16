@@ -4,7 +4,64 @@ use IR_Precision, only: I4P, R4P, R8P, str
 USE mpi_environment
 
 implicit none
+
+#include "assert.i90"
+
 private
+
+    integer(I4P), parameter :: STEPS_HANDLER_STATE_START   = 0
+    integer(I4P), parameter :: STEPS_HANDLER_STATE_INIT    = 1
+    integer(I4P), parameter :: STEPS_HANDLER_STATE_APPEND  = 2
+    integer(I4P), parameter :: STEPS_HANDLER_STATE_ITER    = 3
+
+    !-----------------------------------------------------------------
+    ! STEPS_HANDLER State Transition Diagram
+    !-----------------------------------------------------------------
+    ! - This diagram controls the basic life cycle of the steps handler
+    ! - Incremental steps definition (append) and iteration over them
+    !   cannot be mixed. Append cannot be performed after (begin/Next/End)
+    !----------------------------------------------------------------- 
+    !       INIT STATE      |       ACTION      |      FINAL STATE
+    !----------------------------------------------------------------- 
+    ! START                 | Free              | START
+    ! START                 | Initialize        | INIT
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free              | START
+    ! INIT                  | Initialize        | INIT
+    ! INIT                  | GetNumberOfSteps  | INIT
+    ! INIT                  | GetCurrentStep    | APPEND
+    ! INIT                  | GetCurrentValue   | APPEND
+    ! INIT                  | GetCurrentFilename| APPEND
+    ! INIT                  | SetCurrentValue   | APPEND
+    ! INIT                  | SetCurrentFilename| APPEND
+    ! INIT                  | Append            | APPEND
+    !----------------------------------------------------------------- 
+    ! APPEND                | Free              | START
+    ! APPEND                | Initialize        | INIT
+    ! APPEND                | GetNumberOfSteps  | APPEND
+    ! APPEND                | GetCurrentStep    | APPEND
+    ! APPEND                | GetCurrentValue   | APPEND
+    ! APPEND                | GetCurrentFilename| APPEND
+    ! APPEND                | SetCurrentValue   | APPEND
+    ! APPEND                | SetCurrentFilename| APPEND
+    ! APPEND                | Append            | APPEND
+    ! APPEND                | BEGIN             | ITER
+    ! APPEND                | NEXT              | ITER
+    ! APPEND                | END               | ITER
+    !----------------------------------------------------------------- 
+    ! APPEND                | Free              | START
+    ! APPEND                | Initialize        | INIT
+    ! APPEND                | GetNumberOfSteps  | ITER
+    ! APPEND                | GetCurrentStep    | ITER
+    ! APPEND                | GetCurrentValue   | ITER
+    ! APPEND                | GetCurrentFilename| ITER
+    ! APPEND                | SetCurrentValue   | ITER
+    ! APPEND                | SetCurrentFilename| ITER
+    ! APPEND                | BEGIN             | ITER
+    ! APPEND                | NEXT              | ITER
+    ! APPEND                | END               | ITER
+    !----------------------------------------------------------------- 
+
 
     integer(I4P), parameter :: DEFAULT_STEPS_ARRAY_SIZE = 10
     type string_t
@@ -21,6 +78,7 @@ private
         real(R8P),      allocatable :: Values(:)
         type(string_t), allocatable :: Filenames(:)
         type(mpi_env_t), pointer    :: MPIEnvironment => NULL()
+        integer(I4P)                :: State         = STEPS_HANDLER_STATE_START
         integer(I4P)                :: NumberOfSteps = 0
         integer(I4P)                :: StepsCounter  = 0
     contains
@@ -34,10 +92,12 @@ private
         procedure, non_overridable, public :: Begin                  => steps_handler_Begin
         procedure, non_overridable, public :: Next                   => steps_handler_Next
         procedure, non_overridable, public :: End                    => steps_handler_End
+        procedure, non_overridable, public :: HasFinished            => steps_handler_HasFinished
         procedure, non_overridable, public :: GetNumberOfSteps       => steps_handler_GetNumberOfSteps
         procedure, non_overridable, public :: GetCurrentStep         => steps_handler_GetCurrentStep
         procedure, non_overridable, public :: GetCurrentValue        => steps_handler_GetCurrentValue
         procedure, non_overridable, public :: GetCurrentFilename     => steps_handler_GetCurrentFilename
+        procedure, non_overridable, public :: SetCurrentValue        => steps_handler_SetCurrentValue
         procedure, non_overridable, public :: SetCurrentFilename     => steps_handler_SetCurrentFilename
         procedure, non_overridable, public :: GetStepValue           => steps_handler_GetStepValue
         procedure, non_overridable, public :: Free                   => steps_handler_Free
@@ -97,6 +157,7 @@ contains
             endif
             this%NumberOfSteps = NumberOfSteps
         endif
+        this%State = STEPS_HANDLER_STATE_INIT
     end subroutine steps_handler_Initialize
 
 
@@ -107,6 +168,7 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         integer(I4P)                          :: NumberOfSteps        !< Number of steps
     !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
         NumberOfSteps = this%NumberOfSteps
     end function steps_handler_GetNumberOfSteps
 
@@ -118,6 +180,8 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         integer(I4P)                          :: CurrentStep          !< Current step number
     !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
+        if(.not. this%StepsCounter>0) call this%Append(0.0)
         CurrentStep = this%StepsCounter
     end function steps_handler_GetCurrentStep
 
@@ -129,12 +193,10 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         real(R8P)                             :: CurrentValue         !< Current step value
     !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
         CurrentValue = 0.0_R8P
-        if(this%MPIEnvironment%is_root()) then
-            if(allocated(this%Values) .and. this%StepsCounter>0) then
-                CurrentValue = this%Values(this%StepsCounter)
-            endif
-        endif
+        if(.not. this%StepsCounter>0) call this%Append(0.0)
+        CurrentValue = this%Values(this%StepsCounter)
     end function steps_handler_GetCurrentValue
 
 
@@ -145,26 +207,41 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         character(len=:), allocatable         :: CurrentFilename      !< Current step filename
     !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
         CurrentFilename=''
-        if(this%MPIEnvironment%is_root()) then
-            if(this%StepsCounter>0) then
-                CurrentFilename = this%Filenames(this%StepsCounter)%Get()
-            endif
-        endif
+        if(.not. this%StepsCounter>0) call this%Append(CurrentFilename)
+        CurrentFilename = this%Filenames(this%StepsCounter)%Get()
     end function steps_handler_GetCurrentFilename
+
+
+    subroutine steps_handler_SetCurrentValue(this, Value)
+    !-----------------------------------------------------------------
+    !< Set the current step value
+    !----------------------------------------------------------------- 
+        class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
+        real(R8P),              intent(IN)    :: Value                !< Current step value
+    !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
+        if(this%StepsCounter>0) then
+            this%Values(this%StepsCounter) = Value
+        else
+            call this%Append(Value)
+        endif
+    end subroutine steps_handler_SetCurrentValue
 
 
     subroutine steps_handler_SetCurrentFilename(this, Filename)
     !-----------------------------------------------------------------
-    !< Return the current step filename
+    !< Set the current step filename
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         character(len=*),       intent(IN)    :: Filename             !< Current step filename
     !----------------------------------------------------------------- 
-        if(this%MPIEnvironment%is_root()) then
-            if(this%StepsCounter>0) then
-                call this%Filenames(this%StepsCounter)%Set(Filename)
-            endif
+        assert(this%State > STEPS_HANDLER_STATE_START)
+        if(this%StepsCounter>0) then
+            call this%Filenames(this%StepsCounter)%Set(Filename)
+        else
+            call this%Append(Filename)
         endif
     end subroutine steps_handler_SetCurrentFilename
 
@@ -177,6 +254,7 @@ contains
         integer(I4P),           intent(IN)    :: StepNumber           !< Number of the step
         real(R8P)                             :: Value                !< Current step number
     !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
         Value = 0.0_R8P
         if(this%MPIEnvironment%is_root()) then
             if(StepNumber>0 .and. StepNumber<=this%NumberOfSteps) then
@@ -227,10 +305,12 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         real(R8P),              intent(IN)    :: Value                !< Step Value
     !-----------------------------------------------------------------
+        assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND)
         call this%ResizeArrays()
         this%StepsCounter = this%StepsCounter+1
         this%NumberOfSteps = max(this%NumberOfSteps, this%StepsCounter)
         if(this%MPIEnvironment%is_root()) this%Values(this%StepsCounter) = Value
+        this%State = STEPS_HANDLER_STATE_APPEND
     end subroutine steps_handler_Append_R8P
 
 
@@ -241,10 +321,12 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         real(R4P),              intent(IN)    :: Value                !< Step Value
     !-----------------------------------------------------------------
+        assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND)
         call this%ResizeArrays()
         this%StepsCounter = this%StepsCounter+1
         this%NumberOfSteps = max(this%NumberOfSteps, this%StepsCounter)
         if(this%MPIEnvironment%is_root()) this%Values(this%StepsCounter) = real(Value, kind=R8P)
+        this%State = STEPS_HANDLER_STATE_APPEND
     end subroutine steps_handler_Append_R4P
 
 
@@ -255,10 +337,12 @@ contains
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         character(len=*),       intent(IN)    :: Filename             !< Step Filename
     !-----------------------------------------------------------------
+        assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND)
         call this%ResizeArrays()
         this%StepsCounter = this%StepsCounter+1
         this%NumberOfSteps = max(this%NumberOfSteps, this%StepsCounter)
         if(this%MPIEnvironment%is_root()) call this%Filenames(this%StepsCounter)%Set(Filename)
+        this%State = STEPS_HANDLER_STATE_APPEND
     end subroutine steps_handler_Append_String
 
 
@@ -268,6 +352,7 @@ contains
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
     !-----------------------------------------------------------------
+        assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfSteps)
     end subroutine steps_handler_BroadcastNumberOfSteps
 
@@ -278,7 +363,9 @@ contains
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
     !-----------------------------------------------------------------
-        this%StepsCounter = 0
+        assert(this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
+        this%StepsCounter = 1
+        this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_Begin
 
 
@@ -288,9 +375,9 @@ contains
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
     !-----------------------------------------------------------------
-        if(this%StepsCounter<this%NumberOfSteps) then
-            this%StepsCounter = this%StepsCounter+1
-        endif
+        assert(this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
+        this%StepsCounter = this%StepsCounter+1
+        this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_Next
 
 
@@ -300,8 +387,21 @@ contains
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
     !-----------------------------------------------------------------
+        assert(this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
         this%StepsCounter = this%NumberOfSteps
+        this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_End
+
+
+    function steps_handler_HasFinished(this) result(HasFinished)
+    !-----------------------------------------------------------------
+    !< Check if "iterator" reached the last position
+    !----------------------------------------------------------------- 
+        class(steps_handler_t), intent(IN) :: this                    !< Steps Handler
+        logical                            :: HasFinished             !< True if the las position have been reached
+    !-----------------------------------------------------------------
+        HasFinished = (this%StepsCounter >= this%NumberOfSteps)
+    end function steps_handler_HasFinished
 
 
     subroutine steps_handler_Free(this)
@@ -320,6 +420,7 @@ contains
             enddo
             deallocate(this%Filenames)
         endif
+        this%State = STEPS_HANDLER_STATE_START
     end subroutine steps_handler_Free
 
 end module steps_handler

@@ -200,8 +200,6 @@ contains
             this%prefix = trim(adjustl(fileprefix))
             this%action = action
             call this%TemporalFile%set_filename(trim(adjustl(fileprefix))//XDMF_EXT)
-            call this%SpatialFile%set_filename(trim(adjustl(fileprefix))//'_'//&
-                trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
                     call this%TemporalFile%openfile()
@@ -224,8 +222,9 @@ contains
         type(xdmf_time_t)                    :: time                  !< XDMF Time type
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
-            call this%SpatialFile%set_filename(trim(adjustl(this%prefix))//'_'//&
+            call this%StepsHandler%SetCurrentFilename(trim(adjustl(this%prefix))//'_'//&
                 trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
+            call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
                     call xinclude%open(xml_handler = this%TemporalFile%xml_handler, &
@@ -339,6 +338,7 @@ contains
                 call this%CloseSpatialGrid()
             enddo
             call this%CloseSpatialFile()
+            call this%UniformGridDescriptor%FreeAttributesMetadata()
         endif
     end subroutine xdmf_handler_Serialize
 

@@ -71,10 +71,10 @@ implicit none
     call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_rectilinear_grid_series')
     call xh5%Parse()
 
-    do i=1, xh5%GetNumberOfSteps()
-        call xh5%NextStep()
+    do i=1, xh5%GetNumberOfSteps()-1
         call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
         call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
+        call xh5%NextStep()
 #ifdef ENABLE_HDF5
     !< Check results
     if(.not. (sum(out_X - X)<=epsilon(0._R4P))) exitcode = -1

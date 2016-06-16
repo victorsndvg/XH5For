@@ -135,8 +135,8 @@ contains
         class(xh5for_t), intent(INOUT)  :: this
         real(R8P),       intent(IN)     :: Value
     !----------------------------------------------------------------- 
+        if(this%Heavydata%FileIsOpen()) call this%Heavydata%CloseFile()
         call this%StepsHandler%Append(Value=Value)
-        if(this%Action == XDMF_ACTION_WRITE) call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
     end subroutine xh5for_AppendStep
 
 
@@ -147,11 +147,8 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT)  :: this
     !----------------------------------------------------------------- 
+        if(this%Heavydata%FileIsOpen()) call this%Heavydata%CloseFile()
         call this%StepsHandler%Next()
-        if(this%Action == XDMF_ACTION_READ) then
-            call this%LightData%ParseSpatialFile()
-            call this%HeavyData%OpenFile(action=this%action, fileprefix=this%Prefix)
-        endif
     end subroutine xh5for_NextStep
 
 
@@ -531,6 +528,7 @@ contains
         real(R4P),                  intent(IN)    :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
             call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = Name)
@@ -549,6 +547,7 @@ contains
         real(R8P),                  intent(IN)    :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
             call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = Name)
@@ -569,6 +568,7 @@ contains
         real(R4P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
             call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -588,6 +588,7 @@ contains
         real(R4P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
             call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -607,6 +608,7 @@ contains
         real(R8P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
             call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -615,6 +617,7 @@ contains
             call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
         endif
     end subroutine xh5for_WriteGeometry_DXDYDZ_R8P
+
 
     subroutine xh5for_WriteGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
     !----------------------------------------------------------------- 
@@ -626,6 +629,7 @@ contains
         real(R8P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
             call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -644,6 +648,10 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -662,6 +670,10 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: XYZ(:)   !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -682,6 +694,10 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -702,6 +718,10 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: Z(:)             !< Z R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -721,6 +741,10 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -740,6 +764,10 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -758,6 +786,7 @@ contains
         integer(I4P),               intent(IN)    :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)
@@ -776,6 +805,7 @@ contains
         integer(I8P),               intent(IN)    :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = Name)
@@ -794,6 +824,10 @@ contains
         integer(I4P), allocatable, intent(OUT)   :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -812,6 +846,10 @@ contains
         integer(I8P), allocatable,  intent(OUT)   :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         if(present(Name)) then
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -833,6 +871,7 @@ contains
         integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
     !-----------------------------------------------------------------
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I4P
 
@@ -848,13 +887,14 @@ contains
         integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
     !-----------------------------------------------------------------
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_I8P
 
 
     subroutine xh5for_WriteAttribute_R4P(this, Name, Type, Center, Values)
     !----------------------------------------------------------------- 
-    !< Write I4P Attribute
+    !< Write I4P Attributed
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
         character(len=*),intent(IN)    :: Name                        !< Attribute name
@@ -863,6 +903,7 @@ contains
         real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
     !-----------------------------------------------------------------
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R4P
 
@@ -878,6 +919,7 @@ contains
         real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
     !-----------------------------------------------------------------
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        if(.not. this%HeavyData%FileIsOpen()) call this%HeavyData%OpenFile(this%Action, This%Prefix)
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
     end subroutine xh5for_WriteAttribute_R8P
 
@@ -892,6 +934,10 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_I4P
@@ -907,6 +953,10 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_I8P
@@ -922,6 +972,10 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_R4P
@@ -937,6 +991,10 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
     !-----------------------------------------------------------------
+        if(.not. this%HeavyData%FileIsOpen()) then
+            call this%LightData%ParseSpatialFile()
+            call this%HeavyData%OpenFile(this%Action, This%Prefix)
+        endif
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
     end subroutine xh5for_ReadAttribute_R8P

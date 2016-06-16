@@ -35,6 +35,7 @@ implicit none
     print*, 'Freeing ... '
     call TimeSteps%Free()
 
+    call TimeSteps%initialize(mpienv)
     print*, ''
     print*, 'Initial number of steps:', TimeSteps%GetNumberOfSteps()
     print*, 'Adding steps ... '
