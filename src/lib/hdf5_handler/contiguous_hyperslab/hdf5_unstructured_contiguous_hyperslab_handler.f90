@@ -7,6 +7,8 @@ use HDF5
 use hdf5_contiguous_hyperslab_handler
 use xh5for_utils
 use xh5for_parameters
+use mpi_environment
+use spatial_grid_descriptor
 
 implicit none
 
@@ -17,6 +19,7 @@ private
     !< HDF5 contiguous hyperslab handler for Unstructured grids
     !----------------------------------------------------------------- 
     contains
+    private
         procedure :: WriteGeometry_XYZ_R4P   => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R4P
         procedure :: WriteGeometry_XYZ_R8P   => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_XYZ_R8P
         procedure :: WriteGeometry_X_Y_Z_R4P => hdf5_unstructured_contiguous_hyperslab_WriteGeometry_X_Y_Z_R4P
@@ -49,14 +52,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
         integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
-        LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,        &
                 DatasetDims     = (/GlobalGeometrySize/), &
                 HyperSlabOffset = (/GeometrySizeOffset/), &
@@ -76,14 +84,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
         integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalGeometrySize = int(this%SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
-        LocalGeometrySize  = int(this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        GeometrySizeOffset = int(this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
+        LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,        &
                 DatasetDims     = (/GlobalGeometrySize/), &
                 HyperSlabOffset = (/GeometrySizeOffset/), &
@@ -105,14 +118,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalNumberOfNodes !< Total number of nodes
         integer(HSIZE_T)                                       :: LocalNumberOfNodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: NodeOffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalNumberOfNodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        LocalNumberOfNodes  = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        NodeOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName='X_'//Name,   &
                 DatasetDims     = (/GlobalNumberOfNodes/), &
                 HyperSlabOffset = (/NodeOffset/),          &
@@ -144,14 +162,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalNumberOfNodes !< Total number of nodes
         integer(HSIZE_T)                                       :: LocalNumberOfNodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: NodeOffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalNumberOfNodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        LocalNumberOfNodes  = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        NodeOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalNumberOfNodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        LocalNumberOfNodes  = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        NodeOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName='X_'//Name,   &
                 DatasetDims     = (/GlobalNumberOfNodes/), &
                 HyperSlabOffset = (/NodeOffset/),          &
@@ -217,16 +240,21 @@ contains
         integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
         call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=this%MPIEnvironment%get_rank())
-        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize = int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
+        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize = int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
 
         call this%WriteHyperSlab(DatasetName=Name,                            &
                 DatasetDims     = (/GlobalTopologySize/), &
@@ -247,16 +275,21 @@ contains
         integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
         call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
-        call this%SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=this%MPIEnvironment%get_rank())
-        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize = int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
+        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize = int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%WriteHyperSlab(DatasetName=Name,                            &
                 DatasetDims     = (/GlobalTopologySize/), &
                 HyperSlabOffset = (/TopologySizeOffset/), &
@@ -277,15 +310,20 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
+        globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -306,15 +344,20 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        spacedim = int(GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=this%MPIEnvironment%get_rank())),HSIZE_T)
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
+        globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,                 &
                 DatasetDims     = (/spacedim*globalnumberofnodes/), &
                 HyperSlabOffset = (/spacedim*nodeoffset/),          &
@@ -336,14 +379,19 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
@@ -384,14 +432,19 @@ contains
         integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
         integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
         integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        globalnumberofnodes = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-        localnumberofnodes = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        nodeoffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+        localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        nodeoffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
@@ -466,14 +519,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize  =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize  =  int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,           &
                 DatasetDims     = (/GlobalTopologySize/), &
                 HyperSlabOffset = (/TopologySizeOffset/), &
@@ -493,14 +551,19 @@ contains
         integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        GlobalTopologySize = int(this%SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize =  int(this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+        MPIEnvironment        => this%GetMPIEnvironment()
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
+        LocalTopologySize =  int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         call this%ReadHyperSlab(DatasetName = Name,           &
                 DatasetDims     = (/GlobalTopologySize/), &
                 HyperSlabOffset = (/TopologySizeOffset/), &

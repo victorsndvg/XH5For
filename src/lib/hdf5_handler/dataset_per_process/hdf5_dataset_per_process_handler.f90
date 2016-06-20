@@ -7,6 +7,8 @@ use HDF5
 use hdf5_handler
 use xh5for_utils
 use xh5for_parameters
+use mpi_environment
+use spatial_grid_descriptor
 
 implicit none
 
@@ -19,6 +21,7 @@ private
     !< HDF5 dataset per process handler
     !----------------------------------------------------------------- 
     contains
+    private
         procedure :: CalculateAttributeDimensions => hdf5_dataset_per_process_handler_CalculateAttributeDimensions
         procedure :: WriteMetadata_I4P  => hdf5_dataset_per_process_handler_WriteMetadata_I4P
         procedure :: WriteMetadata_I8P  => hdf5_dataset_per_process_handler_WriteMetadata_I8P
@@ -73,19 +76,21 @@ contains
         integer(I4P),                               intent(IN)  :: GridID              !< Index to loop on GridID's
         integer(I4P),                               intent(IN)  :: Center              !< Attribute center at (Node, Cell, etc.)
         integer(HSIZE_T),                           intent(OUT) :: LocalNumberOfData   !< Local number of data
+        class(spatial_grid_descriptor_t), pointer               :: SpatialGridDescriptor !< Spatial grid descriptor
     !----------------------------------------------------------------- 
     !< @TODO: face and edge attributes
-        assert(this%FileIsOpen())
 #ifdef ENABLE_HDF5
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor))
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
                 LocalNumberOfData = 1_HSIZE_T
             case Default
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID),HSIZE_T)
         end select
 #endif
     end subroutine hdf5_dataset_per_process_handler_CalculateAttributeDimensions
@@ -109,7 +114,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -117,7 +122,7 @@ contains
                 space_id = filespace,                         &
                 hdferr   = hdferror)
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetFileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_INTEGER,              &
                 space_id = filespace,                       &
@@ -148,10 +153,10 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Open dataset
-        call H5Dopen_f(loc_id = this%file_id,              &
+        call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror,                        &
@@ -194,7 +199,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -202,7 +207,7 @@ contains
                 space_id = filespace,                         &
                 hdferr   = hdferror)
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetFileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_INTEGER,              &
                 space_id = filespace,                       &
@@ -233,10 +238,10 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Open dataset
-        call H5Dopen_f(loc_id = this%file_id,              &
+        call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror,                        &
@@ -279,7 +284,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -287,7 +292,7 @@ contains
                 space_id = filespace,                         &
                 hdferr   = hdferror)
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetFileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_REAL,                 &
                 space_id = filespace,                       &
@@ -318,10 +323,10 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Open dataset
-        call H5Dopen_f(loc_id = this%file_id,              &
+        call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror,                        &
@@ -364,7 +369,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -372,7 +377,7 @@ contains
                 space_id = filespace,                         &
                 hdferr   = hdferror)
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetFileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_DOUBLE,               &
                 space_id = filespace,                       &
@@ -403,10 +408,10 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Open dataset
-        call H5Dopen_f(loc_id = this%file_id,              &
+        call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror,                        &
@@ -451,7 +456,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -467,7 +472,7 @@ contains
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetFileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror) 
@@ -507,7 +512,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -523,7 +528,7 @@ contains
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetFileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -562,7 +567,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -578,7 +583,7 @@ contains
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetFileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -618,7 +623,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen())
+        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -634,7 +639,7 @@ contains
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetFileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -668,13 +673,16 @@ contains
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
         integer(I4P)                                           :: GridID              !< Index to loop on GridID's
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+        do GridID=0, MPIEnvironment%get_comm_size()-1
             call this%CalculateAttributeDimensions(GridID=GridID, Center=Center, LocalNumberOfData=LocalNumberOfData)
             call this%WriteMetaData(                                                           &
                     DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
@@ -683,9 +691,9 @@ contains
                     HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                &
                     Values          = Values)
         enddo
-        call this%CalculateAttributeDimensions(GridID=this%MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
-        call this%WriteData(                                                                                   &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+        call this%CalculateAttributeDimensions(GridID=MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
+        call this%WriteData(                                                                                       &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -708,13 +716,16 @@ contains
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
         integer(I4P)                                           :: GridID              !< Index to loop on GridID's
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+        do GridID=0, MPIEnvironment%get_comm_size()-1
             call this%CalculateAttributeDimensions( GridID=GridID, Center=Center, LocalNumberOfData=LocalNumberOfData)
             call this%WriteMetaData(                                                           &
                     DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
@@ -723,9 +734,9 @@ contains
                     HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                &
                     Values          = Values)
         enddo
-        call this%CalculateAttributeDimensions(GridID=this%MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
-        call this%WriteData(                                                                                   &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+        call this%CalculateAttributeDimensions(GridID=MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
+        call this%WriteData(                                                                                       &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -748,13 +759,16 @@ contains
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
         integer(I4P)                                           :: GridID              !< Index to loop on GridID's
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+        do GridID=0, MPIEnvironment%get_comm_size()-1
             call this%CalculateAttributeDimensions(GridID=GridID, Center=Center, LocalNumberOfData=LocalNumberOfData)
             call this%WriteMetaData(                                                           &
                     DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
@@ -763,9 +777,9 @@ contains
                     HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                &
                     Values          = Values)
         enddo
-        call this%CalculateAttributeDimensions(GridID=this%MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
+        call this%CalculateAttributeDimensions(GridID=MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
         call this%WriteData(                                                                                   &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -788,13 +802,16 @@ contains
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
         integer(I4P)                                           :: GridID              !< Index to loop on GridID's
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
-        do GridID=0, this%MPIEnvironment%get_comm_size()-1
+        do GridID=0, MPIEnvironment%get_comm_size()-1
             call this%CalculateAttributeDimensions(GridID=GridID, Center=Center, LocalNumberOfData=LocalNumberOfData)
             call this%WriteMetaData(                                                           &
                     DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=GridID))),  &
@@ -803,9 +820,9 @@ contains
                     HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                &
                     Values          = Values)
         enddo
-        call this%CalculateAttributeDimensions(GridID=this%MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
-        call this%WriteData(                                                                                   &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+        call this%CalculateAttributeDimensions(GridID=MPIEnvironment%get_rank(), Center=Center, LocalNumberOfData=LocalNumberOfData)
+        call this%WriteData(                                                                                       &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -827,18 +844,21 @@ contains
         integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
         call this%CalculateAttributeDimensions(                      &
-                GridID             = this%MPIEnvironment%get_rank(), &
+                GridID             = MPIEnvironment%get_rank(),      &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
         call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -860,18 +880,21 @@ contains
         integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
         call this%CalculateAttributeDimensions(                      &
-                GridID             = this%MPIEnvironment%get_rank(), &
+                GridID             = MPIEnvironment%get_rank(),      &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
         call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -893,18 +916,21 @@ contains
         integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
         call this%CalculateAttributeDimensions(                      &
-                GridID             = this%MPIEnvironment%get_rank(), &
+                GridID             = MPIEnvironment%get_rank(),      &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
         call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &
@@ -926,18 +952,21 @@ contains
         integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
         integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
         integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        type(mpi_env_t), pointer                               :: MPIEnvironment      !< MPI Environment
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
         NumberOfComponents = int(GetNumberOfComponentsFromAttributeType(Type), HSIZE_T)
         call this%CalculateAttributeDimensions(                      &
-                GridID             = this%MPIEnvironment%get_rank(), &
+                GridID             = MPIEnvironment%get_rank(),      &
                 Center             = Center,                         &
                 LocalNumberOfData  = LocalNumberOfData)
         call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=this%MPIEnvironment%get_rank()))),  &
+                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),       &
                 DatasetDims     = (/LocalNumberOfData*NumberOfComponents/),                                        &
                 HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
                 HyperSlabSize   = (/LocalNumberOfData*NumberOfComponents/),                                        &

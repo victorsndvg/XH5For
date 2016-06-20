@@ -59,11 +59,12 @@ private
     !----------------------------------------------------------------- 
 
     type, abstract :: hdf5_handler_t
+    private
     !-----------------------------------------------------------------
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: prefix                           !< Name prefix of the HDF5 file
-        integer(HID_T)                            :: file_id = XDMF_NO_VALUE          !< File identifier 
+        integer(HID_T)                            :: FileID  = XDMF_NO_VALUE          !< File identifier 
         integer(I4P)                              :: action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
         integer(I4P)                              :: state = HDF5_HANDLER_STATE_START !< HDF5 state
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null()  !< MPI environment 
@@ -96,11 +97,16 @@ private
         procedure(hdf5_handler_ReadAttribute_I8P),       deferred :: ReadAttribute_I8P
         procedure(hdf5_handler_ReadAttribute_R4P),       deferred :: ReadAttribute_R4P
         procedure(hdf5_handler_ReadAttribute_R8P),       deferred :: ReadAttribute_R8P
-        procedure, non_overridable, public   :: Initialize     => hdf5_handler_Initialize
-        procedure, non_overridable, public   :: Free           => hdf5_handler_Free
-        procedure, non_overridable, public   :: OpenFile       => hdf5_handler_OpenFile
-        procedure, non_overridable, public   :: FileIsOpen     => hdf5_handler_FileIsOpen
-        procedure, non_overridable, public   :: CloseFile      => hdf5_handler_CloseFile
+        procedure, non_overridable, public   :: Initialize               => hdf5_handler_Initialize
+        procedure, non_overridable, public   :: Free                     => hdf5_handler_Free
+        procedure, non_overridable, public   :: OpenFile                 => hdf5_handler_OpenFile
+        procedure, non_overridable, public   :: FileIsOpen               => hdf5_handler_FileIsOpen
+        procedure, non_overridable, public   :: CloseFile                => hdf5_handler_CloseFile
+        procedure, non_overridable, public   :: GetFileID                => hdf5_handler_GetFileID
+        procedure, non_overridable, public   :: GetAction                => hdf5_handler_GetAction
+        procedure, non_overridable, public   :: GetMPIEnvironment        => hdf5_handler_GetMPIEnvironment
+        procedure, non_overridable, public   :: GetUniformGridDescriptor => hdf5_handler_GetUniformGridDescriptor
+        procedure, non_overridable, public   :: GetSpatialGridDescriptor => hdf5_handler_GetSpatialGridDescriptor
         generic,                    public   :: WriteTopology  => WriteTopology_I4P, &
                                                                   WriteTopology_I8P
         generic,                    public   :: ReadTopology   => ReadTopology_I4P, &
@@ -393,7 +399,7 @@ contains
         class(hdf5_handler_t),  intent(INOUT) :: this                 !< HDF5 handler type
     !----------------------------------------------------------------- 
         if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
-        this%file_id = XDMF_NO_VALUE
+        this%FileID = XDMF_NO_VALUE
         this%action  = XDMF_NO_VALUE
         if(allocated(this%Prefix)) deallocate(this%Prefix)
         nullify(this%MPIEnvironment)
@@ -412,6 +418,66 @@ contains
     !----------------------------------------------------------------- 
         FileIsOpen = (this%State == HDF5_HANDLER_STATE_OPEN)
     end function hdf5_handler_FileIsOpen
+
+    function hdf5_handler_GetAction(this) result(Action)
+    !-----------------------------------------------------------------
+    !< Return the current Action
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
+        integer(I4P)                      :: Action                   !< File ID
+    !----------------------------------------------------------------- 
+        assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
+        Action = this%Action
+    end function hdf5_handler_GetAction
+
+
+    function hdf5_handler_GetFileID(this) result(FileID)
+    !-----------------------------------------------------------------
+    !< Return the File ID
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
+        integer(I4P)                      :: FileID                   !< File ID
+    !----------------------------------------------------------------- 
+        assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
+        FileID = this%FileID
+    end function hdf5_handler_GetFileID
+
+
+    function hdf5_handler_GetUniformGridDescriptor(this) result(UniformGridDescriptor)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the UniformGridDescriptor
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t),         intent(IN) :: this                  !< HDF5 handler type
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor !< Uniform grid descriptor
+    !----------------------------------------------------------------- 
+        assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
+        nullify(UniformGridDescriptor)
+        UniformGridDescriptor => this%UniformGridDescriptor
+    end function hdf5_handler_GetUniformGridDescriptor
+
+
+    function hdf5_handler_GetSpatialGridDescriptor(this) result(SpatialGridDescriptor)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the SpatialGridDescriptor
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t),         intent(IN) :: this                  !< HDF5 handler type
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Uniform grid descriptor
+    !----------------------------------------------------------------- 
+        nullify(SpatialGridDescriptor)
+        SpatialGridDescriptor => this%SpatialGridDescriptor
+    end function hdf5_handler_GetSpatialGridDescriptor
+
+
+    function hdf5_handler_GetMPIEnvironment(this) result(MPIEnvironment)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the MPIEnvironment
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
+        class(mpi_env_t), pointer         :: MPIEnvironment           !< MPI Environment
+    !----------------------------------------------------------------- 
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%MPIEnvironment
+    end function hdf5_handler_GetMPIEnvironment
 
 
     subroutine hdf5_handler_OpenFile(this, action, fileprefix)
@@ -449,7 +515,7 @@ contains
                 ! read-write access.
                 call H5fcreate_f(name = HDF5FileName,                 &
                         access_flags  = H5F_ACC_TRUNC_F,              &
-                        file_id       = this%file_id,                 &
+                        File_id       = this%FileID,                  &
                         hdferr        = hdferror,                     &
                         creation_prp  = H5P_DEFAULT_F,                &
                         access_prp    = plist_id)
@@ -458,7 +524,7 @@ contains
                 ! does not exist, H5Fopen fails.
                 call H5fopen_f(name  = HDF5FileName,                  &
                         access_flags = H5F_ACC_RDONLY_F,              &
-                        file_id      = this%file_id,                  &
+                        File_id      = this%FileID,                   &
                         hdferr       = hdferror,                      &
                         access_prp   = plist_id)
         end select
@@ -479,7 +545,7 @@ contains
     !-----------------------------------------------------------------
         assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
 #ifdef ENABLE_HDF5
-        call H5Fclose_f(file_id = this%file_id, hdferr = hdferror)
+        call H5Fclose_f(file_id = this%FileID, hdferr = hdferror)
         call H5close_f(error = hdferror) 
 #endif
         this%State = HDF5_HANDLER_STATE_CLOSE
