@@ -37,7 +37,7 @@ install:
   - make -j2 > /dev/null 2>&1
   - make install > /dev/null 2>&1
   ##################
-  - export PATH=$TRAVIS_BUILD_DIR/hdf5/bin:$PATH
+  - export PATH=$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/hdf5/bin:$TRAVIS_BUILD_DIR/hdf5/lib:$TRAVIS_BUILD_DIR/hdf5/include:$PATH
   - echo $PATH
   - cmake --version
 

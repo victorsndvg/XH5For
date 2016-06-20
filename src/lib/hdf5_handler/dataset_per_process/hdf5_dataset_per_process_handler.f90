@@ -22,39 +22,39 @@ private
     !----------------------------------------------------------------- 
     contains
     private
-        procedure :: CalculateAttributeDimensions => hdf5_dataset_per_process_handler_CalculateAttributeDimensions
-        procedure :: WriteMetadata_I4P  => hdf5_dataset_per_process_handler_WriteMetadata_I4P
-        procedure :: WriteMetadata_I8P  => hdf5_dataset_per_process_handler_WriteMetadata_I8P
-        procedure :: WriteMetadata_R4P  => hdf5_dataset_per_process_handler_WriteMetadata_R4P
-        procedure :: WriteMetadata_R8P  => hdf5_dataset_per_process_handler_WriteMetadata_R8P
-        procedure :: WriteData_I4P      => hdf5_dataset_per_process_handler_WriteData_I4P
-        procedure :: WriteData_I8P      => hdf5_dataset_per_process_handler_WriteData_I8P
-        procedure :: WriteData_R4P      => hdf5_dataset_per_process_handler_WriteData_R4P
-        procedure :: WriteData_R8P      => hdf5_dataset_per_process_handler_WriteData_R8P
-        procedure :: ReadDataset_I4P    => hdf5_dataset_per_process_handler_ReadDataset_I4P
-        procedure :: ReadDataset_I8P    => hdf5_dataset_per_process_handler_ReadDataset_I8P
-        procedure :: ReadDataset_R4P    => hdf5_dataset_per_process_handler_ReadDataset_R4P
-        procedure :: ReadDataset_R8P    => hdf5_dataset_per_process_handler_ReadDataset_R8P
-        procedure :: WriteAttribute_I4P => hdf5_dataset_per_process_handler_WriteAttribute_I4P
-        procedure :: WriteAttribute_I8P => hdf5_dataset_per_process_handler_WriteAttribute_I8P
-        procedure :: WriteAttribute_R4P => hdf5_dataset_per_process_handler_WriteAttribute_R4P
-        procedure :: WriteAttribute_R8P => hdf5_dataset_per_process_handler_WriteAttribute_R8P
-        procedure :: ReadAttribute_I4P  => hdf5_dataset_per_process_handler_ReadAttribute_I4P
-        procedure :: ReadAttribute_I8P  => hdf5_dataset_per_process_handler_ReadAttribute_I8P
-        procedure :: ReadAttribute_R4P  => hdf5_dataset_per_process_handler_ReadAttribute_R4P
-        procedure :: ReadAttribute_R8P  => hdf5_dataset_per_process_handler_ReadAttribute_R8P
-        generic   :: WriteMetadata      => WriteMetadata_I4P, &
-                                           WriteMetadata_I8P, &
-                                           WriteMetadata_R4P, &
-                                           WriteMetadata_R8P
-        generic   :: WriteData          => WriteData_I4P, &
-                                           WriteData_I8P, &
-                                           WriteData_R4P, &
-                                           WriteData_R8P
-        generic   :: ReadDataset        => ReadDataset_I4P, &
-                                           ReadDataset_I8P, &
-                                           ReadDataset_R4P, &
-                                           ReadDataset_R8P
+        procedure         :: CalculateAttributeDimensions => hdf5_dataset_per_process_handler_CalculateAttributeDimensions
+        procedure         :: WriteMetadata_I4P  => hdf5_dataset_per_process_handler_WriteMetadata_I4P
+        procedure         :: WriteMetadata_I8P  => hdf5_dataset_per_process_handler_WriteMetadata_I8P
+        procedure         :: WriteMetadata_R4P  => hdf5_dataset_per_process_handler_WriteMetadata_R4P
+        procedure         :: WriteMetadata_R8P  => hdf5_dataset_per_process_handler_WriteMetadata_R8P
+        procedure         :: WriteData_I4P      => hdf5_dataset_per_process_handler_WriteData_I4P
+        procedure         :: WriteData_I8P      => hdf5_dataset_per_process_handler_WriteData_I8P
+        procedure         :: WriteData_R4P      => hdf5_dataset_per_process_handler_WriteData_R4P
+        procedure         :: WriteData_R8P      => hdf5_dataset_per_process_handler_WriteData_R8P
+        procedure         :: ReadDataset_I4P    => hdf5_dataset_per_process_handler_ReadDataset_I4P
+        procedure         :: ReadDataset_I8P    => hdf5_dataset_per_process_handler_ReadDataset_I8P
+        procedure         :: ReadDataset_R4P    => hdf5_dataset_per_process_handler_ReadDataset_R4P
+        procedure         :: ReadDataset_R8P    => hdf5_dataset_per_process_handler_ReadDataset_R8P
+        procedure         :: WriteAttribute_I4P => hdf5_dataset_per_process_handler_WriteAttribute_I4P
+        procedure         :: WriteAttribute_I8P => hdf5_dataset_per_process_handler_WriteAttribute_I8P
+        procedure         :: WriteAttribute_R4P => hdf5_dataset_per_process_handler_WriteAttribute_R4P
+        procedure         :: WriteAttribute_R8P => hdf5_dataset_per_process_handler_WriteAttribute_R8P
+        procedure         :: ReadAttribute_I4P  => hdf5_dataset_per_process_handler_ReadAttribute_I4P
+        procedure         :: ReadAttribute_I8P  => hdf5_dataset_per_process_handler_ReadAttribute_I8P
+        procedure         :: ReadAttribute_R4P  => hdf5_dataset_per_process_handler_ReadAttribute_R4P
+        procedure         :: ReadAttribute_R8P  => hdf5_dataset_per_process_handler_ReadAttribute_R8P
+        generic, public   :: WriteMetadata      => WriteMetadata_I4P, &
+                                                   WriteMetadata_I8P, &
+                                                   WriteMetadata_R4P, &
+                                                   WriteMetadata_R8P
+        generic, public   :: WriteData          => WriteData_I4P, &
+                                                   WriteData_I8P, &
+                                                   WriteData_R4P, &
+                                                   WriteData_R8P
+        generic, public   :: ReadDataset        => ReadDataset_I4P, &
+                                                   ReadDataset_I8P, &
+                                                   ReadDataset_R4P, &
+                                                   ReadDataset_R8P
 
     end type hdf5_dataset_per_process_handler_t
 

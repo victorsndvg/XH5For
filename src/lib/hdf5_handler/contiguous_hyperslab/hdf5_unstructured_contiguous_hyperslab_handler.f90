@@ -8,9 +8,12 @@ use hdf5_contiguous_hyperslab_handler
 use xh5for_utils
 use xh5for_parameters
 use mpi_environment
+use uniform_grid_descriptor
 use spatial_grid_descriptor
 
 implicit none
+
+#include "assert.i90"
 
 private
 
@@ -241,6 +244,7 @@ contains
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(uniform_grid_descriptor_t), pointer              :: UniformGridDescriptor !< Uniform grid descriptor
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -248,9 +252,10 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
+        UniformGridDescriptor => this%GetUniformGridDescriptor()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
-        call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
+        assert(associated(UniformGridDescriptor) .and. associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        call UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
         call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
         GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
         LocalTopologySize = int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -276,6 +281,7 @@ contains
         integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
         integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(uniform_grid_descriptor_t), pointer              :: UniformGridDescriptor !< Uniform grid descriptor
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -283,9 +289,10 @@ contains
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
+        UniformGridDescriptor => this%GetUniformGridDescriptor()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
-        call this%UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
+        assert(associated(UniformGridDescriptor) .and. associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        call UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
         call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
         GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
         LocalTopologySize = int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)

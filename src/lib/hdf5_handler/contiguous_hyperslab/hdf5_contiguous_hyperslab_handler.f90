@@ -22,31 +22,31 @@ private
     !----------------------------------------------------------------- 
     contains
     private
-        procedure :: CalculateAttributeDimensions => hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
-        procedure :: WriteHyperSlab_I4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
-        procedure :: WriteHyperSlab_I8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
-        procedure :: WriteHyperSlab_R4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
-        procedure :: WriteHyperSlab_R8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R8P
-        procedure :: ReadHyperSlab_I4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I4P
-        procedure :: ReadHyperSlab_I8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
-        procedure :: ReadHyperSlab_R4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
-        procedure :: ReadHyperSlab_R8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
-        procedure :: WriteAttribute_I4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
-        procedure :: WriteAttribute_I8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
-        procedure :: WriteAttribute_R4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
-        procedure :: WriteAttribute_R8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
-        procedure :: ReadAttribute_I4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I4P
-        procedure :: ReadAttribute_I8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I8P
-        procedure :: ReadAttribute_R4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R4P
-        procedure :: ReadAttribute_R8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R8P
-        generic   :: WriteHyperSlab     => WriteHyperSlab_I4P, &
-                                           WriteHyperSlab_I8P, &
-                                           WriteHyperSlab_R4P, &
-                                           WriteHyperSlab_R8P
-        generic   :: ReadHyperSlab      => ReadHyperSlab_I4P, &
-                                           ReadHyperSlab_I8P, &
-                                           ReadHyperSlab_R4P, &
-                                           ReadHyperSlab_R8P
+        procedure       :: CalculateAttributeDimensions => hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
+        procedure       :: WriteHyperSlab_I4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
+        procedure       :: WriteHyperSlab_I8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
+        procedure       :: WriteHyperSlab_R4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
+        procedure       :: WriteHyperSlab_R8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R8P
+        procedure       :: ReadHyperSlab_I4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I4P
+        procedure       :: ReadHyperSlab_I8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
+        procedure       :: ReadHyperSlab_R4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
+        procedure       :: ReadHyperSlab_R8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
+        procedure       :: WriteAttribute_I4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
+        procedure       :: WriteAttribute_I8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
+        procedure       :: WriteAttribute_R4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
+        procedure       :: WriteAttribute_R8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
+        procedure       :: ReadAttribute_I4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I4P
+        procedure       :: ReadAttribute_I8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I8P
+        procedure       :: ReadAttribute_R4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R4P
+        procedure       :: ReadAttribute_R8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R8P
+        generic, public :: WriteHyperSlab     => WriteHyperSlab_I4P, &
+                                                 WriteHyperSlab_I8P, &
+                                                 WriteHyperSlab_R4P, &
+                                                 WriteHyperSlab_R8P
+        generic, public :: ReadHyperSlab      => ReadHyperSlab_I4P, &
+                                                 ReadHyperSlab_I8P, &
+                                                 ReadHyperSlab_R4P, &
+                                                 ReadHyperSlab_R8P
 
     end type hdf5_contiguous_hyperslab_handler_t
 
