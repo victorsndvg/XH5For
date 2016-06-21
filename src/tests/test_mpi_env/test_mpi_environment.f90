@@ -6,11 +6,11 @@ use mpi_environment
 #ifdef MPI_MOD
   use mpi
 #endif
+implicit none
 #ifdef MPI_H
   include 'mpif.h'
 #endif
 
-implicit none
 
     type(mpi_env_t) :: env
     integer         :: mpierr

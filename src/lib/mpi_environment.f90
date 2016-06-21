@@ -10,10 +10,17 @@ use IR_Precision, only : I4P, I8P, R4P, R8P
 #ifdef MPI_MOD
     use mpi
 #endif
+implicit none 
 #ifdef MPI_H
     include 'mpif.h'
 #endif
+#else
+implicit none 
 #endif
+
+#include "assert.i90"
+
+private
 
     type mpi_env_t
     !-----------------------------------------------------------------
@@ -99,7 +106,11 @@ contains
         class(mpi_env_t), intent(INOUT) :: this                       !< MPI environment
     !----------------------------------------------------------------- 
         ! No allocatable variables. Default initialization
-        call this%Initialize()
+        this%comm = 0
+        this%root = 0
+        this%rank = 0
+        this%info = 0
+        this%size = 1
     end subroutine mpi_env_Free
 
     function mpi_env_get_comm(this) result(comm)

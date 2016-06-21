@@ -4,7 +4,13 @@ use mpi_environment
 use steps_handler
 use IR_Precision, only: I4P, R4P, R8P
 
+#ifdef MPI_MOD
+  use mpi
+#endif
 implicit none
+#ifdef MPI_H
+  include 'mpif.h'
+#endif
 
     type(mpi_env_t)       :: mpienv
     type(steps_handler_t) :: TimeSteps
