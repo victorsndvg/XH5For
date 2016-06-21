@@ -1,7 +1,7 @@
-language: python
+language: c
 
-python:
-  - 2.7
+env:
+- MPI=mpich2
 
 sudo: false
 
