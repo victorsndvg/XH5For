@@ -22,7 +22,7 @@ before_install:
   - pip install codecov
   - git submodule update --init --recursive
   - travis_retry wget --quiet https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz;
-  - travis_retry wget --quiet https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
+  - travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
   - export FC=/usr/bin/gfortran-5
