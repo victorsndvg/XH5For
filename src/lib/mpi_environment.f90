@@ -71,22 +71,17 @@ contains
         this%rank = 0
         this%info = 0
         this%size = 1
-
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_Initialized(mpi_was_initialized, mpierr)
-
         this%info = MPI_INFO_NULL
-
         if(mpi_was_initialized) then
             if(present(comm)) then
                 this%comm = comm
             else
                 CALL MPI_COMM_DUP(MPI_COMM_WORLD, this%comm, mpierr)
             endif
-    
             call MPI_COMM_RANK (this%comm, this%rank, mpierr)
             call MPI_COMM_SIZE (this%comm, this%size, mpierr)
-    
             if(present(root)) then
                 this%root = root
             else
@@ -107,54 +102,54 @@ contains
         call this%Initialize()
     end subroutine mpi_env_Free
 
-    function mpi_env_get_comm(this)
+    function mpi_env_get_comm(this) result(comm)
     !-----------------------------------------------------------------
     !< Return MPI communicator
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
-        integer                      :: mpi_get_comm                  !< MPI communicator
+        integer                      :: comm                          !< MPI communicator
     !----------------------------------------------------------------- 
-        mpi_get_comm = this%comm
+        comm = this%comm
     end function mpi_env_get_comm
 
-    function mpi_env_get_root(this)
+    function mpi_env_get_root(this) result(root)
     !-----------------------------------------------------------------
     !< Return MPI root processor
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
-        integer                      :: mpi_get_root                  !< MPI root processor
+        integer                      :: root                          !< MPI root processor
     !----------------------------------------------------------------- 
-        mpi_get_root = this%root
+        root = this%root
     end function mpi_env_get_root
 
-    function mpi_env_get_rank(this)
+    function mpi_env_get_rank(this) result(rank)
     !-----------------------------------------------------------------
     !< Return MPI rank
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
-        integer                      :: mpi_get_rank                  !< MPI rank
+        integer                      :: rank                          !< MPI rank
     !----------------------------------------------------------------- 
-        mpi_get_rank = this%rank
+        rank = this%rank
     end function mpi_env_get_rank
 
-    function mpi_env_get_info(this)
+    function mpi_env_get_info(this) result(info)
     !-----------------------------------------------------------------
     !< Return MPI info
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
-        integer                      :: mpi_get_info                  !< MPI info
+        integer                      :: info                          !< MPI info
     !----------------------------------------------------------------- 
-        mpi_get_info = this%info
+        info = this%info
     end function mpi_env_get_info
 
-    function mpi_env_get_comm_size(this)
+    function mpi_env_get_comm_size(this) result(size)
     !----------------------------------------------------------------- 
     !< Return MPI communicator size
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
-        integer                      :: mpi_get_comm_size             !< MPI communicator size
+        integer                      :: size                          !< MPI communicator size
     !----------------------------------------------------------------- 
-        mpi_get_comm_size = this%size
+        size = this%size
     end function mpi_env_get_comm_size
 
 
@@ -309,14 +304,14 @@ contains
     end subroutine mpi_env_broadcast_string
 
 
-    function mpi_env_is_root(this)
+    function mpi_env_is_root(this) result(is_root)
     !-----------------------------------------------------------------
     !< Is the current task the root processor?
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(IN)  :: this                         !< MPI environment
-        logical                       :: mpi_env_is_root              !< Boolean variable, True if is root task   
+        logical                       :: is_root                      !< Boolean variable, True if is root task   
     !----------------------------------------------------------------- 
-        mpi_env_is_root = this%get_rank() == this%get_root()
+        is_root = this%get_rank() == this%get_root()
     end function mpi_env_is_root
 
 

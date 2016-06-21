@@ -155,16 +155,15 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+        ! Create the dataset with default properties.
+        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Open dataset
         call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
-                hdferr  = hdferror,                        &
-                dapl_id = plist_id) 
-        ! Create the dataset with default properties.
-        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
-        ! Set MPIO data transfer mode to COLLECTIVE
+                hdferr  = hdferror) 
 #ifdef ENABLE_MPI
+        ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Write data
@@ -240,16 +239,15 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+        ! Create the dataset with default properties.
+        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Open dataset
         call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
-                hdferr  = hdferror,                        &
-                dapl_id = plist_id) 
-        ! Create the dataset with default properties.
-        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
-        ! Set MPIO data transfer mode to COLLECTIVE
+                hdferr  = hdferror) 
 #ifdef ENABLE_MPI
+        ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
 !        ! Write data
@@ -325,16 +323,15 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+        ! Create the dataset with default properties.
+        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Open dataset
         call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
-                hdferr  = hdferror,                        &
-                dapl_id = plist_id) 
-        ! Create the dataset with default properties.
-        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
-        ! Set MPIO data transfer mode to COLLECTIVE
+                hdferr  = hdferror) 
 #ifdef ENABLE_MPI
+        ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Write data
@@ -410,16 +407,15 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+        ! Create the dataset with default properties.
+        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
         ! Open dataset
         call H5Dopen_f(loc_id = this%GetFileID(),          &
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
-                hdferr  = hdferror,                        &
-                dapl_id = plist_id) 
-        ! Create the dataset with default properties.
-        call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
-        ! Set MPIO data transfer mode to COLLECTIVE
+                hdferr  = hdferror) 
 #ifdef ENABLE_MPI
+        ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Write data
