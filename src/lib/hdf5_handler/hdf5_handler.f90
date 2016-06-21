@@ -498,7 +498,7 @@ contains
         if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         call H5pset_fapl_mpio_f(prp_id = plist_id, &
                         comm   = this%MPIEnvironment%get_comm(), &
                         info   = this%MPIEnvironment%get_info(), &

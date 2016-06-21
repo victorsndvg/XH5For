@@ -123,6 +123,11 @@ FOREACH(EXT_LIB ${EXT_LIBS})
     ENDIF()
 ENDFOREACH ()
 
+# ADD ENABLE_PARALLEL_HDF5 DEFINITION
+IF (HDF5_IS_PARALLEL)
+    ADD_DEFINITIONS(-DENABLE_PARALLEL_HDF5)
+ENDIF()
+
 #################################################################
 # MPI Fortran DEFINITIONS AND PATHS
 #################################################################

@@ -162,7 +162,7 @@ contains
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror) 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
@@ -246,7 +246,7 @@ contains
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror) 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
@@ -330,7 +330,7 @@ contains
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror) 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
@@ -414,7 +414,7 @@ contains
                 name    = '/'//trim(adjustl(DatasetName)), &
                 dset_id = dset_id,                         &
                 hdferr  = hdferror) 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
@@ -463,8 +463,8 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
@@ -519,8 +519,8 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
@@ -574,8 +574,8 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
@@ -630,8 +630,8 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
