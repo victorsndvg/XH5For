@@ -365,6 +365,7 @@ contains
             do i=1, this%StepsHandler%GetNumberOfSteps()
                 call xinclude%Open(xml_handler=this%TemporalFile%xml_handler, HRef=this%StepsHandler%GetCurrentFilename())
                 call xinclude%Close(xml_handler=this%TemporalFile%xml_handler)
+                call this%StepsHandler%Next()
             enddo
             call this%CloseTemporalFile()
         endif
