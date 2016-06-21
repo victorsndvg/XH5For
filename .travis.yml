@@ -3,9 +3,6 @@ language: python
 python:
   - 2.7
 
-env:
-- MPI=mpich2
-
 sudo: false
 
 cache:
@@ -25,10 +22,20 @@ before_install:
   - pip install codecov
   - git submodule update --init --recursive
   - travis_retry wget --quiet https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz;
+  - travis_retry wget --quiet https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
   - export FC=/usr/bin/gfortran-5
   - $FC --version
+  ##################
+  ## Install OMPI ##
+  ##################
+  - cd $TRAVIS_BUILD_DIR
+  - tar -zxf openmpi-1.10.2.tar.gz
+  - cd openmpi-1.10.2
+  - ./configure --prefix=$TRAVIS_BUILD_DIR/openmpi > /dev/null
+  - make -j2 > /dev/null
+  - make install > /dev/null 2>&1
   ##################
   ## Install HDF5 ##
   ##################
@@ -40,7 +47,7 @@ install:
   - make -j2 > /dev/null 2>&1
   - make install > /dev/null 2>&1
   ##################
-  - export PATH=$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/hdf5/bin:$TRAVIS_BUILD_DIR/hdf5/lib:$TRAVIS_BUILD_DIR/hdf5/include:$PATH
+  - export PATH=$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/openmpi/bin:$TRAVIS_BUILD_DIR/openmpi/lib:$TRAVIS_BUILD_DIR/openmpi/include:$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/hdf5/bin:$TRAVIS_BUILD_DIR/hdf5/lib:$TRAVIS_BUILD_DIR/hdf5/include:$PATH
   - echo $PATH
   - cmake --version
 
