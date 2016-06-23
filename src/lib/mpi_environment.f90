@@ -22,15 +22,32 @@ implicit none
 
 private
 
+    integer(I4P), private, parameter :: MPI_ENV_STATE_START = 0
+    integer(I4P), private, parameter :: MPI_ENV_STATE_INIT  = 1
+
+    !-----------------------------------------------------------------
+    ! XH5FOR State Transition Diagram
+    !-----------------------------------------------------------------
+    ! - This diagram controls the basic life cycle of the XH5For library
+    !----------------------------------------------------------------- 
+    !       INIT STATE      |     ACTION      |      FINAL STATE
+    !----------------------------------------------------------------- 
+    ! START                 | Free            | START
+    ! START                 | Initialize      | INIT
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free            | START
+
     type mpi_env_t
+    private
     !-----------------------------------------------------------------
     !< MPI environment type
     !----------------------------------------------------------------- 
-        integer :: comm = 0                                           !< MPI communicator
-        integer :: root = 0                                           !< MPI root processor
-        integer :: rank = 0                                           !< MPI rank
-        integer :: info = 0                                           !< MPI info
-        integer :: size = 1                                           !< MPI communicator size
+        integer      :: comm  = 0                    !< MPI communicator
+        integer      :: root  = 0                    !< MPI root processor
+        integer      :: rank  = 0                    !< MPI rank
+        integer      :: info  = 0                    !< MPI info
+        integer      :: size  = 1                    !< MPI communicator size
+        integer(I4P) :: State = MPI_ENV_STATE_START  !< MPI communicator size
     contains
     private
         procedure         :: mpi_env_allgather_single_int_value_I4P
@@ -72,6 +89,7 @@ contains
         logical                         :: mpi_was_initialized        !< Flag to check if MPI was initialized
         integer                         :: mpierr                     !< Aux variable for MPI error checking
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_START)
         if(present(mpierror)) mpierror = 0
         this%comm = 0
         this%root = 0
@@ -97,6 +115,7 @@ contains
         endif
         if(present(mpierror)) mpierror = mpierr
 #endif
+        this%State = MPI_ENV_STATE_INIT
     end subroutine mpi_env_initialize
 
     subroutine mpi_env_Free(this)
@@ -111,6 +130,7 @@ contains
         this%rank = 0
         this%info = 0
         this%size = 1
+        this%State = MPI_ENV_STATE_START
     end subroutine mpi_env_Free
 
     function mpi_env_get_comm(this) result(comm)
@@ -120,6 +140,7 @@ contains
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
         integer                      :: comm                          !< MPI communicator
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         comm = this%comm
     end function mpi_env_get_comm
 
@@ -130,6 +151,7 @@ contains
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
         integer                      :: root                          !< MPI root processor
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         root = this%root
     end function mpi_env_get_root
 
@@ -140,6 +162,7 @@ contains
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
         integer                      :: rank                          !< MPI rank
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         rank = this%rank
     end function mpi_env_get_rank
 
@@ -150,6 +173,7 @@ contains
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
         integer                      :: info                          !< MPI info
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         info = this%info
     end function mpi_env_get_info
 
@@ -160,6 +184,7 @@ contains
         class(mpi_env_t), intent(IN) :: this                          !< MPI environment
         integer                      :: size                          !< MPI communicator size
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         size = this%size
     end function mpi_env_get_comm_size
 
@@ -175,6 +200,7 @@ contains
         integer(I4P)                           :: mpierr              !< Aux variable for MPI error
         integer(I4P)                           :: comm_size           !< MPI communicator size aux variable
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
         comm_size = this%get_comm_size()
         if(allocated(recv_data)) deallocate(recv_data); allocate(recv_data(comm_size))
@@ -197,6 +223,7 @@ contains
         integer(I4P)                           :: mpierr              !< Aux variable for MPI error
         integer(I4P)                           :: comm_size           !< MPI communicator size aux variable
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
         comm_size = this%get_comm_size()
         if(allocated(recv_data)) deallocate(recv_data); allocate(recv_data(comm_size))
@@ -218,6 +245,7 @@ contains
         integer(I4P), optional,    intent(OUT)   :: mpierror          !< MPI error
         integer(I4P)                             :: mpierr            !< Aux variable for MPI error
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_BCAST (send_data, 1, MPI_INTEGER, this%root, this%comm, mpierr)
@@ -235,6 +263,7 @@ contains
         integer(I4P), optional,    intent(OUT)   :: mpierror          !< MPI error
         integer(I4P)                             :: mpierr            !< Aux variable for MPI error
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_BCAST (send_data, 1, MPI_INTEGER, this%root, this%comm, mpierr)
@@ -253,6 +282,7 @@ contains
         integer(I4P)                             :: data_size         !< Send data size
         integer(I4P)                             :: mpierr            !< Aux variable for MPI error
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         if(this%is_root()) data_size = size(send_data,dim=1)
@@ -277,6 +307,7 @@ contains
         integer(I4P)                             :: data_size         !< Send data size
         integer(I4P)                             :: mpierr            !< Aux variable for MPI error
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         if(this%is_root()) data_size = size(send_data,dim=1)
@@ -301,6 +332,7 @@ contains
         integer(I4P)                                 :: data_size     !< Send data size
         integer(I4P)                                 :: mpierr        !< Aux variable for MPI error
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         if(this%is_root()) data_size = len(send_data)
@@ -322,9 +354,8 @@ contains
         class(mpi_env_t), intent(IN)  :: this                         !< MPI environment
         logical                       :: is_root                      !< Boolean variable, True if is root task   
     !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
         is_root = this%get_rank() == this%get_root()
     end function mpi_env_is_root
-
-
 
 end module mpi_environment

@@ -66,12 +66,11 @@ implicit none
     geometry = geometry/2 + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixed_series')
+    call xh5%Open(FilePrefix='xh5for_ch_regular_grid_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
 
     do i=1, num_steps
         time = time+1.0
+        call xh5%SetMesh(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
         call xh5%AppendStep(Value=time)
         call xh5%WriteTopology(Connectivities = topology)
         call xh5%WriteGeometry(XYZ = geometry)
@@ -84,9 +83,7 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixed_series')
+    call xh5%Open(FilePrefix='xh5for_ch_regular_grid_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
     call xh5%Parse()
 
     do i=1, xh5%GetNumberOfSteps()

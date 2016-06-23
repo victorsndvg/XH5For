@@ -17,10 +17,11 @@ implicit none
 
 #include "assert.i90"
 
-    integer(I4P), private, parameter :: XH5FOR_STATE_START = 0
-    integer(I4P), private, parameter :: XH5FOR_STATE_INIT  = 1
-    integer(I4P), private, parameter :: XH5FOR_STATE_OPEN  = 2
-    integer(I4P), private, parameter :: XH5FOR_STATE_CLOSE = 3
+    integer(I4P), private, parameter :: XH5FOR_STATE_START     = 0
+    integer(I4P), private, parameter :: XH5FOR_STATE_OPEN      = 1
+    integer(I4P), private, parameter :: XH5FOR_STATE_INIT      = 2
+    integer(I4P), private, parameter :: XH5FOR_STATE_MESH_SET  = 3
+    integer(I4P), private, parameter :: XH5FOR_STATE_CLOSE     = 4
 
     !-----------------------------------------------------------------
     ! XH5FOR State Transition Diagram
@@ -63,11 +64,11 @@ implicit none
         class(hdf5_handler_t),            allocatable :: HeavyData
     contains
     private
-        procedure         :: xh5for_Initialize_Unstructured_Reader
-        procedure         :: xh5for_Initialize_Unstructured_Writer_I4P
-        procedure         :: xh5for_Initialize_Unstructured_Writer_I8P
-        procedure         :: xh5for_Initialize_Structured_Writer_I4P
-        procedure         :: xh5for_Initialize_Structured_Writer_I8P
+        procedure         :: xh5for_Initialize
+        procedure         :: xh5for_Set_Unstructured_Mesh_I4P
+        procedure         :: xh5for_Set_Unstructured_Mesh_I8P
+        procedure         :: xh5for_Set_Structured_Mesh_I4P
+        procedure         :: xh5for_Set_Structured_Mesh_I8P
         procedure         :: xh5for_WriteGeometry_XYZ_R4P
         procedure         :: xh5for_WriteGeometry_XYZ_R8P
         procedure         :: xh5for_WriteGeometry_X_Y_Z_R4P
@@ -98,12 +99,13 @@ implicit none
         procedure, public :: AppendStep            => xh5for_AppendStep
         procedure, public :: NextStep              => xh5for_NextStep
         procedure, public :: GetNumberOfSteps      => xh5for_GetNumberOfSteps
-        generic,   public :: Initialize            => xh5for_Initialize_Unstructured_Writer_I4P, &
-                                                      xh5for_Initialize_Unstructured_Writer_I8P, &
-                                                      xh5for_Initialize_Structured_Writer_I4P,   &
-                                                      xh5for_Initialize_Structured_Writer_I8P,   &
-                                                      xh5for_Initialize_Unstructured_Reader
+        procedure, public :: Initialize            => xh5for_Initialize
+        generic,   public :: SetMesh               => xh5for_Set_Unstructured_Mesh_I4P, &
+                                                      xh5for_Set_Unstructured_Mesh_I8P, &
+                                                      xh5for_Set_Structured_Mesh_I4P,   &
+                                                      xh5for_Set_Structured_Mesh_I8P
         procedure, public :: Free                  => xh5for_Free
+        procedure, public :: Clean                 => xh5for_Clean
         procedure, public :: Open                  => xh5for_Open
         procedure, public :: Parse                 => xh5for_Parse
         procedure, public :: Serialize             => xh5for_Serialize
@@ -236,18 +238,56 @@ contains
     end subroutine xh5for_Free
 
 
-    subroutine xh5for_Initialize_Unstructured_Reader(this, comm, root)
+    subroutine xh5for_Clean(this)
     !----------------------------------------------------------------- 
-    !< Apply strategy and initialize lightdata and heavydata handlers
+    !< Clean initialized
     !----------------------------------------------------------------- 
-        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
-        integer, optional, intent(IN)     :: comm                     !< MPI communicator
-        integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        integer                           :: error                    !< Error variable
-        integer                           :: r_root = 0               !< Real MPI root procesor
+        class(xh5for_t),   intent(INOUT)  :: this
     !----------------------------------------------------------------- 
+        assert(this%State /= XH5FOR_STATE_START)
+        ! Build components from factory
+        if(allocated(this%UniformGridDescriptor)) then
+            call this%UniformGridDescriptor%Free()
+            deallocate(this%UniformGridDescriptor)
+        endif
+        if(allocated(this%SpatialGridDescriptor)) then
+            call this%SpatialGridDescriptor%Free()
+            deallocate(this%SpatialGridDescriptor)
+        endif
+        if(allocated(this%LightData)) then
+            call this%LightData%Free()
+            deallocate(this%LightData)
+        endif
+        if(allocated(this%HeavyData)) then
+            call this%HeavyData%Free()
+            deallocate(this%HeavyData)
+        endif
+        this%State = XH5FOR_STATE_OPEN
+    end subroutine xh5for_Clean
+
+
+    subroutine xh5for_Open(this, FilePrefix, GridType, Strategy, Action, Comm, Root)
+    !-----------------------------------------------------------------
+    !< Open a XDMF (Temporal) file, set the MPI environment and also
+    !< initialize the steps handler
+    !----------------------------------------------------------------- 
+        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
+        character(len=*),       intent(IN)    :: FilePrefix           !< XDMF filename prefix
+        integer(I4P), optional, intent(IN)    :: GridType             !< XDMF grid type
+        integer(I4P), optional, intent(IN)    :: Strategy             !< Data IO management strategy
+        integer(I4P), optional, intent(IN)    :: Action               !< XDMF Open file action (Read or Write)
+        integer,      optional, intent(IN)    :: comm                 !< MPI communicator
+        integer,      optional, intent(IN)    :: root                 !< MPI root procesor
+        integer                               :: error                !< Error variable
+        integer                               :: r_root               !< Real MPI root procesor
+    !-----------------------------------------------------------------
         call this%Free()
-        this%Action = XDMF_ACTION_READ
+        r_root = 0
+        ! Assign Fileprefix, strategy and action
+        this%Prefix = trim(adjustl(FilePrefix))
+        if(present(Strategy)) call this%SetStrategy(Strategy)
+        if(present(GridType)) call this%SetGridType(GridType)
+        if(present(Action)) this%Action = Action
         if(present(root)) r_root = root
         ! MPI environment initialization
         if(present(comm)) then
@@ -255,6 +295,20 @@ contains
         else
             call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
         endif
+        ! Steps initialization
+        call this%StepsHandler%Initialize(this%MPIEnvironment)
+        this%State = XH5FOR_STATE_OPEN
+    end subroutine xh5for_Open
+
+
+    subroutine xh5for_Initialize(this)
+    !----------------------------------------------------------------- 
+    !< Apply strategy and create all components
+    !----------------------------------------------------------------- 
+        class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
+    !----------------------------------------------------------------- 
+        assert(this%State == XH5FOR_STATE_OPEN)
+        call this%Clean()
         ! Build components from factory
         call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
         call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
@@ -262,14 +316,14 @@ contains
         call TheFactory%CreateXDMFHandler(this%LightData)
         call TheFactory%CreateHDF5Handler(this%HeavyData)
         call this%SpatialGridDescriptor%Initialize(MPIEnvironment = this%MPIEnvironment)
-        ! Steps initialization
-        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor)
+                SpatialGridDescriptor = this%SpatialGridDescriptor, &
+                FilePrefix            = this%Prefix,                &
+                Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -277,38 +331,21 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
         this%State = XH5FOR_STATE_INIT
-    end subroutine xh5for_Initialize_Unstructured_Reader
+    end subroutine xh5for_Initialize
 
 
-    subroutine xh5for_Initialize_Unstructured_Writer_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+    subroutine xh5for_Set_Unstructured_Mesh_I4P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
     !----------------------------------------------------------------- 
-    !< Apply strategy and initialize lightdata and heavydata handlers
+    !< Set mesh metadata and initialize all library components
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
         integer(I4P),      intent(IN)     :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
         integer(I4P),      intent(IN)     :: NumberOfElements         !< Number of elements of the current grid (I4P)
         integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
-        integer, optional, intent(IN)     :: comm                     !< MPI communicator
-        integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        integer                           :: error                    !< Error variable
-        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
-        call this%Free()
-        this%Action = XDMF_ACTION_WRITE
-        if(present(root)) r_root = root
-        ! MPI environment initialization
-        if(present(comm)) then
-            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
-        else
-            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
-        endif
-        ! Build components from factory
-        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
-        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheFactory%CreateXDMFHandler(this%LightData)
-        call TheFactory%CreateHDF5Handler(this%HeavyData)
+        assert(this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
+        if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
@@ -324,53 +361,36 @@ contains
                 TopologyType     = TopologyType,               &
                 GeometryType     = GeometryType,               &
                 GridType         = this%GridType)
-        ! Steps initialization
-        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor)
+                SpatialGridDescriptor = this%SpatialGridDescriptor, &
+                FilePrefix            = this%Prefix,                &
+                Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-        this%State = XH5FOR_STATE_INIT
-    end subroutine xh5for_Initialize_Unstructured_Writer_I4P
+        this%State = XH5FOR_STATE_MESH_SET
+    end subroutine xh5for_Set_Unstructured_Mesh_I4P
 
 
-    subroutine xh5for_Initialize_Unstructured_Writer_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, comm, root)
+    subroutine xh5for_Set_Unstructured_Mesh_I8P(this, NumberOfNodes, NumberOfElements, TopologyType, GeometryType)
     !----------------------------------------------------------------- 
-    !< Apply strategy and initialize lightdata and heavydata handlers
+    !< Set mesh metadata and initialize all library components
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
-        integer(I8P),      intent(IN)     :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
-        integer(I8P),      intent(IN)     :: NumberOfElements         !< Number of elements of the current grid (I4P)
+        integer(I8P),      intent(IN)     :: NumberOfNodes            !< Number of nodes of the current grid (I8P)
+        integer(I8P),      intent(IN)     :: NumberOfElements         !< Number of elements of the current grid (I8P)
         integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
-        integer, optional, intent(IN)     :: comm                     !< MPI communicator
-        integer, optional, intent(IN)     :: root                     !< MPI root procesor
-        integer                           :: error                    !< Error variable
-        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
-        call this%Free()
-        this%Action = XDMF_ACTION_WRITE
-        if(present(root)) r_root = root
-        ! MPI environment initialization
-        if(present(comm)) then
-            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
-        else
-            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
-        endif
-        ! Build components from factory
-        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
-        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheFactory%CreateXDMFHandler(this%LightData)
-        call TheFactory%CreateHDF5Handler(this%HeavyData)
+        assert(this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
+        if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
                 NumberOfNodes    = int(NumberOfNodes,I8P),    &
@@ -386,54 +406,37 @@ contains
                 TopologyType     = TopologyType,              &
                 GeometryType     = GeometryType,              &
                 GridType         = this%GridType)
-        ! Steps initialization
-        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor)
+                SpatialGridDescriptor = this%SpatialGridDescriptor, &
+                FilePrefix            = this%Prefix,                &
+                Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-        this%State = XH5FOR_STATE_INIT
-    end subroutine xh5for_Initialize_Unstructured_Writer_I8P
+        this%State = XH5FOR_STATE_MESH_SET
+    end subroutine xh5for_Set_Unstructured_Mesh_I8P
 
 
-    subroutine xh5for_Initialize_Structured_Writer_I4P(this, GridShape, comm, root)
+    subroutine xh5for_Set_Structured_Mesh_I4P(this, GridShape)
     !----------------------------------------------------------------- 
-    !< Apply strategy and initialize lightdata and heavydata handlers
+    !< Set mesh metadata and initialize all library components
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
         integer(I4P),      intent(IN)     :: GridShape(3)             !< Shape of the grid
-        integer, optional, intent(IN)     :: comm                     !< MPI communicator
-        integer, optional, intent(IN)     :: root                     !< MPI root procesor
         integer(I8P)                      :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
         integer(I8P)                      :: NumberOfElements         !< Number of elements of the current grid (I4P)
         integer(I4P)                      :: TopologyType             !< Topology type of the current grid
         integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
-        integer                           :: error                    !< Error variable
-        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
-        call this%Free()
-        this%Action = XDMF_ACTION_WRITE
-        if(present(root)) r_root = root
-        ! MPI environment initialization
-        if(present(comm)) then
-            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
-        else
-            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
-        endif
-        ! Build components from factory
-        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
-        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheFactory%CreateXDMFHandler(this%LightData)
-        call TheFactory%CreateHDF5Handler(this%HeavyData)
+        assert(this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR)
+        if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &
                 XDim     = int(GridShape(1),I8P),   &
@@ -447,54 +450,38 @@ contains
                 YDim     = int(GridShape(2),I8P),              &
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
-        ! Steps initialization
-        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor)
+                SpatialGridDescriptor = this%SpatialGridDescriptor, &
+                FilePrefix            = this%Prefix,                &
+                Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-        this%State = XH5FOR_STATE_INIT
-    end subroutine xh5for_Initialize_Structured_Writer_I4P
+        this%State = XH5FOR_STATE_MESH_SET
+    end subroutine xh5for_Set_Structured_Mesh_I4P
 
 
-    subroutine xh5for_Initialize_Structured_Writer_I8P(this, GridShape, comm, root)
+    subroutine xh5for_Set_Structured_Mesh_I8P(this, GridShape)
     !----------------------------------------------------------------- 
-    !< Apply strategy and initialize lightdata and heavydata handlers
+    !< Set mesh metadata and initialize all library components
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this                     !< XH5For derived type
         integer(I8P),      intent(IN)     :: GridShape(3)             !< GridShape
-        integer, optional, intent(IN)     :: comm                     !< MPI communicator
-        integer, optional, intent(IN)     :: root                     !< MPI root procesor
         integer(I8P)                      :: NumberOfNodes            !< Number of nodes of the current grid (I4P)
         integer(I8P)                      :: NumberOfElements         !< Number of elements of the current grid (I4P)
         integer(I4P)                      :: TopologyType             !< Topology type of the current grid
         integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
-        integer                           :: error                    !< Error variable
-        integer                           :: r_root = 0               !< Real MPI root procesor
     !----------------------------------------------------------------- 
-        call this%Free()
-        this%Action = XDMF_ACTION_WRITE
-        if(present(root)) r_root = root
-        ! MPI environment initialization
-        if(present(comm)) then
-            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
-        else
-            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
-        endif
-        ! Build components from factory
-        call TheXH5ForFactoryCreator%CreateFactory(GridType=this%GridType, Strategy=this%Strategy, AbstractFactory=TheFactory)
-        call TheFactory%CreateUniformGridDescriptor(this%UniformGridDescriptor)
-        call TheFactory%CreateSpatialGridDescriptor(this%SpatialGridDescriptor)
-        call TheFactory%CreateXDMFHandler(this%LightData)
-        call TheFactory%CreateHDF5Handler(this%HeavyData)
+        assert(this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR)
+        if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
+        call this%Clean()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &
                 XDim = GridShape(1),                &
@@ -508,38 +495,22 @@ contains
                 YDim     = int(GridShape(2),I8P),              &
                 ZDim     = int(GridShape(3),I8P),              &
                 GridType = this%GridType)
-        ! Steps initialization
-        call this%StepsHandler%Initialize(this%MPIEnvironment)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor)
+                SpatialGridDescriptor = this%SpatialGridDescriptor, &
+                FilePrefix            = this%Prefix,                &
+                Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
                 StepsHandler          = this%StepsHandler,          &
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor)
-        this%State = XH5FOR_STATE_INIT
-    end subroutine xh5for_Initialize_Structured_Writer_I8P
-
-
-    subroutine xh5for_Open(this, action, fileprefix)
-    !-----------------------------------------------------------------
-    !< Open a XDMF and HDF5 files
-    !----------------------------------------------------------------- 
-        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
-        character(len=*),       intent(IN)    :: fileprefix           !< XDMF filename prefix
-        integer(I4P), optional, intent(IN)    :: action               !< XDMF Open file action (Read or Write)
-    !-----------------------------------------------------------------
-        assert(this%State >= XH5FOR_STATE_INIT)
-        if(present(action)) this%action = action
-        this%Prefix = trim(adjustl(Fileprefix))
-        call this%LightData%Open(this%action, this%Prefix)
-        this%State = XH5FOR_STATE_OPEN
-    end subroutine xh5for_Open
+        this%State = XH5FOR_STATE_MESH_SET
+    end subroutine xh5for_Set_Structured_Mesh_I8P
 
 
     subroutine xh5for_OpenHeavyDataFile(this)
@@ -560,7 +531,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN)
+        assert(this%State == XH5FOR_STATE_MESH_SET)
         if(this%Action == XDMF_ACTION_Write) then
             call this%HeavyData%CloseFile()
             call this%LightData%SerializeSpatialFile()
@@ -574,8 +545,10 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN)
+        assert(this%State == XH5FOR_STATE_OPEN .or. this%State == XH5FOR_STATE_INIT .or. this%State == XH5FOR_STATE_MESH_SET)
+        if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         if(this%Action == XDMF_ACTION_READ) call this%LightData%ParseTemporalFile()
+        this%State = XH5FOR_STATE_MESH_SET
     end subroutine xh5for_Parse
 
 
@@ -585,8 +558,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN)
-        if(this%action == XDMF_ACTION_WRITE) then
+        if(this%State == XH5FOR_STATE_MESH_SET .and. this%action == XDMF_ACTION_WRITE) then
             call this%LightData%SerializeTemporalFile()
         endif
         this%State = XH5FOR_STATE_CLOSE
@@ -601,7 +573,7 @@ contains
         real(R4P),                  intent(IN)    :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -621,7 +593,7 @@ contains
         real(R8P),                  intent(IN)    :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -643,7 +615,7 @@ contains
         real(R4P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -664,7 +636,7 @@ contains
         real(R4P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -685,7 +657,7 @@ contains
         real(R8P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -707,7 +679,7 @@ contains
         real(R8P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -727,7 +699,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
@@ -747,7 +719,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
@@ -769,7 +741,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -791,7 +763,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: Z(:)             !< Z R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -812,7 +784,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -833,7 +805,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -853,7 +825,7 @@ contains
         integer(I4P),               intent(IN)    :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -873,7 +845,7 @@ contains
         integer(I8P),               intent(IN)    :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -893,7 +865,7 @@ contains
         integer(I4P), allocatable, intent(OUT)   :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
@@ -913,7 +885,7 @@ contains
         integer(I8P), allocatable,  intent(OUT)   :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         if(present(Name)) then
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
@@ -935,7 +907,7 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
@@ -952,7 +924,7 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
@@ -969,7 +941,7 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
@@ -986,7 +958,7 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_WRITE)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
@@ -1003,7 +975,7 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
@@ -1020,7 +992,7 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
@@ -1037,7 +1009,7 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
@@ -1054,7 +1026,7 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)
+        assert(this%State == XH5FOR_STATE_MESH_SET .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%HeavyData%FileIsOpen()) call this%OpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)

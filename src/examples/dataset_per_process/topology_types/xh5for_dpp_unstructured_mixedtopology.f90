@@ -62,9 +62,8 @@ implicit none
     geometry = geometry/2 + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
-    call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_dpp_unstructured_mixedtopology')
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_mixedtopology', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
+    call xh5%SetMesh(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield)
@@ -74,9 +73,7 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_unstructured_mixedtopology')
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_mixedtopology', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
     call xh5%Parse()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(XYZ = out_geometry)
