@@ -17,11 +17,13 @@ private
     private
         character(len=:), allocatable :: filename                     !< File name
         type(xmlf_t), public          :: xml_handler                  !< FoX SAX XML File handler
-        type(Node),       pointer     :: Root => null()               !< FoX DOM node list pointing to XML root element
+        logical                       :: opened = .false.             !< Flag to check if the file is opened yet
+        type(Node),       pointer     :: Root   => null()             !< FoX DOM node list pointing to XML root element
     !----------------------------------------------------------------- 
     contains
     private
         procedure, public :: openfile             => xdmf_file_openfile
+        procedure, public :: isopen               => xdmf_file_isopen
         procedure, public :: parsefile            => xdmf_file_parsefile
         procedure, public :: closefile            => xdmf_file_closefile
         procedure, public :: set_filename         => xdmf_file_set_filename
@@ -120,7 +122,7 @@ contains
                 minimize_overrun=.true., canonical=.false., replace=.true., addDecl=.false., &
                 warning=.false., validate=.false., namespace=.true.)
         endif
-
+        xdmf_file%opened = .true.
     end subroutine xdmf_file_openfile
 
 
@@ -134,6 +136,17 @@ contains
     end subroutine xdmf_file_parseFile
 
 
+    function xdmf_file_isopen(xdmf_file) result(isopen)
+    !-----------------------------------------------------------------
+    !< Check if the file is opened yet
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(IN) :: xdmf_file                   !< XDMF file handler
+        logical                        :: isopen                      !< Flag to check if file is opened yet
+    !-----------------------------------------------------------------
+        isopen = xdmf_file%opened
+    end function xdmf_file_isopen
+
+
     subroutine xdmf_file_closefile(xdmf_file)
     !-----------------------------------------------------------------
     !< Manage the closing of a XDMF file and all the outstanding elements
@@ -142,6 +155,7 @@ contains
     !-----------------------------------------------------------------
         ! empty : Empty files return warning instead of error
         call xml_Close(xf=xdmf_file%xml_handler, empty=.true.)
+        xdmf_file%opened = .false.
     end subroutine xdmf_file_closefile
 
 
@@ -152,6 +166,7 @@ contains
         class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
     !-----------------------------------------------------------------
         if(allocated(xdmf_file%filename)) deallocate(xdmf_file%filename)
+        if(xdmf_file%isopen()) call xdmf_file%closefile()
         nullify(xdmf_file%Root)
     end subroutine xdmf_file_free
 
