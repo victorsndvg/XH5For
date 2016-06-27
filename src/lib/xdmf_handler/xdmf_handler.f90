@@ -18,7 +18,30 @@ use uniform_grid_descriptor
 
 implicit none
 
+#include "assert.i90"
+
 private
+
+    integer(I4P), parameter :: XDMF_HANDLER_STATE_START   = 0
+    integer(I4P), parameter :: XDMF_HANDLER_STATE_INIT    = 1
+
+    !-----------------------------------------------------------------
+    ! XDMF_HANDLER State Transition Diagram
+    !-----------------------------------------------------------------
+    ! - This diagram controls the basic life cycle of the XDMF_HANDLER
+    ! - After initialization, calls to almost all procedures are allowed
+    ! - The state diagram is really simple. Most of the checks also
+    !   realies in the allocation status of the file prefix and in the 
+    !   Action status. Writing/Reading operations are mutually exclusive
+    !----------------------------------------------------------------- 
+    !       INIT STATE      |     ACTION      |      FINAL STATE
+    !----------------------------------------------------------------- 
+    ! START                 | Free            | START
+    ! START                 | Initialize      | INIT
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free            | START
+    ! INIT                  | Initialize      | INIT
+
 
     type, abstract :: xdmf_handler_t
     !-----------------------------------------------------------------
@@ -27,7 +50,8 @@ private
         character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
         type(xdmf_file_t)                         :: TemporalFile                    !< XDMF file handler for temporal collections
         type(xdmf_file_t)                         :: SpatialFile                     !< XDMF file handler for spatial collections
-        integer(I4P)                              :: Action                          !< XDMF purpose (Read or Write)
+        integer(I4P)                              :: Action= XDMF_NO_VALUE           !< XDMF purpose (Read or Write)
+        integer(I4P)                              :: State = XDMF_HANDLER_STATE_START!< XDMF purpose (Read or Write)
         type(steps_handler_t),            pointer :: StepsHandler          => null() !< Steps handler
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
@@ -47,7 +71,8 @@ private
         procedure, public :: Open                         => xdmf_handler_Open
         procedure, public :: Free                         => xdmf_handler_Free
 
-        ! Centralize HDF5 filename generation
+        ! File name related functions 
+        procedure         :: HasPrefix                    => xdmf_handler_HasPrefix
         procedure, public :: GetHDF5Filename              => xdmf_handler_GetHDF5Filename
 
         ! File IO procedures
@@ -157,6 +182,7 @@ contains
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
         if(present(FilePrefix) .and. Present(Action)) call this%Open(FilePrefix, Action)
+        this%State = XDMF_HANDLER_STATE_INIT
     end subroutine xdmf_handler_Initialize
 
 
@@ -173,7 +199,22 @@ contains
         nullify(this%StepsHandler)
         nullify(this%SpatialGridDescriptor)
         nullify(this%UniformGridDescriptor)
+        this%State = XDMF_HANDLER_STATE_START
     end subroutine xdmf_handler_Free
+
+
+    function xdmf_handler_HasPrefix(this) result (HasPrefix)
+    !-----------------------------------------------------------------
+    !< Check if the file prefix was already set
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
+        logical                              :: HasPrefix             !< Flag to check if Prefix has been set
+    !----------------------------------------------------------------- 
+        HasPrefix = .false.
+        if(allocated(this%Prefix)) then
+            if(len_trim(this%Prefix) > 0) HasPrefix = .true.
+        endif
+    end function xdmf_handler_HasPrefix
 
 
     function xdmf_handler_GetHDF5Filename(this) result (HDF5FileName)
@@ -183,6 +224,7 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
         character(len=:), allocatable        :: HDF5FileName          !< Name of the current HDF5 file
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%HasPrefix())
         HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
     end function xdmf_handler_GetHDF5Filename
 
@@ -195,9 +237,9 @@ contains
         character(len=*),      intent(IN)    :: FilePrefix            !< XDMF filename prefix
         integer(I4P),          intent(IN)    :: Action                !< XDMF action to be performed (Read or Write)
     !-----------------------------------------------------------------
+        this%Action = action
         if(this%MPIEnvironment%is_root()) then
             this%Prefix = trim(adjustl(FilePrefix))
-            this%Action = action
             call this%TemporalFile%set_filename(trim(adjustl(FilePrefix))//XDMF_EXT)
         endif
     end subroutine xdmf_handler_Open
@@ -211,7 +253,9 @@ contains
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid 
         type(xdmf_time_t)                    :: time                  !< XDMF Time type
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         if(this%MPIEnvironment%is_root()) then
+            assert(this%HasPrefix())
             call this%StepsHandler%SetCurrentFilename(trim(adjustl(this%prefix))//'_'//&
                 trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
             call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
@@ -237,7 +281,9 @@ contains
         integer(I4P),          intent(IN)    :: GridID                !< Grid ID number
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_WRITE)
         if(this%MPIEnvironment%is_root()) then
+            assert(this%HasPrefix())
             call grid%open(xml_handler=this%SpatialFile%xml_handler, &
                 Name='Grid'//trim(adjustl(str(no_sign=.true.,n=GridID))))
         endif
@@ -257,7 +303,9 @@ contains
         type(xdmf_xinclude_t)                 :: xinclude             !< XDMF Xinclude type
         integer                               :: i
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(this%MPIEnvironment%is_root()) then
+            assert(this%HasPrefix())
             call this%TemporalFile%ParseFile()
             if(getNodeType(this%TemporalFile%get_document_root())==DOCUMENT_NODE) then
                 DocumentRootNode => getDocumentElement(this%TemporalFile%get_document_root())
@@ -292,6 +340,7 @@ contains
         type(NodeList), pointer               :: UniformGridNodes     !< Fox DOM UniformGrid node list
         integer                               :: i
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(this%MPIEnvironment%is_root()) then
             call this%SpatialFile%Free()
             call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
@@ -316,6 +365,7 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
         integer(I4P)                         :: IDidx                 !< GridID idex
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_WRITE)
         if(this%MPIEnvironment%is_root()) then
             call this%OpenSpatialFile()
             do IDidx=0, this%MPIEnvironment%get_comm_size()-1
@@ -341,7 +391,9 @@ contains
         type(xdmf_xinclude_t)                :: xinclude              !< XDMF XInclude type
         integer(I4P)                         :: i
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_WRITE)
         if(this%MPIEnvironment%is_root()) then
+            assert(this%HasPrefix())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
                     call this%TemporalFile%OpenFile()
@@ -370,6 +422,7 @@ contains
         class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
         type(xdmf_grid_t)                    :: grid                  !< XDMF Grid type
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_WRITE .and. this%SpatialFile%isOpen())
         if(this%MPIEnvironment%is_root()) then
             call grid%Close(xml_handler=this%SpatialFile%xml_handler)
         endif
@@ -421,6 +474,7 @@ contains
         type(NodeList),    pointer                :: Childrens       !< List of childrens of the document root node
         integer(I4P)                              :: i               !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         nullify(ChildNode)
         if(hasChildNodes(FatherNode)) then
             Childrens => getElementsByTagname(FatherNode, Tag)
@@ -442,6 +496,7 @@ contains
         type(xdmf_grid_t) :: grid
         integer(I4P)                              :: i                !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         nullify(ChildNode)
         if(hasChildNodes(FatherNode)) then
             Childrens => getChildNodes(FatherNode)
@@ -468,6 +523,7 @@ contains
         type(xdmf_dataitem_t)                         :: dataitem     !< XDMF Topology derived type
         integer(I4P)                                  :: i            !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(.not. associated(DataItemNode)) return
         if(hasChildNodes(DataItemNode)) then
             Childrens => getChildNodes(DataItemNode)
@@ -500,6 +556,7 @@ contains
         integer(I4P)                         :: spacedims             !< Space dimensions
         integer(I4P)                         :: GeometryType          !< GeometryType
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(.not. associated(GeometryNode)) return
         call Geometry%Parse(DOMNode = GeometryNode)
         ! Set GeometryType
@@ -537,6 +594,7 @@ contains
         type(xdmf_attribute_t)                 :: Attribute           !< XDMF Attribute derived type
         integer(I4P)                           :: i                   !< Index for a loop in UniformGridNodes
     !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(associated(UniformGridNodes)) then
             call this%SpatialGridDescriptor%Allocate(NumberOfGrids=getLength(UniformGridNodes))
             do i = 0, getLength(UniformGridNodes) - 1
@@ -565,6 +623,7 @@ contains
         real(R4P),             intent(IN)    :: XYZ(:)                !< Grid coordinates
         character(len=*),      intent(IN)    :: Name                  !< Topology name
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
                                                             Precision       = 4,    &
                                                             ArrayDimensions = (/size(XYZ, dim=1)/))
@@ -579,6 +638,7 @@ contains
         real(R8P),             intent(IN)    :: XYZ(:)                !< Grid coordinates
         character(len=*),      intent(IN)    :: Name                  !< Geometry name
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
                                                             Precision       = 8,    &
                                                             ArrayDimensions = (/size(XYZ, dim=1)/))
@@ -595,6 +655,7 @@ contains
         integer(I4P),          intent(IN)    :: Center                !< Attribute Center (Node, Cell, etc.)
         integer(I4P),          intent(IN)    :: Attribute(:)          !< I4P Grid attribute
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
         call this%UniformGridDescriptor%SetLastAttributeMetadata( &
                         Name=trim(adjustl(Name)),                 &
@@ -615,6 +676,7 @@ contains
         integer(I4P),          intent(IN)    :: Center                !< Attribute Center (Node, Cell, etc.)
         integer(I8P),          intent(IN)    :: Attribute(:)          !< I8P Grid attribute
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
         call this%UniformGridDescriptor%SetLastAttributeMetadata( &
                         Name=trim(adjustl(Name)),                 &
@@ -636,6 +698,7 @@ contains
         integer(I4P),          intent(IN)    :: Center                !< Attribute Center (Node, Cell, etc.)
         real(R4P),             intent(IN)    :: Attribute(:)          !< R4P Grid attribute
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
         call this%UniformGridDescriptor%SetLastAttributeMetadata( &
                         Name=trim(adjustl(Name)),                 &
@@ -657,6 +720,7 @@ contains
         integer(I4P),          intent(IN)    :: Center                !< Attribute Center (Node, Cell, etc.)
         real(R8P),             intent(IN)    :: Attribute(:)          !< R4P Grid attribute
     !-----------------------------------------------------------------
+        assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%UpdateNumberOfAttributes()
         call this%UniformGridDescriptor%SetLastAttributeMetadata( &
                         Name=trim(adjustl(Name)),                 &

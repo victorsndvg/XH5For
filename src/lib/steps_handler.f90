@@ -309,7 +309,6 @@ contains
         real(R8P),              intent(IN)    :: Value                !< Step Value
     !-----------------------------------------------------------------
         assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND)
-print*, 'SH: append (8)', Value
         call this%ResizeArrays()
         this%StepsCounter = this%StepsCounter+1
         this%NumberOfSteps = max(this%NumberOfSteps, this%StepsCounter)
