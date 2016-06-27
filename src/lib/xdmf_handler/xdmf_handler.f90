@@ -27,7 +27,7 @@ private
         character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
         type(xdmf_file_t)                         :: TemporalFile                    !< XDMF file handler for temporal collections
         type(xdmf_file_t)                         :: SpatialFile                     !< XDMF file handler for spatial collections
-        integer(I4P)                              :: action                          !< XDMF purpose (Read or Write)
+        integer(I4P)                              :: Action                          !< XDMF purpose (Read or Write)
         type(steps_handler_t),            pointer :: StepsHandler          => null() !< Steps handler
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null() !< MPI environment 
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null() !< Global grid info
@@ -275,11 +275,11 @@ contains
                     call xinclude%Parse(DOMNode = XIncludeNode)
                     call this%StepsHandler%Append(Filename=xinclude%GetHRef())
                 enddo
-                call this%StepsHandler%Begin()
             endif
             call destroy(this%TemporalFile%get_document_root())
         endif
         call this%StepsHandler%BroadCastNumberOfSteps()
+        call this%StepsHandler%Begin()
     end subroutine xdmf_handler_ParseTemporalFile
 
 

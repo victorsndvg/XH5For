@@ -65,8 +65,8 @@ private
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: prefix                           !< Name prefix of the HDF5 file
         integer(HID_T)                            :: FileID  = XDMF_NO_VALUE          !< File identifier 
-        integer(I4P)                              :: action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
-        integer(I4P)                              :: state = HDF5_HANDLER_STATE_START !< HDF5 state
+        integer(I4P)                              :: Action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
+        integer(I4P)                              :: State = HDF5_HANDLER_STATE_START !< HDF5 state
         type(mpi_env_t),                  pointer :: MPIEnvironment        => null()  !< MPI environment 
         type(steps_handler_t),            pointer :: StepsHandler          => null()  !< Steps handler
         class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor => null()  !< Spatial grid descriptor

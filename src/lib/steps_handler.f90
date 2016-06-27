@@ -34,6 +34,7 @@ private
     ! INIT                  | GetCurrentFilename| APPEND
     ! INIT                  | SetCurrentValue   | APPEND
     ! INIT                  | SetCurrentFilename| APPEND
+    ! INIT                  | BroadCastMetadata | APPEND
     ! INIT                  | Append            | APPEND
     !----------------------------------------------------------------- 
     ! APPEND                | Free              | START
@@ -44,22 +45,24 @@ private
     ! APPEND                | GetCurrentFilename| APPEND
     ! APPEND                | SetCurrentValue   | APPEND
     ! APPEND                | SetCurrentFilename| APPEND
+    ! APPEND                | BroadCastMetadata | APPEND
     ! APPEND                | Append            | APPEND
     ! APPEND                | BEGIN             | ITER
     ! APPEND                | NEXT              | ITER
     ! APPEND                | END               | ITER
     !----------------------------------------------------------------- 
-    ! APPEND                | Free              | START
-    ! APPEND                | Initialize        | INIT
-    ! APPEND                | GetNumberOfSteps  | ITER
-    ! APPEND                | GetCurrentStep    | ITER
-    ! APPEND                | GetCurrentValue   | ITER
-    ! APPEND                | GetCurrentFilename| ITER
-    ! APPEND                | SetCurrentValue   | ITER
-    ! APPEND                | SetCurrentFilename| ITER
-    ! APPEND                | BEGIN             | ITER
-    ! APPEND                | NEXT              | ITER
-    ! APPEND                | END               | ITER
+    ! ITER                  | Free              | START
+    ! ITER                  | Initialize        | INIT
+    ! ITER                  | GetNumberOfSteps  | ITER
+    ! ITER                  | GetCurrentStep    | ITER
+    ! ITER                  | GetCurrentValue   | ITER
+    ! ITER                  | GetCurrentFilename| ITER
+    ! ITER                  | SetCurrentValue   | ITER
+    ! ITER                  | SetCurrentFilename| ITER
+    ! ITER                  | BroadCastMetadata | ITER
+    ! ITER                  | BEGIN             | ITER
+    ! ITER                  | NEXT              | ITER
+    ! ITER                  | END               | ITER
     !----------------------------------------------------------------- 
 
 
@@ -306,6 +309,7 @@ contains
         real(R8P),              intent(IN)    :: Value                !< Step Value
     !-----------------------------------------------------------------
         assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND)
+print*, 'SH: append (8)', Value
         call this%ResizeArrays()
         this%StepsCounter = this%StepsCounter+1
         this%NumberOfSteps = max(this%NumberOfSteps, this%StepsCounter)
@@ -354,6 +358,7 @@ contains
     !-----------------------------------------------------------------
         assert(this%State == STEPS_HANDLER_STATE_INIT .or. this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
         call this%MPIEnvironment%mpi_broadcast(this%NumberOfSteps)
+        if(this%State == STEPS_HANDLER_STATE_INIT)  this%State = STEPS_HANDLER_STATE_APPEND
     end subroutine steps_handler_BroadcastNumberOfSteps
 
 
