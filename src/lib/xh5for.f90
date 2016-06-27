@@ -31,20 +31,33 @@ implicit none
     !       INIT STATE      |     ACTION      |      FINAL STATE
     !----------------------------------------------------------------- 
     ! START                 | Free            | START
-    ! START                 | Initialize      | INIT
-    !----------------------------------------------------------------- 
-    ! INIT                  | Free            | START
-    ! INIT                  | Initialize      | INIT
-    ! INIT                  | OpenFile        | OPEN
+    ! START                 | Open            | OPEN
+    ! START                 | Close           | CLOSE
     !----------------------------------------------------------------- 
     ! OPEN                  | Free            | START
+    ! OPEN                  | Clean           | OPEN
+    ! OPEN                  | Open            | OPEN
     ! OPEN                  | Initialize      | INIT
-    ! OPEN                  | OpenFile        | OPEN
-    ! OPEN                  | Write*          | OPEN
-    ! OPEN                  | Read*           | OPEN
-    ! OPEN                  | CloseFile       | CLOSE
+    ! OPEN                  | SetMesh         | MESH_SET
+    ! OPEN                  | Parse           | MESH_SET
+    ! OPEN                  | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free            | START
+    ! INIT                  | Clean           | OPEN
+    ! INIT                  | Open            | OPEN
+    ! INIT                  | SetMesh         | MESH_SET
+    ! INIT                  | Parse           | MESH_SET
+    !----------------------------------------------------------------- 
+    ! MESH_SET              | Free            | START
+    ! MESH_SET              | Clean           | OPEN
+    ! MESH_SET              | Open            | OPEN
+    ! MESH_SET              | Close           | CLOSE
+    ! MESH_SET              | Write*          | MESH_SET
+    ! MESH_SET              | Read*           | MESH_SET
     !----------------------------------------------------------------- 
     ! CLOSE                 | Free            | START
+    ! CLOSE                 | Clean           | OPEN
+    ! CLOSE                 | Open            | OPEN
     ! CLOSE                 | Initialize      | INIT
     !----------------------------------------------------------------- 
 
@@ -94,12 +107,12 @@ implicit none
         procedure         :: xh5for_ReadAttribute_R4P
         procedure         :: xh5for_ReadAttribute_R8P
         procedure         :: OpenHeavyDataFile     => xh5for_OpenHeavyDataFile
-        procedure, public :: SetStrategy           => xh5for_SetStrategy
-        procedure, public :: SetGridType           => xh5for_SetGridType
+        procedure         :: SetStrategy           => xh5for_SetStrategy
+        procedure         :: SetGridType           => xh5for_SetGridType
         procedure, public :: AppendStep            => xh5for_AppendStep
         procedure, public :: NextStep              => xh5for_NextStep
         procedure, public :: GetNumberOfSteps      => xh5for_GetNumberOfSteps
-        procedure, public :: Initialize            => xh5for_Initialize
+        procedure         :: Initialize            => xh5for_Initialize
         generic,   public :: SetMesh               => xh5for_Set_Unstructured_Mesh_I4P, &
                                                       xh5for_Set_Unstructured_Mesh_I8P, &
                                                       xh5for_Set_Structured_Mesh_I4P,   &
@@ -344,7 +357,7 @@ contains
         integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
     !----------------------------------------------------------------- 
-        assert(this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
+        assert(this%State >= XH5FOR_STATE_OPEN .and. this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
@@ -389,7 +402,7 @@ contains
         integer(I4P),      intent(IN)     :: TopologyType             !< Topology type of the current grid
         integer(I4P),      intent(IN)     :: GeometryType             !< Geometry type of the current grid
     !----------------------------------------------------------------- 
-        assert(this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
+        assert(this%State >= XH5FOR_STATE_OPEN .and. this%GridType == XDMF_GRID_TYPE_UNSTRUCTURED)
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize(           &
@@ -435,7 +448,7 @@ contains
         integer(I4P)                      :: TopologyType             !< Topology type of the current grid
         integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
     !----------------------------------------------------------------- 
-        assert(this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR)
+        assert(this%State >= XH5FOR_STATE_OPEN .and. (this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR))
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &
@@ -479,7 +492,7 @@ contains
         integer(I4P)                      :: TopologyType             !< Topology type of the current grid
         integer(I4P)                      :: GeometryType             !< Geometry type of the current grid
     !----------------------------------------------------------------- 
-        assert(this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR)
+        assert(this%State >= XH5FOR_STATE_OPEN .and. (this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR))
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         call this%Clean()
         ! Uniform grid descriptor initialization
