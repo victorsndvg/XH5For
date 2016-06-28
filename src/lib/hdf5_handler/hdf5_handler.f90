@@ -105,6 +105,7 @@ private
         procedure, non_overridable, public   :: GetFileID                => hdf5_handler_GetFileID
         procedure, non_overridable, public   :: GetAction                => hdf5_handler_GetAction
         procedure, non_overridable, public   :: GetMPIEnvironment        => hdf5_handler_GetMPIEnvironment
+        procedure, non_overridable, public   :: GetStepsHandler          => hdf5_handler_GetStepsHandler
         procedure, non_overridable, public   :: GetUniformGridDescriptor => hdf5_handler_GetUniformGridDescriptor
         procedure, non_overridable, public   :: GetSpatialGridDescriptor => hdf5_handler_GetSpatialGridDescriptor
         generic,                    public   :: WriteTopology  => WriteTopology_I4P, &
@@ -441,6 +442,19 @@ contains
         assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
         FileID = this%FileID
     end function hdf5_handler_GetFileID
+
+
+    function hdf5_handler_GetStepsHandler(this) result(StepsHandler)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the UniformGridDescriptor
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t),         intent(IN) :: this             !< HDF5 handler type
+        class(steps_handler_t), pointer           :: StepsHandler     !< Steps handler
+    !----------------------------------------------------------------- 
+        assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
+        nullify(StepsHandler)
+        StepsHandler => this%StepsHandler
+    end function hdf5_handler_GetStepsHandler
 
 
     function hdf5_handler_GetUniformGridDescriptor(this) result(UniformGridDescriptor)

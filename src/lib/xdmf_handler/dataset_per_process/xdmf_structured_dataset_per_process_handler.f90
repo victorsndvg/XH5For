@@ -110,6 +110,7 @@ contains
         integer(I4P),                                         intent(IN)    :: GridID                  !< Grid ID number
         type(xdmf_topology_t)                                               :: topology                !< XDMF Topology type
         integer(I8P)                                                        :: GridShape(3)            !< Local number of elements
+        character(len=:), allocatable                                       :: HDF5FileName            !< Name of the HDF5 file
         character(len=:), allocatable                                       :: XMDFTopologyTypeName    !< String topology type identifier
         integer(I4P)                                                        :: DimensionsSize          !< Size fo the topology dimensions
         integer(I4P)                                                        :: SpaceDimension          !< Space dimensions
@@ -164,6 +165,7 @@ contains
         type(xdmf_character_data_t)                                         :: chardata                !< XDMF Character Data type
         integer(I4P)                                                        :: GridNumber              !< NumberOfGrids
         integer(I4P)                                                        :: NumberOfGrids           !< NumberOfGrids
+        character(len=:), allocatable                                       :: HDF5FileName            !< Name of the HDF5 file
         character(len=:), allocatable                                       :: XDMFGeometryTypeName    !< String geometry type identifier
         integer(I4P)                                                        :: DimensionsSize          !< Size of the GeometryDimensions
         integer(I4P)                                                        :: SpaceDimension          !< Space dimension
@@ -212,6 +214,7 @@ contains
         integer(I8P)                                                        :: LocalGridShape(3)       !< Uniform Grid shape
         integer(I8P)                                                        :: GlobalGridShape(3)      !< Spatial grid shpae
         integer(I8P)                                                        :: GridShapeOffset(3)      !< Grid shape offset
+        character(len=:), allocatable                                       :: HDF5FileName            !< Name of the HDF5 file
         character(len=:), allocatable                                       :: XDMFGeometryTypeName    !< String geometry type identifier
         Integer(I4P)                                                        :: DimensionsSize          !< Size of the Geometry shape
         Integer(I4P)                                                        :: SpaceDimension          !< Space Dimension

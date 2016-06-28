@@ -50,10 +50,10 @@ implicit none
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_rectilinear_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
 
     do i=1, num_steps
         time = time + 1
-        call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
         call xh5%AppendStep(Value=time)
         call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P+i)  

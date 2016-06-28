@@ -217,15 +217,20 @@ contains
     end function xdmf_handler_HasPrefix
 
 
-    function xdmf_handler_GetHDF5Filename(this) result (HDF5FileName)
+    function xdmf_handler_GetHDF5Filename(this, Step) result (HDF5FileName)
     !-----------------------------------------------------------------
     !< Generate HDF5 Filename depending on time step
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
-        character(len=:), allocatable        :: HDF5FileName          !< Name of the current HDF5 file
+        class(xdmf_handler_t),  intent(INOUT) :: this                 !< XMDF handler
+        integer(I4P), optional, intent(IN)    :: Step                 !< Force step number
+        character(len=:), allocatable         :: HDF5FileName         !< Name of the current HDF5 file
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%HasPrefix())
-        HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        if(present(Step)) then
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//HDF5_EXT
+        else
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        endif
     end function xdmf_handler_GetHDF5Filename
 
 

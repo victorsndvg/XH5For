@@ -64,10 +64,11 @@ implicit none
 
     type :: xh5for_t
     private
-        integer(I4P)                                  :: Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
-        integer(I4P)                                  :: GridType = XDMF_GRID_TYPE_UNSTRUCTURED
-        integer(I4P)                                  :: State    = XH5FOR_STATE_START
-        integer(I4P)                                  :: Action   = XDMF_ACTION_WRITE
+        integer(I4P)                                  :: Strategy   = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
+        integer(I4P)                                  :: GridType   = XDMF_GRID_TYPE_UNSTRUCTURED
+        integer(I4P)                                  :: State      = XH5FOR_STATE_START
+        integer(I4P)                                  :: Action     = XDMF_ACTION_WRITE
+        logical                                       :: StaticGrid = .false.
         character(len=:),                 allocatable :: Prefix
         type(mpi_env_t)                               :: MPIEnvironment
         type(steps_handler_t)                         :: StepsHandler
@@ -279,7 +280,7 @@ contains
     end subroutine xh5for_Clean
 
 
-    subroutine xh5for_Open(this, FilePrefix, GridType, Strategy, Action, Comm, Root)
+    subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy, Action, Comm, Root)
     !-----------------------------------------------------------------
     !< Open a XDMF (Temporal) file, set the MPI environment and also
     !< initialize the steps handler
@@ -287,6 +288,7 @@ contains
         class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
         character(len=*),       intent(IN)    :: FilePrefix           !< XDMF filename prefix
         integer(I4P), optional, intent(IN)    :: GridType             !< XDMF grid type
+        logical,      optional, intent(IN)    :: StaticGrid           !< Static grid flag
         integer(I4P), optional, intent(IN)    :: Strategy             !< Data IO management strategy
         integer(I4P), optional, intent(IN)    :: Action               !< XDMF Open file action (Read or Write)
         integer,      optional, intent(IN)    :: comm                 !< MPI communicator
@@ -300,6 +302,7 @@ contains
         this%Prefix = trim(adjustl(FilePrefix))
         if(present(Strategy)) call this%SetStrategy(Strategy)
         if(present(GridType)) call this%SetGridType(GridType)
+        if(present(StaticGrid)) this%StaticGrid = StaticGrid
         if(present(Action)) this%Action = Action
         if(present(root)) r_root = root
         ! MPI environment initialization
@@ -373,7 +376,8 @@ contains
                 NumberOfElements = int(NumberOfElements,I8P),  &
                 TopologyType     = TopologyType,               &
                 GeometryType     = GeometryType,               &
-                GridType         = this%GridType)
+                GridType         = this%GridType,              &
+                StaticGrid       = this%StaticGrid)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -418,7 +422,8 @@ contains
                 NumberOfElements = int(NumberOfElements,I8P), &
                 TopologyType     = TopologyType,              &
                 GeometryType     = GeometryType,              &
-                GridType         = this%GridType)
+                GridType         = this%GridType,             &
+                StaticGrid       = this%StaticGrid)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -457,12 +462,13 @@ contains
                 ZDim     = int(GridShape(3),I8P),   &
                 GridType = this%GridType)
         ! Spatial grid descriptor initialization
-        call this%SpatialGridDescriptor%Initialize(            &
-                MPIEnvironment   = this%MPIEnvironment,        &
-                XDim     = int(GridShape(1),I8P),              &
-                YDim     = int(GridShape(2),I8P),              &
-                ZDim     = int(GridShape(3),I8P),              &
-                GridType = this%GridType)
+        call this%SpatialGridDescriptor%Initialize(          &
+                MPIEnvironment = this%MPIEnvironment,        &
+                XDim       = int(GridShape(1),I8P),          &
+                YDim       = int(GridShape(2),I8P),          &
+                ZDim       = int(GridShape(3),I8P),          &
+                GridType   = this%GridType,                  &
+                StaticGrid = this%StaticGrid)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &
@@ -504,10 +510,11 @@ contains
         ! Spatial grid descriptor initialization
         call this%SpatialGridDescriptor%Initialize(            &
                 MPIEnvironment   = this%MPIEnvironment,        &
-                XDim     = int(GridShape(1),I8P),              &
-                YDim     = int(GridShape(2),I8P),              &
-                ZDim     = int(GridShape(3),I8P),              &
-                GridType = this%GridType)
+                XDim       = int(GridShape(1),I8P),            &
+                YDim       = int(GridShape(2),I8P),            &
+                ZDim       = int(GridShape(3),I8P),            &
+                GridType   = this%GridType,                    &
+                StaticGrid = this%StaticGrid)
         ! Light data initialization
         call this%LightData%Initialize(                             &
                 MPIEnvironment        = this%MPIEnvironment,        &

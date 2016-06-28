@@ -95,6 +95,7 @@ private
         procedure, non_overridable, public :: Begin                  => steps_handler_Begin
         procedure, non_overridable, public :: Next                   => steps_handler_Next
         procedure, non_overridable, public :: End                    => steps_handler_End
+        procedure, non_overridable, public :: IsFirstStep            => steps_handler_IsFirstStep
         procedure, non_overridable, public :: HasFinished            => steps_handler_HasFinished
         procedure, non_overridable, public :: GetNumberOfSteps       => steps_handler_GetNumberOfSteps
         procedure, non_overridable, public :: GetCurrentStep         => steps_handler_GetCurrentStep
@@ -395,6 +396,17 @@ contains
         this%StepsCounter = this%NumberOfSteps
         this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_End
+
+
+    function steps_handler_IsFirstStep(this) result(IsFirstStep)
+    !-----------------------------------------------------------------
+    !< Check if "iterator" reached the last position
+    !----------------------------------------------------------------- 
+        class(steps_handler_t), intent(IN) :: this                    !< Steps Handler
+        logical                            :: IsFirstStep             !< True if current step is the first one
+    !-----------------------------------------------------------------
+        IsFirstStep = this%StepsCounter == 1
+    end function steps_handler_IsFirstStep
 
 
     function steps_handler_HasFinished(this) result(HasFinished)

@@ -24,6 +24,7 @@ private
     !-----------------------------------------------------------------
     !< XDMF contiguous HyperSlab handler implementation
     !----------------------------------------------------------------- 
+        logical                                     :: StaticGrid = .false.        !< Static grid flag
         integer(I4P)                                :: NumberOfGrids          = 0  !< Number of uniform grids of the spatial grid
         integer(I8P)                                :: GlobalNumberOfNodes    = 0  !< Total number of nodes of the spatial grid
         integer(I8P)                                :: GlobalNumberOfElements = 0  !< Total number of elements of the spatial grid
@@ -74,6 +75,7 @@ private
 
         procedure :: DefaultInitializeWriter            => spatial_grid_descriptor_DefaultInitializeWriter
 
+        procedure :: IsStaticGrid                       => spatial_grid_descriptor_IsStaticGrid
         procedure :: SetNumberOfGrids                   => spatial_grid_descriptor_SetNumberOfGrids
         procedure :: GetNumberOfGrids                   => spatial_grid_descriptor_GetNumberOfGrids
 
@@ -127,7 +129,7 @@ private
 
 
     abstract interface
-        subroutine spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+        subroutine spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType, StaticGrid)
             import spatial_grid_descriptor_t
             import mpi_env_t
             import I4P
@@ -139,9 +141,10 @@ private
             integer(I4P),                     intent(IN)    :: TopologyType
             integer(I4P),                     intent(IN)    :: GeometryType
             integer(I4P),                     intent(IN)    :: GridType
+            logical,      optional,           intent(IN)    :: StaticGrid
         end subroutine spatial_grid_descriptor_InitializeUnstructuredWriter
 
-        subroutine spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType)
+        subroutine spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType, StaticGrid)
             import spatial_grid_descriptor_t
             import mpi_env_t
             import I4P
@@ -152,6 +155,7 @@ private
             integer(I8P),                     intent(IN)    :: YDim
             integer(I8P),                     intent(IN)    :: ZDim
             integer(I4P),                     intent(IN)    :: GridType
+            logical,      optional,           intent(IN)    :: StaticGrid
         end subroutine spatial_grid_descriptor_InitializeStructuredWriter
 
         subroutine spatial_grid_descriptor_BroadcastMetadata(this)
@@ -482,6 +486,17 @@ contains
     end subroutine spatial_grid_descriptor_Allocate
 
 
+    function spatial_grid_descriptor_IsStaticGrid(this)
+    !-----------------------------------------------------------------
+    !< Check if is a static grid
+    !----------------------------------------------------------------- 
+        class(spatial_grid_descriptor_t), intent(INOUT) :: this       !< Spatial grid descriptor type
+        logical :: spatial_grid_descriptor_IsStaticGrid               !< Return true if it's a static grid
+    !-----------------------------------------------------------------
+        spatial_grid_descriptor_IsStaticGrid = this%StaticGrid
+    end function spatial_grid_descriptor_IsStaticGrid
+
+
     subroutine spatial_grid_descriptor_SetNumberOfGrids(this, NumberOfGrids)
     !-----------------------------------------------------------------
     !< Set the total number of grids
@@ -758,7 +773,7 @@ contains
     end function spatial_grid_descriptor_GetElementOffsetPerGridID
 
 
-    subroutine spatial_grid_descriptor_DefaultInitializeWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+    subroutine spatial_grid_descriptor_DefaultInitializeWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType, StaticGrid)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
@@ -769,6 +784,7 @@ contains
         integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the current grid
         integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the current grid
         integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the current grid
+        logical,      optional,           intent(IN)    :: StaticGrid       !< Static grid flag
         integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
         call this%Free()
@@ -781,6 +797,7 @@ contains
         call this%SetGlobalNumberOfElements(sum(this%NumberOfElementsPerGrid))
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
+        if(present(StaticGrid)) this%StaticGrid = StaticGrid
     end subroutine spatial_grid_descriptor_DefaultInitializeWriter
 
 
