@@ -825,7 +825,7 @@ contains
         call this%SetGlobalNumberOfNodes(sum(this%NumberOfNodesPerGrid))
         call this%MPIEnvironment%mpi_broadcast(this%TopologyTypePerGrid)
         call this%MPIEnvironment%mpi_broadcast(this%GeometryTypePerGrid)
-        call this%MPIEnvironment%mpi_broadcast(this%GridTypePerGrid)
+!        call this%MPIEnvironment%mpi_broadcast(this%GridTypePerGrid)
 		this%NumberOfGrids = size(this%NumberOfNodesPerGrid, dim=1)
     end subroutine spatial_grid_descriptor_DefaultBroadcastMetadata
 

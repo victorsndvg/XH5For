@@ -85,11 +85,9 @@ FOREACH(EXT_LIB ${EXT_LIBS})
         ENDIF()
     
         IF (${EXT_LIB}_FOUND)
-            ADD_DEFINITIONS(-DENABLE_${EXT_LIB})
             IF(IS_DIRECTORY ${${EXT_LIB}_INCLUDE_DIR})
                INCLUDE_DIRECTORIES(${${EXT_LIB}_INCLUDE_DIR})
             ENDIF()
-            LINK_DIRECTORIES(${${EXT_LIB}_LIBRARIES})
         ENDIF()
 
     ELSEIF(DEFINED ${PROJECT_NAME}_ENABLE_${EXT_LIB} AND NOT ${PROJECT_NAME}_ENABLE_${EXT_LIB})
@@ -108,11 +106,9 @@ FOREACH(EXT_LIB ${EXT_LIBS})
         IF (${${EXT_LIB}_FOUND})
            SET(NO_LIBS FALSE)
            OPTION(${PROJECT_NAME}_ENABLE_${EXT_LIB} "Enable/disable ${EXT_LIB} library" ON)
-           ADD_DEFINITIONS(-DENABLE_${EXT_LIB})
            IF(IS_DIRECTORY ${${EXT_LIB}_INCLUDE_DIR})
                INCLUDE_DIRECTORIES(${${EXT_LIB}_INCLUDE_DIR})
            ENDIF()
-            LINK_DIRECTORIES(${${EXT_LIB}_LIBRARIES})
         ELSE()
            OPTION(${PROJECT_NAME}_ENABLE_${EXT_LIB} "Enable/disable ${EXT_LIB} library" OFF)
            UNSET(${EXT_LIB}_INCLUDES CACHE)
@@ -133,18 +129,60 @@ ENDIF()
 #################################################################
 
 IF(MPI_Fortran_COMPILER AND ${PROJECT_NAME}_ENABLE_MPI)
+    # Add MPI directories
+    INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
+
     # Find mpi.mod
     FIND_PATH(MPI_MOD_FOUND mpi.mod  PATHS ${MPI_Fortran_INCLUDE_PATH})
     IF(MPI_MOD_FOUND)
-        ADD_DEFINITIONS(-DMPI_MOD)
+        TRY_COMPILE(FORTRAN_COMPILER_MATCH_MPI_MOD 
+                    ${PROJECT_BINARY_DIR} 
+                    ${TESTS_PATH}/try_compile_mpi_mod.f90	
+                    CMAKE_FLAGS
+                        "-DINCLUDE_DIRECTORIES:STRING=${MPI_Fortran_INCLUDE_PATH}"
+                        "-DLINK_LIBRARIES:STRING=${MPI_Fortran_LIBRARIES}"
+                    OUTPUT_VARIABLE OUTPUTVARIABLE)
+
+        IF(FORTRAN_COMPILER_MATCH_MPI_MOD)
+            ADD_DEFINITIONS(-DMPI_MOD)
+        ELSE()
+            MESSAGE(WARNING "MPI: mpi.mod file is NOT COMPATIBLE with this compiler! mpif.h is going be included instead")
+            ADD_DEFINITIONS(-DMPI_H)            
+        ENDIF()
     ELSE()
+        MESSAGE(WARNING "MPI: mpi.mod file NOT FOUND! mpif.h is going to be included instead")
         ADD_DEFINITIONS(-DMPI_H)
     ENDIF()
+    ADD_DEFINITIONS(-DENABLE_MPI)
+ENDIF()
 
+
+#################################################################
+# HDF5 Fortran DEFINITIONS AND PATHS
+#################################################################
+
+IF(HDF5_Fortran_COMPILER_EXECUTABLE AND ${PROJECT_NAME}_ENABLE_HDF5)
     # Add MPI directories
-    ADD_DEFINITIONS(${MPI_Fortran_COMPILE_FLAGS})
-    INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
-#    LINK_DIRECTORIES(${MPI_Fortran_LIBRARIES})
+    INCLUDE_DIRECTORIES(${HDF5_Fortran_INCLUDE_DIR})
+
+    # Find mpi.mod
+    FIND_PATH(HDF5_MOD_FOUND hdf5.mod  PATHS ${HDF5_Fortran_INCLUDE_DIR})
+    IF(HDF5_MOD_FOUND)
+        TRY_COMPILE(FORTRAN_COMPILER_MATCH_HDF5_MOD 
+                    ${PROJECT_BINARY_DIR} 
+                    ${TESTS_PATH}/try_compile_hdf5_mod.f90	
+                    CMAKE_FLAGS
+                        "-DINCLUDE_DIRECTORIES:STRING=${HDF5_Fortran_INCLUDE_DIR}"
+                    LINK_LIBRARIES ${HDF5_Fortran_LIBRARIES})
+
+        IF(FORTRAN_COMPILER_MATCH_HDF5_MOD)
+            ADD_DEFINITIONS(-DENABLE_HDF5)
+        ELSE()
+            MESSAGE(WARNING "HDF5: hdf5.mod file is NOT COMPATIBLE with this compiler! Disabling HDF5 ... ")
+        ENDIF()
+    ELSE()
+        MESSAGE(WARNING "MPI: mpi.mod file NOT FOUND! Disabling HDF5 ...")
+    ENDIF()
 ENDIF()
 
 #################################################################

@@ -9,7 +9,7 @@ USE IR_Precision, only: I4P
 
 implicit none 
 
-    integer(I4P), parameter :: SUPPORTED_DATAITEMPRECISIONS(*) = (/ 1, 2, 4, 8 /)
+    integer(I4P), parameter :: SUPPORTED_DATAITEMPRECISIONS(4) = (/ 1, 2, 4, 8 /)
 
     character(len=*), parameter :: SUPPORTED_TOPOLOGYTYPENAMES =                                        &
                                             'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral'     // &
