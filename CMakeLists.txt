@@ -119,11 +119,6 @@ FOREACH(EXT_LIB ${EXT_LIBS})
     ENDIF()
 ENDFOREACH ()
 
-# ADD ENABLE_PARALLEL_HDF5 DEFINITION
-IF (HDF5_IS_PARALLEL)
-    ADD_DEFINITIONS(-DENABLE_PARALLEL_HDF5)
-ENDIF()
-
 #################################################################
 # MPI Fortran DEFINITIONS AND PATHS
 #################################################################
@@ -162,10 +157,10 @@ ENDIF()
 #################################################################
 
 IF(HDF5_Fortran_COMPILER_EXECUTABLE AND ${PROJECT_NAME}_ENABLE_HDF5)
-    # Add MPI directories
+    # Add HDF5 directories
     INCLUDE_DIRECTORIES(${HDF5_Fortran_INCLUDE_DIR})
 
-    # Find mpi.mod
+    # Find hdf5.mod
     FIND_PATH(HDF5_MOD_FOUND hdf5.mod  PATHS ${HDF5_Fortran_INCLUDE_DIR})
     IF(HDF5_MOD_FOUND)
         TRY_COMPILE(FORTRAN_COMPILER_MATCH_HDF5_MOD 
@@ -177,11 +172,18 @@ IF(HDF5_Fortran_COMPILER_EXECUTABLE AND ${PROJECT_NAME}_ENABLE_HDF5)
 
         IF(FORTRAN_COMPILER_MATCH_HDF5_MOD)
             ADD_DEFINITIONS(-DENABLE_HDF5)
+            IF (HDF5_IS_PARALLEL)
+                ADD_DEFINITIONS(-DENABLE_PARALLEL_HDF5)
+            ELSE(${PROJECT_NAME}_ENABLE_MPI)
+                MESSAGE(FATAL_ERROR "ERROR: INDEPENDENT IO in PARALLEL environments not supported!")
+            ENDIF()
         ELSE()
-            MESSAGE(WARNING "HDF5: hdf5.mod file is NOT COMPATIBLE with this compiler! Disabling HDF5 ... ")
+            MESSAGE(WARNING "HDF5: hdf5.mod file is NOT COMPATIBLE! Disabling HDF5 ... ")
+            SET(${PROJECT_NAME}_ENABLE_HDF5 OFF)
         ENDIF()
     ELSE()
         MESSAGE(WARNING "MPI: mpi.mod file NOT FOUND! Disabling HDF5 ...")
+        SET(${PROJECT_NAME}_ENABLE_HDF5 OFF)
     ENDIF()
 ENDIF()
 
