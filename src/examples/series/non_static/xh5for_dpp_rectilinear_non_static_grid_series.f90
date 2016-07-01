@@ -49,7 +49,7 @@ use xh5for
     Z = Z + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_rectilinear_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_ch_rectilinear_non_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
     call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
 
     do i=1, num_steps
@@ -64,7 +64,7 @@ use xh5for
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_rectilinear_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_ch_rectilinear_non_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
     call xh5%Parse()
 
     do i=1, xh5%GetNumberOfSteps()

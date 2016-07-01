@@ -22,11 +22,8 @@ implicit none
 
 private
 
-    integer(I4P), parameter :: XDMF_HANDLER_STATE_START      = 0
-    integer(I4P), parameter :: XDMF_HANDLER_STATE_INIT       = 1
-    integer(I4P), parameter :: XDMF_HANDLER_STATE_SERIALIZED = 2
-    integer(I4P), parameter :: XDMF_HANDLER_STATE_PARSED     = 3
-    integer(I4P), parameter :: XDMF_HANDLER_STATE_CLOSED     = 4
+    integer(I4P), parameter :: XDMF_HANDLER_STATE_START   = 0
+    integer(I4P), parameter :: XDMF_HANDLER_STATE_INIT    = 1
 
     !-----------------------------------------------------------------
     ! XDMF_HANDLER State Transition Diagram
@@ -354,7 +351,6 @@ contains
         call this%TemporalFile%SetParsed()
         call this%StepsHandler%BroadCastNumberOfSteps()
         call this%StepsHandler%Begin(Start=this%SpatialGridDescriptor%isStaticGrid())
-        this%State = XDMF_HANDLER_STATE_PARSED
     end subroutine xdmf_handler_ParseTemporalFile
 
 
@@ -408,7 +404,6 @@ contains
             call this%CloseSpatialFile()
             call this%UniformGridDescriptor%FreeAttributesMetadata()
         endif
-        this%State = XDMF_HANDLER_STATE_SERIALIZED
     end subroutine xdmf_handler_SerializeSpatialFile
 
 
@@ -478,7 +473,6 @@ contains
             end select
         endif
         call this%SpatialFile%Free()
-        this%State = XDMF_HANDLER_STATE_CLOSED
     end subroutine xdmf_handler_CloseSpatialFile
 
 
