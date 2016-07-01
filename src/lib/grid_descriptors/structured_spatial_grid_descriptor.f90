@@ -75,7 +75,7 @@ contains
         integer(I4P),                     intent(IN)    :: TopologyType     !< Topology type of the current grid
         integer(I4P),                     intent(IN)    :: GeometryType     !< Geometry type of the current grid
         integer(I4P),                     intent(IN)    :: GridType         !< Grid type of the current grid
-        logical,      optional,           intent(IN)    :: StaticGrid        !< Static Grid flag
+        logical,      optional,           intent(IN)    :: StaticGrid       !< Static Grid flag
         integer(I4P)                                    :: i                !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
         call this%Free()

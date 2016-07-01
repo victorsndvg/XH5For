@@ -17,7 +17,8 @@ private
     private
         character(len=:), allocatable :: filename                     !< File name
         type(xmlf_t), public          :: xml_handler                  !< FoX SAX XML File handler
-        logical                       :: opened = .false.             !< Flag to check if the file is opened yet
+        logical                       :: open   = .false.             !< Flag to check if the file is open yet
+        logical                       :: parsed = .false.             !< Flag to check if the file is already parsed
         type(Node),       pointer     :: Root   => null()             !< FoX DOM node list pointing to XML root element
     !----------------------------------------------------------------- 
     contains
@@ -25,6 +26,8 @@ private
         procedure, public :: openfile             => xdmf_file_openfile
         procedure, public :: isopen               => xdmf_file_isopen
         procedure, public :: parsefile            => xdmf_file_parsefile
+        procedure, public :: isparsed             => xdmf_file_isparsed
+        procedure, public :: setparsed            => xdmf_file_setparsed
         procedure, public :: closefile            => xdmf_file_closefile
         procedure, public :: set_filename         => xdmf_file_set_filename
         procedure, public :: get_filename         => xdmf_file_get_filename
@@ -122,7 +125,7 @@ contains
                 minimize_overrun=.true., canonical=.false., replace=.true., addDecl=.false., &
                 warning=.false., validate=.false., namespace=.true.)
         endif
-        xdmf_file%opened = .true.
+        xdmf_file%open = .true.
     end subroutine xdmf_file_openfile
 
 
@@ -133,6 +136,7 @@ contains
         class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
     !-----------------------------------------------------------------
         xdmf_file%root => parseFile(xdmf_file%filename)
+        xdmf_file%parsed = .true.
     end subroutine xdmf_file_parseFile
 
 
@@ -143,8 +147,29 @@ contains
         class(xdmf_file_t), intent(IN) :: xdmf_file                   !< XDMF file handler
         logical                        :: isopen                      !< Flag to check if file is opened yet
     !-----------------------------------------------------------------
-        isopen = xdmf_file%opened
+        isopen = xdmf_file%open
     end function xdmf_file_isopen
+
+
+    subroutine xdmf_file_setparsed(xdmf_file)
+    !-----------------------------------------------------------------
+    !< Set file as already parsed
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
+    !-----------------------------------------------------------------
+        xdmf_file%parsed = .true.
+    end subroutine xdmf_file_setparsed
+
+
+    function xdmf_file_isparsed(xdmf_file) result(isparsed)
+    !-----------------------------------------------------------------
+    !< Check if the file was already parsed
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(IN) :: xdmf_file                   !< XDMF file handler
+        logical                        :: isparsed                    !< Flag to check if file was already parsed
+    !-----------------------------------------------------------------
+        isparsed = xdmf_file%parsed
+    end function xdmf_file_isparsed
 
 
     subroutine xdmf_file_closefile(xdmf_file)
@@ -155,7 +180,8 @@ contains
     !-----------------------------------------------------------------
         ! empty : Empty files return warning instead of error
         call xml_Close(xf=xdmf_file%xml_handler, empty=.true.)
-        xdmf_file%opened = .false.
+        xdmf_file%open   = .false.
+        xdmf_file%parsed = .false.
     end subroutine xdmf_file_closefile
 
 

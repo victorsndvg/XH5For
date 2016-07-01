@@ -68,7 +68,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -103,7 +103,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -140,7 +140,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalNumberOfNodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         LocalNumberOfNodes  = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         NodeOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -187,7 +187,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalNumberOfNodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         LocalNumberOfNodes  = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         NodeOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -270,7 +270,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(UniformGridDescriptor) .and. associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         call UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
         call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
         GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
@@ -310,7 +310,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(UniformGridDescriptor) .and. associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         call UniformGridDescriptor%SetTopologySize(int(size(connectivities,dim=1),I8P))
         call SpatialGridDescriptor%SetTopologySizePerGridID(int(size(connectivities,dim=1),I8P),ID=MPIEnvironment%get_rank())
         GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)

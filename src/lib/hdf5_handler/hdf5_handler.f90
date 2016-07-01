@@ -63,7 +63,8 @@ private
     !-----------------------------------------------------------------
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
-        character(len=:),             allocatable :: prefix                           !< Name prefix of the HDF5 file
+        character(len=:),             allocatable :: Prefix                           !< Name prefix of the HDF5 file
+        character(len=:),             allocatable :: FileName                         !< HDF5 file name
         integer(HID_T)                            :: FileID  = XDMF_NO_VALUE          !< File identifier 
         integer(I4P)                              :: Action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
         integer(I4P)                              :: State = HDF5_HANDLER_STATE_START !< HDF5 state
@@ -108,6 +109,7 @@ private
         procedure, non_overridable, public   :: GetStepsHandler          => hdf5_handler_GetStepsHandler
         procedure, non_overridable, public   :: GetUniformGridDescriptor => hdf5_handler_GetUniformGridDescriptor
         procedure, non_overridable, public   :: GetSpatialGridDescriptor => hdf5_handler_GetSpatialGridDescriptor
+        procedure, non_overridable, public   :: GetHDF5FileName          => hdf5_handler_GetHDF5FileName
         generic,                    public   :: WriteTopology  => WriteTopology_I4P, &
                                                                   WriteTopology_I8P
         generic,                    public   :: ReadTopology   => ReadTopology_I4P, &
@@ -417,7 +419,7 @@ contains
         class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
         logical                           :: FileIsOpen               !< Check if file state is OPEN
     !----------------------------------------------------------------- 
-        FileIsOpen = (this%State == HDF5_HANDLER_STATE_OPEN)
+        FileIsOpen = (this%State == HDF5_HANDLER_STATE_OPEN .and. Allocated(this%Filename))
     end function hdf5_handler_FileIsOpen
 
     function hdf5_handler_GetAction(this) result(Action)
@@ -494,21 +496,40 @@ contains
     end function hdf5_handler_GetMPIEnvironment
 
 
-    subroutine hdf5_handler_OpenFile(this, action, fileprefix)
+    function hdf5_handler_GetHDF5Filename(this, Step) result (HDF5FileName)
+    !-----------------------------------------------------------------
+    !< Generate HDF5 Filename depending on time step
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t),  intent(IN)    :: this                 !< XMDF handler
+        integer(I4P), optional, intent(IN)    :: Step                 !< Force step number
+        character(len=:), allocatable         :: HDF5FileName         !< Name of the current HDF5 file
+    !----------------------------------------------------------------- 
+        assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
+        if(present(Step)) then
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//HDF5_EXT
+        else
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        endif
+    end function hdf5_handler_GetHDF5Filename
+
+
+    subroutine hdf5_handler_OpenFile(this, Action, FilePrefix, Step)
     !-----------------------------------------------------------------
     !< Open a HDF5 file
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
-        integer(I4P),          intent(IN)    :: action                !< Action to be perfomed (Read or Write)
-        character(len=*),      intent(IN)    :: fileprefix            !< HDF5 file prefix
+        integer(I4P),          intent(IN)    :: Action                !< Action to be perfomed (Read or Write)
+        character(len=*),      intent(IN)    :: FilePrefix            !< HDF5 file prefix
+        integer(I4P), optional, intent(IN)   :: Step                 !< Force step number
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
         character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
     !-----------------------------------------------------------------
         assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
 #ifdef ENABLE_HDF5
-        this%action = action
-        HDF5Filename = trim(adjustl(fileprefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        this%Action = Action
+        this%Prefix = FilePrefix
+        this%Filename = this%GetHDF5FileName(Step=Step)
         if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
@@ -527,7 +548,7 @@ contains
                 ! opening. 
                 ! If file does not exist, it is created and opened with 
                 ! read-write access.
-                call H5fcreate_f(name = HDF5FileName,                 &
+                call H5fcreate_f(name = this%FileName,                &
                         access_flags  = H5F_ACC_TRUNC_F,              &
                         File_id       = this%FileID,                  &
                         hdferr        = hdferror,                     &
@@ -536,7 +557,7 @@ contains
             case(XDMF_ACTION_READ)
                 ! Existing file is opened with read-only access. If file 
                 ! does not exist, H5Fopen fails.
-                call H5fopen_f(name  = HDF5FileName,                  &
+                call H5fopen_f(name  = this%FileName,                 &
                         access_flags = H5F_ACC_RDONLY_F,              &
                         File_id      = this%FileID,                   &
                         hdferr       = hdferror,                      &

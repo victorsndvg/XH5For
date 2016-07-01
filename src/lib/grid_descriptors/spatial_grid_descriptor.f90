@@ -801,15 +801,17 @@ contains
     end subroutine spatial_grid_descriptor_DefaultInitializeWriter
 
 
-    subroutine spatial_grid_descriptor_InitializeReader(this, MPIEnvironment)
+    subroutine spatial_grid_descriptor_InitializeReader(this, MPIEnvironment, StaticGrid)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
         class(spatial_grid_descriptor_t), intent(INOUT) :: this           !< Spatial grid descriptor type
         type(mpi_env_t), target,          intent(IN)    :: MPIEnvironment !< MPI environment type
+        logical,      optional,           intent(IN)    :: StaticGrid       !< Static grid flag
     !-----------------------------------------------------------------
         call this%Free()
         this%MPIEnvironment => MPIEnvironment
+        if(present(StaticGrid)) this%StaticGrid = StaticGrid
     end subroutine spatial_grid_descriptor_InitializeReader
 
 

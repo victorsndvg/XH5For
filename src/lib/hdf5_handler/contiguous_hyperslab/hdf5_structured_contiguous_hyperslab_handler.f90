@@ -66,7 +66,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -101,7 +101,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -139,7 +139,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize(1) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
         GlobalGeometrySize(2) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
         GlobalGeometrySize(3) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
@@ -196,7 +196,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize(1) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
         GlobalGeometrySize(2) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
         GlobalGeometrySize(3) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
@@ -248,7 +248,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -299,7 +299,7 @@ contains
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
         StepsHandler          => this%GetStepsHandler()
         assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
-        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsFirstStep()) return
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3

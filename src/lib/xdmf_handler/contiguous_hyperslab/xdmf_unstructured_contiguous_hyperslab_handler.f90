@@ -124,7 +124,7 @@ contains
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
             if(this%SpatialGridDescriptor%IsStaticGrid()) then
-                HDF5FileName = this%GetHDF5FileName(Step=1)
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
             else
                 HDF5FileName = this%GetHDF5FileName()
             endif
@@ -199,7 +199,7 @@ contains
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             if(this%SpatialGridDescriptor%IsStaticGrid()) then
-                HDF5FileName = this%GetHDF5FileName(Step=1)
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
             else
                 HDF5FileName = this%GetHDF5FileName()
             endif
@@ -257,7 +257,7 @@ contains
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
             if(this%SpatialGridDescriptor%IsStaticGrid()) then
-                HDF5FileName = this%GetHDF5FileName(Step=1)
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
             else
                 HDF5FileName = this%GetHDF5FileName()
             endif
