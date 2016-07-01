@@ -34,7 +34,7 @@ install:
   - tar -zxf openmpi-1.10.2.tar.gz
   - cd openmpi-1.10.2
   - ./configure --prefix=$TRAVIS_BUILD_DIR/openmpi > /dev/null
-  - make -j2 > /dev/null
+  - make -j2 > /dev/null 2>&1
   - make install > /dev/null 2>&1
   ##################
   ## Install HDF5 ##
