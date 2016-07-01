@@ -194,7 +194,6 @@ contains
         real(R8P),       intent(IN)     :: Value
     !----------------------------------------------------------------- 
         assert(this%Action == XDMF_ACTION_WRITE)
-        if(this%Heavydata%FileIsOpen()) call this%Heavydata%CloseFile()
         call this%StepsHandler%Append(Value=Value)
     end subroutine xh5for_AppendStep
 
@@ -207,8 +206,7 @@ contains
         class(xh5for_t), intent(INOUT)  :: this
     !----------------------------------------------------------------- 
         assert(this%Action == XDMF_ACTION_READ)
-        if(this%Heavydata%FileIsOpen()) call this%Heavydata%CloseFile()
-        if(.not. this%SpatialGridDescriptor%isStaticGrid()) call this%LightData%CloseSpatialFile()
+        call this%LightData%CloseSpatialFile()
         call this%StepsHandler%Next()
     end subroutine xh5for_NextStep
 
@@ -220,6 +218,8 @@ contains
         class(xh5for_t), intent(INOUT)  :: this
         integer(I4P)                    :: NumberOfSteps
     !----------------------------------------------------------------- 
+        if(this%State == XH5FOR_STATE_OPEN .and. this%Action == XDMF_ACTION_READ)  call this%Initialize()
+        if(this%State == XH5FOR_STATE_INIT .and. this%Action == XDMF_ACTION_READ)  call this%LightData%ParseTemporalFile()
         NumberOfSteps = this%StepsHandler%GetNumberOfSteps()
     end function xh5for_GetNumberOfSteps
 
@@ -283,7 +283,7 @@ contains
 
     subroutine xh5for_CheckOpenHeavyDataFile(this, GridData)
     !----------------------------------------------------------------- 
-    !< Clean initialized
+    !< Check if the right HeavyDataFile is open. If not, open it
     !----------------------------------------------------------------- 
         class(xh5for_t),   intent(INOUT)  :: this
         logical, optional, intent(IN)     :: GridData
@@ -291,17 +291,16 @@ contains
     !----------------------------------------------------------------- 
         isGridData = .false.
         if(Present(GridData)) isGridData = GridData
-        if(.not. this%HeavyData%FileIsOpen()) then
-            if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid() .and. this%StepsHandler%isStaticStep() ) then
-                if(isGridData) then
-                    call this%HeavyData%OpenFile(this%Action, This%Prefix, XDMF_STATIC_STEP)
-                endif
+        if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid() .and. this%StepsHandler%isStaticStep() ) then
+            if(this%HeavyData%IsOpen()) then
+                if(.not. this%HeavyData%IsStepFileOpen(XDMF_STATIC_STEP)) call this%HeavyData%OpenFile(this%Action, This%Prefix)
             else
-                call this%HeavyData%OpenFile(this%Action, This%Prefix)
+                call this%HeavyData%OpenFile(this%Action, This%Prefix, XDMF_STATIC_STEP)
             endif
         else
-            if(.not. isGridData .and. this%SpatialGridDescriptor%isStaticGrid() .and. this%StepsHandler%isStaticStep() ) then
-                call this%StepsHandler%Next()
+            if(this%HeavyData%IsOpen()) then
+                if(.not. this%HeavyData%IsStepFileOpen(this%StepsHandler%GetCurrentStep())) call this%HeavyData%OpenFile(this%Action, This%Prefix)
+            else
                 call this%HeavyData%OpenFile(this%Action, This%Prefix)
             endif
         endif

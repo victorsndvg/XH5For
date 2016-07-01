@@ -188,6 +188,7 @@ contains
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
         if(.not. this%NumberOfSteps>0) call this%Append(0.0)
+        if(.not. this%StepsCounter>0) this%StepsCounter = 1
         CurrentStep = this%StepsCounter
     end function steps_handler_GetCurrentStep
 
@@ -200,14 +201,13 @@ contains
         real(R8P)                             :: CurrentValue         !< Current step value
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
-        CurrentValue = 0.0_R8P
-        if(.not. this%NumberOfSteps>0) call this%Append(0.0)
-        if(this%StepsCounter == XDMF_STATIC_STEP) then
+        CurrentValue = 0.0
+        if(.not. this%NumberOfSteps>0) call this%Append(CurrentValue)
+        if(this%StepsCounter==XDMF_STATIC_STEP .and. (this%StepsCounter<1 .or. this%StepsCounter>this%NumberOfSteps)) then
             CurrentValue = this%Values(1)
         else
-            CurrentValue = this%Values(this%StepsCounter)
+            CurrentValue = this%Values(this%GetCurrentStep())
         endif
-        CurrentValue = this%Values(this%StepsCounter)
     end function steps_handler_GetCurrentValue
 
 
@@ -221,10 +221,10 @@ contains
         assert(this%State > STEPS_HANDLER_STATE_START)
         CurrentFilename=''
         if(.not. this%NumberOfSteps>0) call this%Append(CurrentFilename)
-        if(this%StepsCounter == XDMF_STATIC_STEP) then
+        if(this%StepsCounter==XDMF_STATIC_STEP .and. (this%StepsCounter<1 .or. this%StepsCounter>this%NumberOfSteps)) then
             CurrentFilename = this%Filenames(1)%Get()
         else
-            CurrentFilename = this%Filenames(this%StepsCounter)%Get()
+            CurrentFilename = this%Filenames(this%GetCurrentStep())%Get()
         endif
     end function steps_handler_GetCurrentFilename
 

@@ -118,7 +118,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -186,7 +186,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -255,7 +255,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -323,7 +323,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -392,7 +392,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -461,7 +461,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -530,7 +530,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -599,7 +599,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
-        assert(this%FileIsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))

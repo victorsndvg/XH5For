@@ -194,6 +194,8 @@ contains
         if(allocated(xdmf_file%filename)) deallocate(xdmf_file%filename)
         if(xdmf_file%isopen()) call xdmf_file%closefile()
         nullify(xdmf_file%Root)
+        xdmf_file%open   = .false.
+        xdmf_file%parsed = .false.
     end subroutine xdmf_file_free
 
 

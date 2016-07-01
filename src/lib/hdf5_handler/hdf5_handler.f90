@@ -32,7 +32,7 @@ private
     ! HDF5_HANDLER State Transition Diagram
     !-----------------------------------------------------------------
     ! - This diagram controls the basic life cycle of the HDF5 file.
-    ! - Only a public procedure (FileIsOpen) is needed to check if the
+    ! - Only a public procedure (IsOpen) is needed to check if the
     !   handler is in the right state to perform I/O operations.
     ! - Only the next hierarchy layer needs to ensure this status via
     !   ReadHyperSlabs/WriteHyperSlabs/ReadDataset/WriteData/WriteMetadata
@@ -101,7 +101,8 @@ private
         procedure, non_overridable, public   :: Initialize               => hdf5_handler_Initialize
         procedure, non_overridable, public   :: Free                     => hdf5_handler_Free
         procedure, non_overridable, public   :: OpenFile                 => hdf5_handler_OpenFile
-        procedure, non_overridable, public   :: FileIsOpen               => hdf5_handler_FileIsOpen
+        procedure, non_overridable, public   :: IsOpen                   => hdf5_handler_IsOpen
+        procedure, non_overridable, public   :: IsStepFileOpen           => hdf5_handler_IsStepFileOpen
         procedure, non_overridable, public   :: CloseFile                => hdf5_handler_CloseFile
         procedure, non_overridable, public   :: GetFileID                => hdf5_handler_GetFileID
         procedure, non_overridable, public   :: GetAction                => hdf5_handler_GetAction
@@ -412,15 +413,29 @@ contains
     end subroutine hdf5_handler_Free
 
 
-    function hdf5_handler_FileIsOpen(this) result(FileIsOpen)
+    function hdf5_handler_IsOpen(this) result(IsOpen)
     !-----------------------------------------------------------------
     !< Check if the HDF5 is already open. Needed to Write/Read
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
-        logical                           :: FileIsOpen               !< Check if file state is OPEN
+        logical                           :: IsOpen                   !< Check if file state is OPEN
     !----------------------------------------------------------------- 
-        FileIsOpen = (this%State == HDF5_HANDLER_STATE_OPEN .and. Allocated(this%Filename))
-    end function hdf5_handler_FileIsOpen
+        IsOpen = (this%State == HDF5_HANDLER_STATE_OPEN)
+    end function hdf5_handler_IsOpen
+
+
+    function hdf5_handler_IsStepFileOpen(this, Step) result(IsStepFileOpen)
+    !-----------------------------------------------------------------
+    !< Check if the HDF5 file corresponding to a step is already open
+    !----------------------------------------------------------------- 
+        class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
+        integer(I4P),          intent(IN) :: Step                     !< Step to check
+        logical                           :: IsStepFileOpen           !< Check if file state is OPEN
+    !----------------------------------------------------------------- 
+        IsStepFileOpen = this%IsOpen()
+        if(IsStepFileOpen) IsStepFileOpen = (this%FileName == this%GetHDF5FileName(Step))
+    end function hdf5_handler_IsStepFileOpen
+
 
     function hdf5_handler_GetAction(this) result(Action)
     !-----------------------------------------------------------------

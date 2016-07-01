@@ -470,10 +470,9 @@ contains
                 case(XDMF_ACTION_WRITE)
                     call grid%close(xml_handler=this%SpatialFile%xml_handler)
                     call this%SpatialFile%closefile()
-                case(XDMF_ACTION_READ)
-                    call this%SpatialFile%Free()
             end select
         endif
+        call this%SpatialFile%Free()
     end subroutine xdmf_handler_CloseSpatialFile
 
 
