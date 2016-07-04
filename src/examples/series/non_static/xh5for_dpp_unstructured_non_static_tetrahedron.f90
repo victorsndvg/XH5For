@@ -55,7 +55,7 @@ use xh5for
     vectorvelocity = vectorvelocity+rank
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
 
     do i=1, num_steps
         call xh5%AppendStep(Value=time+i)
@@ -70,7 +70,7 @@ use xh5for
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
 
     do i=1, xh5%GetNumberOfSteps()
         call xh5%Parse()

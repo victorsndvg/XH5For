@@ -49,13 +49,12 @@ use xh5for
     Z = Z + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_dpp_rectilinear_non_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_dpp_rectilinear_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, StaticGrid=.true., Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
     call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
+    call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
 
     do i=1, num_steps
-        time = time + 1
-        call xh5%AppendStep(Value=time)
-        call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
+        call xh5%AppendStep(Value=time+i)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P+i)  
         call xh5%Serialize()
     enddo
@@ -64,11 +63,18 @@ use xh5for
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_dpp_rectilinear_non_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_dpp_rectilinear_static_grid_series', GridType=XDMF_GRID_TYPE_RECTILINEAR, StaticGrid=.true., Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
     call xh5%Parse()
+    call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
+
+#ifdef ENABLE_HDF5
+    !< Check results
+    if(.not. (sum(out_X - X)<=epsilon(0._R8P))) exitcode = -1
+    if(.not. (sum(out_Y - Y)<=epsilon(0._R8P))) exitcode = -1
+    if(.not. (sum(out_Z - Z)<=epsilon(0._R8P))) exitcode = -1
+#endif
 
     do i=1, xh5%GetNumberOfSteps()
-        call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
         call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
         call xh5%NextStep()
 #ifdef ENABLE_HDF5
@@ -77,13 +83,15 @@ use xh5for
     if(.not. (sum(out_Y - Y)<=epsilon(0._R8P))) exitcode = -1
     if(.not. (sum(out_Z - Z)<=epsilon(0._R8P))) exitcode = -1
     if(.not. (sum(out_scalartempI4P - (scalartempI4P+i))==0._I4P)) exitcode = -1
-#else
-    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
     enddo
 
     call xh5%Close()
     call xh5%Free()
+
+#ifndef ENABLE_HDF5
+    if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
+#endif
 
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)

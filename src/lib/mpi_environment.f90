@@ -266,7 +266,7 @@ contains
         assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
-        call MPI_BCAST (send_data, 1, MPI_INTEGER, this%root, this%comm, mpierr)
+        call MPI_BCAST (send_data, 1, MPI_LONG_LONG_INT, this%root, this%comm, mpierr)
 #endif
         if(present(mpierror)) mpierror = mpierr
     end subroutine mpi_env_broadcast_int_I8P
@@ -316,7 +316,7 @@ contains
             if(allocated(send_data)) deallocate(send_data)
             allocate(send_data(data_size))
         endif
-        call MPI_BCAST (send_data, data_size, MPI_LONG, this%root, this%comm, mpierr)
+        call MPI_BCAST (send_data, data_size, MPI_LONG_LONG_INT, this%root, this%comm, mpierr)
 #endif
         if(present(mpierror)) mpierror = mpierr
     end subroutine mpi_env_broadcast_int_I8P_array

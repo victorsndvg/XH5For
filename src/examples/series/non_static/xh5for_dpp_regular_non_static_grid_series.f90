@@ -31,7 +31,7 @@ use xh5for
     integer                    :: exitcode = 0
 
     real(R8P)                  :: time = 0.0
-    integer                    :: num_steps = 5
+    integer                    :: num_steps = 1
 
 
     !-----------------------------------------------------------------
@@ -44,7 +44,7 @@ use xh5for
 #endif
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_regular_non_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_dpp_regular_non_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
 
     do i=1, num_steps
         !< Initialize some values depending on the mpi rank and step
@@ -68,14 +68,20 @@ use xh5for
     call xh5%Close()
     call xh5%Free()
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_regular_non_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_dpp_regular_non_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
 
     do i=1, xh5%GetNumberOfSteps()
+print*, 1, i
         call xh5%Parse()
+print*, 2, i
         call xh5%ReadGeometry(Origin=out_Origin, DxDyDz=out_DxDyDz)
+print*, 3, i
         call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)
+print*, 4, i
         call xh5%ReadAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempR8P)
+print*, 5, i
         call xh5%NextStep()
+print*, 6, i
 
 #ifdef ENABLE_HDF5
         !< Check results
@@ -87,8 +93,9 @@ use xh5for
         if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
     enddo
-
+print*, 7
     call xh5%Close()
+print*, 8
     call xh5%Free()
 
 

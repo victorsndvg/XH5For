@@ -38,7 +38,7 @@ use xh5for
                                                 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,  &
                                                 18.0, 19.0, 20.0, 21.0, 22.0, 23.0 /)
 
-    real(R4P),    allocatable  :: out_geometry(:)
+    real(R8P),    allocatable  :: out_geometry(:)
     integer(I4P), allocatable  :: out_topology(:)
     integer(I4P), allocatable  :: out_cellfield(:)
     real(R8P),    allocatable  :: out_nodefield(:)

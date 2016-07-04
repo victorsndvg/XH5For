@@ -14,13 +14,13 @@ use xh5for
     !< Variable definition
     !----------------------------------------------------------------- 
     type(xh5for_t)             :: xh5
-    real(R4P),    dimension(6) :: X = (/0.0, 0.2, 0.4, 0.6, 0.8, 1.0/)
-    real(R4P),    dimension(4) :: Y = (/0.0, 0.33, 0.66, 1.0/)
-    real(R4P),    dimension(3) :: Z = (/0.0, 0.5, 1.0/)
+    real(R8P),    dimension(6) :: X = (/0.0, 0.2, 0.4, 0.6, 0.8, 1.0/)
+    real(R8P),    dimension(4) :: Y = (/0.0, 0.33, 0.66, 1.0/)
+    real(R8P),    dimension(3) :: Z = (/0.0, 0.5, 1.0/)
     integer(I4P), allocatable  :: scalartempI4P(:)
-    real(R4P),    allocatable  :: out_X(:)
-    real(R4P),    allocatable  :: out_Y(:)
-    real(R4P),    allocatable  :: out_Z(:)
+    real(R8P),    allocatable  :: out_X(:)
+    real(R8P),    allocatable  :: out_Y(:)
+    real(R8P),    allocatable  :: out_Z(:)
     integer(I4P), allocatable  :: out_scalartempI4P(:)
 !    integer(I8P), allocatable  :: out_scalartempI8P(:)
 
