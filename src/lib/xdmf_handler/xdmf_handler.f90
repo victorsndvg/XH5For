@@ -74,6 +74,7 @@ private
         ! File name related functions 
         procedure         :: HasPrefix                    => xdmf_handler_HasPrefix
         procedure, public :: GetHDF5Filename              => xdmf_handler_GetHDF5Filename
+        procedure, public :: GetSpatialFilename           => xdmf_handler_GetSpatialFilename
 
         ! File IO procedures
         procedure, public :: OpenSpatialFile              => xdmf_handler_OpenSpatialFile
@@ -83,7 +84,7 @@ private
         procedure, public :: ParseTemporalFile            => xdmf_handler_ParseTemporalFile
         procedure, public :: ParseSpatialFile             => xdmf_handler_ParseSpatialFile
         procedure         :: CloseSpatialGrid             => xdmf_handler_CloseSpatialGrid
-        procedure         :: CloseSpatialFile             => xdmf_handler_CloseSpatialFile
+        procedure, public :: CloseSpatialFile             => xdmf_handler_CloseSpatialFile
 
         ! XML DOM aux procedures for parsing XDMF
         procedure, public :: GetUniqueNodeByTag           => xdmf_handler_GetUniqueNodeByTag
@@ -217,16 +218,38 @@ contains
     end function xdmf_handler_HasPrefix
 
 
-    function xdmf_handler_GetHDF5Filename(this) result (HDF5FileName)
+    function xdmf_handler_GetHDF5Filename(this, Step) result (HDF5FileName)
     !-----------------------------------------------------------------
     !< Generate HDF5 Filename depending on time step
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
-        character(len=:), allocatable        :: HDF5FileName          !< Name of the current HDF5 file
+        class(xdmf_handler_t),  intent(INOUT) :: this                 !< XMDF handler
+        integer(I4P), optional, intent(IN)    :: Step                 !< Force step number
+        character(len=:), allocatable         :: HDF5FileName         !< Name of the current HDF5 file
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%HasPrefix())
-        HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        if(present(Step)) then
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//HDF5_EXT
+        else
+            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+        endif
     end function xdmf_handler_GetHDF5Filename
+
+
+    function xdmf_handler_GetSpatialFilename(this, Step) result (SpatialFileName)
+    !-----------------------------------------------------------------
+    !< Generate HDF5 Filename depending on time step
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),  intent(INOUT) :: this                 !< XMDF handler
+        integer(I4P), optional, intent(IN)    :: Step                 !< Force step number
+        character(len=:), allocatable         :: SpatialFileName      !< Name of the current Spatial file
+    !----------------------------------------------------------------- 
+        assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%HasPrefix())
+        if(present(Step)) then
+            SpatialfileName = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//XI_EXT
+        else
+            SpatialfileName = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT
+        endif
+    end function xdmf_handler_GetSpatialFilename
 
 
     subroutine xdmf_handler_Open(this, FilePrefix, Action)
@@ -240,7 +263,6 @@ contains
         this%Action = action
         if(this%MPIEnvironment%is_root()) then
             this%Prefix = trim(adjustl(FilePrefix))
-            call this%TemporalFile%set_filename(trim(adjustl(FilePrefix))//XDMF_EXT)
         endif
     end subroutine xdmf_handler_Open
 
@@ -256,8 +278,7 @@ contains
         assert(this%State == XDMF_HANDLER_STATE_INIT)
         if(this%MPIEnvironment%is_root()) then
             assert(this%HasPrefix())
-            call this%StepsHandler%SetCurrentFilename(trim(adjustl(this%prefix))//'_'//&
-                trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//XI_EXT)
+            call this%StepsHandler%SetCurrentFilename(this%GetSpatialFileName())
             call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
@@ -306,6 +327,7 @@ contains
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(this%MPIEnvironment%is_root()) then
             assert(this%HasPrefix())
+            call this%TemporalFile%set_filename(trim(adjustl(this%Prefix))//XDMF_EXT)
             call this%TemporalFile%ParseFile()
             if(getNodeType(this%TemporalFile%get_document_root())==DOCUMENT_NODE) then
                 DocumentRootNode => getDocumentElement(this%TemporalFile%get_document_root())
@@ -326,8 +348,9 @@ contains
             endif
             call destroy(this%TemporalFile%get_document_root())
         endif
+        call this%TemporalFile%SetParsed()
         call this%StepsHandler%BroadCastNumberOfSteps()
-        call this%StepsHandler%Begin()
+        call this%StepsHandler%Begin(Start=this%SpatialGridDescriptor%isStaticGrid())
     end subroutine xdmf_handler_ParseTemporalFile
 
 
@@ -341,20 +364,23 @@ contains
         integer                               :: i
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
-        if(this%MPIEnvironment%is_root()) then
-            call this%SpatialFile%Free()
-            call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
-            call this%SpatialFile%ParseFile()
-            ! Get Spatial Grid Node
-            SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
-            if(.not. associated(SpatialGridNode)) return
-            UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
-            if(.not. associated(UniformGridNodes)) return
-            ! Get Fill Spatial Grid metainfo
-            call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
-            call destroy(this%SpatialFile%get_document_root())
+        if(.not. this%TemporalFile%isParsed()) call this%ParseTemporalFile()
+        if(.not. this%SpatialFile%isParsed()) then
+            if(this%MPIEnvironment%is_root()) then
+                call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
+                call this%SpatialFile%ParseFile()
+                ! Get Spatial Grid Node
+                SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
+                if(.not. associated(SpatialGridNode)) return
+                UniformGridNodes => getElementsByTagname(SpatialGridNode, 'Grid')
+                if(.not. associated(UniformGridNodes)) return
+                ! Get Fill Spatial Grid metainfo
+                call this%FillSpatialGridDescriptor(UniformGridNodes=UniformGridNodes)
+                call destroy(this%SpatialFile%get_document_root())
+            endif
+            call this%SpatialFile%SetParsed()
+            call this%SpatialGridDescriptor%BroadcastMetadata()
         endif
-        call this%SpatialGridDescriptor%BroadcastMetadata()
     end subroutine xdmf_handler_ParseSpatialFile
 
 
@@ -396,6 +422,7 @@ contains
             assert(this%HasPrefix())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
+                    call this%TemporalFile%set_filename(trim(adjustl(this%Prefix))//XDMF_EXT)
                     call this%TemporalFile%OpenFile()
                     call this%StepsHandler%Begin()
                     call domain%open(xml_handler = this%TemporalFile%xml_handler)
@@ -445,6 +472,7 @@ contains
                     call this%SpatialFile%closefile()
             end select
         endif
+        call this%SpatialFile%Free()
     end subroutine xdmf_handler_CloseSpatialFile
 
 

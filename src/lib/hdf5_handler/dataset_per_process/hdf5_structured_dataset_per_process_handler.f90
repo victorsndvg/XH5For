@@ -7,6 +7,7 @@ use HDF5
 use hdf5_dataset_per_process_handler
 use xh5for_utils
 use xh5for_parameters
+use steps_handler
 use mpi_environment
 use spatial_grid_descriptor
 
@@ -48,13 +49,14 @@ contains
     !-----------------------------------------------------------------
     !< Writes R4P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for Unstructured grids
-        real(R4P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
-        integer(I4P)                                           :: GridID              !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for Unstructured grids
+        real(R4P),                                  intent(IN) :: XYZ(:)                !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: LocalGeometrySize     !< Local size of the geometry hyperslab
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -62,7 +64,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         do GridID=0, MPIEnvironment%get_comm_size()-1
             LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID),HSIZE_T)
             call this%WriteMetadata(                                                           &
@@ -87,13 +91,14 @@ contains
     !-----------------------------------------------------------------
     !< Writes R8P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
-        real(R8P),                                  intent(IN) :: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
-        integer(I4P)                                           :: GridID              !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R8P),                                  intent(IN) :: XYZ(:)                !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: LocalGeometrySize     !< Local size of the geometry hyperslab
+        integer(I4P)                                           :: GridID                !< Index to loop on GridID's
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -101,7 +106,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         do GridID=0, MPIEnvironment%get_comm_size()-1
             LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID),HSIZE_T)
             call this%WriteMetadata(                                                           &
@@ -134,8 +141,9 @@ contains
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
         integer(I4P)                                           :: GridID                !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -143,7 +151,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         do GridID=0, MPIEnvironment%get_comm_size()-1
             LocalGeometrySize(1) = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1),HSIZE_T)
             LocalGeometrySize(2) = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2),HSIZE_T)
@@ -210,8 +220,9 @@ contains
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
         integer(I4P)                                           :: GridID                !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -219,7 +230,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         do GridID=0, MPIEnvironment%get_comm_size()-1
             LocalGeometrySize(1) = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1),HSIZE_T)
             LocalGeometrySize(2) = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2),HSIZE_T)
@@ -283,8 +296,9 @@ contains
         real(R4P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
         integer(I4P)                                           :: GridID                !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -292,7 +306,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -365,8 +381,9 @@ contains
         real(R8P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
         integer(I4P)                                           :: GridID                !< Index to loop on GridID's
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -374,7 +391,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -476,15 +495,16 @@ contains
     !-----------------------------------------------------------------
     !< Read XY[Z] R4P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
-        real(R4P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R4P), allocatable,                     intent(OUT):: XYZ(:)                !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: spacedim              !< Space dimension
+        integer(HSIZE_T)                                       :: globalnumberofnodes   !< Global number of nodes
+        integer(HSIZE_T)                                       :: localnumberofnodes    !< Local number of nodes
+        integer(HSIZE_T)                                       :: nodeoffset            !< Node offset for a particular grid
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -492,7 +512,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -511,15 +533,16 @@ contains
     !-----------------------------------------------------------------
     !< Read XY[Z] R8P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
-        real(R8P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R8P), allocatable,                     intent(OUT):: XYZ(:)                !< Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: spacedim              !< Space dimension
+        integer(HSIZE_T)                                       :: globalnumberofnodes   !< Global number of nodes
+        integer(HSIZE_T)                                       :: localnumberofnodes    !< Local number of nodes
+        integer(HSIZE_T)                                       :: nodeoffset            !< Node offset for a particular grid
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -527,7 +550,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
         globalnumberofnodes = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
         localnumberofnodes = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -555,8 +580,9 @@ contains
         integer(HSIZE_T)                                       :: globalnodesperdim(3)  !< Global number of nodes per dimension
         integer(HSIZE_T)                                       :: localnodesperdim(3)   !< Local number of nodes per dimension
         integer(HSIZE_T)                                       :: nodeoffsetperdim(3)   !< Node offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -564,7 +590,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
         globalnodesperdim(1) = int(SpatialGridDescriptor%GetGlobalXsize(),HSIZE_T)
         globalnodesperdim(2) = int(SpatialGridDescriptor%GetGlobalYsize(),HSIZE_T)
@@ -614,17 +642,18 @@ contains
     !-----------------------------------------------------------------
     !< Read X_Y_Z R8P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this      !< HDF5 dataset per process handler for structured grids
-        real(R8P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
-        real(R8P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
-        real(R8P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnodesperdim(3)!< Global number of nodes per dimension
-        integer(HSIZE_T)                                       :: localnodesperdim(3) !< Local number of nodes per dimension
-        integer(HSIZE_T)                                       :: nodeoffsetperdim(3) !< Node offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R8P), allocatable,                     intent(OUT):: X(:)                  !< X Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: Y(:)                  !< Y Grid coordinates
+        real(R8P), allocatable,                     intent(OUT):: Z(:)                  !< Z Grid coordinates
+        character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        integer(HSIZE_T)                                       :: spacedim              !< Space dimension
+        integer(HSIZE_T)                                       :: globalnodesperdim(3)  !< Global number of nodes per dimension
+        integer(HSIZE_T)                                       :: localnodesperdim(3)   !< Local number of nodes per dimension
+        integer(HSIZE_T)                                       :: nodeoffsetperdim(3)   !< Node offset for a particular grid
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -632,7 +661,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         spacedim = int(GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank())),HSIZE_T)
         globalnodesperdim(1) = int(SpatialGridDescriptor%GetGlobalXsize(),HSIZE_T)
         globalnodesperdim(2) = int(SpatialGridDescriptor%GetGlobalYsize(),HSIZE_T)
@@ -682,12 +713,13 @@ contains
     !-----------------------------------------------------------------
     !< Read R4P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this   !< HDF5 dataset per process handler for structured grids
-        real(R4P), allocatable,                     intent(OUT) :: Origin(:)       !< Origin coordinates
-        real(R4P), allocatable,                     intent(OUT) :: DxDyDz(:)       !< Coodinates step for the next point
-        character(len=*),                           intent(IN)  :: Name            !< Geometry dataset name
-        class(spatial_grid_descriptor_t), pointer               :: SpatialGridDescriptor !< Spatial grid descriptor
-        class(mpi_env_t),                 pointer               :: MPIEnvironment        !< MPI Environment
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R4P), allocatable,                     intent(OUT) :: Origin(:)            !< Origin coordinates
+        real(R4P), allocatable,                     intent(OUT) :: DxDyDz(:)            !< Coodinates step for the next point
+        character(len=*),                           intent(IN)  :: Name                 !< Geometry dataset name
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -695,7 +727,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -736,12 +770,13 @@ contains
     !-----------------------------------------------------------------
     !< Read R8P coordinates to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this   !< HDF5 dataset per process handler for structured grids
-        real(R8P), allocatable,                     intent(OUT) :: Origin(:)       !< Origin coordinates
-        real(R8P), allocatable,                     intent(OUT) :: DxDyDz(:)       !< Coodinates step for the next point
-        character(len=*),                           intent(IN)  :: Name            !< Geometry dataset name
-        class(spatial_grid_descriptor_t), pointer               :: SpatialGridDescriptor !< Spatial grid descriptor
-        class(mpi_env_t),                 pointer               :: MPIEnvironment        !< MPI Environment
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        real(R8P), allocatable,                     intent(OUT) :: Origin(:)            !< Origin coordinates
+        real(R8P), allocatable,                     intent(OUT) :: DxDyDz(:)            !< Coodinates step for the next point
+        character(len=*),                           intent(IN)  :: Name                 !< Geometry dataset name
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
+        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -749,7 +784,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -790,31 +827,15 @@ contains
     !-----------------------------------------------------------------
     !< Read I4P connectivities to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this     !< HDF5 dataset per process handler for structured grids
-        integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)  !< I4P Grid connectivities
-        character(len=*),                           intent(IN) :: Name               !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)     !< I4P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                  !< Topology dataset name
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        MPIEnvironment        => this%GetMPIEnvironment()
-        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
-        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize  = int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),  &
-                DatasetDims     = (/LocalTopologySize/),                                                           &
-                HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
-                HyperSlabSize   = (/LocalTopologySize/),                                                           &
-                Values          = Connectivities)
+        ! No topology data is readed from HDF5 file
 #endif
     end subroutine hdf5_structured_dataset_per_process_ReadTopology_I4P
 
@@ -823,31 +844,15 @@ contains
     !-----------------------------------------------------------------
     !< Read I8P connectivities to a HDF5 file for the dataset per process strategy
     !----------------------------------------------------------------- 
-        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this     !< HDF5 dataset per process handler for structured grids
-        integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)  !< I8P Grid connectivities
-        character(len=*),                           intent(IN) :: Name               !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
+        class(hdf5_structured_dataset_per_process_handler_t), intent(IN) :: this        !< HDF5 dataset per process handler for structured grids
+        integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)     !< I8P Grid connectivities
+        character(len=*),                           intent(IN) :: Name                  !< Topology dataset name
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
 #ifdef ENABLE_HDF5
-        MPIEnvironment        => this%GetMPIEnvironment()
-        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
-        GlobalTopologySize = int(SpatialGridDescriptor%GetGlobalTopologySize(),HSIZE_T)
-        LocalTopologySize =  int(SpatialGridDescriptor%GetTopologySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
-        TopologySizeOffset = int(SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
-        call this%ReadDataset(                                                                                     &
-                DatasetName     = Name//'_'//trim(adjustl(str(no_sign=.true.,n=MPIEnvironment%get_rank()))),  &
-                DatasetDims     = (/LocalTopologySize/),                                                           &
-                HyperSlabOffset = (/0_HSIZE_T/),                                                                   &
-                HyperSlabSize   = (/LocalTopologySize/),                                                           &
-                Values          = Connectivities)
+        ! No topology data is readed from HDF5 file
 #endif
     end subroutine hdf5_structured_dataset_per_process_ReadTopology_I8P
 

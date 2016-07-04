@@ -7,6 +7,7 @@ use HDF5
 use hdf5_contiguous_hyperslab_handler
 use xh5for_utils
 use xh5for_parameters
+use steps_handler
 use mpi_environment
 use spatial_grid_descriptor
 
@@ -53,6 +54,7 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize    !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize     !< Local size of the geometry hyperslab
         integer(HSIZE_T)                                       :: GeometrySizeOffset    !< Geometry size offset for a particular grid
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -62,7 +64,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -85,6 +89,7 @@ contains
         integer(HSIZE_T)                                       :: GlobalGeometrySize  !< Total size of the geometry dataset
         integer(HSIZE_T)                                       :: LocalGeometrySize   !< Local size of the geometry hyperslab
         integer(HSIZE_T)                                       :: GeometrySizeOffset  !< Geometry size offset for a particular grid
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -94,7 +99,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize = int(SpatialGridDescriptor%GetGlobalGeometrySize(),HSIZE_T)
         LocalGeometrySize  = int(SpatialGridDescriptor%GetGeometrySizePerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         GeometrySizeOffset = int(SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
@@ -120,6 +127,7 @@ contains
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -129,7 +137,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize(1) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
         GlobalGeometrySize(2) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
         GlobalGeometrySize(3) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
@@ -174,6 +184,7 @@ contains
         integer(HSIZE_T)                                       :: LocalGeometrySize(3)  !< Total number of nodes per axis
         integer(HSIZE_T)                                       :: GeometrySizeOffset(3) !< Total number of nodes per axis
         integer(I4P)                                           :: SpaceDimension        !< Space dimension
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -183,7 +194,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         GlobalGeometrySize(1) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1),HSIZE_T)
         GlobalGeometrySize(2) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2),HSIZE_T)
         GlobalGeometrySize(3) = int(SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3),HSIZE_T)
@@ -223,6 +236,7 @@ contains
         real(R4P),                                  intent(IN) :: Origin(:)             !< Origin coordinates
         real(R4P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -232,7 +246,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3
@@ -271,6 +287,7 @@ contains
         real(R8P),                                  intent(IN) :: Origin(:)             !< Origin coordinates
         real(R8P),                                  intent(IN) :: DxDyDz(:)             !< Coodinates step for the next point
         character(len=*),                           intent(IN) :: Name                  !< Geometry dataset name
+        class(steps_handler_t),           pointer              :: StepsHandler          !< Steps handler
         class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
         class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
@@ -280,7 +297,9 @@ contains
 #ifdef ENABLE_HDF5
         MPIEnvironment        => this%GetMPIEnvironment()
         SpatialGridDescriptor => this%GetSpatialGridDescriptor()
-        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
+        StepsHandler          => this%GetStepsHandler()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment) .and. associated(StepsHandler))
+        if(SpatialGridDescriptor%IsStaticGrid() .and. .not. StepsHandler%IsStaticStep()) return
         select case (SpatialGridDescriptor%GetGeometryTypePerGridID(ID=MPIEnvironment%get_rank()))
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 ! Origin and DxDyDz size must be 3

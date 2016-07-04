@@ -1,15 +1,15 @@
 program xh5for_ch_unstructured_mixedtopology
 
 use xh5for
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
-#else
+#endif
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
 
-implicit none
     !-----------------------------------------------------------------
     !< Variable definition
     !----------------------------------------------------------------- 
@@ -57,7 +57,7 @@ implicit none
     !< Main program
     !----------------------------------------------------------------- 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
 #endif
@@ -66,14 +66,15 @@ implicit none
     geometry = geometry/2 + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_regular_grid_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_mixed_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, StaticGrid=.true., Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%SetMesh(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
+
+    call xh5%WriteTopology(Connectivities = topology)
+    call xh5%WriteGeometry(XYZ = geometry)
 
     do i=1, num_steps
         time = time+1.0
-        call xh5%SetMesh(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
         call xh5%AppendStep(Value=time)
-        call xh5%WriteTopology(Connectivities = topology)
-        call xh5%WriteGeometry(XYZ = geometry)
         call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield+i)
         call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield+i)
         call xh5%Serialize()
@@ -83,19 +84,23 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_regular_grid_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_mixed_series', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, StaticGrid=.true., Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
     call xh5%Parse()
+    call xh5%ReadTopology(Connectivities = out_topology)
+    call xh5%ReadGeometry(XYZ = out_geometry)
+
+#ifdef ENABLE_HDF5
+        !< Check results
+        if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
+        if(.not. (sum(out_topology - topology)==0)) exitcode = -1
+#endif
 
     do i=1, xh5%GetNumberOfSteps()
-        call xh5%ReadTopology(Connectivities = out_topology)
-        call xh5%ReadGeometry(XYZ = out_geometry)
         call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
         call xh5%ReadAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_cellfield)
         call xh5%NextStep()
 #ifdef ENABLE_HDF5
         !< Check results
-        if(.not. (sum(out_geometry - geometry)<=epsilon(0._R4P))) exitcode = -1
-        if(.not. (sum(out_topology - topology)==0)) exitcode = -1
         if(.not. (sum(out_cellfield - (cellfield+i))==0)) exitcode = -1
         if(.not. (sum(out_nodefield - (nodefield+i))<=epsilon(0._R8P))) exitcode = -1
 #else
@@ -106,7 +111,7 @@ implicit none
         call xh5%Close()
         call xh5%Free()
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

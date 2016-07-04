@@ -1,15 +1,15 @@
 program xh5for_dpp_unstructured_hexahedron
 
 use xh5for
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
-#else
+#endif
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
 
-implicit none
     !-----------------------------------------------------------------
     !< Variable definition
     !----------------------------------------------------------------- 
@@ -39,7 +39,7 @@ implicit none
     !< Main program
     !----------------------------------------------------------------- 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
 #endif
@@ -79,7 +79,7 @@ implicit none
     if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

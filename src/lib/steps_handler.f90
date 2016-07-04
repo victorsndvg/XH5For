@@ -2,6 +2,7 @@ module steps_handler
 
 use IR_Precision, only: I4P, R4P, R8P, str
 USE mpi_environment
+USE xh5for_parameters
 
 implicit none
 
@@ -95,6 +96,7 @@ private
         procedure, non_overridable, public :: Begin                  => steps_handler_Begin
         procedure, non_overridable, public :: Next                   => steps_handler_Next
         procedure, non_overridable, public :: End                    => steps_handler_End
+        procedure, non_overridable, public :: IsStaticStep            => steps_handler_IsStaticStep
         procedure, non_overridable, public :: HasFinished            => steps_handler_HasFinished
         procedure, non_overridable, public :: GetNumberOfSteps       => steps_handler_GetNumberOfSteps
         procedure, non_overridable, public :: GetCurrentStep         => steps_handler_GetCurrentStep
@@ -103,6 +105,7 @@ private
         procedure, non_overridable, public :: SetCurrentValue        => steps_handler_SetCurrentValue
         procedure, non_overridable, public :: SetCurrentFilename     => steps_handler_SetCurrentFilename
         procedure, non_overridable, public :: GetStepValue           => steps_handler_GetStepValue
+        procedure, non_overridable, public :: GetStepFilename        => steps_handler_GetStepFilename
         procedure, non_overridable, public :: Free                   => steps_handler_Free
     end type
 
@@ -184,7 +187,8 @@ contains
         integer(I4P)                          :: CurrentStep          !< Current step number
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
-        if(.not. this%StepsCounter>0) call this%Append(0.0)
+        if(.not. this%NumberOfSteps>0) call this%Append(0.0)
+        if(.not. this%StepsCounter>0) this%StepsCounter = 1
         CurrentStep = this%StepsCounter
     end function steps_handler_GetCurrentStep
 
@@ -197,9 +201,13 @@ contains
         real(R8P)                             :: CurrentValue         !< Current step value
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
-        CurrentValue = 0.0_R8P
-        if(.not. this%StepsCounter>0) call this%Append(0.0)
-        CurrentValue = this%Values(this%StepsCounter)
+        CurrentValue = 0.0
+        if(.not. this%NumberOfSteps>0) call this%Append(CurrentValue)
+        if(this%StepsCounter==XDMF_STATIC_STEP .and. (this%StepsCounter<1 .or. this%StepsCounter>this%NumberOfSteps)) then
+            CurrentValue = this%Values(1)
+        else
+            CurrentValue = this%Values(this%GetCurrentStep())
+        endif
     end function steps_handler_GetCurrentValue
 
 
@@ -212,8 +220,12 @@ contains
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
         CurrentFilename=''
-        if(.not. this%StepsCounter>0) call this%Append(CurrentFilename)
-        CurrentFilename = this%Filenames(this%StepsCounter)%Get()
+        if(.not. this%NumberOfSteps>0) call this%Append(CurrentFilename)
+        if(this%StepsCounter==XDMF_STATIC_STEP .and. (this%StepsCounter<1 .or. this%StepsCounter>this%NumberOfSteps)) then
+            CurrentFilename = this%Filenames(1)%Get()
+        else
+            CurrentFilename = this%Filenames(this%GetCurrentStep())%Get()
+        endif
     end function steps_handler_GetCurrentFilename
 
 
@@ -255,7 +267,7 @@ contains
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
         integer(I4P),           intent(IN)    :: StepNumber           !< Number of the step
-        real(R8P)                             :: Value                !< Current step number
+        real(R8P)                             :: Value                !< Step value
     !----------------------------------------------------------------- 
         assert(this%State > STEPS_HANDLER_STATE_START)
         Value = 0.0_R8P
@@ -265,6 +277,24 @@ contains
             endif
         endif
     end function steps_handler_GetStepValue
+
+
+    function steps_handler_GetStepFilename(this, StepNumber) result(Filename)
+    !-----------------------------------------------------------------
+    !< Return the value given the step number
+    !----------------------------------------------------------------- 
+        class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
+        integer(I4P),           intent(IN)    :: StepNumber           !< Number of the step
+        character(len=:), allocatable         :: Filename             !< Step filename
+    !----------------------------------------------------------------- 
+        assert(this%State > STEPS_HANDLER_STATE_START)
+        Filename = ''
+        if(this%MPIEnvironment%is_root()) then
+            if(StepNumber>0 .and. StepNumber<=this%NumberOfSteps) then
+                Filename = this%Filenames(StepNumber)%Get()
+            endif
+        endif
+    end function steps_handler_GetStepFilename
 
 
     subroutine steps_handler_ResizeArrays(this, GrowthFactor)
@@ -361,14 +391,18 @@ contains
     end subroutine steps_handler_BroadcastNumberOfSteps
 
 
-    subroutine steps_handler_Begin(this)
+    subroutine steps_handler_Begin(this, Start)
     !-----------------------------------------------------------------
-    !< CurrentStep returns to the first step
+    !< CurrentStep returns to the first step or force step to 0
     !----------------------------------------------------------------- 
         class(steps_handler_t), intent(INOUT) :: this                 !< Steps Handler
+        logical, optional,      intent(IN)    :: Start                !< Start position
     !-----------------------------------------------------------------
         assert(this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
         this%StepsCounter = 1
+        if(Present(Start)) then
+            if(Start) this%StepsCounter = 0
+        endif
         this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_Begin
 
@@ -395,6 +429,17 @@ contains
         this%StepsCounter = this%NumberOfSteps
         this%State = STEPS_HANDLER_STATE_ITER
     end subroutine steps_handler_End
+
+
+    function steps_handler_IsStaticStep(this) result(IsStaticStep)
+    !-----------------------------------------------------------------
+    !< Check if "iterator" reached the last position
+    !----------------------------------------------------------------- 
+        class(steps_handler_t), intent(IN) :: this                    !< Steps Handler
+        logical                            :: IsStaticStep             !< True if current step is the first one
+    !-----------------------------------------------------------------
+        IsStaticStep = this%StepsCounter == XDMF_STATIC_STEP
+    end function steps_handler_IsStaticStep
 
 
     function steps_handler_HasFinished(this) result(HasFinished)

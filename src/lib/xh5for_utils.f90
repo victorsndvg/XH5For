@@ -125,7 +125,7 @@ contains
     end function
 
     function GetXDMFTopologyTypeName(TopologyType) result(topologyName)
-        integer(I4P), intent(IN)     :: TopologyType
+        integer(I4P),     intent(IN)  :: TopologyType
         character(len=:), allocatable :: topologyName
 !< @Note: How we can manage 2DSMesh, 2DRectMesh, 2DCoRectMesh, 3DSMesh, 3DRectMesh and 3DCoRectMesh TopologyTypes
 !        allowed_topologyTypes = 'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral' // &
@@ -212,8 +212,8 @@ contains
 
 
     function GetXDMFTopologyTypeFromName(TopologyNAme) result(topologyType)
-        character(len=:), allocatable, intent(IN)     :: TopologyName
-        integer(I4P) :: topologyType
+        character(len=*), intent(IN) :: TopologyName
+        integer(I4P)                 :: topologyType
 !< @Note: How we can manage 2DSMesh, 2DRectMesh, 2DCoRectMesh, 3DSMesh, 3DRectMesh and 3DCoRectMesh TopologyTypes
 !        allowed_topologyTypes = 'Polyvertex&Polyline&Polygon&Triangle&Quadrilateral' // &
 !                            '&Tetrahedron&Pyramid&Wedge&Hexahedron&Edge_3&Triangle_6'// &
@@ -314,8 +314,8 @@ contains
 
 
     function GetXDMFGeometryTypeFromName(GeometryName) result(GeometryType)
-        character(len=:), allocatable, intent(IN) :: GeometryName
-        integer(I4P)                              :: GeometryType
+        character(len=*), intent(IN) :: GeometryName
+        integer(I4P)                 :: GeometryType
 
 !< @Note: How we can manage X_Y_Z, VxVyVz, Origin_DxDyDz and Origin_DxDy GeometryTypes
 !        allowed_GeometryTypes = 'XYZ&XY&X_Y_Z&VxVyVz&Origin_DxDyDz%Origin_DxDy'
@@ -390,8 +390,8 @@ contains
 
 
     function GetXDMFCenterTypeFromName(CenterName) result(CenterType)
-        character(len=:), allocatable, intent(IN) :: CenterName
-        integer(I4P)                              :: CenterType
+        character(len=*), intent(IN) :: CenterName
+        integer(I4P)                 :: CenterType
 !< @Note: How we can manage Grid, Face and Edge CenterTypes
 !        allowed_Centers = 'Node&Cell&Grid&Face&Edge'
         select case(CenterName)
@@ -439,8 +439,8 @@ contains
 
 
     function GetXDMFAttributeTypeFromName(AttributeName) result(AttributeType)
-        character(len=:), allocatable, intent(IN) :: AttributeName
-        integer(I4P)                              :: AttributeType
+        character(len=*), intent(IN) :: AttributeName
+        integer(I4P)                 :: AttributeType
 !< @Note: How we can manage NOTYPE CenterTypes
 !        allowed_AttributeTypes = 'Scalar&Vector&Tensor&Tensor6&Matrix&GlobalID'
         select case(AttributeName)

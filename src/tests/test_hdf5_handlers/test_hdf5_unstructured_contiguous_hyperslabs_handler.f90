@@ -7,16 +7,14 @@ use mpi_environment
 use steps_handler
 use unstructured_spatial_grid_descriptor
 use unstructured_uniform_grid_descriptor
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
 #endif
-#ifdef MPI_H
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
-
-implicit none
 
     type(mpi_env_t)                                                     :: mpienv
     type(steps_handler_t)                                               :: stepshandler
@@ -27,9 +25,10 @@ implicit none
     integer(I4P), dimension(6)                                          :: triangletopology = (/0,1,2,1,2,3/)
     integer                                                             :: mpierr, i
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
 #endif
+
     call mpienv%initialize()
     call stepshandler%initialize(mpienv)
     call spatialgrid%initialize(MPIEnvironment=mpienv, NumberOfNodes=4_I8P, NumberOfElements=2_I8P, TopologyType=XDMF_TOPOLOGY_TYPE_TRIANGLE, GeometryType=XDMF_GEOMETRY_TYPE_XY, GridType=XDMF_GRID_TYPE_UNSTRUCTURED)
@@ -39,9 +38,9 @@ implicit none
     call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hdf5_uns_hyperslab')
     call heavydata%WriteTopology(triangletopology+mpienv%get_rank(), Name='Connectivities')
     call heavydata%WriteGeometry(trianglegeometry, Name='Coordinates')
-!    call lightdata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, GridID=i)
     call heavydata%CloseFile()
-#ifdef ENABLE_MPI
+
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

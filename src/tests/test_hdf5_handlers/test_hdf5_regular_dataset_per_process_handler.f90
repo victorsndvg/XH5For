@@ -7,16 +7,14 @@ use mpi_environment
 use steps_handler
 use structured_spatial_grid_descriptor
 use structured_uniform_grid_descriptor
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
 #endif
-#ifdef MPI_H
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
-
-implicit none
 
     type(mpi_env_t)                                                   :: mpienv
     type(steps_handler_t)                                             :: stepshandler
@@ -30,7 +28,7 @@ implicit none
     integer                                                           :: i
 
 
-#if defined(MPI_MOD) || defined(MPI_H)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
 #endif
 
@@ -45,7 +43,8 @@ implicit none
     call heavydata%WriteGeometry(Origin=Origin,DxDyDz=DxDyDz, Name='Coordinates')
     call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)
     call heavydata%CloseFile()
-#ifdef ENABLE_MPI
+
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

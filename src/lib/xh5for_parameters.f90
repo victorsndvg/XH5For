@@ -12,6 +12,8 @@ implicit none
     character(len=3), parameter :: XI_EXT   = '.xi'
     character(len=3), parameter :: HDF5_EXT = '.h5'
 
+    integer(I4P),     parameter :: XDMF_STATIC_STEP  = 0
+
     integer(I4P), parameter :: XDMF_NO_VALUE  = -1
 
     integer(I4P), parameter :: XDMF_ARRAY_TYPE_INT8    = 0
@@ -111,12 +113,12 @@ implicit none
     !< ACTUALLY SUPPORTED PARAMETERS
     !----------------------------------------------------------------- 
 
-    integer(I4P), parameter :: SUPPORTED_STRATEGIES(*)  = (/ &
+    integer(I4P), parameter :: SUPPORTED_STRATEGIES(2)  = (/ &
                                                                 XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, &
                                                                 XDMF_STRATEGY_DATASET_PER_PROCESS   &
                                                           /)
 
-    integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(*)  = (/ &
+    integer(I4P), parameter :: SUPPORTED_GEOMETRYTYPES(7)  = (/ &
                                                                 ! Unstructured
                                                                 XDMF_GEOMETRY_TYPE_XY,            &
                                                                 XDMF_GEOMETRY_TYPE_XYZ,           &
@@ -128,7 +130,7 @@ implicit none
                                                                 XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ  &
                                                              /)
 
-    integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(*)  = (/ &
+    integer(I4P), parameter :: SUPPORTED_TOPOLOGYTYPES(32) = (/ &
                                                                 ! Unstructured
 !                                                               XDMF_TOPOLOGY_TYPE_POLYVERTEX,      &
 !                                                               XDMF_TOPOLOGY_TYPE_POLYLINE,        &
@@ -168,7 +170,7 @@ implicit none
                                                                 XDMF_TOPOLOGY_TYPE_3DCORECTMESH     &
                                                              /)
 
-    integer(I4P), parameter :: SUPPORTED_GRIDTYPES(*)  = (/ &
+    integer(I4P), parameter :: SUPPORTED_GRIDTYPES(4)  = (/ &
                                                             XDMF_GRID_TYPE_CURVILINEAR , &
                                                             XDMF_GRID_TYPE_RECTILINEAR , &
                                                             XDMF_GRID_TYPE_REGULAR     , &

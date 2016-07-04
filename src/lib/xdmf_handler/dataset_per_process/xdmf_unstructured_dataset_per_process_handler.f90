@@ -117,11 +117,17 @@ contains
         integer(I8P)                                              :: GlobalConnectivitySize  !< Global connectivity size
         integer(I8P)                                              :: Start                   !< Hyperslab start
         integer(I8P)                                              :: TopologySize            !< Topology size
+        character(len=:), allocatable                             :: HDF5FileName                 !< Name of the HDF5 file
         character(len=:), allocatable                             :: XMDFTopologyTypeName    !< String topology type identifier
         integer(I4P)                                              :: DimensionsSize          !< Size of the topology shape
     !-----------------------------------------------------------------
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
         if(this%MPIEnvironment%is_root()) then
+            if(this%SpatialGridDescriptor%IsStaticGrid()) then
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
+            else
+                HDF5FileName = this%GetHDF5FileName()
+            endif
             LocalNumberOfElements = this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=GridID)
             Start = this%SpatialGridDescriptor%GetTopologySizeOffsetPerGridID(ID=GridID)
             GlobalConnectivitySize = this%SpatialGridDescriptor%GetGlobalTopologySize()
@@ -137,7 +143,7 @@ contains
                     Format      = 'HDF',                             & 
                     Precision   = this%UniformGridDescriptor%GetTopologyPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = this%GetHDF5Filename()//':'//this%UniformGridDescriptor%GetTopologyName()//&
+                    Data = HDF5Filename//':'//this%UniformGridDescriptor%GetTopologyName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler=this%SpatialFile%xml_handler)
             call topology%close(xml_handler=this%SpatialFile%xml_handler)
@@ -175,10 +181,16 @@ contains
         integer(I4P)                                   :: SpaceDimension               !< Space dimension
         integer(I8P)                                   :: Start                        !< Hyperslab start
         integer(I8P)                                   :: Count                        !< Hyperslab count
+        character(len=:), allocatable                  :: HDF5FileName                 !< Name of the HDF5 file
         character(len=:), allocatable                  :: XDMFGeometryTypeName         !< String geometry type identifier
         integer(I4P)                                   :: DimensionsSize               !< Size of the geometry shape
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
+            if(this%SpatialGridDescriptor%IsStaticGrid()) then
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
+            else
+                HDF5FileName = this%GetHDF5FileName()
+            endif
             LocalGeometrySize = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID)
             Start = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID)
             GlobalGeometrySize = this%SpatialGridDescriptor%GetGlobalGeometrySize()
@@ -193,7 +205,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = this%GetHDF5Filename()//':'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = HDF5Filename//':'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
             call geometry%close(xml_handler = this%SpatialFile%xml_handler)
@@ -215,10 +227,16 @@ contains
         integer(I4P)                                   :: SpaceDimension               !< Space dimension
         integer(I8P)                                   :: Start                        !< Hyperslab start
         integer(I8P)                                   :: Count                        !< Hyperslab count
+        character(len=:), allocatable                  :: HDF5FileName                 !< Name of the HDF5 file
         character(len=:), allocatable                  :: XDMFGeometryTypeName         !< String geometry type identifier
         integer(I4P)                                   :: DimensionsSize               !< Size of the geometry shape
     !-----------------------------------------------------------------
         if(this%MPIEnvironment%is_root()) then
+            if(this%SpatialGridDescriptor%IsStaticGrid()) then
+                HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
+            else
+                HDF5FileName = this%GetHDF5FileName()
+            endif
             LocalNumberOfNodes = this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=GridID)
             Start = this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=GridID)
             GlobalNumberOfNodes = this%SpatialGridDescriptor%GetGlobalNumberOfNodes()
@@ -236,7 +254,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = this%GetHDF5Filename()//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = HDF5Filename//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -248,7 +266,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = this%GetHDF5Filename()//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = HDF5Filename//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
     !-----------------------------------------------------------------
@@ -260,7 +278,7 @@ contains
                     Format     = 'HDF', &
                     Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
             call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = this%GetHDF5Filename()//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Data = HDF5Filename//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
                            '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
             call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
 
