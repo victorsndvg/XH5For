@@ -55,7 +55,7 @@ use xh5for
         scalartempR8P(:) = rank+i!(/(real(j+rank),j=size(scalartempR8P),1,-1)/)
         time = time + 1
 
-        call xh5%SetMesh(GridShape = NewGridShape)
+        call xh5%SetGrid(GridShape = NewGridShape)
         call xh5%AppendStep(Value=time)
         call xh5%WriteGeometry(Origin=(Origin+(i*rank)), DxDyDz=DxDyDz)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
@@ -71,17 +71,11 @@ use xh5for
     call xh5%Open(FilePrefix='xh5for_dpp_regular_non_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
 
     do i=1, xh5%GetNumberOfSteps()
-print*, 1, i
-        call xh5%Parse()
-print*, 2, i
+        call xh5%ParseGrid()
         call xh5%ReadGeometry(Origin=out_Origin, DxDyDz=out_DxDyDz)
-print*, 3, i
         call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)
-print*, 4, i
         call xh5%ReadAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempR8P)
-print*, 5, i
         call xh5%NextStep()
-print*, 6, i
 
 #ifdef ENABLE_HDF5
         !< Check results

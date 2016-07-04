@@ -49,7 +49,7 @@ use xh5for
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_regular_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, StaticGrid=.true., Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
-    call xh5%SetMesh(GridShape = GridShape)
+    call xh5%SetGrid(GridShape = GridShape)
     call xh5%WriteGeometry(Origin=(Origin+rank), DxDyDz=DxDyDz)
 
     do i=1, num_steps
@@ -66,7 +66,7 @@ use xh5for
 
     !< Read XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_regular_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, StaticGrid=.true., Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
-    call xh5%Parse()
+    call xh5%ParseGrid()
     call xh5%ReadGeometry(Origin=out_Origin, DxDyDz=out_DxDyDz)
 
 #ifdef ENABLE_HDF5

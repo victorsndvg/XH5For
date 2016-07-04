@@ -47,7 +47,7 @@ use xh5for
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_regular_grid', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
-    call xh5%SetMesh(GridShape = GridShape)
+    call xh5%SetGrid(GridShape = GridShape)
     call xh5%WriteGeometry(Origin=Origin, DxDyDz=DxDyDz)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
     call xh5%WriteAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempR8P)
@@ -57,7 +57,7 @@ use xh5for
 
     !< Read XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_regular_grid', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
-    call xh5%Parse()
+    call xh5%ParseGrid()
     call xh5%ReadGeometry(Origin=out_Origin, DxDyDz=out_DxDyDz)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)
     call xh5%ReadAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempR8P)

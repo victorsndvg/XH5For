@@ -50,7 +50,7 @@ use xh5for
 
     !< Write XDMF/HDF5 file.    
     call xh5%Open(FilePrefix='xh5for_ch_rectilinear_static_grid_series', Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, StaticGrid=.true., GridType=XDMF_GRID_TYPE_RECTILINEAR, Action=XDMF_ACTION_WRITE)
-    call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
+    call xh5%SetGrid(GridShape=(/size(X), size(Y), size(Z)/))
     call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
 
     do i=1, num_steps
@@ -64,7 +64,7 @@ use xh5for
 
     !< Read XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_rectilinear_static_grid_series', Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, StaticGrid=.true., GridType=XDMF_GRID_TYPE_RECTILINEAR, Action=XDMF_ACTION_READ)
-    call xh5%Parse()
+    call xh5%ParseGrid()
     call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
 
 #ifdef ENABLE_HDF5

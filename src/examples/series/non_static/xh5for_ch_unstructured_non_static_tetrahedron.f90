@@ -59,7 +59,7 @@ use xh5for
 
     do i=1, num_steps
         call xh5%AppendStep(Value=time+i)
-        call xh5%SetMesh(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_X_Y_Z)
+        call xh5%SetGrid(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_X_Y_Z)
         call xh5%WriteTopology(Connectivities = topology)
         call xh5%WriteGeometry(X = X, Y = Y, Z = Z)
         call xh5%WriteAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=vectorvelocity+i)
@@ -73,7 +73,7 @@ use xh5for
     call xh5%Open(FilePrefix='xh5for_ch_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
 
     do i=1, xh5%GetNumberOfSteps()
-        call xh5%Parse()
+        call xh5%ParseGrid()
         call xh5%ReadTopology(Connectivities = out_topology)
         call xh5%ReadGeometry(X = out_X, Y = out_Y, Z = out_Z)
         call xh5%ReadAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_vectorvelocity)

@@ -50,7 +50,7 @@ use xh5for
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_dpp_unstructured_hexahedron', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
-    call xh5%SetMesh(NumberOfNodes=8, NumberOfElements=1,TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
+    call xh5%SetGrid(NumberOfNodes=8, NumberOfElements=1,TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
     call xh5%WriteTopology(Connectivities=topology)
     call xh5%WriteGeometry(XYZ=geometry)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
@@ -61,7 +61,7 @@ use xh5for
 
     !< Read XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_dpp_unstructured_hexahedron', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
-    call xh5%Parse()
+    call xh5%ParseGrid()
     call xh5%ReadTopology(Connectivities=out_topology)
     call xh5%ReadGeometry(XYZ=out_geometry)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)

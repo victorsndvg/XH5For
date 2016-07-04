@@ -47,7 +47,7 @@ use xh5for
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_rectilinear_grid', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, GridType=XDMF_GRID_TYPE_RECTILINEAR, Action=XDMF_ACTION_WRITE)
-    call xh5%SetMesh(GridShape=(/size(X), size(Y), size(Z)/))
+    call xh5%SetGrid(GridShape=(/size(X), size(Y), size(Z)/))
     call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P)  
     call xh5%Serialize()
@@ -56,7 +56,7 @@ use xh5for
 
     !< Read XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_rectilinear_grid', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, GridType=XDMF_GRID_TYPE_RECTILINEAR, Action=XDMF_ACTION_READ)
-    call xh5%Parse()
+    call xh5%ParseGrid()
     call xh5%ReadGeometry(X=out_X, Y=out_Y, Z=out_Z)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempI4P)
     call xh5%Close()
