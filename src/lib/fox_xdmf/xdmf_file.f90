@@ -17,14 +17,17 @@ private
     private
         character(len=:), allocatable :: filename                     !< File name
         type(xmlf_t), public          :: xml_handler                  !< FoX SAX XML File handler
-        logical                       :: open   = .false.             !< Flag to check if the file is open yet
-        logical                       :: parsed = .false.             !< Flag to check if the file is already parsed
+        logical                       :: open       = .false.         !< Flag to check if the file is open yet
+        logical                       :: parsed     = .false.         !< Flag to check if the file is already parsed
+        logical                       :: serialized = .false.         !< Flag to check if the file is serialized yet
         type(Node),       pointer     :: Root   => null()             !< FoX DOM node list pointing to XML root element
     !----------------------------------------------------------------- 
     contains
     private
         procedure, public :: openfile             => xdmf_file_openfile
         procedure, public :: isopen               => xdmf_file_isopen
+        procedure, public :: isserialized         => xdmf_file_isserialized
+        procedure, public :: setserialized        => xdmf_file_setserialized
         procedure, public :: parsefile            => xdmf_file_parsefile
         procedure, public :: isparsed             => xdmf_file_isparsed
         procedure, public :: setparsed            => xdmf_file_setparsed
@@ -151,6 +154,27 @@ contains
     end function xdmf_file_isopen
 
 
+    subroutine xdmf_file_setserialized(xdmf_file)
+    !-----------------------------------------------------------------
+    !< Set file as already serialized
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
+    !-----------------------------------------------------------------
+        xdmf_file%serialized = .true.
+    end subroutine xdmf_file_setserialized
+
+
+    function xdmf_file_isserialized(xdmf_file) result(isserialized)
+    !-----------------------------------------------------------------
+    !< Check if the file is serialized yet
+    !----------------------------------------------------------------- 
+        class(xdmf_file_t), intent(IN) :: xdmf_file                   !< XDMF file handler
+        logical                        :: isserialized                !< Flag to check if file is serialized yet
+    !-----------------------------------------------------------------
+        isserialized = xdmf_file%serialized
+    end function xdmf_file_isserialized
+
+
     subroutine xdmf_file_setparsed(xdmf_file)
     !-----------------------------------------------------------------
     !< Set file as already parsed
@@ -194,8 +218,9 @@ contains
         if(allocated(xdmf_file%filename)) deallocate(xdmf_file%filename)
         if(xdmf_file%isopen()) call xdmf_file%closefile()
         nullify(xdmf_file%Root)
-        xdmf_file%open   = .false.
-        xdmf_file%parsed = .false.
+        xdmf_file%open       = .false.
+        xdmf_file%parsed     = .false.
+        xdmf_file%serialized = .false.
     end subroutine xdmf_file_free
 
 

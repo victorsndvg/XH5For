@@ -77,7 +77,6 @@ use xh5for
         call xh5%AppendStep(Value=time)
         call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield+i)
         call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield+i)
-        call xh5%Serialize()
     enddo
 
     call xh5%Close()

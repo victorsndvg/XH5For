@@ -55,7 +55,6 @@ use xh5for
     call xh5%WriteGeometry(XYZ=geometry)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
     call xh5%WriteAttribute(Name='Temperature_I8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI8P)
-    call xh5%Serialize()
     call xh5%Close()
     call xh5%Free()
 

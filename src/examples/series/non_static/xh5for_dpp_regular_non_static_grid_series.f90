@@ -60,7 +60,6 @@ use xh5for
         call xh5%WriteGeometry(Origin=(Origin+(i*rank)), DxDyDz=DxDyDz)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
         call xh5%WriteAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempR8P)
-        call xh5%Serialize()
         deallocate(scalartempI4P)
         deallocate(scalartempR8P)
     enddo
@@ -87,9 +86,8 @@ use xh5for
         if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
     enddo
-print*, 7
+
     call xh5%Close()
-print*, 8
     call xh5%Free()
 
 

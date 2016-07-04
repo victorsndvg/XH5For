@@ -69,6 +69,7 @@ private
         ! XDMF Handler initialization/finalization procedures
         procedure, public :: Initialize                   => xdmf_handler_Initialize
         procedure, public :: Open                         => xdmf_handler_Open
+        procedure, public :: Clean                        => xdmf_handler_Clean
         procedure, public :: Free                         => xdmf_handler_Free
 
         ! File name related functions 
@@ -80,6 +81,7 @@ private
         procedure, public :: OpenSpatialFile              => xdmf_handler_OpenSpatialFile
         procedure         :: OpenSpatialGrid              => xdmf_handler_OpenSpatialGrid
         procedure, public :: SerializeSpatialFile         => xdmf_handler_SerializeSpatialFile
+        procedure, public :: IsSpatialFileSerialized      => xdmf_handler_IsSpatialFileSerialized
         procedure, public :: SerializeTemporalFile        => xdmf_handler_SerializeTemporalFile
         procedure, public :: ParseTemporalFile            => xdmf_handler_ParseTemporalFile
         procedure, public :: ParseSpatialFile             => xdmf_handler_ParseSpatialFile
@@ -185,6 +187,17 @@ contains
         if(present(FilePrefix) .and. Present(Action)) call this%Open(FilePrefix, Action)
         this%State = XDMF_HANDLER_STATE_INIT
     end subroutine xdmf_handler_Initialize
+
+
+    subroutine xdmf_handler_Clean(this)
+    !-----------------------------------------------------------------
+    !< Free XDMF file handler
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                  !< XMDF handler
+    !----------------------------------------------------------------- 
+        call this%TemporalFile%Free()
+        call this%SpatialFile%Free()
+    end subroutine xdmf_handler_Clean
 
 
     subroutine xdmf_handler_Free(this)
@@ -404,7 +417,19 @@ contains
             call this%CloseSpatialFile()
             call this%UniformGridDescriptor%FreeAttributesMetadata()
         endif
+        call this%SpatialFile%SetSerialized()
     end subroutine xdmf_handler_SerializeSpatialFile
+
+
+    function xdmf_handler_IsSpatialFileSerialized(this) result(IsSpatialFileSerialized)
+    !-----------------------------------------------------------------
+    !< Check if the current Spatial file is already serialized
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(INOUT) :: this                    !< XDMF handler
+        logical                              :: IsSpatialFileSerialized !< Flag to check if the current spatial file is already serialized
+    !----------------------------------------------------------------- 
+        IsSpatialFileSerialized = this%SpatialFile%isSerialized()
+    end function xdmf_handler_IsSpatialFileSerialized
 
 
     subroutine xdmf_handler_SerializeTemporalFile(this)

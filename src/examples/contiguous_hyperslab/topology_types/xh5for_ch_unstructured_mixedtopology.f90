@@ -68,7 +68,6 @@ use xh5for
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield)
     call xh5%WriteAttribute(Name='CellField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=cellfield)
-    call xh5%Serialize()
     call xh5%Close()
     call xh5%Free()
 

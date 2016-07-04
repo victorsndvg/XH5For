@@ -55,12 +55,11 @@ use xh5for
         scalartempR8P(:) = rank+i!(/(real(j+rank),j=size(scalartempR8P),1,-1)/)
         time = time + 1
 
-        call xh5%SetGrid(GridShape = NewGridShape)
         call xh5%AppendStep(Value=time)
+        call xh5%SetGrid(GridShape = NewGridShape)
         call xh5%WriteGeometry(Origin=(Origin+(i*rank)), DxDyDz=DxDyDz)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
         call xh5%WriteAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempR8P)
-        call xh5%Serialize()
         deallocate(scalartempI4P)
         deallocate(scalartempR8P)
     enddo

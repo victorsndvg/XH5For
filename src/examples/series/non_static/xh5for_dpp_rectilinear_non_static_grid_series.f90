@@ -57,7 +57,6 @@ use xh5for
         call xh5%AppendStep(Value=time)
         call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
         call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P+i)  
-        call xh5%Serialize()
     enddo
 
     call xh5%Close()

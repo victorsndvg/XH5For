@@ -50,7 +50,6 @@ use xh5for
     call xh5%SetGrid(GridShape=(/size(X), size(Y), size(Z)/))
     call xh5%WriteGeometry(X=X, Y=Y, Z=Z)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempI4P)  
-    call xh5%Serialize()
     call xh5%Close()
     call xh5%Free()
 

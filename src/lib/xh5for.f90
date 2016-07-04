@@ -21,7 +21,8 @@ implicit none
     integer(I4P), private, parameter :: XH5FOR_STATE_OPEN      = 1
     integer(I4P), private, parameter :: XH5FOR_STATE_INIT      = 2
     integer(I4P), private, parameter :: XH5FOR_STATE_GRID_SET  = 3
-    integer(I4P), private, parameter :: XH5FOR_STATE_CLOSE     = 4
+    integer(I4P), private, parameter :: XH5FOR_STATE_GRID_IO   = 4
+    integer(I4P), private, parameter :: XH5FOR_STATE_CLOSE     = 5
 
     !-----------------------------------------------------------------
     ! XH5FOR State Transition Diagram
@@ -53,9 +54,18 @@ implicit none
     ! GRID_SET              | Open            | OPEN
     ! GRID_SET              | SetGrid         | GRID_SET
     ! GRID_SET              | ParseGrid       | GRID_SET
-    ! GRID_SET              | Write*          | GRID_SET
-    ! GRID_SET              | Read*           | GRID_SET
+    ! GRID_SET              | Write*          | GRID_IO
+    ! GRID_SET              | Read*           | GRID_IO
     ! GRID_SET              | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! GRID_IO               | Free            | START
+    ! GRID_IO               | Clean           | OPEN
+    ! GRID_IO               | Open            | OPEN
+    ! GRID_IO               | SetGrid         | GRID_SET
+    ! GRID_IO               | ParseGrid       | GRID_SET
+    ! GRID_IO               | Write*          | GRID_IO
+    ! GRID_IO               | Read*           | GRID_IO
+    ! GRID_IO               | Close           | CLOSE
     !----------------------------------------------------------------- 
     ! CLOSE                 | Free            | START
     ! CLOSE                 | Clean           | OPEN
@@ -124,7 +134,7 @@ implicit none
         procedure, public :: Open                  => xh5for_Open
         procedure         :: CheckOpenHeavyDataFile=> xh5for_CheckOpenHeavyDataFile
         procedure, public :: ParseGrid             => xh5for_ParseGrid
-        procedure, public :: Serialize             => xh5for_Serialize
+        procedure         :: Serialize             => xh5for_Serialize
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
@@ -196,6 +206,12 @@ contains
         real(R8P),       intent(IN)     :: Value
     !----------------------------------------------------------------- 
         assert(this%Action == XDMF_ACTION_WRITE)
+        if(this%State == XH5FOR_STATE_GRID_IO) then
+            if(.not. this%StepsHandler%IsStaticStep() .and. .not. this%LightData%IsSpatialFileSerialized()) then
+                call this%Serialize()
+            endif
+            call this%LightData%Clean()
+        endif
         call this%StepsHandler%Append(Value=Value)
     end subroutine xh5for_AppendStep
 
@@ -529,7 +545,6 @@ contains
     !----------------------------------------------------------------- 
         assert(this%State >= XH5FOR_STATE_OPEN .and. (this%GridType == XDMF_GRID_TYPE_REGULAR .or. this%GridType == XDMF_GRID_TYPE_RECTILINEAR))
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
-        call this%Clean()
         ! Uniform grid descriptor initialization
         call this%UniformGridDescriptor%Initialize( &
                 XDim = GridShape(1),                &
@@ -568,10 +583,10 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET)
+        assert(this%State == XH5FOR_STATE_GRID_IO)
         if(this%Action == XDMF_ACTION_Write) then
-            call this%HeavyData%CloseFile()
             call this%LightData%SerializeSpatialFile()
+            if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
         endif
     end subroutine xh5for_Serialize
 
@@ -582,7 +597,7 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        assert((this%State == XH5FOR_STATE_OPEN .or. this%State == XH5FOR_STATE_INIT .or. this%State == XH5FOR_STATE_GRID_SET) .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State >= XH5FOR_STATE_OPEN .and. this%State /= XH5FOR_STATE_CLOSE) .and. this%Action == XDMF_ACTION_READ)
         if(this%State == XH5FOR_STATE_OPEN) call this%Initialize()
         call this%LightData%ParseSpatialFile()
         this%State = XH5FOR_STATE_GRID_SET
@@ -595,8 +610,11 @@ contains
     !----------------------------------------------------------------- 
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
-        if(this%State == XH5FOR_STATE_GRID_SET .and. this%action == XDMF_ACTION_WRITE) then
+        if(this%State == XH5FOR_STATE_GRID_IO .and. this%action == XDMF_ACTION_WRITE) then
+            if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
+            if(.not. this%StepsHandler%IsStaticStep() .and. .not. this%LightData%IsSpatialFileSerialized()) call this%Serialize()
             call this%LightData%SerializeTemporalFile()
+            call this%LightData%Clean()
         endif
         this%State = XH5FOR_STATE_CLOSE
     end subroutine xh5for_Close
@@ -610,7 +628,7 @@ contains
         real(R4P),                  intent(IN)    :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -619,6 +637,7 @@ contains
             call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_XYZ_R4P
 
 
@@ -630,7 +649,7 @@ contains
         real(R8P),                  intent(IN)    :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = XYZ, Name = Name)
@@ -639,6 +658,7 @@ contains
             call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_XYZ_R8P
 
 
@@ -652,7 +672,7 @@ contains
         real(R4P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -661,6 +681,7 @@ contains
             call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_X_Y_Z_R4P
 
 
@@ -673,7 +694,7 @@ contains
         real(R4P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -682,6 +703,7 @@ contains
             call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_DXDYDZ_R4P
 
 
@@ -694,7 +716,7 @@ contains
         real(R8P),                  intent(IN)    :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = Origin, Name = Name)
@@ -703,6 +725,7 @@ contains
             call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_DXDYDZ_R8P
 
 
@@ -716,7 +739,7 @@ contains
         real(R8P),                  intent(IN)    :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetGeometry(XYZ = X, Name = Name)
@@ -725,6 +748,7 @@ contains
             call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
             call this%HeavyData%WriteGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteGeometry_X_Y_Z_R8P
 
 
@@ -736,8 +760,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
-!        if(this%SpatialGridDescriptor%isStaticGrid()) call this%LightData%ParseSpatialFile(FirstStep=.true.)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
@@ -746,6 +769,7 @@ contains
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_XYZ_R4P
 
 
@@ -757,7 +781,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = Name)
@@ -766,6 +790,7 @@ contains
             call this%HeavyData%ReadGeometry(XYZ = XYZ, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = XYZ, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_XYZ_R8P
 
 
@@ -779,7 +804,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_REAd)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -788,6 +813,7 @@ contains
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_X_Y_Z_R4P
 
 
@@ -801,7 +827,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: Z(:)             !< Z R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = Name)
@@ -810,6 +836,7 @@ contains
             call this%HeavyData%ReadGeometry(X = X, Y = Y, Z = Z, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = X, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_X_Y_Z_R8P
 
 
@@ -822,7 +849,7 @@ contains
         real(R4P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -831,6 +858,7 @@ contains
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_DXDYDZ_R4P
 
 
@@ -843,7 +871,7 @@ contains
         real(R8P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = Name)
@@ -852,6 +880,7 @@ contains
             call this%HeavyData%ReadGeometry(Origin = Origin, DxDyDz = DxDyDz, Name = 'Coordinates')
             call this%LightData%SetGeometry(XYZ = Origin, Name = 'Coordinates')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadGeometry_DXDYDZ_R8P
 
 
@@ -863,7 +892,7 @@ contains
         integer(I4P),               intent(IN)    :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -872,6 +901,7 @@ contains
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteTopology_I4P
 
 
@@ -883,7 +913,7 @@ contains
         integer(I8P),               intent(IN)    :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = Name)
@@ -892,6 +922,7 @@ contains
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
             call this%HeavyData%WriteTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteTopology_I8P
 
 
@@ -903,7 +934,7 @@ contains
         integer(I4P), allocatable, intent(OUT)   :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
 !        if(this%SpatialGridDescriptor%isStaticGrid()) call this%LightData%ParseSpatialFile(FirstStep=.true.)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
@@ -913,6 +944,7 @@ contains
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadTopology_I4P
 
 
@@ -924,7 +956,7 @@ contains
         integer(I8P), allocatable,  intent(OUT)   :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile(GridData=.true.)
         if(present(Name)) then
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = Name)
@@ -933,6 +965,7 @@ contains
             call this%HeavyData%ReadTopology(Connectivities = Connectivities, Name = 'Connectivities')
             call this%LightData%SetTopology(Connectivities = Connectivities, Name = 'Connectivities')
         endif
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadTopology_I8P
 
 
@@ -946,10 +979,11 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I4P),    intent(IN)    :: Values(:)                   !< I4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteAttribute_I4P
 
 
@@ -963,10 +997,11 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         integer(I8P),    intent(IN)    :: Values(:)                   !< I8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteAttribute_I8P
 
 
@@ -980,10 +1015,11 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R4P),       intent(IN)    :: Values(:)                   !< R4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteAttribute_R4P
 
 
@@ -997,10 +1033,11 @@ contains
         integer(I4P),    intent(IN)    :: Center                      !< Attribute centered at (Node, Cell, etc.)
         real(R8P),       intent(IN)    :: Values(:)                   !< R8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_WRITE)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_WRITE)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%WriteAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_WriteAttribute_R8P
 
 
@@ -1014,10 +1051,11 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadAttribute_I4P
 
 
@@ -1031,10 +1069,11 @@ contains
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
         integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadAttribute_I8P
 
 
@@ -1048,10 +1087,11 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadAttribute_R4P
 
 
@@ -1065,10 +1105,11 @@ contains
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
         real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
     !-----------------------------------------------------------------
-        assert(this%State == XH5FOR_STATE_GRID_SET .and. this%Action == XDMF_ACTION_READ)
+        assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
         call this%HeavyData%ReadAttribute(Name = Name, Type = Type, Center = Center, Values = Values)
         call this%LightData%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
+        this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadAttribute_R8P
 
 end module xh5for

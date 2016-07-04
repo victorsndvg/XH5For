@@ -63,7 +63,6 @@ use xh5for
         call xh5%WriteTopology(Connectivities = topology)
         call xh5%WriteGeometry(X = X, Y = Y, Z = Z)
         call xh5%WriteAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=vectorvelocity+i)
-        call xh5%Serialize()
     enddo
 
     call xh5%Close()
