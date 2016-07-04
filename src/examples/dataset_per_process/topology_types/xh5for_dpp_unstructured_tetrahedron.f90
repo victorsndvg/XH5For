@@ -1,15 +1,15 @@
 program xh5for_dpp_unstructured_tetrahedron
 
 use xh5for
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
-#else
+#endif
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
 
-implicit none
     !-----------------------------------------------------------------
     !< Variable definition
     !----------------------------------------------------------------- 
@@ -41,7 +41,7 @@ implicit none
     !< Main program
     !----------------------------------------------------------------- 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
 #endif
@@ -51,9 +51,8 @@ implicit none
     vectorvelocity = vectorvelocity+rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
-    call xh5%Initialize(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_X_Y_Z)
-    call xh5%Open(fileprefix='xh5for_dpp_unstructured_tetrahedron')
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_tetrahedron', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_WRITE)
+    call xh5%SetGrid(NumberOfNodes=5, NumberOfElements=2,TopologyType=XDMF_TOPOLOGY_TYPE_TETRAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_X_Y_Z)
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(X = X, Y = Y, Z = Z)
     call xh5%WriteAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=vectorvelocity)
@@ -61,10 +60,8 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_dpp_unstructured_tetrahedron')
-    call xh5%Parse()
+    call xh5%Open(FilePrefix='xh5for_dpp_unstructured_tetrahedron', GridType=XDMF_GRID_TYPE_UNSTRUCTURED, Strategy=XDMF_STRATEGY_DATASET_PER_PROCESS, Action=XDMF_ACTION_READ)
+    call xh5%ParseGrid()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(X = out_X, Y = out_Y, Z = out_Z)
     call xh5%ReadAttribute(Name='Velocity', Type=XDMF_ATTRIBUTE_TYPE_VECTOR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_vectorvelocity)
@@ -82,7 +79,7 @@ implicit none
     if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

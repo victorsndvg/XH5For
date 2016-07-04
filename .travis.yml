@@ -13,8 +13,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-4.9
-      - gfortran-4.9
+      - gcc-5
+      - gfortran-5
       - cmake
       - cmake-data
 
@@ -22,10 +22,20 @@ before_install:
   - pip install codecov
   - git submodule update --init --recursive
   - travis_retry wget --quiet https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz;
+  - travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
-  - export FC=/usr/bin/gfortran-4.9
+  - export FC=/usr/bin/gfortran-5
   - $FC --version
+  ##################
+  ## Install OMPI ##
+  ##################
+  - cd $TRAVIS_BUILD_DIR
+  - tar -zxf openmpi-1.10.2.tar.gz
+  - cd openmpi-1.10.2
+  - ./configure --prefix=$TRAVIS_BUILD_DIR/openmpi > /dev/null
+  - make -j2 > /dev/null 2>&1
+  - make install > /dev/null 2>&1
   ##################
   ## Install HDF5 ##
   ##################
@@ -33,11 +43,11 @@ install:
   - tar -xzf hdf5-1.8.14.tar.gz
   - cd hdf5-1.8.14
   - mkdir $TRAVIS_BUILD_DIR/hdf5
-  - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules > /dev/null
+  - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-parallel --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules FC=$TRAVIS_BUILD_DIR/openmpi/bin/mpif90 CC=$TRAVIS_BUILD_DIR/openmpi/bin/mpicc > /dev/null
   - make -j2 > /dev/null 2>&1
   - make install > /dev/null 2>&1
   ##################
-  - export PATH=$TRAVIS_BUILD_DIR/hdf5/bin:$PATH
+  - export PATH=$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/openmpi/bin:$TRAVIS_BUILD_DIR/openmpi/lib:$TRAVIS_BUILD_DIR/openmpi/include:$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/hdf5/bin:$TRAVIS_BUILD_DIR/hdf5/lib:$TRAVIS_BUILD_DIR/hdf5/include:$PATH
   - echo $PATH
   - cmake --version
 
@@ -45,15 +55,15 @@ before_script:
   - cd $TRAVIS_BUILD_DIR;
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_Fortran_COMPILER=$TRAVIS_BUILD_DIR/hdf5/bin/h5pfc ..
 
 script:
   - ctest -VV -T Start -T Build -T Test -T Coverage
 
 after_success:
   - find . -name '*.gcno' -print
-  - gcov-4.9 --version
-  - bash <(curl -s https://codecov.io/bash) -x $(which gcov-4.9)
+  - gcov-5 --version
+  - bash <(curl -s https://codecov.io/bash) -x $(which gcov-5)
 
 after_script:
   - cd ..

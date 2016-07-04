@@ -14,6 +14,7 @@ use xdmf_attribute
 use xdmf_time
 use xdmf_information
 use xdmf_character_data
+use xdmf_xinclude
 
 implicit none
 private
@@ -28,5 +29,6 @@ public:: xdmf_attribute_t
 public:: xdmf_time_t
 public:: xdmf_information_t
 public:: xdmf_character_data_t
+public:: xdmf_xinclude_t
 
 end module fox_xdmf

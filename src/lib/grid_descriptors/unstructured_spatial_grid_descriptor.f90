@@ -4,6 +4,7 @@ use IR_Precision, only : I4P, I8P
 use spatial_grid_descriptor
 use mpi_environment
 use xh5for_utils
+use xh5for_parameters
 
 implicit none
 
@@ -59,7 +60,7 @@ public:: unstructured_spatial_grid_descriptor_t
 contains
 
 
-    subroutine unst_spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType)
+    subroutine unst_spatial_grid_descriptor_InitializeUnstructuredWriter(this, MPIEnvironment, NumberOfNodes, NumberOfElements, TopologyType, GeometryType, GridType, StaticGrid)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
@@ -70,18 +71,21 @@ contains
         integer(I4P),                     intent(IN)    :: TopologyType      !< Topology type of the current grid
         integer(I4P),                     intent(IN)    :: GeometryType      !< Geometry type of the current grid
         integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the current grid
+        logical,      optional,           intent(IN)    :: StaticGrid        !< Static Grid flag
         integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
+        call this%Free()
         call this%DefaultInitializeWriter(MPIEnvironment = MPIEnvironment,     &
                                           NumberOfNodes = NumberOfNodes,       &
                                           NumberOfElements = NumberOfElements, &
                                           TopologyType = TopologyType,         &
                                           GeometryType = GeometryType,         &
-                                          GridType = GridType)
+                                          GridType = GridType,                 &
+                                          StaticGrid = StaticGrid)
     end subroutine unst_spatial_grid_descriptor_InitializeUnstructuredWriter
 
 
-    subroutine unst_spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType)
+    subroutine unst_spatial_grid_descriptor_InitializeStructuredWriter(this, MPIEnvironment, XDim, YDim, ZDim, GridType, StaticGrid)
     !-----------------------------------------------------------------
     !< Initilized the spatial grid descriptor type
     !----------------------------------------------------------------- 
@@ -91,12 +95,14 @@ contains
         integer(I8P),                     intent(IN)    :: YDim              !< Number of points of the Y axis
         integer(I8P),                     intent(IN)    :: ZDim              !< Number of points of the Z axis
         integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the current grid
+        logical,      optional,           intent(IN)    :: StaticGrid        !< Static Grid flag
         integer(I8P)                                    :: NumberOfNodes     !< Number of nodes of the current grid
         integer(I8P)                                    :: NumberOfElements  !< Number of elements of the current grid
         integer(I4P)                                    :: TopologyType      !< Topology type of the current grid
         integer(I4P)                                    :: GeometryType      !< Geometry type of the current grid
         integer(I4P)                                    :: i                 !< Loop index in NumberOfGrids
     !-----------------------------------------------------------------
+        call this%Free()
         select case(GridType)
             case (XDMF_GRID_TYPE_UNSTRUCTURED)
                 if(ZDim == 0_I8P) then
@@ -116,7 +122,8 @@ contains
                                           NumberOfElements = NumberOfElements, &
                                           TopologyType = TopologyType,         &
                                           GeometryType = GeometryType,         &
-                                          GridType = GridType)  
+                                          GridType = GridType,                 &
+                                          StaticGrid = StaticGrid)
     end subroutine unst_spatial_grid_descriptor_InitializeStructuredWriter
 
 

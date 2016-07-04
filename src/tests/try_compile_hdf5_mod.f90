@@ -1,0 +1,3 @@
+program try_compile_hdf5_mod
+use hdf5
+end program try_compile_hdf5_mod

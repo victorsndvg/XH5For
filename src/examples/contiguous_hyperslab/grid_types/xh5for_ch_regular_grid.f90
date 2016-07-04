@@ -1,15 +1,15 @@
 program xh5for_ch_regular_grid
 
 use xh5for
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
-#else
+#endif
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
 
-implicit none
     !-----------------------------------------------------------------
     !< Variable definition
     !----------------------------------------------------------------- 
@@ -34,7 +34,7 @@ implicit none
     !< Main program
     !----------------------------------------------------------------- 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
 #endif
@@ -46,10 +46,8 @@ implicit none
     Origin = Origin + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%SetGridType(GridType=XDMF_GRID_TYPE_REGULAR)
-    call xh5%Initialize(GridShape = GridShape)
-    call xh5%Open(action=XDMF_ACTION_WRITE , fileprefix='xh5for_ch_regular_grid')
+    call xh5%Open(FilePrefix='xh5for_ch_regular_grid', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%SetGrid(GridShape = GridShape)
     call xh5%WriteGeometry(Origin=Origin, DxDyDz=DxDyDz)
     call xh5%WriteAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=scalartempI4P)
     call xh5%WriteAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=scalartempR8P)
@@ -57,10 +55,8 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_regular_grid')
-    call xh5%Parse()
+    call xh5%Open(FilePrefix='xh5for_ch_regular_grid', GridType=XDMF_GRID_TYPE_REGULAR, Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%ParseGrid()
     call xh5%ReadGeometry(Origin=out_Origin, DxDyDz=out_DxDyDz)
     call xh5%ReadAttribute(Name='Temperature_I4P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_scalartempI4P)
     call xh5%ReadAttribute(Name='Temperature_R8P', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_CELL , Values=out_scalartempR8P)
@@ -78,7 +74,7 @@ implicit none
 #endif
 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

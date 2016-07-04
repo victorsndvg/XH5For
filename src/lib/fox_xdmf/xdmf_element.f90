@@ -31,6 +31,7 @@ implicit none
         procedure, public                 :: node_is_dataitem    => xdmf_element_node_is_dataitem
         procedure, public                 :: node_is_time        => xdmf_element_node_is_time
         procedure, public                 :: node_is_information => xdmf_element_node_is_information
+        procedure, public                 :: node_is_xinclude    => xdmf_element_node_is_xinclude
         generic,                        public                   :: open => element_open
         procedure(xdmf_element_default_initialization), deferred :: default_initialization
         procedure(xdmf_element_free),   public,         deferred :: free
@@ -213,5 +214,17 @@ contains
     !----------------------------------------------------------------- 
         xdmf_element_node_is_information = (getTagName(DOMNode) == 'Information')
     end function xdmf_element_node_is_information
+
+
+    function xdmf_element_node_is_xinclude(this, DOMNode)
+    !-----------------------------------------------------------------
+    !< Check if a DOM Node is an XInclude
+    !----------------------------------------------------------------- 
+        class(xdmf_element_t), intent(INOUT) :: this                        !< XDMF Element type
+        type(Node), pointer,   intent(IN)    :: DOMNode                     !< FoX DOM Node 
+        logical                              :: xdmf_element_node_is_xinclude !< True if DOM Node is a XDMF Information
+    !----------------------------------------------------------------- 
+        xdmf_element_node_is_xinclude = (getTagName(DOMNode) == 'xi:include')
+    end function xdmf_element_node_is_xinclude
 
 end module xdmf_element

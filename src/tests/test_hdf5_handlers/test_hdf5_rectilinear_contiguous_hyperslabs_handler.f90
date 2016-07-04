@@ -1,23 +1,23 @@
-program test_xdmf_hyperslabs_handler
+program test_hdf5_rect_hyperslabs_handler
 
 use IR_Precision, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
 use hdf5_structured_contiguous_hyperslab_handler
 use mpi_environment
+use steps_handler
 use structured_spatial_grid_descriptor
 use structured_uniform_grid_descriptor
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
 #endif
-#ifdef MPI_H
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
-
-implicit none
 
     type(mpi_env_t)                                                   :: mpienv
+    type(steps_handler_t)                                             :: stepshandler
     type(structured_spatial_grid_descriptor_t)                        :: spatialgrid
     type(structured_uniform_grid_descriptor_t)                        :: uniformgrid
     type(hdf5_structured_contiguous_hyperslab_handler_t)              :: heavydata
@@ -29,23 +29,25 @@ implicit none
     integer                                                           :: i
 
 
-#if defined(MPI_MOD) || defined(MPI_H)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
 #endif
 
     values = (/(i,i=0,size(Xpoints)*size(Ypoints)*size(Zpoints))/)
 
     call mpienv%initialize()
+    call stepshandler%initialize(mpienv)
     call spatialgrid%initialize(MPIEnvironment=mpienv, XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
     call uniformgrid%initialize(XDim=int(size(Xpoints),I8P), YDim=int(size(Ypoints),I8P), ZDim=int(size(Zpoints),I8P), GridType=XDMF_GRID_TYPE_RECTILINEAR)
-    call heavydata%initialize(MPIEnvironment=mpienv, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
-    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='xdmf_rectilinear_hyperslab')
+    call heavydata%initialize(MPIEnvironment=mpienv, StepsHandler=stepshandler, SpatialGridDescriptor=spatialgrid, UniformGridDescriptor=uniformgrid)
+    call heavydata%OpenFile(action=XDMF_ACTION_WRITE, fileprefix='hdf5_rectilinear_hyperslab')
     call heavydata%WriteGeometry(X=Xpoints,Y=Ypoints,Z=Zpoints, Name='Coordinates')
     call heavydata%WriteAttribute(Name='solution', Center=XDMF_ATTRIBUTE_CENTER_NODE, Type=XDMF_ATTRIBUTE_TYPE_SCALAR, Values=values)
     call heavydata%CloseFile()
-#ifdef ENABLE_MPI
+
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 
 
-end program test_xdmf_hyperslabs_handler
+end program test_hdf5_rect_hyperslabs_handler

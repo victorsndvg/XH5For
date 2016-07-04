@@ -6,8 +6,13 @@ use HDF5
 #endif
 use hdf5_handler
 use xh5for_utils
+use xh5for_parameters
+use mpi_environment
+use spatial_grid_descriptor
 
 implicit none
+
+#include "assert.i90"
 
 private
 
@@ -16,31 +21,32 @@ private
     !< HDF5 contiguous hyperslab handler
     !----------------------------------------------------------------- 
     contains
-        procedure :: CalculateAttributeDimensions => hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
-        procedure :: WriteHyperSlab_I4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
-        procedure :: WriteHyperSlab_I8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
-        procedure :: WriteHyperSlab_R4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
-        procedure :: WriteHyperSlab_R8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R8P
-        procedure :: ReadHyperSlab_I4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I4P
-        procedure :: ReadHyperSlab_I8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
-        procedure :: ReadHyperSlab_R4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
-        procedure :: ReadHyperSlab_R8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
-        procedure :: WriteAttribute_I4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
-        procedure :: WriteAttribute_I8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
-        procedure :: WriteAttribute_R4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
-        procedure :: WriteAttribute_R8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
-        procedure :: ReadAttribute_I4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I4P
-        procedure :: ReadAttribute_I8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I8P
-        procedure :: ReadAttribute_R4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R4P
-        procedure :: ReadAttribute_R8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R8P
-        generic   :: WriteHyperSlab     => WriteHyperSlab_I4P, &
-                                           WriteHyperSlab_I8P, &
-                                           WriteHyperSlab_R4P, &
-                                           WriteHyperSlab_R8P
-        generic   :: ReadHyperSlab      => ReadHyperSlab_I4P, &
-                                           ReadHyperSlab_I8P, &
-                                           ReadHyperSlab_R4P, &
-                                           ReadHyperSlab_R8P
+    private
+        procedure       :: CalculateAttributeDimensions => hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
+        procedure       :: WriteHyperSlab_I4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
+        procedure       :: WriteHyperSlab_I8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
+        procedure       :: WriteHyperSlab_R4P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
+        procedure       :: WriteHyperSlab_R8P => hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R8P
+        procedure       :: ReadHyperSlab_I4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I4P
+        procedure       :: ReadHyperSlab_I8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
+        procedure       :: ReadHyperSlab_R4P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
+        procedure       :: ReadHyperSlab_R8P  => hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
+        procedure       :: WriteAttribute_I4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I4P
+        procedure       :: WriteAttribute_I8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_I8P
+        procedure       :: WriteAttribute_R4P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R4P
+        procedure       :: WriteAttribute_R8P => hdf5_contiguous_hyperslab_handler_WriteAttribute_R8P
+        procedure       :: ReadAttribute_I4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I4P
+        procedure       :: ReadAttribute_I8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_I8P
+        procedure       :: ReadAttribute_R4P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R4P
+        procedure       :: ReadAttribute_R8P  => hdf5_contiguous_hyperslab_handler_ReadAttribute_R8P
+        generic, public :: WriteHyperSlab     => WriteHyperSlab_I4P, &
+                                                 WriteHyperSlab_I8P, &
+                                                 WriteHyperSlab_R4P, &
+                                                 WriteHyperSlab_R8P
+        generic, public :: ReadHyperSlab      => ReadHyperSlab_I4P, &
+                                                 ReadHyperSlab_I8P, &
+                                                 ReadHyperSlab_R4P, &
+                                                 ReadHyperSlab_R8P
 
     end type hdf5_contiguous_hyperslab_handler_t
 
@@ -58,31 +64,36 @@ contains
     !-----------------------------------------------------------------
     !< Calculate hyperslab dimensions for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
-        integer(I4P),                               intent(IN)  :: Center              !< Attribute center at (Node, Cell, etc.)
-        integer(HSIZE_T),                           intent(OUT) :: GlobalNumberOfData  !< Global number of data
-        integer(HSIZE_T),                           intent(OUT) :: LocalNumberOfData   !< Local number of data
-        integer(HSIZE_T),                           intent(OUT) :: DataOffset          !< Data offset for current grid
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                  !< HDF5 contiguous hyperslab handler
+        integer(I4P),                               intent(IN)  :: Center                !< Attribute center at (Node, Cell, etc.)
+        integer(HSIZE_T),                           intent(OUT) :: GlobalNumberOfData    !< Global number of data
+        integer(HSIZE_T),                           intent(OUT) :: LocalNumberOfData     !< Local number of data
+        integer(HSIZE_T),                           intent(OUT) :: DataOffset            !< Data offset for current grid
+        class(mpi_env_t),                 pointer               :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer               :: SpatialGridDescriptor !< Spatial grid descriptor
     !----------------------------------------------------------------- 
     !< @TODO: face and edge attributes
 #ifdef ENABLE_HDF5
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        MPIEnvironment        => this%GetMPIEnvironment()
+        assert(associated(SpatialGridDescriptor) .and. associated(MPIEnvironment))
         select case(Center)
             case (XDMF_ATTRIBUTE_CENTER_NODE)
-                GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                GlobalNumberOfData = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_CELL)
-                GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetElementOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                GlobalNumberOfData = int(SpatialGridDescriptor%GetGlobalNumberOfElements(),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfElementsPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(SpatialGridDescriptor%GetElementOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
             case (XDMF_ATTRIBUTE_CENTER_GRID)
-                GlobalNumberOfData = int(this%MPIEnvironment%get_comm_size(),HSIZE_T)
+                GlobalNumberOfData = int(MPIEnvironment%get_comm_size(),HSIZE_T)
                 LocalNumberOfData = 1_HSIZE_T
-                DataOffset = this%MPIEnvironment%get_rank()
+                DataOffset = MPIEnvironment%get_rank()
             case Default
-                GlobalNumberOfData = int(this%SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
-                LocalNumberOfData = int(this%SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
-                DataOffset = int(this%SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=this%MPIEnvironment%get_rank()),HSIZE_T)
+                GlobalNumberOfData = int(SpatialGridDescriptor%GetGlobalNumberOfNodes(),HSIZE_T)
+                LocalNumberOfData = int(SpatialGridDescriptor%GetNumberOfNodesPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
+                DataOffset = int(SpatialGridDescriptor%GetNodeOffsetPerGridID(ID=MPIEnvironment%get_rank()),HSIZE_T)
         end select
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_CalculateAttributeDimensions
@@ -107,6 +118,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -115,12 +127,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetfileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_INTEGER,              &
                 space_id = filespace,                       &
@@ -174,6 +186,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -182,12 +195,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetfileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_INTEGER,              &
                 space_id = filespace,                       &
@@ -242,6 +255,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -250,12 +264,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetfileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_REAL,                 &
                 space_id = filespace,                       &
@@ -309,6 +323,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
@@ -317,12 +332,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
-        call H5Dcreate_f(loc_id = this%file_id,             &
+        call H5Dcreate_f(loc_id = this%GetfileID(),         &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 type_id  = H5T_NATIVE_DOUBLE,               &
                 space_id = filespace,                       &
@@ -377,6 +392,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -387,12 +403,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetfileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -445,6 +461,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -455,12 +472,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetfileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -513,6 +530,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -523,12 +541,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetfileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)
@@ -581,6 +599,7 @@ contains
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
+        assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
@@ -591,12 +610,12 @@ contains
                 hdferr   = hdferror)
         ! Create the dataset with default properties.
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
+#if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-#ifdef ENABLE_MPI
         call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
-        call H5Dopen_f(loc_id = this%file_id,               &
+        call H5Dopen_f(loc_id = this%GetfileID(),           &
                 name     = '/'//trim(adjustl(DatasetName)), &
                 dset_id  = dset_id,                         & 
                 hdferr   = hdferror)

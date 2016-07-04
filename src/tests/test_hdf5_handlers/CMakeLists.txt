@@ -13,16 +13,6 @@ LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
 
 #################################################################
-# FORCE HDF5 FORTRAN COMPILER IF EXISTS
-#################################################################
-
-IF(HDF5_Fortran_COMPILER_EXECUTABLE AND ${PROJECT_NAME}_ENABLE_HDF5)
-    # Force HDF5 Fortran compiler
-    INCLUDE(CMakeForceCompiler)
-    CMAKE_FORCE_Fortran_COMPILER(${HDF5_Fortran_COMPILER_EXECUTABLE} ${CMAKE_Fortran_COMPILER_ID})
-ENDIF()
-
-#################################################################
 # EXTERNAL LIBRARIES
 #################################################################
 
@@ -49,6 +39,9 @@ FOREACH(TEST_SRC ${TESTS_SRC})
     ENDIF()
 
     ADD_TEST(${EXE_NAME}_TEST ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME})
+    IF(MPI_FOUND AND MPIEXEC AND MPIEXEC_NUMPROC_FLAG AND MPIEXEC_MAX_NUMPROCS)
+        ADD_TEST(${EXE_NAME}_PARALLEL_TEST ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME})
+    ENDIF()
 ENDFOREACH()
 
 

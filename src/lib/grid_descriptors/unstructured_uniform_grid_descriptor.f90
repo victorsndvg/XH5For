@@ -29,6 +29,7 @@ contains
         integer(I4P),                     intent(IN)    :: GeometryType      !< Geometry type of the local grid
         integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the local grid
     !-----------------------------------------------------------------
+        call this%Free()
         call this%SetGridType(GridType=GridType)
         select case(GridType)
             case (XDMF_GRID_TYPE_UNSTRUCTURED)
@@ -52,6 +53,7 @@ contains
         integer(I8P)                                    :: NumberOfElements  !< Number of elements of the local grid
         integer(I4P),                     intent(IN)    :: GridType          !< Grid type of the local grid
     !----------------------------------------------------------------- 
+        call this%Free()
         call this%SetGridType(GridType=GridType)
         select case(GridType)
             case (XDMF_GRID_TYPE_UNSTRUCTURED)

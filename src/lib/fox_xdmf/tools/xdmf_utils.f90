@@ -5,6 +5,24 @@ USE IR_Precision, only: I4P, str
 USE xdmf_parameters
 
 implicit none
+private
+
+public :: Upper_Case
+public :: Count_tokens
+public :: Next_token
+public :: is_in_option_list
+public :: warning_message
+public :: isSupportedTopologyTypeName
+public :: isSupportedTimeTypeName
+public :: isSupportedGridTypeName
+public :: isSupportedGridCollectionTypeName
+public :: isSupportedGridSectionName
+public :: isSupportedAttributeTypeNAme
+public :: isSupportedDataItemTypeName
+public :: isSupportedAttributeCenterName
+public :: isSupportedDataItemNumberTypeName
+public :: isSupportedDataItemFormatName
+public :: isSupportedDataItemPrecision
 
 contains
 
@@ -56,6 +74,7 @@ contains
         endif
         Count_tokens = k
     end function Count_tokens
+
 
     function Next_token(s1, pos, separator)
     !-----------------------------------------------------------------
@@ -234,6 +253,7 @@ contains
         if(.not. supported) call warning_message('Not supported NumberType Name: "'//NumberTypeName//'" (Note: Case sensitive)')
     end function isSupportedDataItemNumberTypeName
 
+
     function isSupportedDataItemFormatName(FormatName) result(supported)
     !-----------------------------------------------------------------
     !< Return True if is a valid dataitem Format Name
@@ -256,7 +276,5 @@ contains
         supported = MINVAL(ABS(SUPPORTED_DATAITEMPRECISIONS - Precision)) == 0_I4P
         if(.not. supported) call warning_message('Not supported Precision: "'//trim(str(no_sign=.true., n=Precision))//'"')
     end function isSupportedDataItemPrecision
-
-
 
 end module xdmf_utils

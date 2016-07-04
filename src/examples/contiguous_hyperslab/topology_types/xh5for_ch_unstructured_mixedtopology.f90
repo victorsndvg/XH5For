@@ -1,15 +1,15 @@
 program xh5for_ch_unstructured_mixedtopology
 
 use xh5for
-#ifdef ENABLE_MPI
-#ifdef MPI_MOD
+
+#if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
-#else
+#endif
+  implicit none
+#if defined(ENABLE_MPI) && defined(MPI_H)
   include 'mpif.h'
 #endif
-#endif
 
-implicit none
     !-----------------------------------------------------------------
     !< Variable definition
     !----------------------------------------------------------------- 
@@ -38,7 +38,7 @@ implicit none
                                                 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,  &
                                                 18.0, 19.0, 20.0, 21.0, 22.0, 23.0 /)
 
-    real(R4P),    allocatable  :: out_geometry(:)
+    real(R8P),    allocatable  :: out_geometry(:)
     integer(I4P), allocatable  :: out_topology(:)
     integer(I4P), allocatable  :: out_cellfield(:)
     real(R8P),    allocatable  :: out_nodefield(:)
@@ -53,7 +53,7 @@ implicit none
     !< Main program
     !----------------------------------------------------------------- 
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
 #endif
@@ -62,9 +62,8 @@ implicit none
     geometry = geometry/2 + rank
 
     !< Write XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
-    call xh5%Open(action=XDMF_ACTION_WRITE, fileprefix='xh5for_ch_unstructured_mixedtopology')
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_mixedtopology', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%SetGrid(NumberOfNodes=24, NumberOfElements=10,TopologyType=XDMF_TOPOLOGY_TYPE_MIXED, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
     call xh5%WriteTopology(Connectivities = topology)
     call xh5%WriteGeometry(XYZ = geometry)
     call xh5%WriteAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=nodefield)
@@ -73,10 +72,8 @@ implicit none
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%SetStrategy(Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB)
-    call xh5%Initialize()
-    call xh5%Open(action=XDMF_ACTION_READ, fileprefix='xh5for_ch_unstructured_mixedtopology')
-    call xh5%Parse()
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_mixedtopology', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%ParseGrid()
     call xh5%ReadTopology(Connectivities = out_topology)
     call xh5%ReadGeometry(XYZ = out_geometry)
     call xh5%ReadAttribute(Name='NodeField', Type=XDMF_ATTRIBUTE_TYPE_SCALAR ,Center=XDMF_ATTRIBUTE_CENTER_NODE , Values=out_nodefield)
@@ -94,7 +91,7 @@ implicit none
     if(rank==0) write(*,*) 'Warning: HDF5 is not enabled. Please enable HDF5 and recompile to write the HeavyData'
 #endif
 
-#ifdef ENABLE_MPI
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
     call MPI_FINALIZE(mpierr)
 #endif
 

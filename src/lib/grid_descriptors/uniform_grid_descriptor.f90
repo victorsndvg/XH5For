@@ -28,6 +28,7 @@ private
 
         procedure, public :: Free                        => uniform_grid_descriptor_Free
         procedure, public :: FreeMetadata                => uniform_grid_descriptor_FreeMetadata
+        procedure, public :: FreeAttributesMetadata      => uniform_grid_descriptor_FreeAttributesMetadata
         procedure, public :: SetGridType                 => uniform_grid_descriptor_SetGridType
         procedure, public :: SetNumberOfNodes            => uniform_grid_descriptor_SetNumberOfNodes
         procedure, public :: SetNumberOfElements         => uniform_grid_descriptor_SetNumberOfElements
@@ -474,6 +475,23 @@ contains
     end subroutine uniform_grid_descriptor_UpdateNumberOfAttributes
 
 
+    subroutine uniform_grid_descriptor_FreeAttributesMetadata(this)
+    !-----------------------------------------------------------------
+    !< Free Uniform grid descriptor Attributes Metadata
+    !----------------------------------------------------------------- 
+        class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Local grid descriptor
+        integer(I4P)                                    :: i          !< Index for to loop on attributes
+    !----------------------------------------------------------------- 
+        if(allocated(this%AttributesMetadata)) then
+            do i = 1, this%NumberOfAttributes
+                call this%AttributesMetadata(i)%Free()
+            enddo
+            deallocate(this%AttributesMetadata)
+        endif
+        this%NumberOfAttributes = 0
+    end subroutine uniform_grid_descriptor_FreeAttributesMetadata
+
+
     subroutine uniform_grid_descriptor_FreeMetadata(this)
     !-----------------------------------------------------------------
     !< Free Uniform grid descriptor Metadata
@@ -484,13 +502,7 @@ contains
         this%GridType           = XDMF_NO_VALUE
         this%NumberOfNodes      = XDMF_NO_VALUE
         this%NumberOfElements   = XDMF_NO_VALUE
-        if(allocated(this%AttributesMetadata)) then
-            do i = 1, this%NumberOfAttributes
-                call this%AttributesMetadata(i)%Free()
-            enddo
-            deallocate(this%AttributesMetadata)
-        endif
-        this%NumberOfAttributes = 0
+        call this%FreeAttributesMetadata()
         call this%GeometryMetadata%Free()
         call this%TopologyMetadata%Free()
     end subroutine uniform_grid_descriptor_FreeMetadata
