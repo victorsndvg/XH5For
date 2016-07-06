@@ -1,6 +1,6 @@
 module hdf5_contiguous_hyperslab_handler
 
-use IR_Precision, only : I4P, I8P, R4P, R8P
+use IR_Precision, only : I4P, I8P, R4P, R8P, str
 #ifdef ENABLE_HDF5
 use HDF5
 #endif
@@ -114,12 +114,23 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
                 dims     = DatasetDims,                       &
@@ -163,6 +174,15 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef FORCE_FLUSH
+        call H5FFLUSH_f(object_id = this%GetFileID(), scope = H5F_SCOPE_LOCAL_F, hdferr = hdferror)
+#endif
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[WriteHyperSlab I4P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I4P
 
@@ -182,12 +202,23 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
                 dims     = DatasetDims,                       &
@@ -232,6 +263,15 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef FORCE_FLUSH
+        call H5FFLUSH_f(object_id = this%GetFileID(), scope = H5F_SCOPE_LOCAL_F, hdferr = hdferror)
+#endif
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[WriteHyperSlab I8P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteHyperSlab_I8P
 
@@ -251,12 +291,23 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
                 dims     = DatasetDims,                       &
@@ -300,6 +351,15 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef FORCE_FLUSH
+        call H5FFLUSH_f(object_id = this%GetFileID(), scope = H5F_SCOPE_LOCAL_F, hdferr = hdferror)
+#endif
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[WriteHyperSlab R4P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R4P
 
@@ -319,12 +379,23 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         ! Create filespace
         call H5Screate_simple_f(rank = 1,                     &
                 dims     = DatasetDims,                       &
@@ -368,6 +439,15 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef FORCE_FLUSH
+        call H5FFLUSH_f(object_id = this%GetFileID(), scope = H5F_SCOPE_LOCAL_F, hdferr = hdferror)
+#endif
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[WriteHyperSlab R8P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_WriteHyperSlab_R8P
 
@@ -388,12 +468,23 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
         integer                                                :: rank                !< Hyperslab rank 
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
@@ -437,6 +528,12 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[ReadHyperSlab I4P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I4P
 
@@ -457,12 +554,23 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
         integer                                                :: rank                !< Hyperslab rank 
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
@@ -506,6 +614,12 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[ReadHyperSlab I8P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_I8P
 
@@ -526,12 +640,23 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
         integer                                                :: rank                !< Hyperslab rank 
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
     !-----------------------------------------------------------------
+#endif
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
@@ -575,6 +700,12 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[ReadHyperSlab R4P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R4P
 
@@ -595,12 +726,23 @@ contains
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer                                                :: hdferror            !< HDF5 error code
         integer                                                :: rank                !< Hyperslab rank 
+#ifdef PRINT_IO_TIMES
+        type(mpi_env_t), pointer                               :: MPIEnvironment
+        real(R8P)                                              :: start_time
+        real(R8P)                                              :: end_time
+#endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        start_time = MPIEnvironment%mpi_wtime()
+#endif
         rank = 1
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
@@ -644,6 +786,12 @@ contains
         call H5Dclose_f(dset_id  = dset_id,   hdferr = hdferror)
         call H5Pclose_f(prp_id   = plist_id,  hdferr = hdferror)
         call H5Sclose_f(space_id = filespace, hdferr = hdferror)
+#ifdef PRINT_IO_TIMES
+        end_time = MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[ReadHyperSlab R8P] Dataset: '//DatasetName//&
+                       ' Size: '//trim(adjustl(str(no_sign=.true.,n=HyperSlabSize)))//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
     end subroutine hdf5_contiguous_hyperslab_handler_ReadHyperSlab_R8P
 

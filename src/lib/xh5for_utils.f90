@@ -3,7 +3,7 @@ module xh5for_utils
 !< XH5For: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XH5For utilities
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, str
+use IR_Precision, only: I4P, R8P, str
 use xdmf_utils,   only : warning_message
 use xh5for_parameters
 
@@ -16,6 +16,8 @@ include 'mpif.h'
 #endif	
 private
 
+public :: Abort
+public :: Wtime
 public :: GetNumberOfNodesPerElement
 public :: GetXDMFTopologyTypeName
 public :: GetXDMFTopologyTypeFromName
@@ -55,6 +57,33 @@ contains
             stop -1
         endif
     end subroutine Abort
+
+
+    !  Discussion:
+    !    To get the elapsed wall clock time, call WTIME before and after a given
+    !    operation, and subtract the first reading from the second.
+    !    This function is meant to suggest the similar routines:
+    !      "omp_get_wtime ( )" in OpenMP,
+    !      "MPI_Wtime ( )" in MPI,
+    !      and "tic" and "toc" in MATLAB.
+    !  Licensing:
+    !    This code is distributed under the GNU LGPL license.
+    !  Modified:
+    !    27 April 2009
+    !  Author:
+    !    John Burkardt
+    !  Parameters:
+    !    Output, real ( kind = 8 ) WTIME, the wall clock reading, in seconds.
+    function Wtime() result(time)
+        real(R8P)    :: time
+        integer(I4P) :: clock_max
+        integer(I4P) :: clock_rate
+        integer(I4P) :: clock_reading
+
+        call system_clock(clock_reading,clock_rate,clock_max)
+        time = real(clock_reading,kind=R8P)/real(clock_rate,kind=R8P)
+        return
+    end function Wtime
 
     function GetNumberOfNodesPerElement(TopologyType) result(NodesPerElement)
         integer(I4P), intent(IN) :: TopologyType

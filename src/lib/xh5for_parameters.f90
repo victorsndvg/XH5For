@@ -12,7 +12,7 @@ implicit none
     character(len=3), parameter :: XI_EXT   = '.xi'
     character(len=3), parameter :: HDF5_EXT = '.h5'
 
-    integer(I4P),     parameter :: XDMF_STATIC_STEP  = 0
+    integer(I4P),     parameter :: XDMF_STATIC_STEP  = 0 
 
     integer(I4P), parameter :: XDMF_NO_VALUE  = -1
 

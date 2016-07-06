@@ -276,6 +276,59 @@ LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
 
 #################################################################
+# DEBUG MODE RELATED STUFF
+#################################################################
+
+IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    #############################################################
+    # CODE INSTRUMENTATION WITH SCALASCA OR SCOREP 
+    #############################################################
+
+    IF(ENABLE_SCALASCA)
+
+      FILE(WRITE scalasca_compiler
+        "#!/bin/bash
+        scalasca -instrument ${CMAKE_Fortran_COMPILER} -opt-report \"$@\"
+        ")
+      FILE(INSTALL scalasca_compiler
+        DESTINATION ${PROJECT_BINARY_DIR}
+        PERMISSIONS OWNER_READ OWNER_EXECUTE )
+      FILE(REMOVE scalasca_compiler)
+      SET(CMAKE_Fortran_COMPILER ${PROJECT_BINARY_DIR}/scalasca_compiler)
+
+    ELSEIF(ENABLE_SCOREP)
+
+      FILE(WRITE scorep_compiler
+        "#!/bin/bash
+         scorep ${CMAKE_Fortran_COMPILER} -opt-report \"$@\"
+        ")
+      FILE(INSTALL scorep_compiler
+        DESTINATION ${PROJECT_BINARY_DIR}
+        PERMISSIONS OWNER_READ OWNER_EXECUTE )
+      FILE(REMOVE scorep_compiler)
+      SET(CMAKE_Fortran_COMPILER ${PROJECT_BINARY_DIR}/scorep_compiler)
+
+    ENDIF()
+ENDIF()
+
+
+#############################################################
+# FLUSH DATA AFTER EvERY WRITING
+#############################################################
+
+IF(${PROJECT_NAME}_FORCE_FLUSH)
+    ADD_DEFINITIONS(-DFORCE_FLUSH)
+ENDIF()
+
+#############################################################
+# PRINT THE TIME EXPENDED IN EVERY IO OPERATION
+#############################################################
+
+IF(${PROJECT_NAME}_PRINT_IO_TIMES)
+    ADD_DEFINITIONS(-DPRINT_IO_TIMES)
+ENDIF()
+
+#################################################################
 # ADD SOURCE SUBDIRS
 #################################################################
 

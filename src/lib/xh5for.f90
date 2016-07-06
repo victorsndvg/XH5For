@@ -249,16 +249,6 @@ contains
         class(xh5for_t),   intent(INOUT)  :: this
     !----------------------------------------------------------------- 
         this%Strategy = XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB
-        call this%MPIEnvironment%Free()
-        call this%StepsHandler%Free()
-        if(allocated(this%UniformGridDescriptor)) then
-            call this%UniformGridDescriptor%Free()
-            deallocate(this%UniformGridDescriptor)
-        endif
-        if(allocated(this%SpatialGridDescriptor)) then
-            call this%SpatialGridDescriptor%Free()
-            deallocate(this%SpatialGridDescriptor)
-        endif
         if(allocated(this%LightData)) then
             call this%LightData%Free()
             deallocate(this%LightData)
@@ -267,6 +257,16 @@ contains
             call this%HeavyData%Free()
             deallocate(this%HeavyData)
         endif
+        if(allocated(this%UniformGridDescriptor)) then
+            call this%UniformGridDescriptor%Free()
+            deallocate(this%UniformGridDescriptor)
+        endif
+        if(allocated(this%SpatialGridDescriptor)) then
+            call this%SpatialGridDescriptor%Free()
+            deallocate(this%SpatialGridDescriptor)
+        endif
+        call this%MPIEnvironment%Free()
+        call this%StepsHandler%Free()
         this%State = XH5FOR_STATE_START
     end subroutine xh5for_Free
 
