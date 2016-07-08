@@ -313,10 +313,10 @@ ENDIF()
 
 
 #############################################################
-# FLUSH DATA AFTER EvERY WRITING
+# FLUSH DATA AFTER EvERY HDF5 WRITING
 #############################################################
 
-IF(${PROJECT_NAME}_FORCE_FLUSH)
+IF(HDF5_FORCE_FLUSH)
     ADD_DEFINITIONS(-DFORCE_FLUSH)
 ENDIF()
 
@@ -324,7 +324,7 @@ ENDIF()
 # PRINT THE TIME EXPENDED IN EVERY IO OPERATION
 #############################################################
 
-IF(${PROJECT_NAME}_PRINT_IO_TIMES)
+IF(HDF5_PRINT_IO_TIMES)
     ADD_DEFINITIONS(-DPRINT_IO_TIMES)
 ENDIF()
 
