@@ -10,6 +10,7 @@ use xdmf_element, only: xdmf_element_t
 use xdmf_utils
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFAttribute properties (* Default):
 ! Name            (no default)
@@ -38,6 +39,8 @@ implicit none
         procedure, public :: get_AttributeType      => xdmf_attribute_get_AttributeType
         procedure, public :: get_Center             => xdmf_attribute_get_Center
     end type xdmf_attribute_t
+
+public :: xdmf_attribute_t
 
 contains
 

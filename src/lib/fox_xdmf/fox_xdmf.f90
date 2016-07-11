@@ -19,6 +19,7 @@ use xdmf_xinclude
 implicit none
 private
 
+public:: xmlf_t
 public:: xdmf_file_t
 public:: xdmf_domain_t
 public:: xdmf_grid_t

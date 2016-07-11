@@ -10,6 +10,7 @@ use xdmf_element, only: xdmf_element_t
 use xdmf_utils
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFGrid properties (* Default):
 ! Name             (no default)
@@ -44,6 +45,8 @@ implicit none
         procedure, public :: get_CollectionType     => xdmf_grid_get_CollectionType
         procedure, public :: get_Section            => xdmf_grid_get_Section
     end type xdmf_grid_t
+
+public :: xdmf_grid_t
 
 contains
 

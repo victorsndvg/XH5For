@@ -10,6 +10,7 @@ use xdmf_element, only: xdmf_element_t
 use xdmf_utils
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! Xinclude properties (* Default): https://www.w3.org/TR/xinclude/
 ! HRef                  URI
@@ -33,6 +34,8 @@ implicit none
         procedure, public :: close                  => xdmf_xinclude_close
         procedure, public :: print                  => xdmf_xinclude_print
     end type xdmf_xinclude_t
+
+public :: xdmf_xinclude_t
 
 contains
 

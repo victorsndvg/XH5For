@@ -7,11 +7,16 @@ module xdmf_structured_dataset_per_process_handler
 use fox_xdmf
 use xh5for_utils
 use xh5for_parameters
+use mpi_environment
+use uniform_grid_descriptor
+use spatial_grid_descriptor
 use xdmf_dataset_per_process_handler
 use fox_dom,      only: Node
 use IR_Precision, only: I4P, I8P, R4P, R8P, str
 
 implicit none
+
+#include "assert.i90"
 
 private
 
@@ -41,10 +46,13 @@ contains
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this              !< XDMF dataset per process handler for structured Grids
         integer(I4P),                                         intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                                     intent(IN)    :: Name              !< Topology name
+        class(uniform_grid_descriptor_t), pointer                           :: UniformGridDescriptor  !< Uniform grid descriptor
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyMetadata(Name            = Name, &
-                                                            Precision       = 4,    &
-                                                            ArrayDimensions = (/size(Connectivities, dim=1)/))
+        UniformGridDescriptor => this%GetUniformGridDescriptor()
+        assert(associated(UniformGridDescriptor))
+        call UniformGridDescriptor%SetTopologyMetadata(Name            = Name, &
+                                                       Precision       = 4,    &
+                                                       ArrayDimensions = (/size(Connectivities, dim=1)/))
     end subroutine xdmf_str_dataset_per_process_SetTopology_I4P
 
 
@@ -55,10 +63,13 @@ contains
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this              !< XDMF dataset per process handler for structured Grids
         integer(I8P),                                         intent(IN)    :: Connectivities(:) !< Grid Connectivities
         character(len=*),                                     intent(IN)    :: Name              !< Topology name
+        class(uniform_grid_descriptor_t), pointer                           :: UniformGridDescriptor  !< Uniform grid descriptor
     !-----------------------------------------------------------------
-        call this%UniformGridDescriptor%SetTopologyMetadata(Name            = Name, &
-                                                            Precision       = 8,    &
-                                                            ArrayDimensions = (/size(Connectivities, dim=1)/))
+        UniformGridDescriptor => this%GetUniformGridDescriptor()
+        assert(associated(UniformGridDescriptor))
+        call UniformGridDescriptor%SetTopologyMetadata(Name            = Name, &
+                                                       Precision       = 8,    &
+                                                       ArrayDimensions = (/size(Connectivities, dim=1)/))
     end subroutine xdmf_str_dataset_per_process_SetTopology_I8P
 
 
@@ -70,31 +81,34 @@ contains
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this         !< XDMF dataset per process handler for structured Grids
         type(Node), pointer,                                  intent(IN)    :: TopologyNode !< Fox DOM Topology node
         integer(I4P),                                         intent(IN)    :: ID           !< Grid IDentifier
+        class(spatial_grid_descriptor_t), pointer                           :: SpatialGridDescriptor !< Spatial grid descriptor
         type(xdmf_topology_t)                                               :: Topology     !< XDMF Topology derived type
         type(xdmf_dataitem_t)                                               :: DataItem     !< XDMF DataItem derived type
         type(Node), pointer                                                 :: DataItemNode !< Fox DOM Dataitem node
         integer(I8P), allocatable                                           :: auxDims(:)   !< Aux dimensions variable
         character(len=:), allocatable                                       :: XPath        !< Topology XPath
     !----------------------------------------------------------------- 
+        SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+        assert(associated(SpatialGridDescriptor))
         if(.not. associated(TopologyNode)) return
         call Topology%Parse(DOMNode = TopologyNode)
         ! Set TopologyType
-        call this%SpatialGridDescriptor%SetTopologyTypePerGridID(&
+        call SpatialGridDescriptor%SetTopologyTypePerGridID(&
                     TopologyType = GetXDMFTopologyTypeFromName(Topology%get_TopologyType()), ID=ID)
         ! Set NumberOfElements
         allocate(auxDims(size(Topology%get_Dimensions(),1)))
         auxDims = Topology%get_Dimensions()
         ! Dimensions are specified with the slowest varying dimension first (i.e. KJI order)
         auxDims(:) = auxDims(size(auxDims,dim=1):1:-1)
-        call this%SpatialGridDescriptor%SetXSizePerGridID(AuxDims(1),ID=ID)
-        call this%SpatialGridDescriptor%SetYSizePerGridID(AuxDims(2),ID=ID)
+        call SpatialGridDescriptor%SetXSizePerGridID(AuxDims(1),ID=ID)
+        call SpatialGridDescriptor%SetYSizePerGridID(AuxDims(2),ID=ID)
         if(size(AuxDims,1) == 3) then
-            call this%SpatialGridDescriptor%SetZSizePerGridID(AuxDims(3),ID=ID)
-            call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2))*max(1,AuxDims(3)),ID=ID)
-            call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1)*max(1,AuxDims(3)-1),ID=ID)
+            call SpatialGridDescriptor%SetZSizePerGridID(AuxDims(3),ID=ID)
+            call SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2))*max(1,AuxDims(3)),ID=ID)
+            call SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1)*max(1,AuxDims(3)-1),ID=ID)
         else
-            call this%SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2)),ID=ID)
-            call this%SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1),ID=ID)
+            call SpatialGridDescriptor%SetNumberOfNodesPerGridID(max(1,AuxDims(1))*max(1,AuxDims(2)),ID=ID)
+            call SpatialGridDescriptor%SetNumberOfElementsPerGridID(max(1,AuxDims(1)-1)*max(1,AuxDims(2)-1),ID=ID)
         endif
         ! Free
         call Topology%Free()
@@ -108,6 +122,8 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this         !< XDMF dataset per process handler for structured Grids
         integer(I4P),                                         intent(IN)    :: GridID                  !< Grid ID number
+        type(mpi_env_t),                  pointer                           :: MPIEnvironment          !< MPI environment
+        class(spatial_grid_descriptor_t), pointer                           :: SpatialGridDescriptor   !< Spatial grid descriptor
         type(xdmf_topology_t)                                               :: topology                !< XDMF Topology type
         integer(I8P)                                                        :: GridShape(3)            !< Local number of elements
         character(len=:), allocatable                                       :: HDF5FileName            !< Name of the HDF5 file
@@ -116,23 +132,27 @@ contains
         integer(I4P)                                                        :: SpaceDimension          !< Space dimensions
     !-----------------------------------------------------------------
     !< @Note: allow different Topology or Topology for each part of the spatial grid?
-        if(this%MPIEnvironment%is_root()) then
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        if(MPIEnvironment%is_root()) then
+            SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+            assert(associated(SpatialGridDescriptor))
             ! Topology Grid shape is expressed in ZYX order in structured grids
-            GridShape(1) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=3)
-            GridShape(2) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=2)
-            GridShape(3) = this%SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=1)
-            XMDFTopologyTypeName = GetXDMFTopologyTypeName(this%SpatialGridDescriptor%GetTopologyTypePerGridID(id=GridID))
-            SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
+            GridShape(1) = SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=3)
+            GridShape(2) = SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=2)
+            GridShape(3) = SpatialGridDescriptor%GetTopologySizePerGridID(ID=GridID, Dimension=1)
+            XMDFTopologyTypeName = GetXDMFTopologyTypeName(SpatialGridDescriptor%GetTopologyTypePerGridID(id=GridID))
+            SpaceDimension = GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
             if (SpaceDimension == 2) then
-                call topology%open( xml_handler = this%SpatialFile%xml_handler, &
+                call topology%open( xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions  = GridShape(2:3),                    &
                         TopologyType=XMDFTopologyTypeName)
             else
-                call topology%open( xml_handler = this%SpatialFile%xml_handler, &
+                call topology%open( xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions  = GridShape,                         &
                         TopologyType=XMDFTopologyTypeName)
             endif
-            call topology%close(xml_handler=this%SpatialFile%xml_handler)
+            call topology%close(xml_handler=this%GetSpatialFileXMLHandler())
         endif                    
     end subroutine xdmf_str_dataset_per_process_WriteTopology
 
@@ -143,8 +163,11 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this   !< XDMF dataset per process handler for structured Grids
         integer(I4P),                                         intent(IN)    :: GridID !< Grid ID number
-    !----------------------------------------------------------------- 
-        select case(this%UniformGridDescriptor%GetGeometryType())
+        class(uniform_grid_descriptor_t), pointer                           :: UniformGridDescriptor  !< Uniform grid descriptor
+    !-----------------------------------------------------------------
+        UniformGridDescriptor => this%GetUniformGridDescriptor()
+        assert(associated(UniformGridDescriptor))
+        select case(UniformGridDescriptor%GetGeometryType())
 
             case (XDMF_GEOMETRY_TYPE_ORIGIN_DXDY, XDMF_GEOMETRY_TYPE_ORIGIN_DXDYDZ)
                 call this%WriteGeometry_DXDYDZ(GridID=GridID)
@@ -160,6 +183,9 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this !< XDMF dataset per process handler for structured Grids
         integer(I4P),                                         intent(IN)    :: GridID                  !< Grid ID number
+        type(mpi_env_t),                  pointer                           :: MPIEnvironment          !< MPI environment
+        class(uniform_grid_descriptor_t), pointer                           :: UniformGridDescriptor   !< Uniform grid descriptor
+        class(spatial_grid_descriptor_t), pointer                           :: SpatialGridDescriptor   !< Spatial grid descriptor
         type(xdmf_geometry_t)                                               :: geometry                !< XDMF Geometry type
         type(xdmf_dataitem_t)                                               :: dataitem                !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                                         :: chardata                !< XDMF Character Data type
@@ -170,39 +196,45 @@ contains
         integer(I4P)                                                        :: DimensionsSize          !< Size of the GeometryDimensions
         integer(I4P)                                                        :: SpaceDimension          !< Space dimension
     !-----------------------------------------------------------------
-        if(this%MPIEnvironment%is_root()) then
-            if(this%SpatialGridDescriptor%IsStaticGrid()) then
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        if(MPIEnvironment%is_root()) then
+            UniformGridDescriptor => this%GetUniformGridDescriptor()
+            assert(associated(UniformGridDescriptor))
+            SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+            assert(associated(SpatialGridDescriptor))
+            if(SpatialGridDescriptor%IsStaticGrid()) then
                 HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
             else
                 HDF5FileName = this%GetHDF5FileName()
             endif
-            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
             GridNumber = GridID
-            NumberOfGrids = this%SpatialGridDescriptor%GetNumberOfGrids()
-            SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
-            call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
+            NumberOfGrids = SpatialGridDescriptor%GetNumberOfGrids()
+            SpaceDimension = GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
+            call geometry%open( xml_handler  = this%GetSpatialFileXMLHandler(), &
                     GeometryType = XDMFGeometryTypeName)
             ! Origin
-            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+            call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                     Dimensions = (/int(SpaceDimension,I8P)/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
-                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = HDF5Filename//':'//'Origin_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+            call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                    Data = HDF5Filename//':'//'Origin_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID)))) 
-            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
             ! DXDYXDZ
-            call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+            call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                     Dimensions = (/int(SpaceDimension,I8P)/), &
                     NumberType = 'Float', &
                     Format     = 'HDF', &
-                    Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-            call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                    Data = HDF5Filename//':'//'DxDyDz_'//this%UniformGridDescriptor%GetGeometryName()//&
+                    Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+            call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                    Data = HDF5Filename//':'//'DxDyDz_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID)))) 
-            call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
-            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
+            call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
+            call geometry%close(xml_handler = this%GetSpatialFileXMLHandler())
         endif                    
     end subroutine xdmf_str_dataset_per_process_WriteGeometry_DXDYDZ
 
@@ -213,6 +245,9 @@ contains
     !----------------------------------------------------------------- 
         class(xdmf_structured_dataset_per_process_handler_t), intent(INOUT) :: this !< XDMF dataset per process handler for structured Grids
         integer(I4P),                                         intent(IN)    :: GridID                  !< Grid ID number
+        type(mpi_env_t),                  pointer                           :: MPIEnvironment          !< MPI environment
+        class(uniform_grid_descriptor_t), pointer                           :: UniformGridDescriptor   !< Uniform grid descriptor
+        class(spatial_grid_descriptor_t), pointer                           :: SpatialGridDescriptor   !< Spatial grid descriptor
         type(xdmf_geometry_t)                                               :: geometry                !< XDMF Geometry type
         type(xdmf_dataitem_t)                                               :: dataitem                !< XDMF Dataitem ttype
         type(xdmf_character_data_t)                                         :: chardata                !< XDMF Character Data type
@@ -224,94 +259,100 @@ contains
         Integer(I4P)                                                        :: DimensionsSize          !< Size of the Geometry shape
         Integer(I4P)                                                        :: SpaceDimension          !< Space Dimension
     !-----------------------------------------------------------------
-        if(this%MPIEnvironment%is_root()) then
-            if(this%SpatialGridDescriptor%IsStaticGrid()) then
+        MPIEnvironment => this%GetMPIEnvironment()
+        assert(associated(MPIEnvironment))
+        if(MPIEnvironment%is_root()) then
+            UniformGridDescriptor => this%GetUniformGridDescriptor()
+            assert(associated(UniformGridDescriptor))
+            SpatialGridDescriptor => this%GetSpatialGridDescriptor()
+            assert(associated(SpatialGridDescriptor))
+            if(SpatialGridDescriptor%IsStaticGrid()) then
                 HDF5FileName = this%GetHDF5FileName(Step=XDMF_STATIC_STEP)
             else
                 HDF5FileName = this%GetHDF5FileName()
             endif
-            LocalGridShape(1) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1)
-            LocalGridShape(2) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2)
-            GlobalGridShape(1) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1)
-            GlobalGridShape(2) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2)
-            GridShapeOffset(1) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=1)
-            GridShapeOffset(2) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=2)
-            XDMFGeometryTypeName = GetXDMFGeometryTypeName(this%SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
-            SpaceDimension = GetSpaceDimension(this%SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
+            LocalGridShape(1) = SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=1)
+            LocalGridShape(2) = SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=2)
+            GlobalGridShape(1) = SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=1)
+            GlobalGridShape(2) = SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=2)
+            GridShapeOffset(1) = SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=1)
+            GridShapeOffset(2) = SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=2)
+            XDMFGeometryTypeName = GetXDMFGeometryTypeName(SpatialGridDescriptor%GetGeometryTypePerGridID(ID=GridID))
+            SpaceDimension = GetSpaceDimension(SpatialGridDescriptor%GetGeometryTypePerGridID(id=GridID))
             if (SpaceDimension == 3) then
-                LocalGridShape(3) = this%SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
-                GlobalGridShape(3) = this%SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
-                GridShapeOffset(3) = this%SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
-                call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
+                LocalGridShape(3)  = SpatialGridDescriptor%GetGeometrySizePerGridID(ID=GridID, Dimension=3)
+                GlobalGridShape(3) = SpatialGridDescriptor%GetGlobalGeometrySize(Dimension=3)
+                GridShapeOffset(3) = SpatialGridDescriptor%GetGeometrySizeOffsetPerGridID(ID=GridID, Dimension=3)
+                call geometry%open( xml_handler  = this%GetSpatialFileXMLHandler(), &
                         GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions = (/LocalGridShape(1)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
-                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = HDF5Filename//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
+                        Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Data = HDF5Filename//':X_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions = (/LocalGridShape(2)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
-                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = HDF5Filename//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
+                        Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Data = HDF5Filename//':Y_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
     !-----------------------------------------------------------------
     !< Z
     !----------------------------------------------------------------- 
-                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions = (/LocalGridShape(3)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
-                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = HDF5Filename//':Z_'//this%UniformGridDescriptor%GetGeometryName()//&
+                        Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Data = HDF5Filename//':Z_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
             elseif (SpaceDimension == 2) then
             ! Why paraview need to put in inverse order?? YX
             ! 2D VXVY does not apper in the standard Model&Format
-                call geometry%open( xml_handler  = this%SpatialFile%xml_handler, &
+                call geometry%open( xml_handler  = this%GetSpatialFileXMLHandler(), &
                         GeometryType = XDMFGeometryTypeName)
     !-----------------------------------------------------------------
     !< Y
     !----------------------------------------------------------------- 
-                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions = (/LocalGridShape(2)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
-                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = HDF5Filename//':Y_'//this%UniformGridDescriptor%GetGeometryName()//&
+                        Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Data = HDF5Filename//':Y_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
     !-----------------------------------------------------------------
     !< X
     !----------------------------------------------------------------- 
-                call dataitem%open(xml_handler = this%SpatialFile%xml_handler, &
+                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
                         Dimensions = (/LocalGridShape(1)/), &
                         NumberType = 'Float', &
                         Format     = 'HDF', &
-                        Precision  = this%UniformGridDescriptor%GetGeometryPrecision()) 
-                call chardata%write( xml_handler = this%SpatialFile%xml_handler, &
-                        Data = HDF5Filename//':X_'//this%UniformGridDescriptor%GetGeometryName()//&
+                        Precision  = UniformGridDescriptor%GetGeometryPrecision()) 
+                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Data = HDF5Filename//':X_'//UniformGridDescriptor%GetGeometryName()//&
                                '_'//trim(adjustl(str(no_sign=.true.,n=GridID))))
-                call dataitem%close(xml_handler = this%SpatialFile%xml_handler)
+                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
 
             endif
-            call geometry%close(xml_handler = this%SpatialFile%xml_handler)
+            call geometry%close(xml_handler = this%GetSpatialFileXMLHandler())
         endif                    
     end subroutine xdmf_str_dataset_per_process_WriteGeometry_VXVYVZ
 

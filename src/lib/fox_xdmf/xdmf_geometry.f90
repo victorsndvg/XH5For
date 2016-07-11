@@ -10,6 +10,7 @@ use xdmf_utils,   only: is_in_option_list, warning_message
 use xdmf_element, only: xdmf_element_t
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFGeometry properties (* Default):
 ! GeometryType     XYZ | XY | X_Y_Z | VxVyVz | Origin_DxDyDz | Origin_DxDy
@@ -33,6 +34,8 @@ implicit none
         procedure, public :: print                  => xdmf_geometry_print
         procedure, public :: get_GeometryType       => xdmf_geometry_get_GeometryType
     end type xdmf_geometry_t
+
+public :: xdmf_geometry_t
 
 contains
 
