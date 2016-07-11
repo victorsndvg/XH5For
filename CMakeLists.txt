@@ -321,7 +321,7 @@ IF(HDF5_FORCE_FLUSH)
 ENDIF()
 
 #############################################################
-# PRINT THE TIME EXPENDED IN EVERY IO OPERATION
+# PRINT THE TIME EXPENDED IN EVERY HDF5 IO OPERATION
 #############################################################
 
 IF(HDF5_PRINT_IO_TIMES)

@@ -45,6 +45,15 @@ use xh5for
     endif
 
     call generate_hexa_mesh(rank, num_elems_per_axis, geometry, topology, num_nodes, num_elements)
+
+    if(rank==0) then
+        write(*,fmt='(A)') '==================================================='
+        write(*,fmt='(A)') 'TEST INFO: Fixed size per task'
+        write(*,fmt='(A)') 'TEST INFO: Number of elements: '//trim(adjustl(str(no_sign=.true., n=num_elements)))
+        write(*,fmt='(A)') 'TEST INFO: Number of nodes: '//trim(adjustl(str(no_sign=.true., n=num_nodes)))
+        write(*,fmt='(A)') '==================================================='
+    endif
+
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_unstructured_hexahedron_perf', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
     call xh5%SetGrid(NumberOfNodes=num_nodes, NumberOfElements=num_elements,TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
@@ -78,16 +87,16 @@ use xh5for
 
 contains
 
-    subroutine generate_hexa_mesh(rank, num_elements_per_line, XYZ, topology, number_nodes, number_elements)
+    subroutine generate_hexa_mesh(rank, num_elements_per_axis, XYZ, topology, number_nodes, number_elements)
         integer,                   intent(in)    :: rank
-        integer,                   intent(in)    :: num_elements_per_line
+        integer,                   intent(in)    :: num_elements_per_axis
         real(R4P),    allocatable, intent(inout) :: XYZ(:)
         integer(I4P), allocatable, intent(inout) :: topology(:)
         integer(I4P),              intent(out)   :: number_nodes
         integer(I4P),              intent(out)   :: number_elements
         integer                                  :: dim = 3
         integer                                  :: num_elements_per_surface
-        integer                                  :: num_nodes_per_line
+        integer                                  :: num_nodes_per_axis
         integer                                  :: num_nodes_per_surface
         integer                                  :: num_nodes_per_element = 8 ! hexahedron
         real(R4P),    dimension(3)               :: first_point = (/0.0,0.0,0.0/)
@@ -95,37 +104,37 @@ contains
         real(R4P),    dimension(3)               :: steps
         integer(I4P), dimension(8)               :: first_element_topology
 
-        num_elements_per_surface = num_elements_per_line**2
-        num_elements             = num_elements_per_line**3
-        num_nodes_per_line       = num_elements_per_line+1
-        num_nodes_per_surface    = num_nodes_per_line**2
-        num_nodes                = num_nodes_per_line**3
+        num_elements_per_surface = num_elements_per_axis**2
+        number_elements          = num_elements_per_axis**3
+        num_nodes_per_axis       = num_elements_per_axis+1
+        num_nodes_per_surface    = num_nodes_per_axis**2
+        number_nodes             = num_nodes_per_axis**3
         !< Initialize some values depending on the mpi rank
         first_point = first_point+rank
         last_point = last_point+rank
-        steps = (last_point-first_point)/real(num_elements_per_line, R4P)
+        steps = (last_point-first_point)/real(num_elements_per_axis, R4P)
 
         first_element_topology = (/0,                                          1,                                       &
-                                   num_nodes_per_line+1,                       num_nodes_per_line,                      &
+                                   num_nodes_per_axis+1,                       num_nodes_per_axis,                      &
                                    num_nodes_per_surface,                      num_nodes_per_surface+1,                 &
-                                   num_nodes_per_surface+num_nodes_per_line+1, num_nodes_per_surface+num_nodes_per_line/)
+                                   num_nodes_per_surface+num_nodes_per_axis+1, num_nodes_per_surface+num_nodes_per_axis/)
 
         if(allocated(XYZ)) deallocate(XYZ)
         if(allocated(topology)) deallocate(topology)
-        allocate(XYZ(num_nodes*3))
-        allocate(topology(num_elements*num_nodes_per_element))
+        allocate(XYZ(number_nodes*3))
+        allocate(topology(number_elements*num_nodes_per_element))
 
-        do i=0, num_nodes-1
-            XYZ((i*dim)+1) = first_point(1)+mod(i/num_nodes_per_surface,num_nodes_per_line)*steps(1)
-            XYZ((i*dim)+2) = first_point(2)+mod(i/num_nodes_per_line,num_nodes_per_line)*steps(2)
-            XYZ((i*dim)+3) = first_point(3)+mod(i,num_nodes_per_line)*steps(3)
+        do i=0, number_nodes-1
+            XYZ((i*dim)+1) = first_point(1)+mod(i/num_nodes_per_surface,num_nodes_per_axis)*steps(1)
+            XYZ((i*dim)+2) = first_point(2)+mod(i/num_nodes_per_axis,num_nodes_per_axis)*steps(2)
+            XYZ((i*dim)+3) = first_point(3)+mod(i,num_nodes_per_axis)*steps(3)
         enddo
-        do i=0, num_elements-1
-            topology((i*num_nodes_per_element)+1:(i+1)*num_nodes_per_element) = &
-                                            first_element_topology+&
-                                            mod(i,num_elements_per_line)+&
-                                            mod(i/num_elements_per_line,num_elements_per_line)*num_nodes_per_line+&
-                                            mod(i/num_elements_per_surface, num_elements_per_surface)*num_nodes_per_surface
+        do i=0, number_elements-1
+            topology((i*num_nodes_per_element)+1:(i+1)*num_nodes_per_element) =            &
+                    first_element_topology+                                                &
+                    mod(i,num_elements_per_axis)+                                          &
+                    mod(i/num_elements_per_axis,num_elements_per_axis)*num_nodes_per_axis+ &
+                    mod(i/num_elements_per_surface, num_elements_per_surface)*num_nodes_per_surface
         enddo
 
     end subroutine
