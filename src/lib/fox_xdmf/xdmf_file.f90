@@ -40,6 +40,7 @@ private
     end type xdmf_file_t
 
     public :: xdmf_file_t
+    public :: xmlf_t
 
 contains
 

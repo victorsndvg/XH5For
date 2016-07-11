@@ -12,6 +12,7 @@ use FoX_dom,      only: Node, getTagName
 use IR_Precision, only: I4P
 
 implicit none
+private
 
     type, abstract:: xdmf_element_t
     private
@@ -73,6 +74,7 @@ implicit none
         end subroutine xdmf_element_print
     end interface
 
+public :: xdmf_element_t
 
 contains
 

@@ -9,6 +9,7 @@ use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_element, only: xdmf_element_t
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFDomain properties (* Default):
 ! Name            (no default)
@@ -31,6 +32,8 @@ implicit none
         procedure, public :: print                  => xdmf_domain_print
         procedure, public :: get_Name               => xdmf_domain_get_Name
     end type xdmf_domain_t
+
+public :: xdmf_domain_t
 
 contains
 
