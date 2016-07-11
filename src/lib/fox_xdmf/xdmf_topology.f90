@@ -10,6 +10,7 @@ use xdmf_element, only: xdmf_element_t
 use xdmf_utils
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFTopology properties (* Default):
 ! Name               (no default)
@@ -63,6 +64,8 @@ implicit none
         procedure, public :: get_Order              => xdmf_topology_get_Order
         procedure, public :: get_BaseOffset         => xdmf_topology_get_BaseOffset
     end type xdmf_topology_t
+
+public :: xdmf_topology_t
 
 contains
 

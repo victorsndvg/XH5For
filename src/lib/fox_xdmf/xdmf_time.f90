@@ -10,6 +10,7 @@ use xdmf_element, only: xdmf_element_t
 use xdmf_utils
 
 implicit none
+private
 !---------------------------------------------------------------------
 ! XDMFTime properties (* Default):
 ! TimeType            Single | HyperSlab | List | Range
@@ -37,6 +38,8 @@ implicit none
         procedure, public :: close                  => xdmf_time_close
         procedure, public :: print                  => xdmf_time_print
     end type xdmf_time_t
+
+public :: xdmf_time_t
 
 contains
 

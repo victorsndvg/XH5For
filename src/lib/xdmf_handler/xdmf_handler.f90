@@ -44,6 +44,7 @@ private
 
 
     type, abstract :: xdmf_handler_t
+    private
     !-----------------------------------------------------------------
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
@@ -65,6 +66,14 @@ private
         procedure(xdmf_handler_WriteTopology),           deferred :: WriteTopology
         procedure(xdmf_handler_WriteAttributes),         deferred :: WriteAttributes
         procedure(xdmf_handler_FillSpatialGridTopology), deferred :: FillSpatialGridTopology
+
+        ! Return components
+        procedure, public :: GetSpatialFileXMLHandler     => xdmf_handler_GetSpatialFileXMLHandler
+        procedure, public :: GetStepsHandler              => xdmf_handler_GetStepsHandler
+        procedure, public :: GetMPIEnvironment            => xdmf_handler_GetMPIEnvironment
+        procedure, public :: GetUniformGridDescriptor     => xdmf_handler_GetUniformGridDescriptor
+        procedure, public :: GetSpatialGridDescriptor     => xdmf_handler_GetSpatialGridDescriptor
+        
 
         ! XDMF Handler initialization/finalization procedures
         procedure, public :: Initialize                   => xdmf_handler_Initialize
@@ -187,6 +196,66 @@ contains
         if(present(FilePrefix) .and. Present(Action)) call this%Open(FilePrefix, Action)
         this%State = XDMF_HANDLER_STATE_INIT
     end subroutine xdmf_handler_Initialize
+
+
+    function xdmf_handler_GetSpatialFileXMLHandler(this) result(XMLHandler)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the UniformGridDescriptor
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), target, intent(IN) :: this             !< XDMF handler type
+        class(xmlf_t),         pointer            :: XMLHandler       !< !< FoX SAX XML File handler
+    !----------------------------------------------------------------- 
+        nullify(XMLHandler)
+        XMLHandler => this%SpatialFile%xml_handler
+    end function xdmf_handler_GetSpatialFileXMLHandler
+
+
+    function xdmf_handler_GetStepsHandler(this) result(StepsHandler)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the UniformGridDescriptor
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),         intent(IN) :: this             !< XDMF handler type
+        class(steps_handler_t), pointer           :: StepsHandler     !< Steps handler
+    !----------------------------------------------------------------- 
+        nullify(StepsHandler)
+        StepsHandler => this%StepsHandler
+    end function xdmf_handler_GetStepsHandler
+
+
+    function xdmf_handler_GetMPIEnvironment(this) result(MPIEnvironment)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the MPIEnvironment
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t), intent(IN) :: this                     !< XDMF handler type
+        class(mpi_env_t), pointer         :: MPIEnvironment           !< MPI Environment
+    !----------------------------------------------------------------- 
+        nullify(MPIEnvironment)
+        MPIEnvironment => this%MPIEnvironment
+    end function xdmf_handler_GetMPIEnvironment
+
+
+    function xdmf_handler_GetUniformGridDescriptor(this) result(UniformGridDescriptor)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the UniformGridDescriptor
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),         intent(IN) :: this                  !< XDMF handler type
+        class(uniform_grid_descriptor_t), pointer :: UniformGridDescriptor !< Uniform grid descriptor
+    !----------------------------------------------------------------- 
+        nullify(UniformGridDescriptor)
+        UniformGridDescriptor => this%UniformGridDescriptor
+    end function xdmf_handler_GetUniformGridDescriptor
+
+
+    function xdmf_handler_GetSpatialGridDescriptor(this) result(SpatialGridDescriptor)
+    !-----------------------------------------------------------------
+    !< Return a pointer to the SpatialGridDescriptor
+    !----------------------------------------------------------------- 
+        class(xdmf_handler_t),         intent(IN) :: this                  !< XDMF handler type
+        class(spatial_grid_descriptor_t), pointer :: SpatialGridDescriptor !< Uniform grid descriptor
+    !----------------------------------------------------------------- 
+        nullify(SpatialGridDescriptor)
+        SpatialGridDescriptor => this%SpatialGridDescriptor
+    end function xdmf_handler_GetSpatialGridDescriptor
 
 
     subroutine xdmf_handler_Clean(this)

@@ -7,6 +7,7 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
 use FoX_wxml,     only: xml_AddCharacters, xmlf_t
 
 implicit none
+private
 
     type  :: xdmf_character_data_t
     !-----------------------------------------------------------------
@@ -44,6 +45,8 @@ implicit none
                                                        xdmf_character_data_write_R8P_2D
 
     end type xdmf_character_data_t
+
+public :: xdmf_character_data_t
 
 contains
 
