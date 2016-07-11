@@ -5,6 +5,7 @@ module mpi_environment
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
 use IR_Precision, only : I4P, I8P, R4P, R8P
+use XH5For_utils
 
 #ifdef ENABLE_MPI
 #ifdef MPI_MOD
@@ -65,6 +66,7 @@ private
         procedure, public :: get_info                     => mpi_env_get_info
         procedure, public :: get_comm_size                => mpi_env_get_comm_size
         procedure, public :: is_root                      => mpi_env_is_root
+        procedure, public :: mpi_wtime                    => mpi_env_wtime
         generic,   public :: mpi_allgather                => mpi_env_allgather_single_int_value_I4P, &
                                                              mpi_env_allgather_single_int_value_I8P
         generic,   public :: mpi_broadcast                => mpi_env_broadcast_int_I4P,       &
@@ -345,6 +347,22 @@ contains
 #endif
         if(present(mpierror)) mpierror = mpierr
     end subroutine mpi_env_broadcast_string
+
+
+    function mpi_env_wtime(this) result(time)
+    !-----------------------------------------------------------------
+    !< Call MPI_Wtime()
+    !----------------------------------------------------------------- 
+        class(mpi_env_t), intent(IN)  :: this                         !< MPI environment
+        real(R8P)                     :: time                         !< MPI_WTime returned time
+    !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+        time = MPI_WTIME()
+#else
+        time = Wtime()
+#endif
+    end function mpi_env_wtime
 
 
     function mpi_env_is_root(this) result(is_root)

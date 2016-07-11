@@ -535,13 +535,20 @@ contains
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
         integer(I4P),          intent(IN)    :: Action                !< Action to be perfomed (Read or Write)
         character(len=*),      intent(IN)    :: FilePrefix            !< HDF5 file prefix
-        integer(I4P), optional, intent(IN)   :: Step                 !< Force step number
+        integer(I4P), optional, intent(IN)   :: Step                  !< Force step number
         integer                              :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
         character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
+#ifdef PRINT_IO_TIMES
+        real(R8P)                            :: start_time
+        real(R8P)                            :: end_time
     !-----------------------------------------------------------------
+#endif
         assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        start_time = this%MPIEnvironment%mpi_wtime()
+#endif
         this%Action = Action
         this%Prefix = FilePrefix
         this%Filename = this%GetHDF5FileName(Step=Step)
@@ -580,7 +587,11 @@ contains
         end select
 
         call h5pclose_f(prp_id = plist_id, hdferr = hdferror)
-
+#ifdef PRINT_IO_TIMES
+        end_time = this%MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[OpenFile] Filename: '//this%Filename//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
         this%State = HDF5_HANDLER_STATE_OPEN
     end subroutine hdf5_handler_OpenFile
@@ -592,11 +603,24 @@ contains
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
         integer                              :: hdferror              !< HDF5 error code
+#ifdef PRINT_IO_TIMES
+        real(R8P)                            :: start_time
+        real(R8P)                            :: end_time
     !-----------------------------------------------------------------
-        assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
+#endif
+        assert(this%State == HDF5_HANDLER_STATE_OPEN)
+
 #ifdef ENABLE_HDF5
+#ifdef PRINT_IO_TIMES
+        start_time = this%MPIEnvironment%mpi_wtime()
+#endif
         call H5Fclose_f(file_id = this%FileID, hdferr = hdferror)
         call H5close_f(error = hdferror) 
+#ifdef PRINT_IO_TIMES
+        end_time = this%MPIEnvironment%mpi_wtime()
+        write(*,'(A)') '[CloseFile] Filename: '//this%Filename//&
+                       ' Time: '//trim(adjustl(str(no_sign=.true.,n=end_time-start_time)))
+#endif
 #endif
         this%State = HDF5_HANDLER_STATE_CLOSE
     end subroutine hdf5_handler_CloseFile
