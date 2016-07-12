@@ -1,4 +1,4 @@
-module xh5for
+module xh5for_handler
 
 use mpi_environment
 use xh5for_utils
@@ -16,6 +16,8 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
 implicit none
 
 #include "assert.i90"
+
+private
 
     integer(I4P), private, parameter :: XH5FOR_STATE_START     = 0
     integer(I4P), private, parameter :: XH5FOR_STATE_OPEN      = 1
@@ -1112,4 +1114,11 @@ contains
         this%State = XH5FOR_STATE_GRID_IO
     end subroutine xh5for_ReadAttribute_R8P
 
-end module xh5for
+end module xh5for_handler
+
+module xh5for
+
+use xh5for_handler, only: xh5for_t
+use xh5for_parameters
+
+end module  xh5for

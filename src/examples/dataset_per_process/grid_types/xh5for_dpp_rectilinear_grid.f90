@@ -1,6 +1,7 @@
 program xh5for_dpp_rectilinear_grid
 
 use xh5for
+use IR_Precision, only: I4P, I8P, R4P, R8P, str
 
 #if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
