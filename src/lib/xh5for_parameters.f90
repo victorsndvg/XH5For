@@ -106,8 +106,8 @@ implicit none
     integer(I4P), parameter :: XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB  = 800
     integer(I4P), parameter :: XDMF_STRATEGY_DATASET_PER_PROCESS   = 801
 
-    integer(I4P), public, parameter :: XDMF_ACTION_READ   = 900
-    integer(I4P), public, parameter :: XDMF_ACTION_WRITE  = 901
+    integer(I4P), parameter :: XDMF_ACTION_READ   = 900
+    integer(I4P), parameter :: XDMF_ACTION_WRITE  = 901
 
     !-----------------------------------------------------------------
     !< ACTUALLY SUPPORTED PARAMETERS
