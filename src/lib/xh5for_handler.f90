@@ -327,7 +327,7 @@ contains
     end subroutine
 
 
-    subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy, Action, Comm, Root)
+    subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy, Action, Comm, Info, Root)
     !-----------------------------------------------------------------
     !< Open a XDMF (Temporal) file, set the MPI environment and also
     !< initialize the steps handler
@@ -338,26 +338,20 @@ contains
         logical,      optional, intent(IN)    :: StaticGrid           !< Static grid flag
         integer(I4P), optional, intent(IN)    :: Strategy             !< Data IO management strategy
         integer(I4P), optional, intent(IN)    :: Action               !< XDMF Open file action (Read or Write)
-        integer,      optional, intent(IN)    :: comm                 !< MPI communicator
-        integer,      optional, intent(IN)    :: root                 !< MPI root procesor
+        integer,      optional, intent(IN)    :: Comm                 !< MPI communicator
+        integer,      optional, intent(IN)    :: Info                 !< MPI info
+        integer,      optional, intent(IN)    :: Root                 !< MPI root procesor
         integer                               :: error                !< Error variable
-        integer                               :: r_root               !< Real MPI root procesor
     !-----------------------------------------------------------------
         call this%Free()
-        r_root = 0
         ! Assign Fileprefix, strategy and action
         this%Prefix = trim(adjustl(FilePrefix))
         if(present(Strategy)) call this%SetStrategy(Strategy)
         if(present(GridType)) call this%SetGridType(GridType)
         if(present(StaticGrid)) this%StaticGrid = StaticGrid
         if(present(Action)) this%Action = Action
-        if(present(root)) r_root = root
         ! MPI environment initialization
-        if(present(comm)) then
-            call This%MPIEnvironment%Initialize(comm = comm, root = r_root, mpierror = error)
-        else
-            call This%MPIEnvironment%Initialize(root = r_root, mpierror = error)
-        endif
+        call This%MPIEnvironment%Initialize(comm = comm, root = root, mpierror = error)
         ! Steps initialization
         call this%StepsHandler%Initialize(this%MPIEnvironment)
         this%State = XH5FOR_STATE_OPEN

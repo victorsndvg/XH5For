@@ -80,19 +80,20 @@ public :: mpi_env_t
 
 contains
 
-    subroutine mpi_env_initialize(this, comm, root, mpierror)
+    subroutine mpi_env_initialize(this, comm, info, root, mpierror)
     !-----------------------------------------------------------------
     !< Default MPI values initialization
     !----------------------------------------------------------------- 
         class(mpi_env_t), intent(INOUT) :: this                       !< MPI environment
         integer, optional, intent(IN)   :: comm                       !< MPI communicator
+        integer, optional, intent(IN)   :: info                       !< MPI info
         integer, optional, intent(IN)   :: root                       !< MPI root processor
         integer, optional, intent(OUT)  :: mpierror                   !< MPI error
         logical                         :: mpi_was_initialized        !< Flag to check if MPI was initialized
         integer                         :: mpierr                     !< Aux variable for MPI error checking
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_START)
-        if(present(mpierror)) mpierror = 0
+        mpierr    = 0
         this%comm = 0
         this%root = 0
         this%rank = 0
@@ -100,10 +101,14 @@ contains
         this%size = 1
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
         call MPI_Initialized(mpi_was_initialized, mpierr)
-        this%info = MPI_INFO_NULL
         if(mpi_was_initialized) then
+            if(present(info)) then
+                this%info = info
+            else
+                this%info = MPI_INFO_NULL
+            endif
             if(present(comm)) then
-                this%comm = comm
+                CALL MPI_COMM_DUP(comm, this%comm, mpierr)
             else
                 CALL MPI_COMM_DUP(MPI_COMM_WORLD, this%comm, mpierr)
             endif
@@ -115,10 +120,11 @@ contains
                 this%root = 0
             endif
         endif
-        if(present(mpierror)) mpierror = mpierr
 #endif
+        if(present(mpierror)) mpierror = mpierr
         this%State = MPI_ENV_STATE_INIT
     end subroutine mpi_env_initialize
+
 
     subroutine mpi_env_Free(this)
     !-----------------------------------------------------------------
