@@ -1,6 +1,6 @@
 module xh5for_factory
 
-use IR_Precision, only: I4P
+use PENF, only: I4P
 use xh5for_parameters
 use xh5for_abstract_factory
 use structured_contiguous_hyperslab_factory

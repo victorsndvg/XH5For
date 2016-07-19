@@ -1,6 +1,6 @@
 program test_xdmf_uns_ddp_handler
 
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use PENF, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
 use Fox_xdmf
 use xdmf_unstructured_dataset_per_process_handler

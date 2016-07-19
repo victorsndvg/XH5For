@@ -2,7 +2,7 @@ program test_xdmf_time
 
 use fox_xdmf
 use fox_dom
-use IR_Precision, only: R4P, R8P
+use PENF, only: R4P, R8P
 
 implicit none
 

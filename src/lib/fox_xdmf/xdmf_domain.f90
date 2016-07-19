@@ -3,7 +3,7 @@ module xdmf_domain
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF Domain handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, I8P, str
+use PENF,         only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_element, only: xdmf_element_t

@@ -1,6 +1,6 @@
 module xh5for_metadata
 
-use IR_Precision, only: I4P
+use PENF, only: I4P
 use xh5for_parameters
 
 implicit none

@@ -2,7 +2,7 @@ program steps_handler_test
 
 use mpi_environment
 use steps_handler
-use IR_Precision, only: I4P, R4P, R8P, str
+use PENF, only: I4P, R4P, R8P, str
 
 #ifdef MPI_MOD
   use mpi

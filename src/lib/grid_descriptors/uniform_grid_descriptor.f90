@@ -1,6 +1,6 @@
 module uniform_grid_descriptor
 
-use IR_Precision, only: I4P, I8P, str
+use PENF, only: I4P, I8P, str
 use XH5For_metadata
 use XH5For_utils
 use XH5For_parameters

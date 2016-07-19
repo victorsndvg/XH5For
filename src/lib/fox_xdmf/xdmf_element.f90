@@ -2,14 +2,11 @@ module xdmf_element
 !--------------------------------------------------------------------- -----------------------------------------------------------
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF element handling module
-!< @TODO enhance and generalice the module.
-!< @TODO add comments.
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-
+use PENF,         only: I4P
 use FoX_wxml,     only: xmlf_t
 use FoX_dom,      only: Node, getTagName
-use IR_Precision, only: I4P
 
 implicit none
 private

@@ -1,7 +1,7 @@
 program xh5for_ch_unstructured_hexahedron
 
 use xh5for
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
+use PENF, only: I4P, I8P, R4P, R8P, str
 
 #if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi
@@ -23,9 +23,13 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
     integer(I4P)                  :: num_nodes
     integer(I4P)                  :: num_elements
     character(len=10)             :: arg
+
+    integer                       :: comm = 0
+    integer                       :: info = 0
+    integer                       :: root = 0
     
     integer                       :: rank = 0
-    integer                       :: mpierr
+    integer                       :: mpierr = 0
     integer                       :: exitcode = 0
     integer                       :: i, j ,k
 
@@ -35,8 +39,13 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
     !----------------------------------------------------------------- 
 
 #if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+    integer                       :: bsize
+    character(len=10)             :: bsizestr
+
     call MPI_INIT(mpierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr);
+    CALL MPI_COMM_DUP(MPI_COMM_WORLD, comm, mpierr)
+    info = MPI_INFO_NULL
 #endif
 
     if(command_argument_count()==1) then
@@ -56,7 +65,7 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
     endif
 
     !< Write XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_unstructured_hexahedron_perf', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_hexahedron_perf', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE, Comm=comm, Info=info, Root=root)
     call xh5%SetGrid(NumberOfNodes=num_nodes, NumberOfElements=num_elements,TopologyType=XDMF_TOPOLOGY_TYPE_HEXAHEDRON, GeometryType=XDMF_GEOMETRY_TYPE_XYZ)
     call xh5%WriteGeometry(XYZ=geometry)
     call xh5%WriteTopology(Connectivities=topology)
@@ -64,7 +73,7 @@ use IR_Precision, only: I4P, I8P, R4P, R8P, str
     call xh5%Free()
 
     !< Read XDMF/HDF5 file
-    call xh5%Open(FilePrefix='xh5for_ch_unstructured_hexahedron_perf', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ)
+    call xh5%Open(FilePrefix='xh5for_ch_unstructured_hexahedron_perf', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_READ, Comm=comm, Info=info, Root=root)
     call xh5%ParseGrid()
     call xh5%ReadTopology(Connectivities=out_topology)
     call xh5%ReadGeometry(XYZ=out_geometry)

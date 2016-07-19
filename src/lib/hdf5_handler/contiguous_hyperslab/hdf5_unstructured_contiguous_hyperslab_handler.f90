@@ -1,6 +1,6 @@
 module hdf5_unstructured_contiguous_hyperslab_handler
 
-use IR_Precision, only : I4P, I8P, R4P, R8P
+use PENF, only : I4P, I8P, R4P, R8P
 #ifdef ENABLE_HDF5
 use HDF5
 #endif

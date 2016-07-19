@@ -1,6 +1,6 @@
 module structured_uniform_grid_descriptor
 
-use IR_Precision, only: I4P, I8P
+use PENF, only: I4P, I8P
 use uniform_grid_descriptor
 use xh5for_parameters
 

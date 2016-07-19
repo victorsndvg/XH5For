@@ -1,6 +1,6 @@
 program test_hdf5_reg_dpp_handler
 
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use PENF, only : I4P, I8P, R4P, R8P, str
 use xh5for_parameters
 use hdf5_structured_dataset_per_process_handler
 use mpi_environment

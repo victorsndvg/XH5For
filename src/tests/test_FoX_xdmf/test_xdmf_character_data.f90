@@ -2,7 +2,7 @@ program test_xdmf_character_data
 
 use fox_xdmf
 use fox_dom
-use IR_Precision, only: I4P, I8P, R4P, R8P
+use PENF, only: I4P, I8P, R4P, R8P
 
 implicit none
 

@@ -6,7 +6,7 @@ module xdmf_handler
 
 use xh5for_utils
 use xh5for_parameters
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use PENF,         only : I4P, I8P, R4P, R8P, str
 use fox_xdmf
 use fox_dom,      only: Node, NodeList, GetDocumentElement, Item, GetLength, GetChildNodes, getAttribute, &
                         HasChildNodes, GetElementsByTagName, GetNodeType, GetTagName, Destroy, getTextContent, &

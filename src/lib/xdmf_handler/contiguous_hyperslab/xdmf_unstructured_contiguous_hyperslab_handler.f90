@@ -11,8 +11,8 @@ use mpi_environment
 use uniform_grid_descriptor
 use spatial_grid_descriptor
 use xdmf_contiguous_hyperslab_handler
-use fox_dom,      only: Node
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
+use fox_dom, only: Node
+use PENF,    only: I4P, I8P, R4P, R8P, str
 
 implicit none
 

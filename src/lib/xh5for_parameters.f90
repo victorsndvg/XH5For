@@ -4,7 +4,7 @@ module xh5for_parameters
 !< XH5For global parameters
 !< @Note: Taked from Xdmf.f of the official XDMF API (http://www.xdmf.org)
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P
+use PENF, only: I4P
 
 implicit none 
 

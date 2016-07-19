@@ -3,13 +3,13 @@ module xdmf_character_data
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF character_data handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
+use PENF,         only: I4P, I8P, R4P, R8P, str
 use FoX_wxml,     only: xml_AddCharacters, xmlf_t
 
 implicit none
 private
 
-    type  :: xdmf_character_data_t
+    type :: xdmf_character_data_t
     !-----------------------------------------------------------------
     !< XDMF character_data type
     !----------------------------------------------------------------- 

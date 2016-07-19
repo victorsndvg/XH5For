@@ -1,6 +1,6 @@
 program test_mpi_environment
 
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use PENF, only : I4P, I8P, R4P, R8P, str
 
 use mpi_environment
 #ifdef MPI_MOD

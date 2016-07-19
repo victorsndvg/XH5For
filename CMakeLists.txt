@@ -10,7 +10,7 @@ SET(${PROJECT_NAME}_VERSION 0.0.1)
 SET(${PROJECT_NAME}_SOVERSION 1)
 SET(LIB ${PROJECT_NAME})
 
-SET(CMAKE_VERBOSE_MAKEFILE TRUE)
+SET(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 #################################################################
 # DEFINE PATHS
@@ -42,7 +42,7 @@ INCLUDE_DIRECTORIES(${CMAKE_Fortran_MODULE_DIRECTORY})
 include_directories(${INCLUDE_PATH})
 
 #################################################################
-# CONFIGURATION TYPES & BUILD MODE
+# CONFIGURATION TYPES & BUILD MODE & ENABLE TEST and EXAMPLES
 #################################################################
 
 SET(CMAKE_CONFIGURATION_TYPES DEBUG RELEASE)
@@ -53,6 +53,14 @@ IF(NOT CMAKE_BUILD_TYPE)
 
   SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS NONE DEBUG RELEASE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
+
+IF(NOT ${PROJECT_NAME}_ENABLE_TESTS)
+    OPTION(${PROJECT_NAME}_ENABLE_TESTS "Enable/disable tests compilation" OFF)
+ENDIF(NOT ${PROJECT_NAME}_ENABLE_TESTS)
+
+IF(NOT ${PROJECT_NAME}_ENABLE_EXAMPLES)
+    OPTION(${PROJECT_NAME}_ENABLE_EXAMPLES "Enable/disable examples compilation" OFF)
+ENDIF(NOT ${PROJECT_NAME}_ENABLE_EXAMPLES)
 
 #################################################################
 # STATIC LIBRARIES
@@ -243,11 +251,13 @@ message (STATUS "CMAKE_Fortran_FLAGS_DEBUG: " ${CMAKE_Fortran_FLAGS_DEBUG})
 #################################################################
 
 SET(BUILDNAME ${CMAKE_Fortran_COMPILER_ID}_${CMAKE_BUILD_TYPE}_MKL=${${PROJECT_NAME}_ENABLE_MKL} CACHE STRING "" )
-ENABLE_TESTING()
-INCLUDE(CTest)
+IF(${PROJECT_NAME}_ENABLE_TESTS)
+    ENABLE_TESTING()
+    INCLUDE(CTest)
+ENDIF()
 
 #################################################################
-# Add external projects
+# Add FoX external project
 #################################################################
 
 include(ExternalProject)
@@ -274,6 +284,31 @@ SET(FOX_LIBS ${${FOX_LIB}_BINARY_PATH}/lib/lib${FOX_LIB}_dom.a ${${FOX_LIB}_BINA
 
 LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${FOX_LIB}/modules)
+
+#################################################################
+# Add PENF external project
+#################################################################
+
+SET(PENF_LIB PENF)
+
+SET(${PENF_LIB}_SRC_PATH ${CMAKE_SOURCE_DIR}/thirdparty/PENF)
+SET(${PENF_LIB}_BINARY_PATH ${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB})
+EXTERNALPROJECT_Add(${PENF_LIB}
+    DOWNLOAD_COMMAND ""
+    SOURCE_DIR ${${PENF_LIB}_SRC_PATH}
+    BINARY_DIR ${${PENF_LIB}_BINARY_PATH}
+    INSTALL_DIR ${INSTALL_PREFIX}
+    # Fortran compiler must be forced in order to link external projects from the main project
+    CONFIGURE_COMMAND cmake -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER} D${PENF_LIB}_ENABLE_TESTS=OFF ${${PENF_LIB}_SRC_PATH}
+    BUILD_COMMAND cmake --build .
+    TEST_COMMAND ""
+    INSTALL_COMMAND ""
+)
+
+# The order of the libraries reveals the right linking order
+SET(PENF_LIBS ${${PENF_LIB}_BINARY_PATH}/lib/lib${PENF_LIB}.a)
+LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB}/lib)
+INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB}/modules)
 
 #################################################################
 # DEBUG MODE RELATED STUFF
@@ -333,6 +368,10 @@ ENDIF()
 #################################################################
 
 ADD_SUBDIRECTORY(${LIB_PATH})
-ADD_SUBDIRECTORY(${TESTS_PATH})
-ADD_SUBDIRECTORY(${EXAMPLES_PATH})
+IF(${PROJECT_NAME}_ENABLE_TESTS)
+    ADD_SUBDIRECTORY(${TESTS_PATH})
+ENDIF()
+IF(${PROJECT_NAME}_ENABLE_EXAMPLES)
+    ADD_SUBDIRECTORY(${EXAMPLES_PATH})
+ENDIF()
 

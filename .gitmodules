@@ -1,6 +1,6 @@
 [submodule "thirdparty/fox"]
 	path = thirdparty/fox
 	url = https://github.com/victorsndvg/fox.git
-[submodule "src/lib/fox_xdmf/tools/IR_Precision"]
-	path = src/lib/fox_xdmf/tools/IR_Precision
-	url = https://github.com/szaghi/IR_Precision.git
+[submodule "thirdparty/PENF"]
+	path = thirdparty/PENF
+	url = https://github.com/victorsndvg/PENF.git

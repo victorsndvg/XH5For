@@ -3,7 +3,7 @@ module xdmf_geometry
 !< XdmfHdf5Fortran: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XDMF Geometry handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, I8P, str
+use PENF,         only: I4P, I8P, str
 use FoX_wxml,     only: xml_NewElement, xml_EndElement, xml_AddAttribute, xmlf_t
 use FoX_dom,      only: Node, getTagName, hasAttribute, getAttribute
 use xdmf_utils,   only: is_in_option_list, warning_message

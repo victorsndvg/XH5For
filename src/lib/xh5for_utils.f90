@@ -3,8 +3,8 @@ module xh5for_utils
 !< XH5For: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XH5For utilities
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use IR_Precision, only: I4P, R8P, str
-use xdmf_utils,   only : warning_message
+use PENF,       only: I4P, R8P, str
+use xdmf_utils, only : warning_message
 use xh5for_parameters
 
 #ifdef MPI_MOD

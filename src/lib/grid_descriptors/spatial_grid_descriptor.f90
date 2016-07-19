@@ -4,7 +4,7 @@ module spatial_grid_descriptor
 !< XDMF Time handling module
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use IR_Precision, only : I4P, I8P, R4P, R8P
+use PENF, only : I4P, I8P, R4P, R8P
 use mpi_environment
 use xdmf_utils
 use XH5For_metadata

@@ -1,7 +1,7 @@
 program xh5for_ch_unstructured_quadrilateral
 
 use xh5for
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
+use PENF, only: I4P, I8P, R4P, R8P, str
 
 #if defined(ENABLE_MPI) && defined(MPI_MOD)
   use mpi

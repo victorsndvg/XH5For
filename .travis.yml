@@ -55,7 +55,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR;
   - mkdir build
   - cd build
-  - cmake -DCMAKE_Fortran_COMPILER=$TRAVIS_BUILD_DIR/hdf5/bin/h5pfc ..
+  - cmake -DCMAKE_Fortran_COMPILER=$TRAVIS_BUILD_DIR/hdf5/bin/h5pfc -DXH5For_ENABLE_TESTS=ON -DXH5For_ENABLE_EXAMPLES=ON ..
 
 script:
   - ctest -VV -T Start -T Build -T Test -T Coverage

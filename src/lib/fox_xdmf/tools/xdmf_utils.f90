@@ -1,7 +1,7 @@
 module xdmf_utils
 
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.
-USE IR_Precision, only: I4P, str
+USE PENF, only: I4P, str
 USE xdmf_parameters
 
 implicit none

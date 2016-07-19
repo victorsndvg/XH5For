@@ -4,7 +4,7 @@ module mpi_environment
 !< MPI interface module 
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-use IR_Precision, only : I4P, I8P, R4P, R8P
+use PENF, only : I4P, I8P, R4P, R8P
 use XH5For_utils
 
 #ifdef ENABLE_MPI

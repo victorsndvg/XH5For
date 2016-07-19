@@ -10,7 +10,7 @@ use xh5for_utils
 use xh5for_parameters
 use mpi_environment
 use uniform_grid_descriptor
-use IR_Precision, only: I4P, I8P, R4P, R8P, str
+use PENF, only: I4P, I8P, R4P, R8P, str
 
 implicit none
 

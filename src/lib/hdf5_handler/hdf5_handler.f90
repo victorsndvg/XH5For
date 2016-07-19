@@ -2,9 +2,9 @@ module hdf5_handler
 
 #ifdef ENABLE_HDF5
 use HDF5
-use IR_Precision, only : I8P, R4P, R8P, str
+use PENF, only : I8P, R4P, R8P, str
 #else
-use IR_Precision, only : I4P, I8P, R4P, R8P, str
+use PENF, only : I4P, I8P, R4P, R8P, str
 #endif
 use mpi_environment
 use xh5for_parameters

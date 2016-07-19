@@ -5,7 +5,7 @@ module xdmf_parameters
 !< @Note: Taked from Xdmf.f of the official XDMF API (http://www.xdmf.org)
 !--------------------------------------------------------------------- -----------------------------------------------------------
 
-USE IR_Precision, only: I4P
+USE PENF, only: I4P
 
 implicit none 
 

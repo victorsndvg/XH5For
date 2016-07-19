@@ -2,7 +2,7 @@ program test_xdmf_topology
 
 use fox_xdmf
 use fox_dom
-use IR_Precision, only: I4P, I8P
+use PENF, only: I4P, I8P
 
 implicit none
 
