@@ -198,3 +198,53 @@ Read:
     integer(I4P), parameter :: XDMF_ACTION_WRITE  = 901
 ```
 
+
+## XH5FOR State Transition Diagram
+
+```fortran
+    !----------------------------------------------------------------- 
+    !       INIT STATE      |     ACTION      |      FINAL STATE
+    !----------------------------------------------------------------- 
+    ! START                 | Free            | START
+    ! START                 | Open            | OPEN
+    ! START                 | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! OPEN                  | Free            | START
+    ! OPEN                  | Clean           | OPEN
+    ! OPEN                  | Open            | OPEN
+    ! OPEN                  | Initialize      | INIT
+    ! OPEN                  | SetGrid         | GRID_SET
+    ! OPEN                  | ParseGrid       | GRID_SET
+    ! OPEN                  | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! INIT                  | Free            | START
+    ! INIT                  | Clean           | OPEN
+    ! INIT                  | Open            | OPEN
+    ! INIT                  | SetGrid         | GRID_SET
+    ! INIT                  | ParseGrid       | GRID_SET
+    !----------------------------------------------------------------- 
+    ! GRID_SET              | Free            | START
+    ! GRID_SET              | Clean           | OPEN
+    ! GRID_SET              | Open            | OPEN
+    ! GRID_SET              | SetGrid         | GRID_SET
+    ! GRID_SET              | ParseGrid       | GRID_SET
+    ! GRID_SET              | Write*          | GRID_IO
+    ! GRID_SET              | Read*           | GRID_IO
+    ! GRID_SET              | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! GRID_IO               | Free            | START
+    ! GRID_IO               | Clean           | OPEN
+    ! GRID_IO               | Open            | OPEN
+    ! GRID_IO               | SetGrid         | GRID_SET
+    ! GRID_IO               | ParseGrid       | GRID_SET
+    ! GRID_IO               | Write*          | GRID_IO
+    ! GRID_IO               | Read*           | GRID_IO
+    ! GRID_IO               | Close           | CLOSE
+    !----------------------------------------------------------------- 
+    ! CLOSE                 | Free            | START
+    ! CLOSE                 | Clean           | OPEN
+    ! CLOSE                 | Open            | OPEN
+    ! CLOSE                 | Initialize      | INIT
+    !----------------------------------------------------------------- 
+```
+
