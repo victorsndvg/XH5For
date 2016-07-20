@@ -644,8 +644,8 @@ contains
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
         real(R8P)                                              :: end_time
-    !-----------------------------------------------------------------
 #endif
+    !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
         !< @Note: Fixed rank 1?
