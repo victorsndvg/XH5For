@@ -56,8 +56,8 @@ private
         procedure, public :: GetAttributeCenter          => uniform_grid_descriptor_GetAttributeCenter
         procedure, public :: SetGeometryMetadata         => uniform_grid_descriptor_SetGeometryMetadata
         procedure, public :: SetTopologyMetadata         => uniform_grid_descriptor_SetTopologyMetadata
-        procedure, public :: SetLastAttributeMetadata    => uniform_grid_descriptor_SetLastAttributeMetadata
-        procedure, public :: UpdateNumberOfAttributes    => uniform_grid_descriptor_UpdateNumberOfAttributes
+        procedure, public :: AppendAttributeMetadata     => uniform_grid_descriptor_AppendAttributeMetadata
+        procedure         :: UpdateNumberOfAttributes    => uniform_grid_descriptor_UpdateNumberOfAttributes
         generic,   public :: Initialize                  => Unstructured_Initialize, &
                                                             Structured_Initialize
     end type uniform_grid_descriptor_t
@@ -433,7 +433,7 @@ contains
     end subroutine uniform_grid_descriptor_SetTopologyMetadata
 
 
-    subroutine uniform_grid_descriptor_SetLastAttributeMetadata(this, Name, Type, DataType, Center, Precision, ArrayDimensions)
+    subroutine uniform_grid_descriptor_AppendAttributeMetadata(this, Name, Type, DataType, Center, Precision, ArrayDimensions)
     !-----------------------------------------------------------------
     !< Set XH5For geometry info
     !----------------------------------------------------------------- 
@@ -445,13 +445,14 @@ contains
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the attribute in the HDF5 file
         integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the attribute array in the HDF5 file
     !-----------------------------------------------------------------
+        call this%UpdateNumberOfAttributes()
         call this%AttributesMetadata(this%NumberOfAttributes)%SetName(Name = Name)
         call this%AttributesMetadata(this%NumberOfAttributes)%SetType(Type = Type)
         call this%AttributesMetadata(this%NumberOfAttributes)%SetDataType(DataType = DataType)
         call this%AttributesMetadata(this%NumberOfAttributes)%SetCenter(Center = Center)
         call this%AttributesMetadata(this%NumberOfAttributes)%SetPrecision(Precision = Precision)
         call this%AttributesMetadata(this%NumberOfAttributes)%SetArrayDimensions(ArrayDimensions = ArrayDimensions)
-    end subroutine uniform_grid_descriptor_SetLastAttributeMetadata
+    end subroutine uniform_grid_descriptor_AppendAttributeMetadata
 
 
     subroutine uniform_grid_descriptor_UpdateNumberOfAttributes(this)

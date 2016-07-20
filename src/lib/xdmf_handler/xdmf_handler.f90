@@ -778,8 +778,7 @@ contains
         integer(I4P),          intent(IN)    :: Attribute(:)          !< I4P Grid attribute
     !-----------------------------------------------------------------
         assert(this%State == XDMF_HANDLER_STATE_INIT)
-        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+        call this%UniformGridDescriptor%AppendAttributeMetadata(  &
                         Name=trim(adjustl(Name)),                 &
                         Type=Type, DataType='Int',                &
                         Center=Center,                            &
@@ -799,14 +798,12 @@ contains
         integer(I8P),          intent(IN)    :: Attribute(:)          !< I8P Grid attribute
     !-----------------------------------------------------------------
         assert(this%State == XDMF_HANDLER_STATE_INIT)
-        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+        call this%UniformGridDescriptor%AppendAttributeMetadata(  &
                         Name=trim(adjustl(Name)),                 &
                         Type=Type, DataType='Int',                &
                         Center=Center,                            &
                         Precision=8,                              &
                         ArrayDimensions=(/size(Attribute, dim=1)/))
-
     end subroutine xdmf_handler_AppendAttribute_I8P
 
 
@@ -821,14 +818,12 @@ contains
         real(R4P),             intent(IN)    :: Attribute(:)          !< R4P Grid attribute
     !-----------------------------------------------------------------
         assert(this%State == XDMF_HANDLER_STATE_INIT)
-        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+        call this%UniformGridDescriptor%AppendAttributeMetadata(  &
                         Name=trim(adjustl(Name)),                 &
                         Type=Type, DataType='Float',              &
                         Center=Center,                            &
                         Precision=4,                              &
                         ArrayDimensions=(/size(Attribute, dim=1)/))
-
     end subroutine xdmf_handler_AppendAttribute_R4P
 
 
@@ -843,14 +838,12 @@ contains
         real(R8P),             intent(IN)    :: Attribute(:)          !< R4P Grid attribute
     !-----------------------------------------------------------------
         assert(this%State == XDMF_HANDLER_STATE_INIT)
-        call this%UniformGridDescriptor%UpdateNumberOfAttributes()
-        call this%UniformGridDescriptor%SetLastAttributeMetadata( &
+        call this%UniformGridDescriptor%AppendAttributeMetadata(  &
                         Name=trim(adjustl(Name)),                 &
                         Type=Type, DataType='Float',              &
                         Center=Center,                            &
                         Precision=8,                              &
                         ArrayDimensions=(/size(Attribute, dim=1)/))
-
     end subroutine xdmf_handler_AppendAttribute_R8P
 
 
