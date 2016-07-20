@@ -11,7 +11,9 @@ The Fortran way to easy write parallel partitioned XDMF/HDF5 meshes
 ## XH5For: XDMF Handler 
 
 *XDMF Handler* software subsystem is the one in charge of XML file serialization and parsing. 
+
 *XDMF Handler* stores (via **UniformGridDescriptor** .and. **SpatialGridDescriptor**) all data needed to serialize and parse XDFM files. Only *Geometry* and *Topology* metadatada is stored while parsing.
+
 It relies on [FoX](https://github.com/andreww/fox) (Fortran XML library) to serialize/parse XDMF files.
 
 [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format)
@@ -21,13 +23,7 @@ It relies on [FoX](https://github.com/andreww/fox) (Fortran XML library) to seri
 Serialization:
 
 ```fortran
-        call xdmf_handler%Initialize(                                    &
-                MPIEnvironment        = this%MPIEnvironment,        &
-                StepsHandler          = this%StepsHandler,          &
-                UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor, &
-                FilePrefix            = this%Prefix,                &
-                Action                = this%Action)
+        call xdmf_handler%Initialize(MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, FilePrefix, Action)
         call xdmf_handler%SetGeometry(XYZ = XYZ, Name = Name)
         call xdmf_handler%SetTopology(Connectivities = Connectivities, Name = Name)
         call xdmf_handler%AppendAttribute(Name = Name, Type = Type, Center = Center, Attribute = Values)
@@ -39,13 +35,7 @@ Serialization:
 Parsing:
 
 ```fortran
-        call xdmf_handler%Initialize(                                    &
-                MPIEnvironment        = this%MPIEnvironment,        &
-                StepsHandler          = this%StepsHandler,          &
-                UniformGridDescriptor = this%UniformGridDescriptor, &
-                SpatialGridDescriptor = this%SpatialGridDescriptor, &
-                FilePrefix            = this%Prefix,                &
-                Action                = this%Action)
+        call xdmf_handler%Initialize(MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, FilePrefix, Action)
         call xdmf_handler%ParseTemporalFile()
         call xdmf_handler%ParseSpatialFile()
         call xdmf_handler%Free()
