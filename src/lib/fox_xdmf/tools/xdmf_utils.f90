@@ -58,18 +58,18 @@ contains
         character(len=*),           intent(IN) :: s1
         character(len=1), optional, intent(IN) :: separator
         character(len=len(s1))                 :: s
-        integer                                :: Count_tokens
-        integer                                :: i, k
+        integer(I4P)                           :: Count_tokens
+        integer(I4P)                           :: i, k
     !-----------------------------------------------------------------
         s = s1                            ! remove possible last char null (in C)
-        k = 0  ; if (s /= ' ') k = 1      ! string has at least 1 item
+        k = 0_I4P  ; if (s /= ' ') k = 1_I4P      ! string has at least 1 item
         if(present(separator) ) then
-            do i = 1,len_trim(s)-1
+            do i = 1_I4P,len_trim(s, kind=I4P)-1_I4P
                if(s(i:i) /= separator .and.s(i+1:i+1) == separator) k = k+1
             enddo
         else
-            do i = 1,len_trim(s)-1
-               if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') k = k+1
+            do i = 1_I4P,len_trim(s, kind=I4P)-1_I4P
+               if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1_I4P:i+1_I4P) == ' '.or.s(i+1_I4P:i+1_I4P) == ',') k = k+1_I4P
             enddo
         endif
         Count_tokens = k
@@ -82,34 +82,34 @@ contains
     !< is updated to reference the start of the next token
     !-----------------------------------------------------------------
         character(len=*),           intent(IN)    :: s1
-        integer,                    intent(INOUT) :: pos
+        integer(I4P),               intent(INOUT) :: pos
         character(len=1), optional, intent(IN)    :: separator
         character(len=len(s1))                    :: s
         character(len=:), allocatable             :: Next_token
-        integer                                   :: i, k
+        integer(I4P)                              :: i, k
     !-----------------------------------------------------------------
         s = s1    
-        if(pos<=len(s)) then     
-            k = len_trim(s)
+        if(pos<=len(s, kind=I4P)) then     
+            k = len_trim(s, kind=I4P)
             if(present(separator)) then
-                do i = pos,len_trim(s)-1
-                    if(s(i:i) /= separator.and.s(i+1:i+1) == separator) then
+                do i = pos,len_trim(s, kind=I4P)-1_I4P
+                    if(s(i:i) /= separator.and.s(i+1_I4P:i+1_I4P) == separator) then
                         k = i
                         exit
                     endif
                 enddo
-                if(s(pos:pos) == separator) pos = pos+1
+                if(s(pos:pos) == separator) pos = pos+1_I4P
             else
                 do i = pos,len_trim(s)-1
-                    if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1:i+1) == ' '.or.s(i+1:i+1) == ',') then
+                    if(s(i:i) /= ' '.and.s(i:i) /= ','.and.s(i+1_I4P:i+1_I4P) == ' '.or.s(i+1_I4P:i+1_I4P) == ',') then
                         k = i
                         exit
                     endif
                 enddo
-                if(s(pos:pos) == ' ' .or. s(pos:pos) == ',' ) pos = pos+1
+                if(s(pos:pos) == ' ' .or. s(pos:pos) == ',' ) pos = pos+1_I4P
             endif
             Next_token = s(pos:k)
-            pos = k+1
+            pos = k+1_I4P
         endif
 
     end function Next_token

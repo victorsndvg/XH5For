@@ -410,7 +410,7 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Uniform Grid Descriptor 
         character(len=*),         intent(IN)    :: Name               !< Name to the HDF5 connetivities
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the Coordinates in the HDF5 file
-        integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the Coordinates array in the HDF5 file
+        integer(I8P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the Coordinates array in the HDF5 file
     !-----------------------------------------------------------------
         call this%GeometryMetadata%SetName(Name = Name)
         call this%GeometryMetadata%SetPrecision(Precision = Precision)
@@ -425,7 +425,7 @@ contains
         class(uniform_grid_descriptor_t), intent(INOUT) :: this       !< Uniform Grid Descriptor 
         character(len=*),         intent(IN)    :: Name               !< Name to the HDF5 coordinates
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the coordinates in the HDF5 file
-        integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the coordinates array in the HDF5 file
+        integer(I8P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the coordinates array in the HDF5 file
     !-----------------------------------------------------------------
         call this%TopologyMetadata%SetName(Name = Name)
         call this%TopologyMetadata%SetPrecision(Precision = Precision)
@@ -443,7 +443,7 @@ contains
         character(len=*),         intent(IN)    :: DataType           !< XH5For attribute data type (Int or  Float)
         integer(I4P),             intent(IN)    :: Center             !< Center property of the attribute (Node, Face, Edge, Cell or Grid)
         integer(I4P),             intent(IN)    :: Precision          !< Precision of the attribute in the HDF5 file
-        integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the attribute array in the HDF5 file
+        integer(I8P),             intent(IN)    :: ArrayDimensions(:) !< Dimensions of the attribute array in the HDF5 file
     !-----------------------------------------------------------------
         call this%UpdateNumberOfAttributes()
         call this%AttributesMetadata(this%NumberOfAttributes)%SetName(Name = Name)

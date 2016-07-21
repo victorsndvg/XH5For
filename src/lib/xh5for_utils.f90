@@ -36,8 +36,8 @@ public :: isSupportedGeometryType
 contains
 
     subroutine Abort()
-        integer :: code, info, ierror
-        logical :: initialized_mpi, finalized_mpi
+        integer(I4P) :: code, info, ierror
+        logical(I4P) :: initialized_mpi, finalized_mpi
 
         code = -1
         initialized_mpi = .false.

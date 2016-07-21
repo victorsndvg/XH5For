@@ -171,10 +171,9 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer(i4P)    , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(I4P),     optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
-        integer(I4P)                              :: i                !< Aux index variable
     !----------------------------------------------------------------- 
         call this%set_tag('DataItem')
 
@@ -210,7 +209,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(I4P),     optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
     !----------------------------------------------------------------- 
@@ -252,7 +251,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(I4P),     optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
     !----------------------------------------------------------------- 
@@ -293,7 +292,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(I4P),     optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
         integer(I4P)                              :: i                !< Aux index variable
@@ -308,7 +307,7 @@ contains
         endif
 
         if(allocated(char_dims)) deallocate(char_dims)
-        i = size(Dimensions,dim=1)
+        i = size(Dimensions,dim=1, kind=I4P)
         allocate(character(len=64*i) :: char_dims)
         write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )
@@ -338,7 +337,7 @@ contains
         character(len=*), optional, intent(IN)    :: Name             !< XDMF DataItem Name attribute
         character(len=*), optional, intent(IN)    :: ItemType         !< XDMF DataItem ItemType attribute
         character(len=*), optional, intent(IN)    :: NumberType       !< XDMF DataItem NumberType attribute
-        integer         , optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
+        integer(I4P),     optional, intent(IN)    :: Precision        !< XDMF DataItem Precision attribute
         character(len=*), optional, intent(IN)    :: Format           !< XDMF DataItem Format attribute
         character(len=:), allocatable             :: char_dims        !< Aux String for int to string conversion
         integer(I4P)                              :: i                !< Aux index variable
@@ -353,7 +352,7 @@ contains
         endif
 
         if(allocated(char_dims)) deallocate(char_dims)
-        i = size(Dimensions,dim=1)
+        i = size(Dimensions,dim=1, kind=I4P)
         allocate(character(len=64*i) :: char_dims)
         write(char_dims, fmt=*)   (trim(adjustl(str(no_sign=.true., n=Dimensions(i))))//' ',i=1, size(Dimensions,dim=1) )
         call xml_AddAttribute(xml_handler, name="Dimensions", value=trim(char_dims) )

@@ -1,6 +1,6 @@
 module xh5for_metadata
 
-use PENF, only: I4P
+use PENF, only: I4P, I8P
 use xh5for_parameters
 
 implicit none
@@ -13,7 +13,7 @@ private
         integer(I4P)                  :: Center           = XDMF_NO_VALUE
         character(len=:), allocatable :: DataType
         integer(I4P)                  :: Precision        = XDMF_NO_VALUE
-        integer(I4P),     allocatable :: ArrayDimensions(:)
+        integer(I8P),     allocatable :: ArrayDimensions(:)
     contains
         procedure, public :: SetName            => xh5for_metadata_SetName
         procedure, public :: SetType            => xh5for_metadata_SetType
@@ -94,10 +94,10 @@ contains
     !< Set the Dimension
     !----------------------------------------------------------------- 
         class(xh5for_metadata_t), intent(INOUT) :: this               !< XH5For metadata type
-        integer(I4P),             intent(IN)    :: ArrayDimensions(:) !< Array Dimensions
+        integer(I8P),             intent(IN)    :: ArrayDimensions(:) !< Array Dimensions
     !----------------------------------------------------------------- 
         if(allocated(this%ArrayDimensions)) deallocate(this%ArrayDimensions)
-        allocate(this%ArrayDimensions(size(ArrayDimensions, dim=1)))
+        allocate(this%ArrayDimensions(size(ArrayDimensions, dim=1, kind=I4P)))
         this%ArrayDimensions(:) = ArrayDimensions(:)
     end subroutine xh5for_metadata_SetArrayDimensions
 

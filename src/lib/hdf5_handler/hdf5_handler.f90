@@ -536,7 +536,7 @@ contains
         integer(I4P),          intent(IN)    :: Action                !< Action to be perfomed (Read or Write)
         character(len=*),      intent(IN)    :: FilePrefix            !< HDF5 file prefix
         integer(I4P), optional, intent(IN)   :: Step                  !< Force step number
-        integer                              :: hdferror              !< HDF5 error code
+        integer(I4P)                         :: hdferror              !< HDF5 error code
         integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
         character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
 #ifdef PRINT_IO_TIMES
@@ -602,7 +602,7 @@ contains
     !< Close a HDF5 file
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
-        integer                              :: hdferror              !< HDF5 error code
+        integer(I4P)                         :: hdferror              !< HDF5 error code
 #ifdef PRINT_IO_TIMES
         real(R8P)                            :: start_time
         real(R8P)                            :: end_time

@@ -6,6 +6,7 @@ module xdmf_file
 
 use FoX_wxml
 use FoX_dom, only: Node, parseFile
+use PENF,    only: I4P
 
 implicit none
 private
@@ -96,10 +97,10 @@ contains
     !-----------------------------------------------------------------
     !< Open a XDMF file a returns a FoX **xml_handler**
     !----------------------------------------------------------------- 
-        class(xdmf_file_t), intent(INOUT) :: xdmf_file                !< XDMF file handler
-        logical, optional,  intent(IN)    :: write_header             !< Flag to decide if to print header
-        integer, optional,  intent(OUT)   :: IO_error                 !< IO error status
-        logical                           :: header_flag              !< Real flag to decide if to print header
+        class(xdmf_file_t),     intent(INOUT) :: xdmf_file            !< XDMF file handler
+        logical,      optional, intent(IN)    :: write_header         !< Flag to decide if to print header
+        integer(I4P), optional, intent(OUT)   :: IO_error             !< IO error status
+        logical                               :: header_flag          !< Real flag to decide if to print header
     !-----------------------------------------------------------------
         ! preserve_whitespace: Force the pretty_print=False and 
         !                       minimize_overrun=True

@@ -41,6 +41,7 @@ contains
         integer(I4P),                               intent(IN)    :: GridID                 !< Grid ID number
         type(mpi_env_t) ,                 pointer                 :: MPIEnvironment         !< MPI environment
         class(uniform_grid_descriptor_t), pointer                 :: UniformGridDescriptor  !< Uniform grid descriptor
+        type(xmlf_t),                     pointer                 :: XMLHandler             !< XDMF file handler
         type(xdmf_attribute_t)                                    :: attribute              !< XDMF Attribute type
         type(xdmf_dataitem_t)                                     :: dataitem               !< XDMF Dataitem type
         type(xdmf_character_data_t)                               :: chardata               !< XDMF Character Data type
@@ -50,14 +51,15 @@ contains
         integer(I4P)                                              :: NumberOfComponents     !< Number of components given attribute type
         character(len=:), allocatable                             :: XDMFAttributeTypeName  !< String Attibute type identifier
         character(len=:), allocatable                             :: XDMFCenterTypeName     !< String Attribute Center identifier
-        integer(I4P)                                              :: DimensionsSize         !< Size of the attribute shape
+        integer(I8P)                                              :: DimensionsSize         !< Size of the attribute shape
         integer(I4P)                                              :: indx           
     !-----------------------------------------------------------------
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
         if(MPIEnvironment%is_root()) then
             UniformGridDescriptor => this%GetUniformGridDescriptor()
-            assert(associated(UniformGridDescriptor))
+            XMLHandler            => this%GetSpatialFileXMLHandler()
+            assert(associated(UniformGridDescriptor) .and. associated(XMLHandler))
             do indx = 1, UniformGridDescriptor%GetNumberOfAttributes()
                 call this%CalculateAttributeDimensions(                                      & 
                     GridID = GridID,                                                         &
@@ -71,33 +73,33 @@ contains
                                         UniformGridDescriptor%GetAttributeType(AttributeNumber=indx))
                 XDMFCenterTypeName = GetXDMFCenterTypeName( &
                                         UniformGridDescriptor%GetAttributeCenter(AttributeNumber=indx))
-                DimensionsSize = size(UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx), dim=1)
-                call attribute%open(xml_handler = this%GetSpatialFileXMLHandler(),                    &
+                DimensionsSize = size(UniformGridDescriptor%GetAttributeArrayDimensions(AttributeNumber=indx), dim=1, kind=I8P)
+                call attribute%open(xml_handler = XMLHandler,                                         &
                         Name          = UniformGridDescriptor%GetAttributeName(AttributeNumber=indx), &
                         AttributeType = XDMFAttributeTypeName,                                        &
                         Center        = XDMFCenterTypeName)
-                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(),                                           &
-                        Dimensions = (/int(LocalNumberOfData,I8P), int(NumberOfComponents,I8P), int(DimensionsSize,I8P)/),  &
-                        ItemType   = 'HyperSlab',                                                                           &
+                call dataitem%open(xml_handler = XMLHandler,                                              &
+                        Dimensions = (/LocalNumberOfData, int(NumberOfComponents,I8P), DimensionsSize/),  &
+                        ItemType   = 'HyperSlab',                                                         &
                         Format     = 'HDF')
-                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(), &
-                        Dimensions = (/3_I4P, DimensionsSize/),         &
+                call dataitem%open(xml_handler = XMLHandler,            &
+                        Dimensions = (/3_I8P, DimensionsSize/),         &
                         NumberType = 'Int',                             &
                         Format     = 'XML',                             &
-                        Precision=4) 
-                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                        Precision  = 4_I4P) 
+                call chardata%write( xml_handler = XMLHandler, &
                         Data = (/DataOffset*int(NumberOfComponents,I8P),1_I8P,LocalNumberOfData*int(NumberOfComponents,I8P)/))
-                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
-                call dataitem%open(xml_handler = this%GetSpatialFileXMLHandler(),                      &
+                call dataitem%close(xml_handler = XMLHandler)
+                call dataitem%open(xml_handler = XMLHandler,                                           &
                         Dimensions = (/int(GlobalNumberOfData,I8P)*int(NumberOfComponents,I8P)/),      &
                         NumberType = UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
                         Format     = 'HDF',                                                            &
                         Precision  = UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 
-                call chardata%write( xml_handler = this%GetSpatialFileXMLHandler(), &
+                call chardata%write( xml_handler = XMLHandler, &
                         Data = this%GetHDF5FileName()//':'//UniformGridDescriptor%GetAttributeName(AttributeNumber=indx))
-                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
-                call dataitem%close(xml_handler = this%GetSpatialFileXMLHandler())
-                call attribute%close(xml_handler = this%GetSpatialFileXMLHandler())
+                call dataitem%close(xml_handler = XMLHandler)
+                call dataitem%close(xml_handler = XMLHandler)
+                call attribute%close(xml_handler = XMLHandler)
             enddo
         endif                    
     end subroutine xdmf_contiguous_hyperslab_handler_WriteAttributes

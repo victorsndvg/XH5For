@@ -113,7 +113,7 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -201,7 +201,7 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -290,7 +290,7 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -378,7 +378,7 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -466,8 +466,8 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
-        integer                                                :: rank                !< Hyperslab rank 
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: rank                !< Hyperslab rank 
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -552,8 +552,8 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
-        integer                                                :: rank                !< Hyperslab rank 
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: rank                !< Hyperslab rank 
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -638,8 +638,8 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
-        integer                                                :: rank                !< Hyperslab rank 
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: rank                !< Hyperslab rank 
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time
@@ -724,8 +724,8 @@ contains
         integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer                                                :: hdferror            !< HDF5 error code
-        integer                                                :: rank                !< Hyperslab rank 
+        integer(I4P)                                           :: hdferror            !< HDF5 error code
+        integer(I4P)                                           :: rank                !< Hyperslab rank 
 #ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
         real(R8P)                                              :: start_time

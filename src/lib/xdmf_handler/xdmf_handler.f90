@@ -203,7 +203,7 @@ contains
     !< Return a pointer to the UniformGridDescriptor
     !----------------------------------------------------------------- 
         class(xdmf_handler_t), target, intent(IN) :: this             !< XDMF handler type
-        class(xmlf_t),         pointer            :: XMLHandler       !< !< FoX SAX XML File handler
+        type(xmlf_t),          pointer            :: XMLHandler       !< !< FoX SAX XML File handler
     !----------------------------------------------------------------- 
         nullify(XMLHandler)
         XMLHandler => this%SpatialFile%xml_handler
@@ -215,7 +215,7 @@ contains
     !< Return a pointer to the UniformGridDescriptor
     !----------------------------------------------------------------- 
         class(xdmf_handler_t),         intent(IN) :: this             !< XDMF handler type
-        class(steps_handler_t), pointer           :: StepsHandler     !< Steps handler
+        type(steps_handler_t), pointer            :: StepsHandler     !< Steps handler
     !----------------------------------------------------------------- 
         nullify(StepsHandler)
         StepsHandler => this%StepsHandler
@@ -227,7 +227,7 @@ contains
     !< Return a pointer to the MPIEnvironment
     !----------------------------------------------------------------- 
         class(xdmf_handler_t), intent(IN) :: this                     !< XDMF handler type
-        class(mpi_env_t), pointer         :: MPIEnvironment           !< MPI Environment
+        type(mpi_env_t), pointer          :: MPIEnvironment           !< MPI Environment
     !----------------------------------------------------------------- 
         nullify(MPIEnvironment)
         MPIEnvironment => this%MPIEnvironment
@@ -404,7 +404,7 @@ contains
         type(NodeList), pointer               :: XIncludeNodes        !< Fox DOM Xinclude node list
         type(Node),     pointer               :: XIncludeNode         !< Fox DOM Xinclude node 
         type(xdmf_xinclude_t)                 :: xinclude             !< XDMF Xinclude type
-        integer                               :: i
+        integer(I4P)                          :: i
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(this%MPIEnvironment%is_root()) then
@@ -422,7 +422,7 @@ contains
                 XIncludeNodes => getElementsByTagname(TemporalGridNode, 'xi:include')
 
                 call this%StepsHandler%Initialize(this%MPIEnvironment, getLength(XIncludeNodes))
-                do i = 0, getLength(XIncludeNodes) - 1
+                do i = 0_I4P, getLength(XIncludeNodes) - 1_I4P
                     XIncludeNode => item(XIncludeNodes, i)
                     call xinclude%Parse(DOMNode = XIncludeNode)
                     call this%StepsHandler%Append(Filename=xinclude%GetHRef())
@@ -443,7 +443,6 @@ contains
         class(xdmf_handler_t),  intent(INOUT) :: this                 !< XDMF handler
         type(Node),     pointer               :: SpatialGridNode      !< Fox DOM SpatialGrid node
         type(NodeList), pointer               :: UniformGridNodes     !< Fox DOM UniformGrid node list
-        integer                               :: i
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(.not. this%TemporalFile%isParsed()) call this%ParseTemporalFile()
@@ -594,13 +593,12 @@ contains
         character(len=*),           intent(IN)    :: Tag             !< Fox DOM Child node
         type(Node),        pointer                :: ChildNode       !< Fox DOM result Child node
         type(NodeList),    pointer                :: Childrens       !< List of childrens of the document root node
-        integer(I4P)                              :: i               !< Index for a loop in Childrens
     !----------------------------------------------------------------- 
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         nullify(ChildNode)
         if(hasChildNodes(FatherNode)) then
             Childrens => getElementsByTagname(FatherNode, Tag)
-            if(getLength(Childrens) == 1) ChildNode => item(Childrens, 0)
+            if(getLength(Childrens) == 1_I4P) ChildNode => item(Childrens, 0_I4P)
         endif
         nullify(Childrens)
     end function xdmf_handler_GetUniqueNodeByTag
@@ -748,7 +746,7 @@ contains
         assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
                                                             Precision       = 4,    &
-                                                            ArrayDimensions = (/size(XYZ, dim=1)/))
+                                                            ArrayDimensions = (/size(XYZ, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_SetGeometry_R4P
 
 
@@ -763,7 +761,7 @@ contains
         assert(this%State == XDMF_HANDLER_STATE_INIT)
         call this%UniformGridDescriptor%SetGeometryMetadata(Name            = Name, &
                                                             Precision       = 8,    &
-                                                            ArrayDimensions = (/size(XYZ, dim=1)/))
+                                                            ArrayDimensions = (/size(XYZ, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_SetGeometry_R8P
 
 
@@ -783,7 +781,7 @@ contains
                         Type=Type, DataType='Int',                &
                         Center=Center,                            &
                         Precision=4,                              &
-                        ArrayDimensions=(/size(Attribute, dim=1)/))
+                        ArrayDimensions=(/size(Attribute, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_AppendAttribute_I4P
 
 
@@ -803,7 +801,7 @@ contains
                         Type=Type, DataType='Int',                &
                         Center=Center,                            &
                         Precision=8,                              &
-                        ArrayDimensions=(/size(Attribute, dim=1)/))
+                        ArrayDimensions=(/size(Attribute, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_AppendAttribute_I8P
 
 
@@ -823,7 +821,7 @@ contains
                         Type=Type, DataType='Float',              &
                         Center=Center,                            &
                         Precision=4,                              &
-                        ArrayDimensions=(/size(Attribute, dim=1)/))
+                        ArrayDimensions=(/size(Attribute, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_AppendAttribute_R4P
 
 
@@ -843,7 +841,7 @@ contains
                         Type=Type, DataType='Float',              &
                         Center=Center,                            &
                         Precision=8,                              &
-                        ArrayDimensions=(/size(Attribute, dim=1)/))
+                        ArrayDimensions=(/size(Attribute, dim=1, kind=I8P)/))
     end subroutine xdmf_handler_AppendAttribute_R8P
 
 
