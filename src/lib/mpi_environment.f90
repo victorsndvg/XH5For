@@ -103,14 +103,14 @@ contains
         call MPI_Initialized(mpi_was_initialized, mpierr)
         if(mpi_was_initialized) then
             if(present(info)) then
-                this%info = info
+                call MPI_INFO_DUP( info, this%info, mpierr)
             else
                 this%info = MPI_INFO_NULL
             endif
             if(present(comm)) then
-                CALL MPI_COMM_DUP(comm, this%comm, mpierr)
+                call MPI_COMM_DUP(comm, this%comm, mpierr)
             else
-                CALL MPI_COMM_DUP(MPI_COMM_WORLD, this%comm, mpierr)
+                call MPI_COMM_DUP(MPI_COMM_WORLD, this%comm, mpierr)
             endif
             call MPI_COMM_RANK (this%comm, this%rank, mpierr)
             call MPI_COMM_SIZE (this%comm, this%size, mpierr)
