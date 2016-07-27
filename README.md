@@ -160,7 +160,8 @@ end program xh5for_hexa_per_task
 
 ## UML class diagram:
 Automatically generated with [ForUML](http://research.te.psu.ac.th/aziz/foruml.htm).
-<img src='https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_UML.svg'>
+
+![XH5For UML class diagram](https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_UML.svg "XH5For UML class diagram")
 
 ## How to collaborate
 
