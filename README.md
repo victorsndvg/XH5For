@@ -158,6 +158,9 @@ end program xh5for_hexa_per_task
         * [x] One dataset per process
         * [ ] Chunking
 
+## UML class diagram:
+Automatically generated with [ForUML](http://research.te.psu.ac.th/aziz/foruml.htm).
+<img src='https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_UML.svg'>
 
 ## How to collaborate
 

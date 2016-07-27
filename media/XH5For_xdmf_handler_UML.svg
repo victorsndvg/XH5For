@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg height="1467" version="1.1" width="4150" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#ffffff" height="95" stroke="#ffffff" stroke-width="1" width="604" x="726" y="1069"/>
+<rect fill="none" height="95" stroke="#000000" stroke-width="1" width="604" x="726" y="1069"/>
+<text font-family="Ubuntu" font-size="15" x="887" y="1084">
++ xdmf_contiguous_hyperslab_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="604" x="726" y="1095"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="604" x="726" y="1116"/>
+<text font-family="Ubuntu" font-size="15" x="730" y="1132">
++WriteAttributes(inout this : xdmf_contiguous_hyperslab_handler_t,chardata : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="730" y="1151">
+&lt;&lt;Constructor&gt;&gt; +xdmf_contiguous_hyperslab_handler_t()</text>
+<rect fill="#ffffff" height="95" stroke="#ffffff" stroke-width="1" width="597" x="2831" y="1069"/>
+<rect fill="none" height="95" stroke="#000000" stroke-width="1" width="597" x="2831" y="1069"/>
+<text font-family="Ubuntu" font-size="15" x="2992" y="1084">
++ xdmf_dataset_per_process_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="597" x="2831" y="1095"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="597" x="2831" y="1116"/>
+<text font-family="Ubuntu" font-size="15" x="2835" y="1132">
++WriteAttributes(inout this : xdmf_dataset_per_process_handler_t,chardata : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="2835" y="1151">
+&lt;&lt;Constructor&gt;&gt; +xdmf_dataset_per_process_handler_t()</text>
+<rect fill="#ffffff" height="975" stroke="#ffffff" stroke-width="1" width="1626" x="1264" y="14"/>
+<rect fill="none" height="975" stroke="#000000" stroke-width="1" width="1626" x="1264" y="14"/>
+<text font-family="Ubuntu" font-size="15" x="2016" y="29">
++ xdmf_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="1626" x="1264" y="40"/>
+<text font-family="Ubuntu" font-size="15" x="1268" y="56">
++prefix : character</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="75">
++TemporalFile</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="94">
++SpatialFile</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="113">
++Action : integer</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="132">
++State : integer</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="151">
++StepsHandler</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="170">
++MPIEnvironment</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="189">
++SpatialGridDescriptor</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="208">
++UniformGridDescriptor</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="1626" x="1264" y="219"/>
+<text font-family="Ubuntu" font-size="15" x="1268" y="235">
++SetTopology_I4P(inout this : xdmf_handler_t,Connectivities : integer,Name : character)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="254">
++SetTopology_I8P(inout this : xdmf_handler_t,Connectivities : integer,Name : character)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="273">
++WriteGeometry(inout this : xdmf_handler_t,GridID : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="292">
++WriteTopology(inout this : xdmf_handler_t,GridID : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="311">
++WriteAttributes(inout this : xdmf_handler_t,GridID : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="330">
++FillSpatialGridTopology(inout this : xdmf_handler_t,TopologyNode : Node,ID : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="349">
++GetSpatialFileXMLHandler(XMLHandler : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="368">
++GetStepsHandler(StepsHandler : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="387">
++GetMPIEnvironment(MPIEnvironment : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="406">
++GetUniformGridDescriptor(UniformGridDescriptor : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="425">
++GetSpatialGridDescriptor(SpatialGridDescriptor : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="444">
++Initialize(inout this : xdmf_handler_t,MPIEnvironment : mpi_env_t,StepsHandler : steps_handler_t,UniformGridDescriptor : uniform_grid_descriptor_t,SpatialGridDescriptor : spatial_grid_descriptor_t,FilePrefix : character,Action : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="463">
++Open()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="482">
++Clean(inout this : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="501">
++Free(inout this : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="520">
++HasPrefix(inout this : xdmf_handler_t)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="539">
++GetHDF5Filename(inout this : xdmf_handler_t,Step : integer)</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="558">
++GetSpatialFilename()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="577">
++OpenSpatialFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="596">
++OpenSpatialGrid()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="615">
++SerializeSpatialFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="634">
++IsSpatialFileSerialized()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="653">
++SerializeTemporalFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="672">
++ParseTemporalFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="691">
++ParseSpatialFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="710">
++CloseSpatialGrid()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="729">
++CloseSpatialFile()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="748">
++GetUniqueNodeByTag()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="767">
++GetFirstChildByTag()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="786">
++GetDataItemXPath()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="805">
++FillSpatialGridGeometry()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="824">
++FillSpatialGridDescriptor()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="843">
++SetGeometry_R4P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="862">
++SetGeometry_R8P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="881">
++AppendAttribute_I4P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="900">
++AppendAttribute_I8P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="919">
++AppendAttribute_R4P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="938">
++AppendAttribute_R8P()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="957">
++CalculateAttributeDimensions()</text>
+<text font-family="Ubuntu" font-size="15" x="1268" y="976">
+&lt;&lt;Constructor&gt;&gt; +xdmf_handler_t()</text>
+<polyline fill="none" points="1026,1069 1026,1041 2075,1041 2075,989" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="2075,989 2082,1001 2068,1001" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="2075,989 2082,1001 2068,1001" stroke="#000000" stroke-width="1"/>
+<polyline fill="none" points="3127,1069 3127,1041 2075,1041 2075,989" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="2075,989 2082,1001 2068,1001" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="2075,989 2082,1001 2068,1001" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="209" stroke="#ffffff" stroke-width="1" width="970" x="14" y="1244"/>
+<rect fill="none" height="209" stroke="#000000" stroke-width="1" width="970" x="14" y="1244"/>
+<text font-family="Ubuntu" font-size="15" x="317" y="1259">
++ xdmf_structured_contiguous_hyperslab_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="970" x="14" y="1270"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="970" x="14" y="1291"/>
+<text font-family="Ubuntu" font-size="15" x="18" y="1307">
++SetTopology_I4P(inout this : xdmf_structured_contiguous_hyperslab_handler_t,Connectivities : integer,UniformGridDescriptor : character)</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1326">
++SetTopology_I8P()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1345">
++FillSpatialGridTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1364">
++WriteGeometry()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1383">
++WriteGeometry_VXVYVZ()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1402">
++WriteGeometry_DXDYDZ()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1421">
++WriteTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="18" y="1440">
+&lt;&lt;Constructor&gt;&gt; +xdmf_structured_contiguous_hyperslab_handler_t()</text>
+<polyline fill="none" points="494,1244 494,1219 1023,1219 1023,1164" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1023,1164 1030,1176 1016,1176" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1023,1164 1030,1176 1016,1176" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="209" stroke="#ffffff" stroke-width="1" width="963" x="2122" y="1244"/>
+<rect fill="none" height="209" stroke="#000000" stroke-width="1" width="963" x="2122" y="1244"/>
+<text font-family="Ubuntu" font-size="15" x="2425" y="1259">
++ xdmf_structured_dataset_per_process_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="963" x="2122" y="1270"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="963" x="2122" y="1291"/>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1307">
++SetTopology_I4P(inout this : xdmf_structured_dataset_per_process_handler_t,Connectivities : integer,UniformGridDescriptor : character)</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1326">
++SetTopology_I8P()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1345">
++FillSpatialGridTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1364">
++WriteGeometry()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1383">
++WriteGeometry_VXVYVZ()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1402">
++WriteGeometry_DXDYDZ()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1421">
++WriteTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="2126" y="1440">
+&lt;&lt;Constructor&gt;&gt; +xdmf_structured_dataset_per_process_handler_t()</text>
+<polyline fill="none" points="2603,1244 2603,1214 3129,1214 3129,1164" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="3129,1164 3136,1176 3122,1176" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="3129,1164 3136,1176 3122,1176" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="209" stroke="#ffffff" stroke-width="1" width="978" x="1064" y="1244"/>
+<rect fill="none" height="209" stroke="#000000" stroke-width="1" width="978" x="1064" y="1244"/>
+<text font-family="Ubuntu" font-size="15" x="1362" y="1259">
++ xdmf_unstructured_contiguous_hyperslab_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="978" x="1064" y="1270"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="978" x="1064" y="1291"/>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1307">
++SetTopology_I4P(inout this : xdmf_unstructured_contiguous_hyperslab_handler_t,Connectivities : integer,SpatialGridDescriptor : character)</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1326">
++SetTopology_I8P()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1345">
++FillSpatialGridTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1364">
++WriteGeometry()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1383">
++WriteGeometry_XYZ()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1402">
++WriteGeometry_X_Y_Z()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1421">
++WriteTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="1068" y="1440">
+&lt;&lt;Constructor&gt;&gt; +xdmf_unstructured_contiguous_hyperslab_handler_t()</text>
+<polyline fill="none" points="1548,1244 1548,1219 1023,1219 1023,1164" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="1023,1164 1030,1176 1016,1176" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="1023,1164 1030,1176 1016,1176" stroke="#000000" stroke-width="1"/>
+<rect fill="#ffffff" height="209" stroke="#ffffff" stroke-width="1" width="971" x="3165" y="1244"/>
+<rect fill="none" height="209" stroke="#000000" stroke-width="1" width="971" x="3165" y="1244"/>
+<text font-family="Ubuntu" font-size="15" x="3463" y="1259">
++ xdmf_unstructured_dataset_per_process_handler_t</text>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="971" x="3165" y="1270"/>
+<rect fill="#000000" height="1" stroke="#000000" stroke-width="1" width="971" x="3165" y="1291"/>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1307">
++SetTopology_I4P(inout this : xdmf_unstructured_dataset_per_process_handler_t,Connectivities : integer,SpatialGridDescriptor : character)</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1326">
++SetTopology_I8P()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1345">
++FillSpatialGridTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1364">
++WriteGeometry()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1383">
++WriteGeometry_XYZ()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1402">
++WriteGeometry_X_Y_Z()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1421">
++WriteTopology()</text>
+<text font-family="Ubuntu" font-size="15" x="3169" y="1440">
+&lt;&lt;Constructor&gt;&gt; +xdmf_unstructured_dataset_per_process_handler_t()</text>
+<polyline fill="none" points="3650,1244 3650,1214 3129,1214 3129,1164" stroke="#000000" stroke-width="1"/>
+<polygon fill="#ffffff" points="3129,1164 3136,1176 3122,1176" stroke="#ffffff" stroke-width="1"/>
+<polygon fill="none" points="3129,1164 3136,1176 3122,1176" stroke="#000000" stroke-width="1"/>
+</svg>
