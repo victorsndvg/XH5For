@@ -19,3 +19,9 @@
     
     The hierarchy structure of the code can be modified in the
     future due to design decision and/or integration problems
+
+
+## UML class diagram:
+Automatically generated with [ForUML](http://research.te.psu.ac.th/aziz/foruml.htm).
+
+![XH5For Fox XDMF UML class diagram](https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_fox_xdmf_UML.svg "XH5For Fox XDMF UML class diagram")

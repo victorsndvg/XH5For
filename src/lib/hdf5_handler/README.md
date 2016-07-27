@@ -126,3 +126,8 @@ Read:
     !----------------------------------------------------------------- 
 ```
 
+## XH5For: HDF5 Handler UML class diagram:
+Automatically generated with [ForUML](http://research.te.psu.ac.th/aziz/foruml.htm).
+
+![XH5For HDF5 Handler UML class diagram](https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_hdf5_handler_UML.svg "XH5For HDF5 Handler UML class diagram")
+

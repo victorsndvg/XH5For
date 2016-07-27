@@ -16,4 +16,9 @@ The Fortran way to easy write parallel partitioned XDMF/HDF5 meshes
 
 *Spatial Grid Descriptor* is used by the *XDMF Handler* while parsing and by *HDF5 Handler* to calculate attributes dimensions, offsets, etc.
 
+## XH5For: Spatial Grid Descriptor UML class diagram:
+Automatically generated with [ForUML](http://research.te.psu.ac.th/aziz/foruml.htm).
+
+![XH5For Spatial Grid Descriptor UML class diagram](https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_spatial_grid_descriptor_UML.svg "XH5For Spatial Grid Descriptor UML class diagram")
+
 
