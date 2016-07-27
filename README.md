@@ -1,4 +1,4 @@
-# XH5For
+# XH5For ![](https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_logo.png "XH5For logo")
 The Fortran way to easy write parallel partitioned XDMF/HDF5 meshes
 
 [![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)
