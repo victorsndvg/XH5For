@@ -77,7 +77,7 @@ implicit none
                                           1.0, 1.0, 0.0/)
     integer, dimension(8) :: topology = (/0, 1, 2, 3, 4, 5, 6, 7/)
     integer, dimension(8) :: temperature = (/0, 1, 2, 3, 4, 5, 6, 7/)
-    integer               :: mpierror
+    integer               :: mpierr, rank
 
     call MPI_INIT(mpierror)
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, mpierr)
@@ -91,7 +91,7 @@ implicit none
     call xh5%Close()
     call xh5%Free()
 
-    call MPI_FINLIZE(mpierror)
+    call MPI_FINALIZE(mpierror)
 
 end program xh5for_hexa_per_task
 ```
