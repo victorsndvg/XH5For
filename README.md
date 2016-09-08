@@ -96,7 +96,7 @@ implicit none
 end program xh5for_hexa_per_task
 ```
 
-See can find more info about [XH5For_t](./src/lib/README.md)
+See more info about [XH5For_t](./src/lib/README.md)
 
 ## Some considerations
 
