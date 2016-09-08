@@ -96,6 +96,8 @@ implicit none
 end program xh5for_hexa_per_task
 ```
 
+See can find more info about [XH5For_t](./src/lib/README.md)
+
 ## Some considerations
 
   * **XH5For** use [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format) to describe the **Light data** and [HDF5](https://www.hdfgroup.org/HDF5) for the **Heavy data**.
