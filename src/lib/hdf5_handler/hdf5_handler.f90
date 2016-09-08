@@ -454,7 +454,7 @@ contains
     !< Return the File ID
     !----------------------------------------------------------------- 
         class(hdf5_handler_t), intent(IN) :: this                     !< HDF5 handler type
-        integer(I4P)                      :: FileID                   !< File ID
+        integer(HID_T)                    :: FileID                   !< File ID
     !----------------------------------------------------------------- 
         assert(this%State == HDF5_HANDLER_STATE_OPEN) ! Was initialized
         FileID = this%FileID

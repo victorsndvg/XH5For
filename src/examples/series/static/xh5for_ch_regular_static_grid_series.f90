@@ -46,7 +46,7 @@ use PENF, only: I4P, I8P, R4P, R8P, str
 
     !< Initialize some values depending on the mpi rank and step
     allocate(scalartempI4P((GridShape(1))*(GridShape(2))*(GridShape(3))))
-    allocate(scalartempR8P((GridShape(1)-1)*(GridShape(2)-1)*(GridShape(3)-1)*i))
+    allocate(scalartempR8P((GridShape(1)-1)*(GridShape(2)-1)*(GridShape(3)-1)))
 
     !< Write XDMF/HDF5 file
     call xh5%Open(FilePrefix='xh5for_ch_regular_static_grid_series', GridType=XDMF_GRID_TYPE_REGULAR, StaticGrid=.true., Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
