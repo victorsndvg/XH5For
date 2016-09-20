@@ -21,7 +21,7 @@ addons:
 before_install:
   - pip install codecov
   - git submodule update --init --recursive
-  - travis_retry wget --quiet https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.14/src/hdf5-1.8.14.tar.gz;
+  - travis_retry wget --quiet https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.17.tar;
   - travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
@@ -41,7 +41,7 @@ install:
   ##################
   - cd $TRAVIS_BUILD_DIR
   - tar -xzf hdf5-1.8.14.tar.gz
-  - cd hdf5-1.8.14
+  - cd hdf5-1.8.17
   - mkdir $TRAVIS_BUILD_DIR/hdf5
   - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-parallel --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules FC=$TRAVIS_BUILD_DIR/openmpi/bin/mpif90 CC=$TRAVIS_BUILD_DIR/openmpi/bin/mpicc > /dev/null
   - travis_wait make -j2 > /dev/null 2>&1
