@@ -114,8 +114,8 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(I4P)                                           :: hdferror            !< HDF5 error code
-#ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
+#ifdef PRINT_IO_TIMES
         real(R8P)                                              :: start_time
         real(R8P)                                              :: end_time
 #endif
@@ -125,10 +125,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         ! Create filespace
@@ -140,7 +140,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%GetfileID(),         &
@@ -202,8 +203,8 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(I4P)                                           :: hdferror            !< HDF5 error code
-#ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
+#ifdef PRINT_IO_TIMES
         real(R8P)                                              :: start_time
         real(R8P)                                              :: end_time
 #endif
@@ -213,10 +214,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         ! Create filespace
@@ -228,7 +229,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%GetfileID(),         &
@@ -291,8 +293,8 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(I4P)                                           :: hdferror            !< HDF5 error code
-#ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
+#ifdef PRINT_IO_TIMES
         real(R8P)                                              :: start_time
         real(R8P)                                              :: end_time
 #endif
@@ -302,10 +304,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         ! Create filespace
@@ -317,7 +319,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%GetfileID(),         &
@@ -379,8 +382,8 @@ contains
         integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
         integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
         integer(I4P)                                           :: hdferror            !< HDF5 error code
-#ifdef PRINT_IO_TIMES
         type(mpi_env_t), pointer                               :: MPIEnvironment
+#ifdef PRINT_IO_TIMES
         real(R8P)                                              :: start_time
         real(R8P)                                              :: end_time
 #endif
@@ -390,10 +393,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_WRITE)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         ! Create filespace
@@ -405,7 +408,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Create dataset 
         call H5Dcreate_f(loc_id = this%GetfileID(),         &
@@ -456,22 +460,22 @@ contains
     !-----------------------------------------------------------------
     !< Read I4P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN) :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN) :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabSize(:)    !< Hyperslab size
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
         integer(I4P), allocatable,                  intent(OUT) :: Values(:)          !< I4P Dataset values
-        integer(HID_T)                                         :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                           :: hdferror            !< HDF5 error code
-        integer(I4P)                                           :: rank                !< Hyperslab rank 
+        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                            :: hdferror            !< HDF5 error code
+        integer(I4P)                                            :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        type(mpi_env_t), pointer                               :: MPIEnvironment
-        real(R8P)                                              :: start_time
-        real(R8P)                                              :: end_time
+        real(R8P)                                               :: start_time
+        real(R8P)                                               :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -479,10 +483,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
@@ -496,7 +500,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%GetfileID(),           &
@@ -542,22 +547,22 @@ contains
     !-----------------------------------------------------------------
     !< Read I8P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN) :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN) :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabSize(:)    !< Hyperslab size
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
         integer(I8P), allocatable,                  intent(OUT) :: Values(:)          !< I8P Dataset values
-        integer(HID_T)                                         :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                           :: hdferror            !< HDF5 error code
-        integer(I4P)                                           :: rank                !< Hyperslab rank 
+        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                            :: hdferror            !< HDF5 error code
+        integer(I4P)                                            :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        type(mpi_env_t), pointer                               :: MPIEnvironment
-        real(R8P)                                              :: start_time
-        real(R8P)                                              :: end_time
+        real(R8P)                                               :: start_time
+        real(R8P)                                               :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -565,10 +570,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
@@ -582,7 +587,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%GetfileID(),           &
@@ -628,22 +634,22 @@ contains
     !-----------------------------------------------------------------
     !< Read R4P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN) :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN) :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabSize(:)    !< Hyperslab size
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
         real(R4P), allocatable,                     intent(OUT) :: Values(:)          !< R4P Dataset values
-        integer(HID_T)                                         :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                           :: hdferror            !< HDF5 error code
-        integer(I4P)                                           :: rank                !< Hyperslab rank 
+        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                            :: hdferror            !< HDF5 error code
+        integer(I4P)                                            :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        type(mpi_env_t), pointer                               :: MPIEnvironment
-        real(R8P)                                              :: start_time
-        real(R8P)                                              :: end_time
+        real(R8P)                                               :: start_time
+        real(R8P)                                               :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -651,10 +657,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
@@ -668,7 +674,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%GetfileID(),           &
@@ -714,22 +721,22 @@ contains
     !-----------------------------------------------------------------
     !< read R8P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN) :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN) :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN) :: HyperSlabSize(:)    !< Hyperslab size
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
         real(R8P), allocatable,                     intent(OUT) :: Values(:)          !< R8P Dataset values
-        integer(HID_T)                                         :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                         :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                         :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                         :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                           :: hdferror            !< HDF5 error code
-        integer(I4P)                                           :: rank                !< Hyperslab rank 
+        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                            :: hdferror            !< HDF5 error code
+        integer(I4P)                                            :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        type(mpi_env_t), pointer                               :: MPIEnvironment
-        real(R8P)                                              :: start_time
-        real(R8P)                                              :: end_time
+        real(R8P)                                               :: start_time
+        real(R8P)                                               :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -737,10 +744,10 @@ contains
         !< @Note: Fixed rank 1?
         assert(this%IsOpen() .and. this%GetAction() == XDMF_ACTION_READ)
 #ifdef ENABLE_HDF5
-#ifdef PRINT_IO_TIMES
         nullify(MPIEnvironment)
         MPIEnvironment => this%GetMPIEnvironment()
         assert(associated(MPIEnvironment))
+#ifdef PRINT_IO_TIMES
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
@@ -754,7 +761,8 @@ contains
         call H5Pcreate_f(H5P_DATASET_XFER_F, prp_id = plist_id, hdferr=hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
+        if(MPIEnvironment%is_Parallel()) &
+            call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Open dataset 
         call H5Dopen_f(loc_id = this%GetfileID(),           &
