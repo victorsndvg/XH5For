@@ -175,7 +175,7 @@ contains
                 hdferr  = hdferror) 
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
         ! Set MPIO data transfer mode to COLLECTIVE
-        if(MPIEnvironemnt%is_Parallel()) &
+        if(MPIEnvironment%is_Parallel()) &
             call H5Pset_dxpl_mpio_f(prp_id = plist_id, data_xfer_mode = H5FD_MPIO_COLLECTIVE_F, hdferr = hdferror)
 #endif
         ! Write data
