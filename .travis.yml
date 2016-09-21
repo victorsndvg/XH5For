@@ -31,7 +31,7 @@ install:
   ## Install OMPI ##
   ##################
   - cd $TRAVIS_BUILD_DIR
-  - tar -zxf openmpi-1.10.2.tar.gz
+  - tar zxf openmpi-1.10.2.tar.gz
   - cd openmpi-1.10.2
   - ./configure --prefix=$TRAVIS_BUILD_DIR/openmpi > /dev/null
   - travis_wait make -j2 > /dev/null 2>&1
@@ -40,7 +40,7 @@ install:
   ## Install HDF5 ##
   ##################
   - cd $TRAVIS_BUILD_DIR
-  - tar -xzf hdf5-1.8.14.tar.gz
+  - tar xzf hdf5-1.8.17.tar
   - cd hdf5-1.8.17
   - mkdir $TRAVIS_BUILD_DIR/hdf5
   - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-parallel --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules FC=$TRAVIS_BUILD_DIR/openmpi/bin/mpif90 CC=$TRAVIS_BUILD_DIR/openmpi/bin/mpicc > /dev/null
