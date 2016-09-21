@@ -351,7 +351,7 @@ ENDIF()
 # FLUSH DATA AFTER EvERY HDF5 WRITING
 #############################################################
 
-IF(HDF5_FORCE_FLUSH)
+IF(XH5For_FORCE_FLUSH)
     ADD_DEFINITIONS(-DFORCE_FLUSH)
 ENDIF()
 
@@ -359,7 +359,7 @@ ENDIF()
 # PRINT THE TIME EXPENDED IN EVERY HDF5 IO OPERATION
 #############################################################
 
-IF(HDF5_PRINT_IO_TIMES)
+IF(XH5For_PRINT_IO_TIMES)
     ADD_DEFINITIONS(-DPRINT_IO_TIMES)
 ENDIF()
 
