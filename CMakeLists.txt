@@ -16,6 +16,7 @@ SET(CMAKE_VERBOSE_MAKEFILE FALSE)
 # DEFINE PATHS
 #################################################################
 
+SET(CMAKE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 SET(SRC_PATH ${CMAKE_SOURCE_DIR}/src)
 SET(LIB_PATH ${SRC_PATH}/lib)
 SET(EXAMPLES_PATH ${SRC_PATH}/examples)
@@ -32,14 +33,14 @@ SET(INCLUDE_PATH ${SRC_PATH}/include)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR}/modules)
+SET(MODULE_OUTPUT_PATH ${CMAKE_Fortran_MODULE_DIRECTORY})
 SET(THIRDPARTY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/thirdparty)
-INCLUDE_DIRECTORIES(${CMAKE_Fortran_MODULE_DIRECTORY})
 
 #################################################################
 # ADD INCLUDE DIRS
 #################################################################
 
-include_directories(${INCLUDE_PATH})
+INCLUDE_DIRECTORIES(${INCLUDE_PATH} ${MODULE_OUTPUT_PATH})
 
 #################################################################
 # CONFIGURATION TYPES & BUILD MODE & ENABLE TEST and EXAMPLES
@@ -125,7 +126,10 @@ FOREACH(EXT_LIB ${EXT_LIBS})
            UNSET(${EXT_LIB}_LIBRARIES CACHE)
         ENDIF()
     ENDIF()
+    SET(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIBRARIES} ${${EXT_LIB}_LIBRARIES})
 ENDFOREACH ()
+
+SET(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIBRARIES} ${${EXT_LIB}_LIBRARIES})
 
 #################################################################
 # MPI Fortran DEFINITIONS AND PATHS
@@ -374,4 +378,12 @@ ENDIF()
 IF(${PROJECT_NAME}_ENABLE_EXAMPLES)
     ADD_SUBDIRECTORY(${EXAMPLES_PATH})
 ENDIF()
+
+#################################################################
+# CREATE CONFIG FILE
+#################################################################
+
+CONFIGURE_FILE(${CMAKE_PATH}/${PROJECT_NAME}Config.cmake.in 
+               ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+               @ONLY)
 
