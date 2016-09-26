@@ -41,6 +41,7 @@ SET(THIRDPARTY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/thirdparty)
 #################################################################
 
 INCLUDE_DIRECTORIES(${INCLUDE_PATH} ${MODULE_OUTPUT_PATH})
+SET(INCLUDE_DIRS ${MODULE_OUTPUT_PATH})
 
 #################################################################
 # CONFIGURATION TYPES & BUILD MODE & ENABLE TEST and EXAMPLES
@@ -313,6 +314,7 @@ EXTERNALPROJECT_Add(${PENF_LIB}
 SET(PENF_LIBS ${${PENF_LIB}_BINARY_PATH}/lib/lib${PENF_LIB}.a)
 LINK_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB}/lib)
 INCLUDE_DIRECTORIES(${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB}/modules)
+SET(INCLUDE_DIRS ${INCLUDE_DIRS} ${THIRDPARTY_OUTPUT_PATH}/${PENF_LIB}/modules)
 
 #################################################################
 # DEBUG MODE RELATED STUFF
