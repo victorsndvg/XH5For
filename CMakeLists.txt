@@ -259,6 +259,9 @@ SET(BUILDNAME ${CMAKE_Fortran_COMPILER_ID}_${CMAKE_BUILD_TYPE}_MKL=${${PROJECT_N
 IF(${PROJECT_NAME}_ENABLE_TESTS)
     ENABLE_TESTING()
     INCLUDE(CTest)
+    SET(CTEST_COMMAND "${CMAKE_COMMAND} --build . --target test")
+ELSE()
+    UNSET(CTEST_COMMAND CACHE)
 ENDIF()
 
 #################################################################
@@ -277,7 +280,7 @@ EXTERNALPROJECT_Add(${FOX_LIB}
     INSTALL_DIR ${INSTALL_PREFIX}
     # Fortran compiler must be forced in order to link external projects from the main project
     CONFIGURE_COMMAND cmake -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER} -D${FOX_LIB}_ENABLE_WXML=ON -D${FOX_LIB}_ENABLE_DOM=ON -D${FOX_LIB}_ENABLE_WCML=OFF -D${FOX_LIB}_ENABLE_WKML=OFF -D${FOX_LIB}_ENABLE_EXAMPLES=OFF ${${FOX_LIB}_SRC_PATH}
-    BUILD_COMMAND cmake --build .
+    BUILD_COMMAND ${CMAKE_COMMAND} --build .
     TEST_COMMAND ""
     INSTALL_COMMAND ""
 )

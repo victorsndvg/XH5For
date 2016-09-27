@@ -9,6 +9,8 @@ SET(LIB_SRC ${LIB_SRC} PARENT_SCOPE)
 # Library target
 #################################################################
 ADD_LIBRARY(${LIB} ${LIB_SRC})
+ADD_DEPENDENCIES(${LIB} ${PENF_LIB})
+ADD_DEPENDENCIES(${LIB} ${FOX_LIB})
 
 #################################################################
 # External libraries
@@ -29,8 +31,8 @@ ENDIF()
 #################################################################
 # External projects
 #################################################################
-FOREACH(FOX_LIB ${FOX_LIBS})
-        TARGET_LINK_LIBRARIES(${LIB} ${FOX_LIB})
+FOREACH(EXT_LIB ${FOX_LIBS})
+        TARGET_LINK_LIBRARIES(${LIB} ${EXT_LIB})
 ENDFOREACH()
 
 SET_TARGET_PROPERTIES(${LIB} PROPERTIES VERSION ${${LIB}_VERSION} SOVERSION ${${LIB}_SOVERSION})
