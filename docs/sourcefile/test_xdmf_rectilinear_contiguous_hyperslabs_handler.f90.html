@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="XDMF parallel partitioned mesh I/O on top of HDF5">
+    
+    <meta name="author" content="Víctor Sande Veiga" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 &ndash; XH5For</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">XH5For </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 0.3% of total for source files.">33 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li class="active">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#progs-0">Programs</a></h3></div>
+  <div id="progs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_hyperslabs_handler.html">test_xdmf_rect_hyperslabs_handler</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90.html#src">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-0">All Source Files</a></h3></div>
+  <div id="allfiles-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/ch_unstructured_hexahedron_perf.f90.html">ch_unstructured_hexahedron_perf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/fox_xdmf.f90.html">fox_xdmf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_contiguous_hyperslab_handler.f90.html">hdf5_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_dataset_per_process_handler.f90.html">hdf5_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_handler.f90.html">hdf5_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_structured_contiguous_hyperslab_handler.f90.html">hdf5_structured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_structured_dataset_per_process_handler.f90.html">hdf5_structured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_unstructured_contiguous_hyperslab_handler.f90.html">hdf5_unstructured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_unstructured_dataset_per_process_handler.f90.html">hdf5_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/mpi_environment.f90.html">mpi_environment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/spatial_grid_descriptor.f90.html">spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/steps_handler.f90.html">steps_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/steps_handler_test.f90.html">steps_handler_test.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_contiguous_hyperslab_factory.f90.html">structured_contiguous_hyperslab_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_dataset_per_process_factory.f90.html">structured_dataset_per_process_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_spatial_grid_descriptor.f90.html">structured_spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_uniform_grid_descriptor.f90.html">structured_uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_fox_wxml.f90.html">test_FoX_wxml.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_rectilinear_contiguous_hyperslabs_handler.f90.html">test_hdf5_rectilinear_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_rectilinear_dataset_per_process_handler.f90.html">test_hdf5_rectilinear_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_regular_contiguous_hyperslabs_handler.f90.html">test_hdf5_regular_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_regular_dataset_per_process_handler.f90.html">test_hdf5_regular_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_unstructured_contiguous_hyperslabs_handler.f90.html">test_hdf5_unstructured_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_unstructured_dataset_per_process_handler.f90.html">test_hdf5_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_mpi_environment.f90.html">test_mpi_environment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_attribute.f90.html">test_xdmf_attribute.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_character_data.f90.html">test_xdmf_character_data.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_dataitem.f90.html">test_xdmf_dataitem.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_geometry.f90.html">test_xdmf_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_grid.f90.html">test_xdmf_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90.html">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_dataset_per_process.f90.html">test_xdmf_rectilinear_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_regular_contiguous_hyperslabs_handler.f90.html">test_xdmf_regular_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_regular_dataset_per_process.f90.html">test_xdmf_regular_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_time.f90.html">test_xdmf_time.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_topology.f90.html">test_xdmf_topology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_unstructured_contiguous_hyperslabs_handler.f90.html">test_xdmf_unstructured_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_unstructured_dataset_per_process.f90.html">test_xdmf_unstructured_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_xinclude.f90.html">test_xdmf_xinclude.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/try_compile_hdf5_mod.f90.html">try_compile_hdf5_mod.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/try_compile_mpi_mod.f90.html">try_compile_mpi_mod.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/uniform_grid_descriptor.f90.html">uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_contiguous_hyperslab_factory.f90.html">unstructured_contiguous_hyperslab_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_dataset_per_process_factory.f90.html">unstructured_dataset_per_process_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_spatial_grid_descriptor.f90.html">unstructured_spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_uniform_grid_descriptor.f90.html">unstructured_uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_attribute.f90.html">xdmf_attribute.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_character_data.f90.html">xdmf_character_data.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_contiguous_hyperslab_handler.f90.html">xdmf_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_dataitem.f90.html">xdmf_dataitem.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_dataset_per_process_handler.f90.html">xdmf_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_domain.f90.html">xdmf_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_element.f90.html">xdmf_element.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_file.f90.html">xdmf_file.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_geometry.f90.html">xdmf_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_grid.f90.html">xdmf_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_handler.f90.html">xdmf_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_information.f90.html">xdmf_information.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_parameters.f90.html">xdmf_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_structured_contiguous_hyperslab_handler.f90.html">xdmf_structured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_structured_dataset_per_process_handler.f90.html">xdmf_structured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_time.f90.html">xdmf_time.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_topology.f90.html">xdmf_topology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_unstructured_contiguous_hyperslab_handler.f90.html">xdmf_unstructured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_unstructured_dataset_per_process_handler.f90.html">xdmf_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_utils.f90.html">xdmf_utils.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_xinclude.f90.html">xdmf_xinclude.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for.f90.html">xh5for.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_abstract_factory.f90.html">xh5for_abstract_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_grid.f90.html">xh5for_ch_rectilinear_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_non_static_grid_series.f90.html">xh5for_ch_rectilinear_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_static_grid_series.f90.html">xh5for_ch_rectilinear_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_grid.f90.html">xh5for_ch_regular_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_non_static_grid_series.f90.html">xh5for_ch_regular_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_static_grid_series.f90.html">xh5for_ch_regular_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_hexahedron.f90.html">xh5for_ch_unstructured_hexahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_hexahedron_perf.f90.html">xh5for_ch_unstructured_hexahedron_perf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_mixedtopology.f90.html">xh5for_ch_unstructured_mixedtopology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_non_static_tetrahedron.f90.html">xh5for_ch_unstructured_non_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_quadilateral.f90.html">xh5for_ch_unstructured_quadilateral.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_static_mixed_series.f90.html">xh5for_ch_unstructured_static_mixed_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_static_tetrahedron.f90.html">xh5for_ch_unstructured_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_tetrahedron.f90.html">xh5for_ch_unstructured_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_triangles.f90.html">xh5for_ch_unstructured_triangles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_grid.f90.html">xh5for_dpp_rectilinear_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_non_static_grid_series.f90.html">xh5for_dpp_rectilinear_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_static_grid_series.f90.html">xh5for_dpp_rectilinear_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_grid.f90.html">xh5for_dpp_regular_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_non_static_grid_series.f90.html">xh5for_dpp_regular_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_static_grid_series.f90.html">xh5for_dpp_regular_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_hexahedron.f90.html">xh5for_dpp_unstructured_hexahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_mixedtopology.f90.html">xh5for_dpp_unstructured_mixedtopology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_non_static_tetrahedron.f90.html">xh5for_dpp_unstructured_non_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_quadilateral.f90.html">xh5for_dpp_unstructured_quadilateral.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_static_tetrahedron.f90.html">xh5for_dpp_unstructured_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_tetrahedron.f90.html">xh5for_dpp_unstructured_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_triangles.f90.html">xh5for_dpp_unstructured_triangles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_factory.f90.html">xh5for_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_handler.f90.html">xh5for_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_metadata.f90.html">xh5for_metadata.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_parameters.f90.html">xh5for_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_utils.f90.html">xh5for_utils.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    <div class="col-md-9" id='text'>
+    
+    
+    <h3>This File Depends On</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph Pages: 1 -->
+<svg id="sourcefiletest_xdmf_rectilinear_contiguous_hyperslabs_handlerf90EfferentGraph" width="641pt" height="312pt"
+ viewBox="0.00 0.00 641.00 312.16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph" class="graph" transform="scale(0.342415 0.342415) rotate(0) translate(4 907.638)">
+<title>sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-907.638 1868,-907.638 1868,4 -4,4"/>
+<!-- sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node1" class="node"><title>sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<polygon fill="none" stroke="black" points="1864,-329.638 1577,-329.638 1577,-305.638 1864,-305.638 1864,-329.638"/>
+<text text-anchor="middle" x="1720.5" y="-315.238" font-family="Helvetica,sans-Serif" font-size="10.50">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</text>
+</g>
+<!-- sourcefile~xh5for_parameters.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node2" class="node"><title>sourcefile~xh5for_parameters.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node2"><a xlink:href="../sourcefile/xh5for_parameters.f90.html" xlink:title="xh5for_parameters.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="272,-384.638 151,-384.638 151,-360.638 272,-360.638 272,-384.638"/>
+<text text-anchor="middle" x="211.5" y="-370.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xh5for_parameters.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge68" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M218.266,-360.463C235.62,-325.562 291.255,-225.74 373,-195.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M375,-195.638C423.996,-177.596 427.847,-155.822 476,-135.638 569.258,-96.5494 594.881,-77.7606 696,-77.6384"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-77.6384C752.199,-71.711 752.248,-31.4192 805,-17.6384 949.766,20.1803 993.875,-11.4053 1141,-38.6384"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1143,-38.6384C1264.81,-59.741 1295.27,-70.5908 1410,-116.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1412,-116.638C1529.54,-163.812 1649.75,-258.743 1697.77,-298.956"/>
+<polygon fill="#000000" stroke="#000000" points="1695.72,-301.809 1705.62,-305.586 1700.24,-296.46 1695.72,-301.809"/>
+</g>
+<!-- sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node3" class="node"><title>sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node3"><a xlink:href="../sourcefile/xdmf_structured_contiguous_hyperslab_handler.f90.html" xlink:title="xdmf_structured_contiguous_hyperslab_handler.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1541,-329.638 1281,-329.638 1281,-305.638 1541,-305.638 1541,-329.638"/>
+<text text-anchor="middle" x="1411" y="-315.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_structured_contiguous_hyperslab_handler.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge31" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-77.6384C943.894,-77.3415 1024.19,-52.4507 1245,-160.638 1311.5,-193.218 1369,-262.144 1395.08,-296.808"/>
+<polygon fill="#000000" stroke="#000000" points="1392.55,-299.268 1401.31,-305.23 1398.18,-295.107 1392.55,-299.268"/>
+</g>
+<!-- sourcefile~structured_uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node4" class="node"><title>sourcefile~structured_uniform_grid_descriptor.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node4"><a xlink:href="../sourcefile/structured_uniform_grid_descriptor.f90.html" xlink:title="structured_uniform_grid_descriptor.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1003,-50.6384 805,-50.6384 805,-26.6384 1003,-26.6384 1003,-50.6384"/>
+<text text-anchor="middle" x="904" y="-36.2384" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">structured_uniform_grid_descriptor.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~structured_uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge33" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~structured_uniform_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-77.6384C725.369,-77.6054 791.84,-64.0263 841.724,-52.9024"/>
+<polygon fill="#000000" stroke="#000000" points="842.79,-56.2503 851.78,-50.6435 841.256,-49.4205 842.79,-56.2503"/>
+</g>
+<!-- sourcefile~structured_spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node5" class="node"><title>sourcefile~structured_spatial_grid_descriptor.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node5"><a xlink:href="../sourcefile/structured_spatial_grid_descriptor.f90.html" xlink:title="structured_spatial_grid_descriptor.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1000.5,-441.638 807.5,-441.638 807.5,-417.638 1000.5,-417.638 1000.5,-441.638"/>
+<text text-anchor="middle" x="904" y="-427.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">structured_spatial_grid_descriptor.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge34" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M264.084,-384.672C326.868,-398.738 436.304,-421.394 531.5,-431.638"/>
+</g>
+<!-- sourcefile~steps_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node7" class="node"><title>sourcefile~steps_handler.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node7"><a xlink:href="../sourcefile/steps_handler.f90.html" xlink:title="steps_handler.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="746,-209.638 648,-209.638 648,-185.638 746,-185.638 746,-209.638"/>
+<text text-anchor="middle" x="697" y="-195.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">steps_handler.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~steps_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge40" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~steps_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.5,-195.638C567.974,-195.778 606.558,-196.24 637.476,-196.685"/>
+<polygon fill="#000000" stroke="#000000" points="637.6,-200.187 647.65,-196.835 637.703,-193.188 637.6,-200.187"/>
+</g>
+<!-- sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node9" class="node"><title>sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node9"><a xlink:href="../sourcefile/xdmf_contiguous_hyperslab_handler.f90.html" xlink:title="xdmf_contiguous_hyperslab_handler.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1245,-329.638 1039,-329.638 1039,-305.638 1245,-305.638 1245,-329.638"/>
+<text text-anchor="middle" x="1142" y="-315.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_contiguous_hyperslab_handler.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge11" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-77.6384C738.466,-77.5896 738.488,-108.058 769,-134.638 785.594,-149.094 785.671,-158.116 805,-168.638 844.385,-190.078 862.013,-174.446 903,-192.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M905,-192.638C981.753,-226.707 1068.03,-275.137 1111.94,-300.554"/>
+<polygon fill="#000000" stroke="#000000" points="1110.24,-303.616 1120.64,-305.615 1113.76,-297.564 1110.24,-303.616"/>
+</g>
+<!-- sourcefile~uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node10" class="node"><title>sourcefile~uniform_grid_descriptor.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node10"><a xlink:href="../sourcefile/uniform_grid_descriptor.f90.html" xlink:title="uniform_grid_descriptor.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="769,-167.638 625,-167.638 625,-143.638 769,-143.638 769,-167.638"/>
+<text text-anchor="middle" x="697" y="-153.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uniform_grid_descriptor.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge17" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M375,-195.638C440.271,-171.603 461.945,-195.357 531.5,-195.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.5,-195.638C544.484,-195.683 599.193,-181.718 642.137,-170.278"/>
+<polygon fill="#000000" stroke="#000000" points="643.176,-173.623 651.932,-167.659 641.367,-166.861 643.176,-173.623"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node11" class="node"><title>sourcefile~xh5for_utils.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node11"><a xlink:href="../sourcefile/xh5for_utils.f90.html" xlink:title="xh5for_utils.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="416.5,-384.638 331.5,-384.638 331.5,-360.638 416.5,-360.638 416.5,-384.638"/>
+<text text-anchor="middle" x="374" y="-370.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xh5for_utils.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xh5for_utils.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge20" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xh5for_utils.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M272.264,-372.638C288.196,-372.638 305.281,-372.638 320.773,-372.638"/>
+<polygon fill="#000000" stroke="#000000" points="321.21,-376.139 331.21,-372.638 321.21,-369.139 321.21,-376.139"/>
+</g>
+<!-- sourcefile~spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node12" class="node"><title>sourcefile~spatial_grid_descriptor.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node12"><a xlink:href="../sourcefile/spatial_grid_descriptor.f90.html" xlink:title="spatial_grid_descriptor.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="766.5,-289.638 627.5,-289.638 627.5,-265.638 766.5,-265.638 766.5,-289.638"/>
+<text text-anchor="middle" x="697" y="-275.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spatial_grid_descriptor.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge21" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M375,-195.638C433.985,-173.918 422.499,-261.644 476,-294.638 498.191,-308.324 505.493,-311.803 531.5,-313.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.5,-313.638C576.209,-316.652 623.917,-304.117 656.529,-293.023"/>
+<polygon fill="#000000" stroke="#000000" points="657.869,-296.262 666.143,-289.645 655.548,-289.658 657.869,-296.262"/>
+</g>
+<!-- sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node13" class="node"><title>sourcefile~xdmf_handler.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node13"><a xlink:href="../sourcefile/xdmf_handler.f90.html" xlink:title="xdmf_handler.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="952,-289.638 856,-289.638 856,-265.638 952,-265.638 952,-289.638"/>
+<text text-anchor="middle" x="904" y="-275.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_handler.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge7" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.5,-195.638C575.431,-195.808 584.151,-209.173 625,-218.638 701.018,-236.253 789.214,-254.622 845.527,-266.09"/>
+<polygon fill="#000000" stroke="#000000" points="845.164,-269.588 855.66,-268.149 846.558,-262.728 845.164,-269.588"/>
+</g>
+<!-- sourcefile~xh5for_metadata.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node14" class="node"><title>sourcefile~xh5for_metadata.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node14"><a xlink:href="../sourcefile/xh5for_metadata.f90.html" xlink:title="xh5for_metadata.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="588.5,-285.638 476.5,-285.638 476.5,-261.638 588.5,-261.638 588.5,-285.638"/>
+<text text-anchor="middle" x="532.5" y="-271.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xh5for_metadata.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xh5for_metadata.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge14" class="edge"><title>sourcefile~xh5for_parameters.f90&#45;&gt;sourcefile~xh5for_metadata.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M375,-195.638C427.339,-176.365 485.161,-224.931 513.637,-253.89"/>
+<polygon fill="#000000" stroke="#000000" points="511.427,-256.644 520.862,-261.465 516.493,-251.813 511.427,-256.644"/>
+</g>
+<!-- sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge69" class="edge"><title>sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1541.07,-317.638C1549.58,-317.638 1558.19,-317.638 1566.79,-317.638"/>
+<polygon fill="#000000" stroke="#000000" points="1566.88,-321.139 1576.88,-317.638 1566.88,-314.139 1566.88,-321.139"/>
+</g>
+<!-- sourcefile~structured_uniform_grid_descriptor.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge70" class="edge"><title>sourcefile~structured_uniform_grid_descriptor.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1003.04,-30.6812C1045.75,-29.2565 1096.18,-30.3421 1141,-38.6384"/>
+</g>
+<!-- sourcefile~structured_spatial_grid_descriptor.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge71" class="edge"><title>sourcefile~structured_spatial_grid_descriptor.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M931.527,-441.684C974.454,-460.418 1062.29,-495.632 1141,-507.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1143,-507.638C1202.25,-516.676 1352.44,-562.327 1410,-545.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1412,-545.638C1542.33,-507.85 1660.38,-385.294 1702.83,-337.233"/>
+<polygon fill="#000000" stroke="#000000" points="1705.49,-339.507 1709.42,-329.67 1700.21,-334.906 1705.49,-339.507"/>
+</g>
+<!-- sourcefile~mpi_environment.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node6" class="node"><title>sourcefile~mpi_environment.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node6"><a xlink:href="../sourcefile/mpi_environment.f90.html" xlink:title="mpi_environment.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="589,-403.638 476,-403.638 476,-379.638 589,-379.638 589,-403.638"/>
+<text text-anchor="middle" x="532.5" y="-389.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_environment.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge72" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M585.402,-403.66C639.936,-416.117 728.28,-435.803 805,-450.638 953.712,-479.395 991.265,-484.797 1141,-507.638"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge28" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M905,-389.638C1057.5,-376.688 1234.24,-348.411 1332.99,-331.402"/>
+<polygon fill="#000000" stroke="#000000" points="1333.63,-334.844 1342.89,-329.691 1332.44,-327.946 1333.63,-334.844"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge37" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-393.638C748.19,-395.881 804.332,-406.306 845.155,-415.365"/>
+<polygon fill="#000000" stroke="#000000" points="844.403,-418.783 854.929,-417.572 845.945,-411.955 844.403,-418.783"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~steps_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge39" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~steps_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M540.292,-379.263C554.236,-354.459 587.912,-297.539 625,-256.638 638.641,-241.596 656.171,-226.991 670.399,-216.075"/>
+<polygon fill="#000000" stroke="#000000" points="672.877,-218.591 678.767,-209.784 668.671,-212.995 672.877,-218.591"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge13" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M589.18,-391.434C620.566,-391.542 660.486,-392.052 696,-393.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-393.638C789.038,-397.706 812.198,-397.35 903,-389.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M905,-389.638C978.367,-383.408 1059.61,-353.085 1105.07,-333.831"/>
+<polygon fill="#000000" stroke="#000000" points="1106.68,-336.95 1114.48,-329.785 1103.91,-330.519 1106.68,-336.95"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge23" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M543.233,-379.466C558.736,-360.795 590.795,-325.01 625,-303.638 631.123,-299.813 637.892,-296.431 644.747,-293.479"/>
+<polygon fill="#000000" stroke="#000000" points="646.125,-296.697 654.096,-289.718 643.512,-290.203 646.125,-296.697"/>
+</g>
+<!-- sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge4" class="edge"><title>sourcefile~mpi_environment.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M589.293,-383.045C628.886,-376.247 678.059,-366.173 696,-355.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-355.638C726.723,-338.772 737.762,-343.202 769,-331.638 801.681,-319.541 838.358,-304.669 865.068,-293.598"/>
+<polygon fill="#000000" stroke="#000000" points="866.542,-296.775 874.431,-289.703 863.854,-290.312 866.542,-296.775"/>
+</g>
+<!-- sourcefile~steps_handler.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge73" class="edge"><title>sourcefile~steps_handler.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M746.348,-186.886C754.205,-184.151 762.04,-180.778 769,-176.638 788.448,-165.073 784.271,-149.71 805,-140.638 928.263,-86.6943 1284.07,-69.2426 1410,-116.638"/>
+</g>
+<!-- sourcefile~steps_handler.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge2" class="edge"><title>sourcefile~steps_handler.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M731.671,-209.719C743.504,-214.03 756.87,-218.975 769,-223.638 801.318,-236.064 837.747,-250.791 864.455,-261.725"/>
+<polygon fill="#000000" stroke="#000000" points="863.249,-265.013 873.83,-265.57 865.906,-258.536 863.249,-265.013"/>
+</g>
+<!-- sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node8" class="node"><title>sourcefile~fox_xdmf.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node8"><a xlink:href="../sourcefile/fox_xdmf.f90.html" xlink:title="fox_xdmf.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="569.5,-609.638 495.5,-609.638 495.5,-585.638 569.5,-585.638 569.5,-609.638"/>
+<text text-anchor="middle" x="532.5" y="-595.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fox_xdmf.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge74" class="edge"><title>sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1143,-545.638C1257.45,-514.301 1296.03,-578.684 1410,-545.638"/>
+</g>
+<!-- sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge26" class="edge"><title>sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M569.515,-597.431C664.156,-596.268 927.305,-589.051 1141,-545.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1143,-545.638C1262.83,-512.83 1361.09,-387.744 1396.18,-338.109"/>
+<polygon fill="#000000" stroke="#000000" points="1399.15,-339.967 1401.98,-329.759 1393.4,-335.971 1399.15,-339.967"/>
+</g>
+<!-- sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge8" class="edge"><title>sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M546.645,-585.401C563.49,-570.406 594.211,-545.314 625,-531.638 782.022,-461.895 851.324,-531.35 1003,-450.638 1056.2,-422.328 1103.2,-367.502 1126.14,-337.852"/>
+<polygon fill="#000000" stroke="#000000" points="1128.95,-339.937 1132.22,-329.857 1123.38,-335.702 1128.95,-339.937"/>
+</g>
+<!-- sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge1" class="edge"><title>sourcefile~fox_xdmf.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M535.074,-585.529C540.456,-549.002 561.462,-438.793 625,-379.638 649.379,-356.941 667.277,-372.505 696,-355.638"/>
+</g>
+<!-- sourcefile~xdmf_contiguous_hyperslab_handler.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge25" class="edge"><title>sourcefile~xdmf_contiguous_hyperslab_handler.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M1245.08,-317.638C1253.44,-317.638 1261.98,-317.638 1270.54,-317.638"/>
+<polygon fill="#000000" stroke="#000000" points="1270.61,-321.139 1280.61,-317.638 1270.61,-314.139 1270.61,-321.139"/>
+</g>
+<!-- sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge27" class="edge"><title>sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M769.235,-157.496C808.698,-157.971 858.614,-157.662 903,-154.638"/>
+</g>
+<!-- sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~structured_uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge32" class="edge"><title>sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~structured_uniform_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M719.166,-143.558C755.782,-122.66 831.045,-79.7052 873.026,-55.7456"/>
+<polygon fill="#000000" stroke="#000000" points="874.999,-58.6497 881.949,-50.6531 871.529,-52.5702 874.999,-58.6497"/>
+</g>
+<!-- sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge10" class="edge"><title>sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M769.009,-164.806C818.383,-171.868 879.407,-182.166 903,-192.638"/>
+</g>
+<!-- sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge3" class="edge"><title>sourcefile~uniform_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M748.296,-167.714C755.436,-170.225 762.539,-173.183 769,-176.638 787.365,-186.462 788.558,-193.855 805,-206.638 828.984,-225.286 857.141,-245.52 877.104,-259.599"/>
+<polygon fill="#000000" stroke="#000000" points="875.194,-262.535 885.388,-265.42 879.218,-256.807 875.194,-262.535"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge29" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M378,-360.281C386.852,-326.464 416.074,-231.6 476,-181.638 529.334,-137.173 556.37,-145.206 625,-134.638 688.255,-124.899 705.176,-129.902 769,-134.638 829.05,-139.095 842.924,-158.731 903,-154.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M905,-154.638C1094.76,-139.158 1307.25,-254.896 1382.1,-300.083"/>
+<polygon fill="#000000" stroke="#000000" points="1380.58,-303.255 1390.94,-305.478 1384.23,-297.28 1380.58,-303.255"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge35" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M395.891,-384.677C425.1,-400.52 480.322,-426.916 531.5,-431.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.5,-431.638C622.116,-439.815 723.195,-438.542 797.207,-435.661"/>
+<polygon fill="#000000" stroke="#000000" points="797.617,-439.147 807.467,-435.244 797.333,-432.153 797.617,-439.147"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~mpi_environment.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge38" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~mpi_environment.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M416.528,-377.68C431.601,-379.51 449.025,-381.626 465.679,-383.647"/>
+<polygon fill="#000000" stroke="#000000" points="465.571,-387.16 475.92,-384.891 466.415,-380.211 465.571,-387.16"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge12" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-317.638C809.762,-302.747 938.797,-304.911 1028.67,-309.48"/>
+<polygon fill="#000000" stroke="#000000" points="1028.71,-312.987 1038.88,-310.018 1029.08,-305.997 1028.71,-312.987"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge15" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M382.323,-360.313C397.133,-336.365 432.925,-283.22 476,-252.638 519.816,-221.531 543.267,-237.853 589,-209.638 607.473,-198.242 606.108,-187.324 625,-176.638 628.269,-174.789 631.717,-173.089 635.26,-171.527"/>
+<polygon fill="#000000" stroke="#000000" points="636.819,-174.673 644.804,-167.71 634.219,-168.174 636.819,-174.673"/>
+</g>
+<!-- sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge5" class="edge"><title>sourcefile~xh5for_utils.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M416.724,-364.951C477.88,-353.806 595.509,-332.833 696,-317.638"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M698,-317.638C748.307,-310.936 804.881,-299.606 845.833,-290.712"/>
+<polygon fill="#000000" stroke="#000000" points="846.612,-294.124 855.632,-288.566 845.114,-287.286 846.612,-294.124"/>
+</g>
+<!-- sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge30" class="edge"><title>sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_structured_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M713.786,-265.595C728.553,-254.084 750.976,-235.965 769,-218.638 786.243,-202.063 784.474,-190.916 805,-178.638 843.483,-155.619 858.261,-157.686 903,-154.638"/>
+</g>
+<!-- sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge36" class="edge"><title>sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~structured_spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M748.273,-289.691C755.907,-293.222 763.168,-297.775 769,-303.638 802.31,-337.131 770.19,-371.708 805,-403.638 808.873,-407.191 813.176,-410.269 817.756,-412.934"/>
+<polygon fill="#000000" stroke="#000000" points="816.364,-416.153 826.864,-417.568 819.538,-409.914 816.364,-416.153"/>
+</g>
+<!-- sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge6" class="edge"><title>sourcefile~spatial_grid_descriptor.f90&#45;&gt;sourcefile~xdmf_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M766.547,-277.638C792.212,-277.638 821.08,-277.638 845.631,-277.638"/>
+<polygon fill="#000000" stroke="#000000" points="845.866,-281.139 855.866,-277.638 845.866,-274.139 845.866,-281.139"/>
+</g>
+<!-- sourcefile~xdmf_handler.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge9" class="edge"><title>sourcefile~xdmf_handler.f90&#45;&gt;sourcefile~xdmf_contiguous_hyperslab_handler.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M952.191,-285.637C983.052,-290.868 1024.17,-297.836 1060.15,-303.935"/>
+<polygon fill="#000000" stroke="#000000" points="1059.71,-307.41 1070.15,-305.63 1060.88,-300.508 1059.71,-307.41"/>
+</g>
+<!-- sourcefile~xh5for_metadata.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge16" class="edge"><title>sourcefile~xh5for_metadata.f90&#45;&gt;sourcefile~uniform_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M568.618,-261.5C575.943,-257.845 583.193,-253.267 589,-247.638 614.404,-223.014 597.816,-199.283 625,-176.638 626.725,-175.201 628.546,-173.862 630.44,-172.615"/>
+<polygon fill="#000000" stroke="#000000" points="632.156,-175.666 639.157,-167.713 628.725,-169.564 632.156,-175.666"/>
+</g>
+<!-- sourcefile~xh5for_metadata.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge24" class="edge"><title>sourcefile~xh5for_metadata.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M588.515,-274.993C597.809,-275.221 607.616,-275.463 617.372,-275.703"/>
+<polygon fill="#000000" stroke="#000000" points="617.414,-279.205 627.497,-275.952 617.587,-272.207 617.414,-279.205"/>
+</g>
+<!-- sourcefile~xdmf_utils.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node15" class="node"><title>sourcefile~xdmf_utils.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node15"><a xlink:href="../sourcefile/xdmf_utils.f90.html" xlink:title="xdmf_utils.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="251,-651.638 172,-651.638 172,-627.638 251,-627.638 251,-651.638"/>
+<text text-anchor="middle" x="211.5" y="-637.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_utils.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xh5for_utils.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge19" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xh5for_utils.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M217.433,-627.623C230.272,-596.931 266.616,-513.625 308,-450.638 321.884,-429.507 340.615,-407.569 354.404,-392.361"/>
+<polygon fill="#000000" stroke="#000000" points="357.3,-394.383 361.493,-384.653 352.147,-389.644 357.3,-394.383"/>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge22" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~spatial_grid_descriptor.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M214.824,-627.427C224.576,-577.488 263.739,-389.645 308,-351.638 384.444,-285.998 430.991,-306.546 531.5,-313.638"/>
+</g>
+<!-- sourcefile~xdmf_xinclude.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node21" class="node"><title>sourcefile~xdmf_xinclude.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node21"><a xlink:href="../sourcefile/xdmf_xinclude.f90.html" xlink:title="xdmf_xinclude.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="423.5,-777.638 324.5,-777.638 324.5,-753.638 423.5,-753.638 423.5,-777.638"/>
+<text text-anchor="middle" x="374" y="-763.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_xinclude.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_xinclude.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge44" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_xinclude.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M224.533,-652.023C236.682,-664.609 255.899,-684.745 272,-702.638 288.445,-720.914 287.535,-731.015 308,-744.638 310.534,-746.325 313.214,-747.885 315.984,-749.327"/>
+<polygon fill="#000000" stroke="#000000" points="314.529,-752.51 325.074,-753.536 317.471,-746.158 314.529,-752.51"/>
+</g>
+<!-- sourcefile~xdmf_attribute.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node22" class="node"><title>sourcefile~xdmf_attribute.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node22"><a xlink:href="../sourcefile/xdmf_attribute.f90.html" xlink:title="xdmf_attribute.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="423.5,-735.638 324.5,-735.638 324.5,-711.638 423.5,-711.638 423.5,-735.638"/>
+<text text-anchor="middle" x="374" y="-721.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_attribute.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_attribute.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge46" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_attribute.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M227.933,-651.731C246.193,-665.573 277.921,-688.189 308,-702.638 312.017,-704.568 316.255,-706.384 320.563,-708.077"/>
+<polygon fill="#000000" stroke="#000000" points="319.454,-711.399 330.047,-711.586 321.883,-704.834 319.454,-711.399"/>
+</g>
+<!-- sourcefile~xdmf_dataitem.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node23" class="node"><title>sourcefile~xdmf_dataitem.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node23"><a xlink:href="../sourcefile/xdmf_dataitem.f90.html" xlink:title="xdmf_dataitem.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="424.5,-693.638 323.5,-693.638 323.5,-669.638 424.5,-669.638 424.5,-693.638"/>
+<text text-anchor="middle" x="374" y="-679.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_dataitem.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_dataitem.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge48" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_dataitem.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M251.353,-649.805C271.144,-654.985 295.561,-661.374 317.314,-667.066"/>
+<polygon fill="#000000" stroke="#000000" points="316.534,-670.48 327.094,-669.626 318.306,-663.708 316.534,-670.48"/>
+</g>
+<!-- sourcefile~xdmf_time.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node24" class="node"><title>sourcefile~xdmf_time.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node24"><a xlink:href="../sourcefile/xdmf_time.f90.html" xlink:title="xdmf_time.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="414,-651.638 334,-651.638 334,-627.638 414,-627.638 414,-651.638"/>
+<text text-anchor="middle" x="374" y="-637.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_time.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_time.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge50" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_time.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M251.353,-639.638C273.173,-639.638 300.616,-639.638 323.911,-639.638"/>
+<polygon fill="#000000" stroke="#000000" points="323.949,-643.139 333.949,-639.638 323.949,-636.139 323.949,-643.139"/>
+</g>
+<!-- sourcefile~xdmf_geometry.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node25" class="node"><title>sourcefile~xdmf_geometry.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node25"><a xlink:href="../sourcefile/xdmf_geometry.f90.html" xlink:title="xdmf_geometry.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="426.5,-609.638 321.5,-609.638 321.5,-585.638 426.5,-585.638 426.5,-609.638"/>
+<text text-anchor="middle" x="374" y="-595.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_geometry.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_geometry.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge51" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_geometry.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M251.353,-629.471C271.144,-624.292 295.561,-617.903 317.314,-612.211"/>
+<polygon fill="#000000" stroke="#000000" points="318.306,-615.569 327.094,-609.651 316.534,-608.797 318.306,-615.569"/>
+</g>
+<!-- sourcefile~xdmf_topology.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node26" class="node"><title>sourcefile~xdmf_topology.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node26"><a xlink:href="../sourcefile/xdmf_topology.f90.html" xlink:title="xdmf_topology.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="424,-567.638 324,-567.638 324,-543.638 424,-543.638 424,-567.638"/>
+<text text-anchor="middle" x="374" y="-553.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_topology.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_topology.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge54" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_topology.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M227.933,-627.545C246.193,-613.704 277.921,-591.087 308,-576.638 312.017,-574.709 316.255,-572.893 320.563,-571.2"/>
+<polygon fill="#000000" stroke="#000000" points="321.883,-574.443 330.047,-567.69 319.454,-567.878 321.883,-574.443"/>
+</g>
+<!-- sourcefile~xdmf_grid.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node27" class="node"><title>sourcefile~xdmf_grid.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node27"><a xlink:href="../sourcefile/xdmf_grid.f90.html" xlink:title="xdmf_grid.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="413,-819.638 335,-819.638 335,-795.638 413,-795.638 413,-819.638"/>
+<text text-anchor="middle" x="374" y="-805.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_grid.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_grid.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge56" class="edge"><title>sourcefile~xdmf_utils.f90&#45;&gt;sourcefile~xdmf_grid.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M226.498,-651.757C239.597,-663.671 259.039,-682.893 272,-702.638 294.289,-736.594 277.983,-759.275 308,-786.638 313.005,-791.201 319.012,-794.773 325.324,-797.57"/>
+<polygon fill="#000000" stroke="#000000" points="324.119,-800.856 334.71,-801.136 326.606,-794.312 324.119,-800.856"/>
+</g>
+<!-- sourcefile~xdmf_parameters.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node16" class="node"><title>sourcefile~xdmf_parameters.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node16"><a xlink:href="../sourcefile/xdmf_parameters.f90.html" xlink:title="xdmf_parameters.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="115,-651.638 7.10543e-15,-651.638 7.10543e-15,-627.638 115,-627.638 115,-651.638"/>
+<text text-anchor="middle" x="57.5" y="-637.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_parameters.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_parameters.f90&#45;&gt;sourcefile~xdmf_utils.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge18" class="edge"><title>sourcefile~xdmf_parameters.f90&#45;&gt;sourcefile~xdmf_utils.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M115.099,-639.638C130.461,-639.638 146.956,-639.638 161.838,-639.638"/>
+<polygon fill="#000000" stroke="#000000" points="161.849,-643.139 171.849,-639.638 161.849,-636.139 161.849,-643.139"/>
+</g>
+<!-- sourcefile~xdmf_information.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node17" class="node"><title>sourcefile~xdmf_information.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node17"><a xlink:href="../sourcefile/xdmf_information.f90.html" xlink:title="xdmf_information.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="430.5,-861.638 317.5,-861.638 317.5,-837.638 430.5,-837.638 430.5,-861.638"/>
+<text text-anchor="middle" x="374" y="-847.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_information.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_information.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge57" class="edge"><title>sourcefile~xdmf_information.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M427.067,-837.628C431.775,-835.169 436.193,-832.207 440,-828.638 501.928,-770.59 522.714,-665.298 529.018,-619.688"/>
+<polygon fill="#000000" stroke="#000000" points="532.5,-620.046 530.296,-609.683 525.557,-619.158 532.5,-620.046"/>
+</g>
+<!-- sourcefile~xdmf_character_data.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node18" class="node"><title>sourcefile~xdmf_character_data.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node18"><a xlink:href="../sourcefile/xdmf_character_data.f90.html" xlink:title="xdmf_character_data.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="440,-525.638 308,-525.638 308,-501.638 440,-501.638 440,-525.638"/>
+<text text-anchor="middle" x="374" y="-511.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_character_data.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_character_data.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge58" class="edge"><title>sourcefile~xdmf_character_data.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M418.354,-525.697C425.725,-528.295 433.192,-531.284 440,-534.638 464.979,-546.944 490.885,-565.407 508.729,-579.169"/>
+<polygon fill="#000000" stroke="#000000" points="506.772,-582.082 516.801,-585.499 511.092,-576.574 506.772,-582.082"/>
+</g>
+<!-- sourcefile~xdmf_file.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node19" class="node"><title>sourcefile~xdmf_file.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node19"><a xlink:href="../sourcefile/xdmf_file.f90.html" xlink:title="xdmf_file.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="410.5,-483.638 337.5,-483.638 337.5,-459.638 410.5,-459.638 410.5,-483.638"/>
+<text text-anchor="middle" x="374" y="-469.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_file.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_file.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge59" class="edge"><title>sourcefile~xdmf_file.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M410.647,-479.368C420.65,-482.516 431.19,-486.826 440,-492.638 473.852,-514.975 502.625,-553.118 518.442,-576.765"/>
+<polygon fill="#000000" stroke="#000000" points="515.643,-578.881 524.037,-585.345 521.506,-575.057 515.643,-578.881"/>
+</g>
+<!-- sourcefile~xdmf_domain.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node20" class="node"><title>sourcefile~xdmf_domain.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node20"><a xlink:href="../sourcefile/xdmf_domain.f90.html" xlink:title="xdmf_domain.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="421.5,-903.638 326.5,-903.638 326.5,-879.638 421.5,-879.638 421.5,-903.638"/>
+<text text-anchor="middle" x="374" y="-889.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_domain.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_domain.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge60" class="edge"><title>sourcefile~xdmf_domain.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M421.735,-882.502C428.474,-879.581 434.857,-875.726 440,-870.638 511.681,-799.735 527.209,-671.089 530.571,-619.705"/>
+<polygon fill="#000000" stroke="#000000" points="534.067,-619.876 531.132,-609.695 527.078,-619.484 534.067,-619.876"/>
+</g>
+<!-- sourcefile~xdmf_xinclude.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge61" class="edge"><title>sourcefile~xdmf_xinclude.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M423.787,-754.119C429.574,-751.556 435.141,-748.435 440,-744.638 482.963,-711.07 510.977,-651.281 523.659,-619.274"/>
+<polygon fill="#000000" stroke="#000000" points="526.931,-620.517 527.237,-609.927 520.393,-618.015 526.931,-620.517"/>
+</g>
+<!-- sourcefile~xdmf_attribute.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge62" class="edge"><title>sourcefile~xdmf_attribute.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M422.56,-711.635C428.672,-709.139 434.655,-706.165 440,-702.638 473.852,-680.302 502.625,-642.159 518.442,-618.512"/>
+<polygon fill="#000000" stroke="#000000" points="521.506,-620.22 524.037,-609.932 515.643,-616.396 521.506,-620.22"/>
+</g>
+<!-- sourcefile~xdmf_dataitem.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge63" class="edge"><title>sourcefile~xdmf_dataitem.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M418.354,-669.58C425.725,-666.982 433.192,-663.993 440,-660.638 464.979,-648.333 490.885,-629.87 508.729,-616.108"/>
+<polygon fill="#000000" stroke="#000000" points="511.092,-618.703 516.801,-609.778 506.772,-613.194 511.092,-618.703"/>
+</g>
+<!-- sourcefile~xdmf_time.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge64" class="edge"><title>sourcefile~xdmf_time.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M414.088,-629.148C435.776,-623.328 462.871,-616.056 485.567,-609.966"/>
+<polygon fill="#000000" stroke="#000000" points="486.571,-613.32 495.322,-607.348 484.756,-606.559 486.571,-613.32"/>
+</g>
+<!-- sourcefile~xdmf_geometry.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge65" class="edge"><title>sourcefile~xdmf_geometry.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M426.678,-597.638C445.521,-597.638 466.696,-597.638 485.057,-597.638"/>
+<polygon fill="#000000" stroke="#000000" points="485.218,-601.139 495.218,-597.638 485.218,-594.139 485.218,-601.139"/>
+</g>
+<!-- sourcefile~xdmf_topology.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge66" class="edge"><title>sourcefile~xdmf_topology.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M419.847,-567.674C440.416,-573.194 464.777,-579.732 485.487,-585.29"/>
+<polygon fill="#000000" stroke="#000000" points="484.762,-588.719 495.328,-587.931 486.577,-581.958 484.762,-588.719"/>
+</g>
+<!-- sourcefile~xdmf_grid.f90&#45;&gt;sourcefile~fox_xdmf.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge67" class="edge"><title>sourcefile~xdmf_grid.f90&#45;&gt;sourcefile~fox_xdmf.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M413.083,-800.905C422.676,-797.795 432.397,-793.256 440,-786.638 492.281,-741.134 517.375,-658.973 526.827,-619.703"/>
+<polygon fill="#000000" stroke="#000000" points="530.268,-620.359 529.088,-609.83 523.444,-618.796 530.268,-620.359"/>
+</g>
+<!-- sourcefile~xdmf_element.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node28" class="node"><title>sourcefile~xdmf_element.f90</title>
+<g id="a_sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_node28"><a xlink:href="../sourcefile/xdmf_element.f90.html" xlink:title="xdmf_element.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="260.5,-735.638 162.5,-735.638 162.5,-711.638 260.5,-711.638 260.5,-735.638"/>
+<text text-anchor="middle" x="211.5" y="-721.238" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_element.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_information.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge41" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_information.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M220.423,-735.919C235.105,-757.72 268.65,-803.271 308,-828.638 310.607,-830.319 313.36,-831.876 316.202,-833.316"/>
+<polygon fill="#000000" stroke="#000000" points="314.956,-836.594 325.51,-837.529 317.843,-830.217 314.956,-836.594"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_domain.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge42" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_domain.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M217.105,-735.928C228.259,-764.035 259.435,-833.444 308,-870.638 310.816,-872.795 313.861,-874.734 317.043,-876.477"/>
+<polygon fill="#000000" stroke="#000000" points="315.765,-879.745 326.298,-880.889 318.777,-873.427 315.765,-879.745"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_xinclude.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge43" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_xinclude.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M258.493,-735.674C276.793,-740.463 298.02,-746.017 317.19,-751.034"/>
+<polygon fill="#000000" stroke="#000000" points="316.44,-754.455 327,-753.601 318.212,-747.684 316.44,-754.455"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_attribute.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge45" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_attribute.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M260.655,-723.638C277.482,-723.638 296.563,-723.638 314.162,-723.638"/>
+<polygon fill="#000000" stroke="#000000" points="314.324,-727.139 324.324,-723.638 314.324,-720.139 314.324,-727.139"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_dataitem.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge47" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_dataitem.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M258.493,-711.603C276.793,-706.814 298.02,-701.259 317.19,-696.243"/>
+<polygon fill="#000000" stroke="#000000" points="318.212,-699.593 327,-693.676 316.44,-692.821 318.212,-699.593"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_time.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge49" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_time.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M227.933,-711.545C246.193,-697.704 277.921,-675.087 308,-660.638 313.205,-658.138 318.78,-655.83 324.398,-653.73"/>
+<polygon fill="#000000" stroke="#000000" points="325.571,-657.028 333.834,-650.397 323.239,-650.427 325.571,-657.028"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_geometry.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge52" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_geometry.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M224.533,-711.254C236.682,-698.668 255.899,-678.532 272,-660.638 288.445,-642.363 287.535,-632.262 308,-618.638 310.534,-616.951 313.214,-615.392 315.984,-613.95"/>
+<polygon fill="#000000" stroke="#000000" points="317.471,-617.119 325.074,-609.741 314.529,-610.767 317.471,-617.119"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_topology.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge53" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_topology.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M226.498,-711.519C239.597,-699.606 259.039,-680.384 272,-660.638 294.289,-626.683 277.983,-604.002 308,-576.638 310.177,-574.654 312.544,-572.856 315.043,-571.229"/>
+<polygon fill="#000000" stroke="#000000" points="316.89,-574.208 323.967,-566.323 313.517,-568.073 316.89,-574.208"/>
+</g>
+<!-- sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_grid.f90 -->
+<g id="sourcefile~~test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90~~EfferentGraph_edge55" class="edge"><title>sourcefile~xdmf_element.f90&#45;&gt;sourcefile~xdmf_grid.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M227.933,-735.731C246.193,-749.573 277.921,-772.189 308,-786.638 313.41,-789.237 319.221,-791.629 325.064,-793.795"/>
+<polygon fill="#000000" stroke="#000000" points="324.266,-797.223 334.86,-797.221 326.577,-790.616 324.266,-797.223"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var pansourcefiletest_xdmf_rectilinear_contiguous_hyperslabs_handlerf90EfferentGraph = svgPanZoom('#sourcefiletest_xdmf_rectilinear_contiguous_hyperslabs_handlerf90EfferentGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="190pt" height="32pt"
+ viewBox="0.00 0.00 190.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 186,-28 186,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node"><title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="67,-24 0,-24 0,-0 67,-0 67,-24"/>
+<text text-anchor="middle" x="33.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="182,-24 85,-24 85,-0 182,-0 182,-24"/>
+<text text-anchor="middle" x="133.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a file to a file which depends upon it. A file 
+    is dependent upon another if the latter must be compiled before the former
+    can be.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#progs-1">Programs</a></h3></div>
+  <div id="progs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_hyperslabs_handler.html">test_xdmf_rect_hyperslabs_handler</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90.html#src">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><a name="ln-1"></a><span class="k">program </span><span class="n">test_xdmf_rect_hyperslabs_handler</span>
+<a name="ln-2"></a>
+<a name="ln-3"></a><span class="k">use </span><span class="n">PENF</span><span class="p">,</span> <span class="n">only</span> <span class="p">:</span> <span class="n">I4P</span><span class="p">,</span> <span class="n">I8P</span><span class="p">,</span> <span class="n">R4P</span><span class="p">,</span> <span class="n">R8P</span><span class="p">,</span> <span class="n">str</span>
+<a name="ln-4"></a><span class="k">use </span><span class="n">xh5for_parameters</span>
+<a name="ln-5"></a><span class="k">use </span><span class="n">Fox_xdmf</span>
+<a name="ln-6"></a><span class="k">use </span><span class="n">xdmf_structured_contiguous_hyperslab_handler</span>
+<a name="ln-7"></a><span class="k">use </span><span class="n">mpi_environment</span>
+<a name="ln-8"></a><span class="k">use </span><span class="n">steps_handler</span>
+<a name="ln-9"></a><span class="k">use </span><span class="n">structured_spatial_grid_descriptor</span>
+<a name="ln-10"></a><span class="k">use </span><span class="n">structured_uniform_grid_descriptor</span>
+<a name="ln-11"></a>
+<a name="ln-12"></a><span class="cp">#if defined(ENABLE_MPI) &amp;&amp; defined(MPI_MOD)</span>
+<a name="ln-13"></a>  <span class="k">use </span><span class="n">mpi</span>
+<a name="ln-14"></a><span class="cp">#endif</span>
+<a name="ln-15"></a>  <span class="k">implicit none</span>
+<a name="ln-16"></a><span class="cp">#if defined(ENABLE_MPI) &amp;&amp; defined(MPI_H)</span>
+<a name="ln-17"></a>  <span class="k">include</span> <span class="s1">&#39;mpif.h&#39;</span>
+<a name="ln-18"></a><span class="cp">#endif</span>
+<a name="ln-19"></a>
+<a name="ln-20"></a>    <span class="k">type</span><span class="p">(</span><span class="n">mpi_env_t</span><span class="p">)</span>                                                   <span class="kd">::</span> <span class="n">mpienv</span>
+<a name="ln-21"></a>    <span class="k">type</span><span class="p">(</span><span class="n">steps_handler_t</span><span class="p">)</span>                                             <span class="kd">::</span> <span class="n">stepshandler</span>
+<a name="ln-22"></a>    <span class="k">type</span><span class="p">(</span><span class="n">structured_spatial_grid_descriptor_t</span><span class="p">)</span>                        <span class="kd">::</span> <span class="n">spatialgrid</span>
+<a name="ln-23"></a>    <span class="k">type</span><span class="p">(</span><span class="n">structured_uniform_grid_descriptor_t</span><span class="p">)</span>                        <span class="kd">::</span> <span class="n">uniformgrid</span>
+<a name="ln-24"></a>    <span class="k">type</span><span class="p">(</span><span class="n">xdmf_structured_contiguous_hyperslab_handler_t</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">lightdata</span>
+<a name="ln-25"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">R4P</span><span class="p">),</span>    <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">Xpoints</span>  <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">/</span><span class="p">)</span>
+<a name="ln-26"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">R4P</span><span class="p">),</span>    <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">Ypoints</span>  <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="o">/</span><span class="p">)</span>
+<a name="ln-27"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">R4P</span><span class="p">),</span>    <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">Zpoints</span>  <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="o">/</span><span class="p">)</span>
+<a name="ln-28"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">R4P</span><span class="p">),</span>    <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>                           <span class="kd">::</span> <span class="n">values</span>  
+<a name="ln-29"></a>    <span class="kt">integer</span>                                                           <span class="kd">::</span> <span class="n">mpierr</span>
+<a name="ln-30"></a>    <span class="kt">integer</span>                                                           <span class="kd">::</span> <span class="n">i</span>
+<a name="ln-31"></a>
+<a name="ln-32"></a>
+<a name="ln-33"></a><span class="cp">#if defined(ENABLE_MPI) &amp;&amp; (defined(MPI_MOD) || defined(MPI_H))</span>
+<a name="ln-34"></a>    <span class="k">call </span><span class="n">MPI_INIT</span><span class="p">(</span><span class="n">mpierr</span><span class="p">)</span>
+<a name="ln-35"></a><span class="cp">#endif</span>
+<a name="ln-36"></a>
+<a name="ln-37"></a>    <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">Xpoints</span><span class="p">)</span><span class="o">*</span><span class="n">size</span><span class="p">(</span><span class="n">Ypoints</span><span class="p">)</span><span class="o">*</span><span class="n">size</span><span class="p">(</span><span class="n">Zpoints</span><span class="p">))</span><span class="o">/</span><span class="p">)</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a>    <span class="k">call </span><span class="n">mpienv</span><span class="p">%</span><span class="n">initialize</span><span class="p">()</span>
+<a name="ln-40"></a>    <span class="k">call </span><span class="n">stepshandler</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">mpienv</span><span class="p">)</span>
+<a name="ln-41"></a>    <span class="k">call </span><span class="n">spatialgrid</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">MPIEnvironment</span><span class="o">=</span><span class="n">mpienv</span><span class="p">,</span> <span class="n">XDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Xpoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">YDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Ypoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">ZDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Zpoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">GridType</span><span class="o">=</span><span class="n">XDMF_GRID_TYPE_RECTILINEAR</span><span class="p">)</span>
+<a name="ln-42"></a>    <span class="k">call </span><span class="n">uniformgrid</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">XDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Xpoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">YDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Ypoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">ZDim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">Zpoints</span><span class="p">),</span><span class="n">I8P</span><span class="p">),</span> <span class="n">GridType</span><span class="o">=</span><span class="n">XDMF_GRID_TYPE_RECTILINEAR</span><span class="p">)</span>
+<a name="ln-43"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">MPIEnvironment</span><span class="o">=</span><span class="n">mpienv</span><span class="p">,</span> <span class="n">StepsHandler</span><span class="o">=</span><span class="n">stepshandler</span><span class="p">,</span> <span class="n">SpatialGridDescriptor</span><span class="o">=</span><span class="n">spatialgrid</span><span class="p">,</span> <span class="n">UniformGridDescriptor</span><span class="o">=</span><span class="n">uniformgrid</span><span class="p">)</span>
+<a name="ln-44"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="k">Open</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">XDMF_ACTION_WRITE</span><span class="p">,</span> <span class="n">fileprefix</span><span class="o">=</span><span class="s1">&#39;xdmf_rectilinear_hyperslab&#39;</span><span class="p">)</span>
+<a name="ln-45"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="n">SetGeometry</span><span class="p">(</span><span class="n">XYZ</span><span class="o">=</span><span class="n">Xpoints</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;Coordinates&#39;</span><span class="p">)</span>
+<a name="ln-46"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="n">AppendAttribute</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s1">&#39;solution&#39;</span><span class="p">,</span> <span class="n">Center</span><span class="o">=</span><span class="n">XDMF_ATTRIBUTE_CENTER_NODE</span><span class="p">,</span> <span class="k">Type</span><span class="o">=</span><span class="n">XDMF_ATTRIBUTE_TYPE_SCALAR</span><span class="p">,</span> <span class="n">Attribute</span><span class="o">=</span><span class="n">values</span><span class="p">)</span>
+<a name="ln-47"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="n">SerializeSpatialFile</span><span class="p">()</span>
+<a name="ln-48"></a>    <span class="k">call </span><span class="n">lightdata</span><span class="p">%</span><span class="n">SerializeTemporalFile</span><span class="p">()</span>
+<a name="ln-49"></a>
+<a name="ln-50"></a><span class="cp">#if defined(ENABLE_MPI) &amp;&amp; (defined(MPI_MOD) || defined(MPI_H))</span>
+<a name="ln-51"></a>    <span class="k">call </span><span class="n">MPI_FINALIZE</span><span class="p">(</span><span class="n">mpierr</span><span class="p">)</span>
+<a name="ln-52"></a><span class="cp">#endif</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>
+<a name="ln-55"></a><span class="k">end program </span><span class="n">test_xdmf_rect_hyperslabs_handler</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-1">All Source Files</a></h3></div>
+  <div id="allfiles-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/ch_unstructured_hexahedron_perf.f90.html">ch_unstructured_hexahedron_perf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/fox_xdmf.f90.html">fox_xdmf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_contiguous_hyperslab_handler.f90.html">hdf5_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_dataset_per_process_handler.f90.html">hdf5_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_handler.f90.html">hdf5_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_structured_contiguous_hyperslab_handler.f90.html">hdf5_structured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_structured_dataset_per_process_handler.f90.html">hdf5_structured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_unstructured_contiguous_hyperslab_handler.f90.html">hdf5_unstructured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/hdf5_unstructured_dataset_per_process_handler.f90.html">hdf5_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/mpi_environment.f90.html">mpi_environment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/spatial_grid_descriptor.f90.html">spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/steps_handler.f90.html">steps_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/steps_handler_test.f90.html">steps_handler_test.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_contiguous_hyperslab_factory.f90.html">structured_contiguous_hyperslab_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_dataset_per_process_factory.f90.html">structured_dataset_per_process_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_spatial_grid_descriptor.f90.html">structured_spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/structured_uniform_grid_descriptor.f90.html">structured_uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_fox_wxml.f90.html">test_FoX_wxml.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_rectilinear_contiguous_hyperslabs_handler.f90.html">test_hdf5_rectilinear_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_rectilinear_dataset_per_process_handler.f90.html">test_hdf5_rectilinear_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_regular_contiguous_hyperslabs_handler.f90.html">test_hdf5_regular_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_regular_dataset_per_process_handler.f90.html">test_hdf5_regular_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_unstructured_contiguous_hyperslabs_handler.f90.html">test_hdf5_unstructured_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_hdf5_unstructured_dataset_per_process_handler.f90.html">test_hdf5_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_mpi_environment.f90.html">test_mpi_environment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_attribute.f90.html">test_xdmf_attribute.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_character_data.f90.html">test_xdmf_character_data.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_dataitem.f90.html">test_xdmf_dataitem.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_geometry.f90.html">test_xdmf_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_grid.f90.html">test_xdmf_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90.html">test_xdmf_rectilinear_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_rectilinear_dataset_per_process.f90.html">test_xdmf_rectilinear_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_regular_contiguous_hyperslabs_handler.f90.html">test_xdmf_regular_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_regular_dataset_per_process.f90.html">test_xdmf_regular_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_time.f90.html">test_xdmf_time.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_topology.f90.html">test_xdmf_topology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_unstructured_contiguous_hyperslabs_handler.f90.html">test_xdmf_unstructured_contiguous_hyperslabs_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_unstructured_dataset_per_process.f90.html">test_xdmf_unstructured_dataset_per_process.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/test_xdmf_xinclude.f90.html">test_xdmf_xinclude.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/try_compile_hdf5_mod.f90.html">try_compile_hdf5_mod.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/try_compile_mpi_mod.f90.html">try_compile_mpi_mod.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/uniform_grid_descriptor.f90.html">uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_contiguous_hyperslab_factory.f90.html">unstructured_contiguous_hyperslab_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_dataset_per_process_factory.f90.html">unstructured_dataset_per_process_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_spatial_grid_descriptor.f90.html">unstructured_spatial_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/unstructured_uniform_grid_descriptor.f90.html">unstructured_uniform_grid_descriptor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_attribute.f90.html">xdmf_attribute.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_character_data.f90.html">xdmf_character_data.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_contiguous_hyperslab_handler.f90.html">xdmf_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_dataitem.f90.html">xdmf_dataitem.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_dataset_per_process_handler.f90.html">xdmf_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_domain.f90.html">xdmf_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_element.f90.html">xdmf_element.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_file.f90.html">xdmf_file.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_geometry.f90.html">xdmf_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_grid.f90.html">xdmf_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_handler.f90.html">xdmf_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_information.f90.html">xdmf_information.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_parameters.f90.html">xdmf_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_structured_contiguous_hyperslab_handler.f90.html">xdmf_structured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_structured_dataset_per_process_handler.f90.html">xdmf_structured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_time.f90.html">xdmf_time.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_topology.f90.html">xdmf_topology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_unstructured_contiguous_hyperslab_handler.f90.html">xdmf_unstructured_contiguous_hyperslab_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_unstructured_dataset_per_process_handler.f90.html">xdmf_unstructured_dataset_per_process_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_utils.f90.html">xdmf_utils.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xdmf_xinclude.f90.html">xdmf_xinclude.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for.f90.html">xh5for.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_abstract_factory.f90.html">xh5for_abstract_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_grid.f90.html">xh5for_ch_rectilinear_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_non_static_grid_series.f90.html">xh5for_ch_rectilinear_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_rectilinear_static_grid_series.f90.html">xh5for_ch_rectilinear_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_grid.f90.html">xh5for_ch_regular_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_non_static_grid_series.f90.html">xh5for_ch_regular_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_regular_static_grid_series.f90.html">xh5for_ch_regular_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_hexahedron.f90.html">xh5for_ch_unstructured_hexahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_hexahedron_perf.f90.html">xh5for_ch_unstructured_hexahedron_perf.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_mixedtopology.f90.html">xh5for_ch_unstructured_mixedtopology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_non_static_tetrahedron.f90.html">xh5for_ch_unstructured_non_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_quadilateral.f90.html">xh5for_ch_unstructured_quadilateral.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_static_mixed_series.f90.html">xh5for_ch_unstructured_static_mixed_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_static_tetrahedron.f90.html">xh5for_ch_unstructured_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_tetrahedron.f90.html">xh5for_ch_unstructured_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_ch_unstructured_triangles.f90.html">xh5for_ch_unstructured_triangles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_grid.f90.html">xh5for_dpp_rectilinear_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_non_static_grid_series.f90.html">xh5for_dpp_rectilinear_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_rectilinear_static_grid_series.f90.html">xh5for_dpp_rectilinear_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_grid.f90.html">xh5for_dpp_regular_grid.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_non_static_grid_series.f90.html">xh5for_dpp_regular_non_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_regular_static_grid_series.f90.html">xh5for_dpp_regular_static_grid_series.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_hexahedron.f90.html">xh5for_dpp_unstructured_hexahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_mixedtopology.f90.html">xh5for_dpp_unstructured_mixedtopology.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_non_static_tetrahedron.f90.html">xh5for_dpp_unstructured_non_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_quadilateral.f90.html">xh5for_dpp_unstructured_quadilateral.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_static_tetrahedron.f90.html">xh5for_dpp_unstructured_static_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_tetrahedron.f90.html">xh5for_dpp_unstructured_tetrahedron.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_dpp_unstructured_triangles.f90.html">xh5for_dpp_unstructured_triangles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_factory.f90.html">xh5for_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_handler.f90.html">xh5for_handler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_metadata.f90.html">xh5for_metadata.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_parameters.f90.html">xh5for_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/xh5for_utils.f90.html">xh5for_utils.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2016-10-05T10:22:05.247293 
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

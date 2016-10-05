@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="XDMF parallel partitioned mesh I/O on top of HDF5">
+    
+    <meta name="author" content="Víctor Sande Veiga" >
+    <link rel="icon" href="./favicon.png">
+
+    <title> XH5For </title>
+
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/pygments.css" rel="stylesheet">
+    <link href="./css/font-awesome.min.css" rel="stylesheet">
+    <link href="./css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="./js/jquery-2.1.3.min.js"></script>
+    <script src="./js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="./index.html">XH5For </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="./lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="./lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="./lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="./lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="./lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="./lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="./lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="./lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="./lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="./lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="./search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <p>XDMF parallel partitioned mesh I/O on top of HDF5</p>
+        	 
+	<p> Find us on&hellip;</p>
+        <p>
+        	 
+          <a class="btn btn-lg btn-primary" href="https://github.com/victorsndvg/XH5For" role="button">GitHub</a>
+			 
+			 
+			 
+			 
+	         
+			 
+          <a class="btn btn-lg btn-danger" style="float:right" href="https://github.com/victorsndvg/XH5For/releases" role="button">Download the Source</a>
+			 
+        </p>
+      </div>
+
+      <div class="row" id='text'>
+		  
+        <div class="col-md-8">
+		  
+          <h1>XH5For</h1>
+          <h1 id="xh5for"><a class="toclink" href="#xh5for">XH5For</a></h1>
+<p><img alt="XH5For logo" src="http://github.com/victorsndvg/XH5For/blob/master/media/XH5For_logo.png" title="XH5For logo"> </p>
+<p>The Fortran way to easy write parallel partitioned XDMF/HDF5 meshes</p>
+<p><a href="https://travis-ci.org/victorsndvg/XH5For"><img alt="Build Status" src="https://travis-ci.org/victorsndvg/XH5For.svg?branch=master"></a>
+<a href="https://codecov.io/github/victorsndvg/XH5For?branch=master"><img alt="codecov.io" src="https://codecov.io/github/victorsndvg/XH5For/coverage.svg?branch=master"></a></p>
+<h2 id="license"><a class="toclink" href="#license">License</a></h2>
+<p><a href="http://www.gnu.org/licenses/lgpl-3.0.txt"><img alt="License" src="https://img.shields.io/badge/license-GNU%20LESSER%20GENERAL%20PUBLIC%20LICENSE%20v3%2C%20LGPLv3-red.svg"></a>                 </p>
+<h2 id="what-is-xh5for"><a class="toclink" href="#what-is-xh5for">What is XH5For?</a></h2>
+<p>Is a library to read and write parallel partitioned FEM meshes taking advantage of the Collective/Independent IO provided by the HDF5 library. 
+<strong>XH5For</strong> is not a general-purpose XDMF library, it only reads XDMF files written by itself.</p>
+<h3 id="some-concepts"><a class="toclink" href="#some-concepts">Some concepts</a></h3>
+<ul>
+<li><a href="http://www.xdmf.org/index.php/XDMF_Model_and_Format">XDMF Model and Format</a> is a standarized way to describe common scientific data. It separates the <strong>Light data</strong> <em>(XML description of the data model)</em> and the <strong>Heavy data</strong> <em>(raw values)</em> usually saved in HDF5 or binary Files.</li>
+<li><a href="https://www.hdfgroup.org/HDF5">HDF5</a> is a model and data format designed for efficient Collective/Independent I/O and work with big amounts of data.</li>
+</ul>
+<h2 id="how-to-get-xh5for"><a class="toclink" href="#how-to-get-xh5for">How to get XH5For</a></h2>
+<p><code>git clone --recursive https://github.com/victorsndvg/XH5For.git</code></p>
+<h2 id="compilation"><a class="toclink" href="#compilation">Compilation</a></h2>
+<p><strong>XH5For</strong> compile with GNU Fortran compiler 5.1 (and newer versions) and Intel Fortran compiler 15.0.1 (and newer versions).</p>
+<p><strong>XH5For</strong> uses <a href="https://cmake.org/">CMake</a> as a portable compilation system. </p>
+<p>The easiest way to compile <strong>XH5For</strong> under Linux is:</p>
+<div class="codehilite"><pre>$ <span class="nb">cd</span> XH5For
+$ mkdir build
+$ <span class="nb">cd</span> build
+$ cmake <span class="o">[</span>cmake-settings<span class="o">]</span> ../
+$ make
+</pre></div>
+
+
+<p><em>To compile XH5For under Windows use de equivalent commands</em></p>
+<h3 id="xh5for-cmake-basic-settings"><a class="toclink" href="#xh5for-cmake-basic-settings">XH5For CMake basic settings</a></h3>
+<p>CMake compilation system settings allows us to manage compilation system behaviour. 
+Look at the <a href="https://cmake.org/cmake/help/v3.2/manual/cmake.1.html">CMake command line-interface</a> to know how to pass CMake settings.
+There are several ways to <a href="https://cmake.org/runningcmake/">configure XH5For compilation system with CMake</a></p>
+<p>The most important XH5For settings are:</p>
+<ul>
+<li><code>XH5For_ENABLE_HDF5</code>: <em>ON</em> if HDF5 library is automagically found in your system (default <em>OFF</em>)</li>
+<li><code>XH5For_ENABLE_MPI</code>: <em>ON</em> if MPI library is automagically found in your system (default <em>OFF</em>)</li>
+<li><code>XH5For_ENABLE_TESTS</code>: (default <em>OFF</em>)</li>
+<li><code>XH5For_ENABLE_EXAMPLES</code>: (default <em>OFF</em>)</li>
+</ul>
+<h2 id="getting-started-with-xh5for"><a class="toclink" href="#getting-started-with-xh5for">Getting started with XH5For</a></h2>
+<p>The code below writes an hexahedron per MPI task:</p>
+<div class="codehilite"><pre><span class="k">program </span><span class="n">xh5for_hexa_per_task</span>
+
+    <span class="k">use </span><span class="n">xh5for</span>
+    <span class="k">use </span><span class="n">mpi</span>
+
+<span class="k">implicit none</span>
+
+<span class="k">    type</span><span class="p">(</span><span class="n">xh5for_t</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">xh5</span>
+    <span class="kt">real</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">geometry</span> <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                          <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="o">/</span><span class="p">)</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">topology</span> <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="o">/</span><span class="p">)</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">temperature</span> <span class="o">=</span> <span class="p">(</span><span class="o">/</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="o">/</span><span class="p">)</span>
+    <span class="kt">integer</span>               <span class="kd">::</span> <span class="n">mpierr</span><span class="p">,</span> <span class="n">rank</span>
+
+    <span class="k">call </span><span class="n">MPI_INIT</span><span class="p">(</span><span class="n">mpierror</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">MPI_Comm_rank</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">mpierr</span><span class="p">)</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">+</span><span class="n">rank</span>
+
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="k">Open</span><span class="p">(</span><span class="n">FilePrefix</span><span class="o">=</span><span class="s1">&#39;xh5for_unstructured_hexahedron&#39;</span><span class="p">,</span> <span class="n">Strategy</span><span class="o">=</span><span class="n">XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB</span><span class="p">,</span> <span class="n">Action</span><span class="o">=</span><span class="n">XDMF_ACTION_WRITE</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="n">SetGrid</span><span class="p">(</span><span class="n">NumberOfNodes</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">NumberOfElements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">TopologyType</span><span class="o">=</span><span class="n">XDMF_TOPOLOGY_TYPE_HEXAHEDRON</span><span class="p">,</span> <span class="n">GeometryType</span><span class="o">=</span><span class="n">XDMF_GEOMETRY_TYPE_XYZ</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="n">WriteTopology</span><span class="p">(</span><span class="n">Connectivities</span><span class="o">=</span><span class="n">topology</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="n">WriteGeometry</span><span class="p">(</span><span class="n">XYZ</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="n">WriteAttribute</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="s1">&#39;Temperature&#39;</span><span class="p">,</span> <span class="k">Type</span><span class="o">=</span><span class="n">XDMF_ATTRIBUTE_TYPE_SCALAR</span> <span class="p">,</span><span class="n">Center</span><span class="o">=</span><span class="n">XDMF_ATTRIBUTE_CENTER_NODE</span> <span class="p">,</span> <span class="n">Values</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="k">Close</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">xh5</span><span class="p">%</span><span class="n">Free</span><span class="p">()</span>
+
+    <span class="k">call </span><span class="n">MPI_FINALIZE</span><span class="p">(</span><span class="n">mpierror</span><span class="p">)</span>
+
+<span class="k">end program </span><span class="n">xh5for_hexa_per_task</span>
+</pre></div>
+
+
+<p>See more info about <a href="./src/lib/README.md">XH5For_t</a></p>
+<h2 id="some-considerations"><a class="toclink" href="#some-considerations">Some considerations</a></h2>
+<ul>
+<li><strong>XH5For</strong> use <a href="http://www.xdmf.org/index.php/XDMF_Model_and_Format">XDMF Model and Format</a> to describe the <strong>Light data</strong> and <a href="https://www.hdfgroup.org/HDF5">HDF5</a> for the <strong>Heavy data</strong>.</li>
+<li>HDF5 API must be linked to read/write the <strong>Heavy data</strong>.</li>
+<li>Paralell HDF5 API must to be linked to take advange of the Collective IO.</li>
+<li>Paralell HDF5 API only works if an MPI library is also linked.</li>
+<li>XML syntax is be based on XDMF v2.x.</li>
+<li>The handling of XML files is developed on top of <a href="https://github.com/andreww/fox">FoX</a> (Fortran XML library) for reading/writing XDMF files. Particularly, <em>FoX_wxml</em> library is used for writing XDMF files and <em>FoX_dom</em> will be used for parsing.</li>
+</ul>
+<h2 id="zen-of-xh5for"><a class="toclink" href="#zen-of-xh5for">Zen of XH5For:</a></h2>
+<ul>
+<li>Use <em>HDF5</em> high level library based on <em>MPI_IO</em></li>
+<li>Open in the right mode</li>
+<li>Number of XDMF/HDF5 files must be independent of the number of processes</li>
+<li>Reduce simultaneous open files to the minimun</li>
+<li>Prefer collective IO</li>
+<li>Do not open/close files too frequently</li>
+<li>Avoid small accesses</li>
+<li>Try <em>MPI_IO</em> hints</li>
+<li>Write/Read as infrequently as possible</li>
+<li>Reduce precision if possible</li>
+</ul>
+<p><a href="http://www.idris.fr/media/docs/docu/idris/idris_patc_hints_proj.pdf">Best practices for parallel IO and MPI-IO hints</a></p>
+<h2 id="development-roadmap"><a class="toclink" href="#development-roadmap">Development roadmap:</a></h2>
+<ul>
+<li>XDMF:<ul>
+<li>Series:<ul>
+<li>[x] Static grid</li>
+<li>[x] Non-Static grid</li>
+</ul>
+</li>
+<li>Grid:<ul>
+<li>[x] Structured</li>
+<li>[x] Unstructured</li>
+</ul>
+</li>
+<li>Element:<ul>
+<li>Linear</li>
+<li>[x] Triangle</li>
+<li>[x] Quadrangle</li>
+<li>[x] Tretrahedron</li>
+<li>[x] Hexahedron</li>
+<li>[x] Mixed</li>
+<li>[ ] ...</li>
+</ul>
+</li>
+<li>Field:<ul>
+<li>Center on: <ul>
+<li>[x] Node</li>
+<li>[x] Cell</li>
+<li>[x] Grid</li>
+<li>[ ] Edge</li>
+<li>[ ] Face</li>
+</ul>
+</li>
+<li>Type:<ul>
+<li>[x] Scalar</li>
+<li>[x] Vector</li>
+<li>[ ] Tensor</li>
+<li>[ ] Matrix</li>
+<li>[ ] Tensor6</li>
+<li>[ ] GlobalID</li>
+<li>[ ] NoType</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>HDF5:<ul>
+<li>[x] Groups</li>
+<li>[x] DataSets</li>
+<li>[x] HyperSlabs</li>
+<li>Strategies:<ul>
+<li>[x] Contiguous hyperslab</li>
+<li>[x] One dataset per process</li>
+<li>[ ] Chunking</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="uml-class-diagram"><a class="toclink" href="#uml-class-diagram">UML class diagram:</a></h2>
+<p>Automatically generated with <a href="http://research.te.psu.ac.th/aziz/foruml.htm">ForUML</a>.</p>
+<p><img alt="XH5For UML class diagram" src="https://github.com/victorsndvg/XH5For/tree/master/media/XH5For_UML.svg" title="XH5For UML class diagram"></p>
+<h2 id="how-to-collaborate"><a class="toclink" href="#how-to-collaborate">How to collaborate</a></h2>
+<p>If you want to actively collaborate in the project, please feel free to fork and submit pull requests.
+Any help or suggestions would be greatly appreciated :)</p>
+        </div>
+		  
+        <div class="col-md-4">
+	  <div class="well">
+          <h2>Developer Info</h2>
+          <h4>Víctor Sande Veiga</h4>
+          
+          <p>Scientific software developer</p>
+			   
+            <div class="text-center"><div class="btn-group" role="group">
+              
+              <a class="btn btn-lg btn-primary" href="mailto:victorsv@gmail.com"><i class="fa fa-envelope fa-lg"></i></a>
+              
+              
+             <a class="btn btn-lg btn-primary" href="https://github.com/victorsndvg"><i class="fa fa-globe fa-lg"></i></a>
+              
+              
+              <a class="btn btn-lg btn-primary" href="https://github.com/victorsndvg"><i class="fa fa-github fa-lg"></i></a>
+				  
+				  
+              
+              
+              
+              
+            </div></div>
+            
+       </div>
+       </div>
+       
+      </div>
+      
+      
+      
+      
+		
+      <div class="row">
+        <div class="col-xs-6 col-sm-3">
+              <h3>Source Files</h3>
+              <ul>
+                
+                  
+                    <li><a href='./sourcefile/ch_unstructured_hexahedron_perf.f90.html'>ch_unstructured_hexahedron_perf.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/fox_xdmf.f90.html'>fox_xdmf.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_contiguous_hyperslab_handler.f90.html'>hdf5_contiguous_hyperslab_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_dataset_per_process_handler.f90.html'>hdf5_dataset_per_process_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_handler.f90.html'>hdf5_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_structured_contiguous_hyperslab_handler.f90.html'>hdf5_structured_contiguous_hyperslab_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_structured_dataset_per_process_handler.f90.html'>hdf5_structured_dataset_per_process_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_unstructured_contiguous_hyperslab_handler.f90.html'>hdf5_unstructured_contiguous_hyperslab_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/hdf5_unstructured_dataset_per_process_handler.f90.html'>hdf5_unstructured_dataset_per_process_handler.f90</a></li>
+                  
+                
+                  
+                    <li><a href='./sourcefile/mpi_environment.f90.html'>mpi_environment.f90</a></li>
+                  
+                
+                  
+                    <li><a href="./lists/files.html"><em>All source files&hellip;</em></a></li>
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+              </ul>
+          </div>
+          
+		  <div class="col-xs-6 col-sm-3">
+              <h3>Modules</h3>
+              <ul>
+                
+                  
+                    <li><a href='./module/fox_xdmf.html'>fox_xdmf</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_contiguous_hyperslab_handler.html'>hdf5_contiguous_hyperslab_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_dataset_per_process_handler.html'>hdf5_dataset_per_process_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_handler.html'>hdf5_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_structured_contiguous_hyperslab_handler.html'>hdf5_structured_contiguous_hyperslab_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_structured_dataset_per_process_handler.html'>hdf5_structured_dataset_per_process_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_unstructured_contiguous_hyperslab_handler.html'>hdf5_unstructured_contiguous_hyperslab_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/hdf5_unstructured_dataset_per_process_handler.html'>hdf5_unstructured_dataset_per_process_handler</a></li>
+                  
+                
+                  
+                    <li><a href='./module/mpi_environment.html'>mpi_environment</a></li>
+                  
+                
+                  
+                    <li><a href='./module/spatial_grid_descriptor.html'>spatial_grid_descriptor</a></li>
+                  
+                
+                  
+                    <li><a href="./lists/modules.html"><em>All modules&hellip;</em></a></li>
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+              </ul>
+          </div>
+          
+          
+		  <div class="col-xs-6 col-sm-3">
+              <h3>Procedures</h3>
+              <ul>
+                
+                  
+                    <li><a href='./proc/abort.html'>Abort</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/count_tokens.html'>Count_tokens</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/generate_hexa_mesh.html'>generate_hexa_mesh</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/generate_hexa_mesh%7E2.html'>generate_hexa_mesh</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getnumberofcomponentsfromattributetype.html'>GetNumberOfComponentsFromAttributeType</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getnumberofnodesperelement.html'>GetNumberOfNodesPerElement</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getspacedimension.html'>GetSpaceDimension</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getxdmfattributetypename.html'>GetXDMFAttributeTypeName</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getxdmfcentertypefromname.html'>GetXDMFCenterTypeFromName</a></li>
+                  
+                
+                  
+                    <li><a href='./proc/getxdmfcentertypename.html'>GetXDMFCenterTypeName</a></li>
+                  
+                
+                  
+                    <li><a href="./lists/procedures.html"><em>All procedures&hellip;</em></a></li>
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+              </ul>
+          </div>
+          
+          
+		  <div class="col-xs-6 col-sm-3">
+              <h3>Derived Types</h3>
+              <ul>
+                
+                  
+                    <li><a href='./type/hdf5_contiguous_hyperslab_handler_t.html'>hdf5_contiguous_hyperslab_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_dataset_per_process_handler_t.html'>hdf5_dataset_per_process_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_handler_t.html'>hdf5_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_structured_contiguous_hyperslab_handler_t.html'>hdf5_structured_contiguous_hyperslab_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_structured_dataset_per_process_handler_t.html'>hdf5_structured_dataset_per_process_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_unstructured_contiguous_hyperslab_handler_t.html'>hdf5_unstructured_contiguous_hyperslab_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/hdf5_unstructured_dataset_per_process_handler_t.html'>hdf5_unstructured_dataset_per_process_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/mpi_env_t.html'>mpi_env_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/spatial_grid_descriptor_t.html'>spatial_grid_descriptor_t</a></li>
+                  
+                
+                  
+                    <li><a href='./type/steps_handler_t.html'>steps_handler_t</a></li>
+                  
+                
+                  
+                    <li><a href="./lists/types.html"><em>All derived types&hellip;</em></a></li>
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+                  
+                
+              </ul>
+          </div>
+          
+      </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2016-10-05T10:22:05.247293 
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="./js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="./js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="./tipuesearch/tipuesearch_content.js"></script>
+    <link  href="./tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="./tipuesearch/tipuesearch_set.js"></script>
+    <script src="./tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

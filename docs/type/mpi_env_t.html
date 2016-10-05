@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="XDMF parallel partitioned mesh I/O on top of HDF5">
+    
+    <meta name="author" content="Víctor Sande Veiga" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>mpi_env_t &ndash; XH5For </title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">XH5For </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>mpi_env_t
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title="<p> 3.3% of total for derived types.</p>Including implementation: 330 statements,  1.7% of total for derived types.">31 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/mpi_environment.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/mpi_environment.f90.html'>mpi_environment.f90</a></li>
+  
+     <li><a href='../module/mpi_environment.html'>mpi_environment</a></li>
+  
+     <li class="active">mpi_env_t</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E2">Initialize</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E4">Free</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm">get_comm</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_root">get_root</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_rank">get_rank</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_info">get_info</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm_size">get_comm_size</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_root">is_root</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_parallel">is_parallel</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_wtime">mpi_wtime</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_allgather">mpi_allgather</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_broadcast">mpi_broadcast</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/mpi_env_t.html#src">mpi_env_t</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-0">All Derived Types</a></h3></div>
+  <div id="alltypes-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/hdf5_contiguous_hyperslab_handler_t.html">hdf5_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_dataset_per_process_handler_t.html">hdf5_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_handler_t.html">hdf5_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_contiguous_hyperslab_handler_t.html">hdf5_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_dataset_per_process_handler_t.html">hdf5_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_contiguous_hyperslab_handler_t.html">hdf5_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_dataset_per_process_handler_t.html">hdf5_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html">mpi_env_t</a>
+      
+      <a class="list-group-item" href="../type/spatial_grid_descriptor_t.html">spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/steps_handler_t.html">steps_handler_t</a>
+      
+      <a class="list-group-item" href="../type/structured_contiguous_hyperslab_factory_t.html">structured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_dataset_per_process_factory_t.html">structured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_spatial_grid_descriptor_t.html">structured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/structured_uniform_grid_descriptor_t.html">structured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/uniform_grid_descriptor_t.html">uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_contiguous_hyperslab_factory_t.html">unstructured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_dataset_per_process_factory_t.html">unstructured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_spatial_grid_descriptor_t.html">unstructured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_uniform_grid_descriptor_t.html">unstructured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_attribute_t.html">xdmf_attribute_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_character_data_t.html">xdmf_character_data_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_contiguous_hyperslab_handler_t.html">xdmf_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataitem_t.html">xdmf_dataitem_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataset_per_process_handler_t.html">xdmf_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_domain_t.html">xdmf_domain_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_element_t.html">xdmf_element_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_file_t.html">xdmf_file_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_geometry_t.html">xdmf_geometry_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_grid_t.html">xdmf_grid_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_handler_t.html">xdmf_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_information_t.html">xdmf_information_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_contiguous_hyperslab_handler_t.html">xdmf_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_dataset_per_process_handler_t.html">xdmf_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_time_t.html">xdmf_time_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_topology_t.html">xdmf_topology_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html">xdmf_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_dataset_per_process_handler_t.html">xdmf_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_xinclude_t.html">xdmf_xinclude_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_abstract_factory_t.html">xh5for_abstract_factory_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html">xh5for_metadata_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html">xh5for_t</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: mpi_env_t</h2>
+    
+    <p>MPI environment type</p>
+    <br>
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E2">Initialize</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E4">Free</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm">get_comm</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_root">get_root</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_rank">get_rank</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_info">get_info</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm_size">get_comm_size</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_root">is_root</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_parallel">is_parallel</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_wtime">mpi_wtime</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_allgather">mpi_allgather</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_broadcast">mpi_broadcast</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/mpi_env_t.html#src">mpi_env_t</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+    
+    
+    
+    
+    
+     
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-initialize%7E2"></span><h3>procedure, public :: <strong>Initialize</strong>  => mpi_env_initialize 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine mpi_env_initialize(this, comm, info, root, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Default MPI values initialization</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>comm</strong></td><td><p>MPI communicator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>info</strong></td><td><p>MPI info</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>root</strong></td><td><p>MPI root processor</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E4"></span><h3>procedure, public :: <strong>Free</strong>  => mpi_env_Free 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine mpi_env_Free(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Free MPI derived type</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-get_comm"></span><h3>procedure, public :: <strong>get_comm</strong>  => mpi_env_get_comm 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_get_comm(this) result(comm)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return MPI communicator</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>MPI communicator</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-get_root"></span><h3>procedure, public :: <strong>get_root</strong>  => mpi_env_get_root 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_get_root(this) result(root)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return MPI root processor</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>MPI root processor</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-get_rank"></span><h3>procedure, public :: <strong>get_rank</strong>  => mpi_env_get_rank 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_get_rank(this) result(rank)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return MPI rank</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>MPI rank</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-get_info"></span><h3>procedure, public :: <strong>get_info</strong>  => mpi_env_get_info 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_get_info(this) result(info)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return MPI info</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>MPI info</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-get_comm_size"></span><h3>procedure, public :: <strong>get_comm_size</strong>  => mpi_env_get_comm_size 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_get_comm_size(this) result(size)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return MPI communicator size</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>MPI communicator size</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-is_root"></span><h3>procedure, public :: <strong>is_root</strong>  => mpi_env_is_root 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_is_root(this) result(is_root)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Is the current task the root processor?</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical
+  </small></h4>
+  <p>Boolean variable, True if is root task   </p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-is_parallel"></span><h3>procedure, public :: <strong>is_parallel</strong>  => mpi_env_is_parallel 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_is_parallel(this) result(is_parallel)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Is the current task the root processor?</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical
+  </small></h4>
+  <p>Boolean variable, True if is root task   </p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-mpi_wtime"></span><h3>procedure, public :: <strong>mpi_wtime</strong>  => mpi_env_wtime 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function mpi_env_wtime(this) result(time)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Call MPI_Wtime()</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=R8P)
+  </small></h4>
+  <p>MPI_WTime returned time</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-mpi_allgather"></span><h3>generic, public :: <strong>mpi_allgather</strong>  => mpi_env_allgather_single_int_value_I4P, mpi_env_allgather_single_int_value_I8P 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_allgather_single_int_value_I4P(this, send_data, recv_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I4P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>send_data</strong></td><td><p>MPI_allgather send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>recv_data</strong>(:)</td><td><p>MPI_allgather receive data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_allgather_single_int_value_I8P(this, send_data, recv_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I8P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>send_data</strong></td><td><p>MPI_allgather send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>recv_data</strong>(:)</td><td><p>MPI_allgather receive data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-mpi_broadcast"></span><h3>generic, public :: <strong>mpi_broadcast</strong>  => mpi_env_broadcast_int_I4P, mpi_env_broadcast_int_I8P, mpi_env_broadcast_int_I4P_array, mpi_env_broadcast_int_I8P_array, mpi_env_broadcast_string 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_broadcast_int_I4P(this, send_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I4P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>send_data</strong></td><td><p>MPI_broadcast send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_broadcast_int_I8P(this, send_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I4P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>send_data</strong></td><td><p>MPI_broadcast send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_broadcast_int_I4P_array(this, send_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I4P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>send_data</strong>(:)</td><td><p>MPI_broadcast send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_broadcast_int_I8P_array(this, send_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a single I4P value per task</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>send_data</strong>(:)</td><td><p>MPI_broadcast send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine mpi_env_broadcast_string(this, send_data, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_allgather interface for a deferred length character array</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=:),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>send_data</strong></td><td><p>MPI_broadcast send data</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre>    <span class="k">type </span><span class="n">mpi_env_t</span>
+    <span class="k">private</span>
+    <span class="c">!-----------------------------------------------------------------</span>
+    <span class="c">!&lt; MPI environment type</span>
+    <span class="c">!----------------------------------------------------------------- </span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">comm</span>  <span class="o">=</span> <span class="mi">0</span>                    <span class="c">!&lt; MPI communicator</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">root</span>  <span class="o">=</span> <span class="mi">0</span>                    <span class="c">!&lt; MPI root processor</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rank</span>  <span class="o">=</span> <span class="mi">0</span>                    <span class="c">!&lt; MPI rank</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">info</span>  <span class="o">=</span> <span class="mi">0</span>                    <span class="c">!&lt; MPI info</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">size</span>  <span class="o">=</span> <span class="mi">1</span>                    <span class="c">!&lt; MPI communicator size</span>
+        <span class="kt">logical</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">parallel</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>           <span class="c">!&lt; Flag to check if MPI was initialized</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span> <span class="kd">::</span> <span class="n">State</span> <span class="o">=</span> <span class="n">MPI_ENV_STATE_START</span>  <span class="c">!&lt; MPI communicator size</span>
+    <span class="k">contains</span>
+<span class="k">    private</span>
+<span class="k">        procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_allgather_single_int_value_I4P</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_allgather_single_int_value_I8P</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_broadcast_int_I4P</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_broadcast_int_I8P</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_broadcast_int_I4P_array</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_broadcast_int_I8P_array</span>
+        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">mpi_env_broadcast_string</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">Initialize</span>                   <span class="o">=&gt;</span> <span class="n">mpi_env_Initialize</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">Free</span>                         <span class="o">=&gt;</span> <span class="n">mpi_env_Free</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">get_comm</span>                     <span class="o">=&gt;</span> <span class="n">mpi_env_get_comm</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">get_root</span>                     <span class="o">=&gt;</span> <span class="n">mpi_env_get_root</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">get_rank</span>                     <span class="o">=&gt;</span> <span class="n">mpi_env_get_rank</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">get_info</span>                     <span class="o">=&gt;</span> <span class="n">mpi_env_get_info</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">get_comm_size</span>                <span class="o">=&gt;</span> <span class="n">mpi_env_get_comm_size</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">is_root</span>                      <span class="o">=&gt;</span> <span class="n">mpi_env_is_root</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">is_parallel</span>                  <span class="o">=&gt;</span> <span class="n">mpi_env_is_parallel</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_wtime</span>                    <span class="o">=&gt;</span> <span class="n">mpi_env_wtime</span>
+        <span class="k">generic</span><span class="p">,</span>   <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_allgather</span>                <span class="o">=&gt;</span> <span class="n">mpi_env_allgather_single_int_value_I4P</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                             <span class="n">mpi_env_allgather_single_int_value_I8P</span>
+        <span class="k">generic</span><span class="p">,</span>   <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_broadcast</span>                <span class="o">=&gt;</span> <span class="n">mpi_env_broadcast_int_I4P</span><span class="p">,</span>       <span class="p">&amp;</span>
+                                                             <span class="n">mpi_env_broadcast_int_I8P</span><span class="p">,</span>       <span class="p">&amp;</span>
+                                                             <span class="n">mpi_env_broadcast_int_I4P_array</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                             <span class="n">mpi_env_broadcast_int_I8P_array</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                             <span class="n">mpi_env_broadcast_string</span>
+    <span class="k">end type </span><span class="n">mpi_env_t</span>
+</pre></div>
+
+    </section>
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-1">All Derived Types</a></h3></div>
+  <div id="alltypes-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/hdf5_contiguous_hyperslab_handler_t.html">hdf5_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_dataset_per_process_handler_t.html">hdf5_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_handler_t.html">hdf5_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_contiguous_hyperslab_handler_t.html">hdf5_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_dataset_per_process_handler_t.html">hdf5_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_contiguous_hyperslab_handler_t.html">hdf5_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_dataset_per_process_handler_t.html">hdf5_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html">mpi_env_t</a>
+      
+      <a class="list-group-item" href="../type/spatial_grid_descriptor_t.html">spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/steps_handler_t.html">steps_handler_t</a>
+      
+      <a class="list-group-item" href="../type/structured_contiguous_hyperslab_factory_t.html">structured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_dataset_per_process_factory_t.html">structured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_spatial_grid_descriptor_t.html">structured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/structured_uniform_grid_descriptor_t.html">structured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/uniform_grid_descriptor_t.html">uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_contiguous_hyperslab_factory_t.html">unstructured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_dataset_per_process_factory_t.html">unstructured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_spatial_grid_descriptor_t.html">unstructured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_uniform_grid_descriptor_t.html">unstructured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_attribute_t.html">xdmf_attribute_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_character_data_t.html">xdmf_character_data_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_contiguous_hyperslab_handler_t.html">xdmf_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataitem_t.html">xdmf_dataitem_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataset_per_process_handler_t.html">xdmf_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_domain_t.html">xdmf_domain_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_element_t.html">xdmf_element_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_file_t.html">xdmf_file_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_geometry_t.html">xdmf_geometry_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_grid_t.html">xdmf_grid_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_handler_t.html">xdmf_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_information_t.html">xdmf_information_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_contiguous_hyperslab_handler_t.html">xdmf_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_dataset_per_process_handler_t.html">xdmf_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_time_t.html">xdmf_time_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_topology_t.html">xdmf_topology_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html">xdmf_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_dataset_per_process_handler_t.html">xdmf_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_xinclude_t.html">xdmf_xinclude_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_abstract_factory_t.html">xh5for_abstract_factory_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html">xh5for_metadata_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html">xh5for_t</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2016-10-05T10:22:05.247293 
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

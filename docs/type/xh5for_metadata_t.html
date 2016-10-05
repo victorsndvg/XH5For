@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="XDMF parallel partitioned mesh I/O on top of HDF5">
+    
+    <meta name="author" content="Víctor Sande Veiga" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>xh5for_metadata_t &ndash; XH5For </title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">XH5For </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>xh5for_metadata_t
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title="<p> 2.4% of total for derived types.</p>Including implementation: 97 statements,  0.5% of total for derived types.">23 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/xh5for_metadata.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/xh5for_metadata.f90.html'>xh5for_metadata.f90</a></li>
+  
+     <li><a href='../module/xh5for_metadata.html'>xh5for_metadata</a></li>
+  
+     <li class="active">xh5for_metadata_t</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setname">SetName</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-settype">SetType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setcenter">SetCenter</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setdatatype">SetDataType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setprecision">SetPrecision</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setarraydimensions">SetArrayDimensions</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getname">GetName</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-gettype">GetType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getcenter">GetCenter</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getdatatype">GetDataType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getprecision">GetPrecision</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getarraydimensions">GetArrayDimensions</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-free%7E2">Free</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/xh5for_metadata_t.html#src">xh5for_metadata_t</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-0">All Derived Types</a></h3></div>
+  <div id="alltypes-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/hdf5_contiguous_hyperslab_handler_t.html">hdf5_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_dataset_per_process_handler_t.html">hdf5_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_handler_t.html">hdf5_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_contiguous_hyperslab_handler_t.html">hdf5_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_dataset_per_process_handler_t.html">hdf5_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_contiguous_hyperslab_handler_t.html">hdf5_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_dataset_per_process_handler_t.html">hdf5_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html">mpi_env_t</a>
+      
+      <a class="list-group-item" href="../type/spatial_grid_descriptor_t.html">spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/steps_handler_t.html">steps_handler_t</a>
+      
+      <a class="list-group-item" href="../type/structured_contiguous_hyperslab_factory_t.html">structured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_dataset_per_process_factory_t.html">structured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_spatial_grid_descriptor_t.html">structured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/structured_uniform_grid_descriptor_t.html">structured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/uniform_grid_descriptor_t.html">uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_contiguous_hyperslab_factory_t.html">unstructured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_dataset_per_process_factory_t.html">unstructured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_spatial_grid_descriptor_t.html">unstructured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_uniform_grid_descriptor_t.html">unstructured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_attribute_t.html">xdmf_attribute_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_character_data_t.html">xdmf_character_data_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_contiguous_hyperslab_handler_t.html">xdmf_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataitem_t.html">xdmf_dataitem_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataset_per_process_handler_t.html">xdmf_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_domain_t.html">xdmf_domain_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_element_t.html">xdmf_element_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_file_t.html">xdmf_file_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_geometry_t.html">xdmf_geometry_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_grid_t.html">xdmf_grid_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_handler_t.html">xdmf_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_information_t.html">xdmf_information_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_contiguous_hyperslab_handler_t.html">xdmf_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_dataset_per_process_handler_t.html">xdmf_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_time_t.html">xdmf_time_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_topology_t.html">xdmf_topology_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html">xdmf_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_dataset_per_process_handler_t.html">xdmf_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_xinclude_t.html">xdmf_xinclude_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_abstract_factory_t.html">xh5for_abstract_factory_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html">xh5for_metadata_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html">xh5for_t</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: xh5for_metadata_t</h2>
+    
+    
+    
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setname">SetName</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-settype">SetType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setcenter">SetCenter</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setdatatype">SetDataType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setprecision">SetPrecision</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-setarraydimensions">SetArrayDimensions</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getname">GetName</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-gettype">GetType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getcenter">GetCenter</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getdatatype">GetDataType</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getprecision">GetPrecision</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-getarraydimensions">GetArrayDimensions</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html#boundprocedure-free%7E2">Free</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/xh5for_metadata_t.html#src">xh5for_metadata_t</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+    
+    
+    
+    
+    
+     
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-setname"></span><h3>procedure, public :: <strong>SetName</strong>  => xh5for_metadata_SetName 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetName(this, Name)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the Name</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Name</strong></td><td><p>DataSet Name</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-settype"></span><h3>procedure, public :: <strong>SetType</strong>  => xh5for_metadata_SetType 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetType(this, Type)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the Type</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Type</strong></td><td><p>Type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-setcenter"></span><h3>procedure, public :: <strong>SetCenter</strong>  => xh5for_metadata_SetCenter 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetCenter(this, Center)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the Center</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Center</strong></td><td><p>Center</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-setdatatype"></span><h3>procedure, public :: <strong>SetDataType</strong>  => xh5for_metadata_SetDataType 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetDataType(this, DataType)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the DataType</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>DataType</strong></td><td><p>DataType</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-setprecision"></span><h3>procedure, public :: <strong>SetPrecision</strong>  => xh5for_metadata_SetPrecision 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetPrecision(this, Precision)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the Precision</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Precision</strong></td><td><p>Precision</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-setarraydimensions"></span><h3>procedure, public :: <strong>SetArrayDimensions</strong>  => xh5for_metadata_SetArrayDimensions 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_SetArrayDimensions(this, ArrayDimensions)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Set the Dimension</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I8P),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ArrayDimensions</strong>(:)</td><td><p>Array Dimensions</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getname"></span><h3>procedure, public :: <strong>GetName</strong>  => xh5for_metadata_GetName 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function xh5for_metadata_GetName(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the Name</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  <p>Returned Name</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-gettype"></span><h3>procedure, public :: <strong>GetType</strong>  => xh5for_metadata_GetType 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function xh5for_metadata_GetType(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the Type</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>Returned Type</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getcenter"></span><h3>procedure, public :: <strong>GetCenter</strong>  => xh5for_metadata_GetCenter 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function xh5for_metadata_GetCenter(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the Center</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>Returned Center</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getdatatype"></span><h3>procedure, public :: <strong>GetDataType</strong>  => xh5for_metadata_GetDataType 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function xh5for_metadata_GetDataType(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the DataType</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  <p>Returned DataType</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getprecision"></span><h3>procedure, public :: <strong>GetPrecision</strong>  => xh5for_metadata_GetPrecision 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private function xh5for_metadata_GetPrecision(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the Precision</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=I4P)
+  </small></h4>
+  <p>Returned Precision</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getarraydimensions"></span><h3>procedure, public :: <strong>GetArrayDimensions</strong>  => xh5for_metadata_GetArrayDimensions 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_GetArrayDimensions(this, ArrayDimensions)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Return the Dimension</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>ArrayDimensions</strong>(:)</td><td><p>Returned Dimension</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E2"></span><h3>procedure, public :: <strong>Free</strong>  => xh5for_metadata_Free 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_metadata_Free(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Free XH5For Metadata</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_metadata_t.html'>xh5for_metadata_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For metadata type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre>    <span class="k">type</span> <span class="kd">::</span> <span class="n">xh5for_metadata_t</span>
+    <span class="k">private</span>
+<span class="k">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">Name</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                  <span class="kd">::</span> <span class="k">Type</span>             <span class="o">=</span> <span class="n">XDMF_NO_VALUE</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                  <span class="kd">::</span> <span class="n">Center</span>           <span class="o">=</span> <span class="n">XDMF_NO_VALUE</span>
+        <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">DataType</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                  <span class="kd">::</span> <span class="nb">Precision</span>        <span class="o">=</span> <span class="n">XDMF_NO_VALUE</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">I8P</span><span class="p">),</span>     <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">ArrayDimensions</span><span class="p">(:)</span>
+    <span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetName</span>            <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetName</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetType</span>            <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetType</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetCenter</span>          <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetCenter</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetDataType</span>        <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetDataType</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetPrecision</span>       <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetPrecision</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">SetArrayDimensions</span> <span class="o">=&gt;</span> <span class="n">xh5for_metadata_SetArrayDimensions</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetName</span>            <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetName</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetType</span>            <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetType</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetCenter</span>          <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetCenter</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetDataType</span>        <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetDataType</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetPrecision</span>       <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetPrecision</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">GetArrayDimensions</span> <span class="o">=&gt;</span> <span class="n">xh5for_metadata_GetArrayDimensions</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">Free</span>               <span class="o">=&gt;</span> <span class="n">xh5for_metadata_Free</span>
+    <span class="k">end type </span><span class="n">xh5for_metadata_t</span>
+</pre></div>
+
+    </section>
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-1">All Derived Types</a></h3></div>
+  <div id="alltypes-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/hdf5_contiguous_hyperslab_handler_t.html">hdf5_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_dataset_per_process_handler_t.html">hdf5_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_handler_t.html">hdf5_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_contiguous_hyperslab_handler_t.html">hdf5_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_structured_dataset_per_process_handler_t.html">hdf5_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_contiguous_hyperslab_handler_t.html">hdf5_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/hdf5_unstructured_dataset_per_process_handler_t.html">hdf5_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html">mpi_env_t</a>
+      
+      <a class="list-group-item" href="../type/spatial_grid_descriptor_t.html">spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/steps_handler_t.html">steps_handler_t</a>
+      
+      <a class="list-group-item" href="../type/structured_contiguous_hyperslab_factory_t.html">structured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_dataset_per_process_factory_t.html">structured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/structured_spatial_grid_descriptor_t.html">structured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/structured_uniform_grid_descriptor_t.html">structured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/uniform_grid_descriptor_t.html">uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_contiguous_hyperslab_factory_t.html">unstructured_contiguous_hyperslab_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_dataset_per_process_factory_t.html">unstructured_dataset_per_process_factory_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_spatial_grid_descriptor_t.html">unstructured_spatial_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/unstructured_uniform_grid_descriptor_t.html">unstructured_uniform_grid_descriptor_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_attribute_t.html">xdmf_attribute_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_character_data_t.html">xdmf_character_data_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_contiguous_hyperslab_handler_t.html">xdmf_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataitem_t.html">xdmf_dataitem_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_dataset_per_process_handler_t.html">xdmf_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_domain_t.html">xdmf_domain_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_element_t.html">xdmf_element_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_file_t.html">xdmf_file_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_geometry_t.html">xdmf_geometry_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_grid_t.html">xdmf_grid_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_handler_t.html">xdmf_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_information_t.html">xdmf_information_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_contiguous_hyperslab_handler_t.html">xdmf_structured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_structured_dataset_per_process_handler_t.html">xdmf_structured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_time_t.html">xdmf_time_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_topology_t.html">xdmf_topology_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html">xdmf_unstructured_contiguous_hyperslab_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_unstructured_dataset_per_process_handler_t.html">xdmf_unstructured_dataset_per_process_handler_t</a>
+      
+      <a class="list-group-item" href="../type/xdmf_xinclude_t.html">xdmf_xinclude_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_abstract_factory_t.html">xh5for_abstract_factory_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_metadata_t.html">xh5for_metadata_t</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html">xh5for_t</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2016-10-05T10:22:05.247293 
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="XDMF parallel partitioned mesh I/O on top of HDF5">
+    
+    <meta name="author" content="Víctor Sande Veiga" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>test_xdmf_character_data &ndash; XH5For</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">XH5For </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>test_xdmf_character_data
+    <small>Program</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 2.7% of total for programs.">65 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/test_xdmf_character_data.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/test_xdmf_character_data.f90.html'>test_xdmf_character_data.f90</a></li>
+  
+     <li class="active">test_xdmf_character_data</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
+  <div id="vars-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-file%7E4">file</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-dataitem%7E2">dataitem</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-character_data">character_data</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-document_root%7E4">document_root</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-element%7E4">element</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-element_list%7E4">element_list</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-i%7E4">i</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../program/test_xdmf_character_data.html#src">test_xdmf_character_data</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprogs-0">All Programs</a></h3></div>
+  <div id="allprogs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/ch_unstructured_hexahedron.html">ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/steps_handler_test.html">steps_handler_test</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_hyperslabs_handler.html">test_hdf5_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_rect_dpp_handler.html">test_hdf5_rect_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_rect_hyperslabs_handler.html">test_hdf5_rect_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_reg_dpp_handler.html">test_hdf5_reg_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_reg_hyperslabs_handler.html">test_hdf5_reg_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_uns_hyperslabs_handler.html">test_hdf5_uns_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_mpi_environment.html">test_mpi_environment</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_attribute.html">test_xdmf_attribute</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html">test_xdmf_character_data</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_dataitem.html">test_xdmf_dataitem</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_geometry.html">test_xdmf_geometry</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_grid.html">test_xdmf_grid</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_dpp_handler.html">test_xdmf_rect_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_hyperslabs_handler.html">test_xdmf_rect_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_reg_ddp_handler.html">test_xdmf_reg_ddp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_reg_hyperslabs_handler.html">test_xdmf_reg_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_time.html">test_xdmf_time</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_topology.html">test_xdmf_topology</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_uns_ddp_handler.html">test_xdmf_uns_ddp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_uns_hyperslabs_handler.html">test_xdmf_uns_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_xinclude.html">test_xdmf_xinclude</a>
+      
+      <a class="list-group-item" href="../program/try_compile_hdf5_mod.html">try_compile_hdf5_mod</a>
+      
+      <a class="list-group-item" href="../program/try_compile_mpi_mod.html">try_compile_mpi_mod</a>
+      
+      <a class="list-group-item" href="../program/wxml_example.html">wxml_example</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid%7E2.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid%7E3.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E2.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E3.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E4.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E5.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_hexahedron.html">xh5for_ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_hexahedron%7E2.html">xh5for_ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_mixedtopology.html">xh5for_ch_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_mixedtopology%7E2.html">xh5for_ch_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_quadrilateral.html">xh5for_ch_unstructured_quadrilateral</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E2.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E3.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E4.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E5.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_triangles.html">xh5for_ch_unstructured_triangles</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid%7E2.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid%7E3.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_regular_grid.html">xh5for_dpp_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_hexahedron.html">xh5for_dpp_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_mixedtopology.html">xh5for_dpp_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_quadrilateral.html">xh5for_dpp_unstructured_quadrilateral</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_tetrahedron.html">xh5for_dpp_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_triangles.html">xh5for_dpp_unstructured_triangles</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li><a href='../module/fox_xdmf.html'>fox_xdmf</a></li>
+      
+      <li>fox_dom</li>
+      
+      <li>PENF</li>
+      
+    </ul>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: program~~test_xdmf_character_data~~UsesGraph Pages: 1 -->
+<svg id="programtest_xdmf_character_dataUsesGraph" width="641pt" height="611pt"
+ viewBox="0.00 0.00 641.00 610.90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="program~~test_xdmf_character_data~~UsesGraph" class="graph" transform="scale(0.865047 0.865047) rotate(0) translate(4 702.201)">
+<title>program~~test_xdmf_character_data~~UsesGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-702.201 737,-702.201 737,4 -4,4"/>
+<!-- program~test_xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node1" class="node"><title>program~test_xdmf_character_data</title>
+<polygon fill="none" stroke="black" points="733,-361.401 596,-361.401 596,-337.401 733,-337.401 733,-361.401"/>
+<text text-anchor="middle" x="664.5" y="-347.001" font-family="Helvetica,sans-Serif" font-size="10.50">test_xdmf_character_data</text>
+</g>
+<!-- module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node2" class="node"><title>module~fox_xdmf</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node2"><a xlink:href="../module/fox_xdmf.html" xlink:title="fox_xdmf">
+<polygon fill="#337ab7" stroke="#337ab7" points="560,-361.401 504,-361.401 504,-337.401 560,-337.401 560,-361.401"/>
+<text text-anchor="middle" x="532" y="-347.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fox_xdmf</text>
+</a>
+</g>
+</g>
+<!-- module~fox_xdmf&#45;&gt;program~test_xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge67" class="edge"><title>module~fox_xdmf&#45;&gt;program~test_xdmf_character_data</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M560.04,-349.401C567.77,-349.401 576.605,-349.401 585.782,-349.401"/>
+<polygon fill="#000000" stroke="#000000" points="585.839,-352.901 595.839,-349.401 585.839,-345.901 585.839,-352.901"/>
+</g>
+<!-- PENF -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node3" class="node"><title>PENF</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-209.401 0,-209.401 0,-185.401 54,-185.401 54,-209.401"/>
+<text text-anchor="middle" x="27" y="-195.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">PENF</text>
+</g>
+<!-- PENF&#45;&gt;program~test_xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge68" class="edge"><title>PENF&#45;&gt;program~test_xdmf_character_data</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C199.788,-567.21 148.959,-635.239 223,-682.401 265.734,-709.621 287.888,-694.854 337,-682.401 504.215,-640 619.253,-437.514 653.138,-370.783"/>
+<polygon fill="#000000" stroke="#000000" points="656.378,-372.13 657.711,-361.62 650.114,-369.005 656.378,-372.13"/>
+</g>
+<!-- module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node5" class="node"><title>module~xdmf_grid</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node5"><a xlink:href="../module/xdmf_grid.html" xlink:title="xdmf_grid">
+<polygon fill="#337ab7" stroke="#337ab7" points="450.5,-361.401 390.5,-361.401 390.5,-337.401 450.5,-337.401 450.5,-361.401"/>
+<text text-anchor="middle" x="420.5" y="-347.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_grid</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge8" class="edge"><title>PENF&#45;&gt;module~xdmf_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M28.9912,-209.605C32.4553,-247.212 46.2891,-363.875 90,-448.401 104.836,-477.09 115.438,-479.811 137.5,-503.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C169.363,-535.332 184.24,-471.626 223,-451.401 247.007,-438.874 252.274,-431.752 279,-427.401"/>
+</g>
+<!-- module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node6" class="node"><title>module~xdmf_xinclude</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node6"><a xlink:href="../module/xdmf_xinclude.html" xlink:title="xdmf_xinclude">
+<polygon fill="#337ab7" stroke="#337ab7" points="461,-277.401 380,-277.401 380,-253.401 461,-253.401 461,-277.401"/>
+<text text-anchor="middle" x="420.5" y="-263.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_xinclude</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge13" class="edge"><title>PENF&#45;&gt;module~xdmf_xinclude</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-197.401C201.416,-194.056 217.273,-189.519 279,-195.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-195.401C325.578,-199.648 370.654,-227.888 396.79,-247.175"/>
+<polygon fill="#000000" stroke="#000000" points="394.816,-250.071 404.899,-253.325 399.046,-244.494 394.816,-250.071"/>
+</g>
+<!-- module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node7" class="node"><title>module~xdmf_dataitem</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node7"><a xlink:href="../module/xdmf_dataitem.html" xlink:title="xdmf_dataitem">
+<polygon fill="#337ab7" stroke="#337ab7" points="462,-213.401 379,-213.401 379,-189.401 462,-189.401 462,-213.401"/>
+<text text-anchor="middle" x="420.5" y="-199.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_dataitem</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge18" class="edge"><title>PENF&#45;&gt;module~xdmf_dataitem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-39.4006C159.779,-28.8915 319.881,-81.2813 337,-96.4006 367.444,-123.288 344.558,-151.404 373,-180.401 374.047,-181.468 375.158,-182.485 376.319,-183.456"/>
+<polygon fill="#000000" stroke="#000000" points="374.378,-186.368 384.591,-189.188 378.365,-180.615 374.378,-186.368"/>
+</g>
+<!-- module~xdmf_domain -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node8" class="node"><title>module~xdmf_domain</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node8"><a xlink:href="../module/xdmf_domain.html" xlink:title="xdmf_domain">
+<polygon fill="#337ab7" stroke="#337ab7" points="459,-536.401 382,-536.401 382,-512.401 459,-512.401 459,-536.401"/>
+<text text-anchor="middle" x="420.5" y="-522.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_domain</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_domain -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge23" class="edge"><title>PENF&#45;&gt;module~xdmf_domain</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C178.817,-545.441 170.801,-578.141 223,-602.401 268.947,-623.755 289.923,-621.132 337,-602.401 366.064,-590.836 390.798,-563.636 405.401,-544.629"/>
+<polygon fill="#000000" stroke="#000000" points="408.239,-546.677 411.377,-536.558 402.613,-542.512 408.239,-546.677"/>
+</g>
+<!-- module~xdmf_file -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node9" class="node"><title>module~xdmf_file</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node9"><a xlink:href="../module/xdmf_file.html" xlink:title="xdmf_file">
+<polygon fill="#337ab7" stroke="#337ab7" points="307.5,-593.401 252.5,-593.401 252.5,-569.401 307.5,-569.401 307.5,-593.401"/>
+<text text-anchor="middle" x="280" y="-579.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_file</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_file -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge27" class="edge"><title>PENF&#45;&gt;module~xdmf_file</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C168.317,-534.214 212.112,-555.94 242.928,-568.504"/>
+<polygon fill="#000000" stroke="#000000" points="241.855,-571.843 252.442,-572.261 244.427,-565.332 241.855,-571.843"/>
+</g>
+<!-- module~xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node10" class="node"><title>module~xdmf_character_data</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node10"><a xlink:href="../module/xdmf_character_data.html" xlink:title="xdmf_character_data">
+<polygon fill="#337ab7" stroke="#337ab7" points="337,-673.401 223,-673.401 223,-649.401 337,-649.401 337,-673.401"/>
+<text text-anchor="middle" x="280" y="-659.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_character_data</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge30" class="edge"><title>PENF&#45;&gt;module~xdmf_character_data</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C186.917,-554.102 170.843,-589.589 223,-635.401 226.877,-638.806 231.276,-641.85 235.864,-644.548"/>
+<polygon fill="#000000" stroke="#000000" points="234.359,-647.712 244.832,-649.315 237.644,-641.531 234.359,-647.712"/>
+</g>
+<!-- module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node11" class="node"><title>module~xdmf_time</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node11"><a xlink:href="../module/xdmf_time.html" xlink:title="xdmf_time">
+<polygon fill="#337ab7" stroke="#337ab7" points="451.5,-319.401 389.5,-319.401 389.5,-295.401 451.5,-295.401 451.5,-319.401"/>
+<text text-anchor="middle" x="420.5" y="-305.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_time</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge32" class="edge"><title>PENF&#45;&gt;module~xdmf_time</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-197.401C164.84,-196.032 313.096,-260.146 383.023,-291.101"/>
+<polygon fill="#000000" stroke="#000000" points="381.789,-294.382 392.35,-295.238 384.628,-287.984 381.789,-294.382"/>
+</g>
+<!-- module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node12" class="node"><title>module~xdmf_attribute</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node12"><a xlink:href="../module/xdmf_attribute.html" xlink:title="xdmf_attribute">
+<polygon fill="#337ab7" stroke="#337ab7" points="461,-129.401 380,-129.401 380,-105.401 461,-105.401 461,-129.401"/>
+<text text-anchor="middle" x="420.5" y="-115.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_attribute</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge37" class="edge"><title>PENF&#45;&gt;module~xdmf_attribute</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M31.9226,-185.31C42.7815,-154.122 76.5339,-71.1778 137.5,-39.4006"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-39.4006C196.483,-9.69948 215.761,-12.8062 279,-1.40062"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-1.40062C339.653,9.17778 387.541,-59.8586 408.33,-96.1476"/>
+<polygon fill="#000000" stroke="#000000" points="405.334,-97.9615 413.243,-105.011 411.456,-94.5683 405.334,-97.9615"/>
+</g>
+<!-- module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node13" class="node"><title>module~xdmf_topology</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node13"><a xlink:href="../module/xdmf_topology.html" xlink:title="xdmf_topology">
+<polygon fill="#337ab7" stroke="#337ab7" points="461.5,-171.401 379.5,-171.401 379.5,-147.401 461.5,-147.401 461.5,-171.401"/>
+<text text-anchor="middle" x="420.5" y="-157.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_topology</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge42" class="edge"><title>PENF&#45;&gt;module~xdmf_topology</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-39.4006C194.48,-10.7437 217.541,-47.5705 279,-39.4006"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-39.4006C306.431,-36.02 317.504,-36.7251 337,-53.4006 368.178,-80.0675 344.334,-109.051 373,-138.401 374.044,-139.47 375.153,-140.49 376.313,-141.461"/>
+<polygon fill="#000000" stroke="#000000" points="374.367,-144.371 384.577,-147.201 378.361,-138.622 374.367,-144.371"/>
+</g>
+<!-- module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node14" class="node"><title>module~xdmf_geometry</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node14"><a xlink:href="../module/xdmf_geometry.html" xlink:title="xdmf_geometry">
+<polygon fill="#337ab7" stroke="#337ab7" points="464,-403.401 377,-403.401 377,-379.401 464,-379.401 464,-403.401"/>
+<text text-anchor="middle" x="420.5" y="-389.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_geometry</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge48" class="edge"><title>PENF&#45;&gt;module~xdmf_geometry</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C183.392,-550.333 214.768,-467.266 279,-465.401"/>
+</g>
+<!-- module~xdmf_information -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node15" class="node"><title>module~xdmf_information</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node15"><a xlink:href="../module/xdmf_information.html" xlink:title="xdmf_information">
+<polygon fill="#337ab7" stroke="#337ab7" points="468,-445.401 373,-445.401 373,-421.401 468,-421.401 468,-445.401"/>
+<text text-anchor="middle" x="420.5" y="-431.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_information</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_information -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge52" class="edge"><title>PENF&#45;&gt;module~xdmf_information</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-503.401C181.849,-548.683 217.208,-498.325 279,-503.401"/>
+</g>
+<!-- module~xdmf_utils -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node16" class="node"><title>module~xdmf_utils</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node16"><a xlink:href="../module/xdmf_utils.html" xlink:title="xdmf_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="310.5,-129.401 249.5,-129.401 249.5,-105.401 310.5,-105.401 310.5,-129.401"/>
+<text text-anchor="middle" x="280" y="-115.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_utils</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_utils -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge4" class="edge"><title>PENF&#45;&gt;module~xdmf_utils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.1283,-198.192C76.326,-198.674 109.026,-198.939 137.5,-197.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M139.5,-197.401C162.204,-196.174 167.93,-190.783 187,-178.401 205.716,-166.248 204.62,-156.056 223,-143.401 228.33,-139.731 234.261,-136.345 240.213,-133.315"/>
+<polygon fill="#000000" stroke="#000000" points="242,-136.339 249.499,-128.855 238.97,-130.029 242,-136.339"/>
+</g>
+<!-- module~xdmf_element -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node18" class="node"><title>module~xdmf_element</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node18"><a xlink:href="../module/xdmf_element.html" xlink:title="xdmf_element">
+<polygon fill="#337ab7" stroke="#337ab7" points="320,-361.401 240,-361.401 240,-337.401 320,-337.401 320,-361.401"/>
+<text text-anchor="middle" x="280" y="-347.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_element</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_element -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge5" class="edge"><title>PENF&#45;&gt;module~xdmf_element</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M32.6118,-209.717C40.9082,-230.189 60.3012,-271.163 90,-293.401 131.164,-324.223 189.122,-338.155 229.975,-344.407"/>
+<polygon fill="#000000" stroke="#000000" points="229.578,-347.885 239.973,-345.836 230.569,-340.956 229.578,-347.885"/>
+</g>
+<!-- module~xdmf_parameters -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node21" class="node"><title>module~xdmf_parameters</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node21"><a xlink:href="../module/xdmf_parameters.html" xlink:title="xdmf_parameters">
+<polygon fill="#337ab7" stroke="#337ab7" points="187,-169.401 90,-169.401 90,-145.401 187,-145.401 187,-169.401"/>
+<text text-anchor="middle" x="138.5" y="-155.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xdmf_parameters</text>
+</a>
+</g>
+</g>
+<!-- PENF&#45;&gt;module~xdmf_parameters -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge1" class="edge"><title>PENF&#45;&gt;module~xdmf_parameters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.228,-187.82C66.3453,-183.393 81.0487,-178.022 94.7081,-173.032"/>
+<polygon fill="#000000" stroke="#000000" points="96.2258,-176.204 104.418,-169.485 93.8239,-169.629 96.2258,-176.204"/>
+</g>
+<!-- fox_dom -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node4" class="node"><title>fox_dom</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="559,-319.401 505,-319.401 505,-295.401 559,-295.401 559,-319.401"/>
+<text text-anchor="middle" x="532" y="-305.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fox_dom</text>
+</g>
+<!-- fox_dom&#45;&gt;program~test_xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge69" class="edge"><title>fox_dom&#45;&gt;program~test_xdmf_character_data</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M559.095,-315.799C575.512,-321.083 597.176,-328.055 616.513,-334.278"/>
+<polygon fill="#000000" stroke="#000000" points="615.487,-337.625 626.078,-337.357 617.631,-330.961 615.487,-337.625"/>
+</g>
+<!-- module~xdmf_grid&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge56" class="edge"><title>module~xdmf_grid&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M450.557,-349.401C463.684,-349.401 479.36,-349.401 493.372,-349.401"/>
+<polygon fill="#000000" stroke="#000000" points="493.693,-352.901 503.693,-349.401 493.693,-345.901 493.693,-352.901"/>
+</g>
+<!-- module~xdmf_xinclude&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge57" class="edge"><title>module~xdmf_xinclude&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M453.568,-277.627C458.612,-280.177 463.605,-283.107 468,-286.401 487.673,-301.146 486.207,-311.435 504,-328.401 504.795,-329.159 505.616,-329.917 506.456,-330.671"/>
+<polygon fill="#000000" stroke="#000000" points="504.378,-333.497 514.286,-337.248 508.88,-328.137 504.378,-333.497"/>
+</g>
+<!-- module~xdmf_dataitem&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge58" class="edge"><title>module~xdmf_dataitem&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M437.769,-213.547C447.528,-221.481 459.63,-232.543 468,-244.401 491.424,-277.583 479.183,-296.247 504,-328.401 504.463,-329 504.946,-329.592 505.447,-330.175"/>
+<polygon fill="#000000" stroke="#000000" points="503.088,-332.763 512.695,-337.231 507.971,-327.747 503.088,-332.763"/>
+</g>
+<!-- module~xdmf_domain&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge59" class="edge"><title>module~xdmf_domain&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.735,-512.371C439.164,-498.512 454.988,-475 468,-454.401 486.214,-425.566 506.341,-391.635 518.83,-370.32"/>
+<polygon fill="#000000" stroke="#000000" points="521.974,-371.877 523.997,-361.477 515.93,-368.346 521.974,-371.877"/>
+</g>
+<!-- module~xdmf_file&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge60" class="edge"><title>module~xdmf_file&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M304.794,-593.439C334.778,-606.715 386.387,-623.033 419.5,-597.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M421.5,-597.401C495.893,-539.815 520.87,-420.964 528.246,-371.625"/>
+<polygon fill="#000000" stroke="#000000" points="531.718,-372.068 529.631,-361.68 524.785,-371.102 531.718,-372.068"/>
+</g>
+<!-- module~xdmf_character_data&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge61" class="edge"><title>module~xdmf_character_data&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M318.499,-649.327C347.892,-638.68 388.814,-621.154 419.5,-597.401"/>
+</g>
+<!-- module~xdmf_time&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge62" class="edge"><title>module~xdmf_time&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M451.711,-318.988C464.854,-324.029 480.374,-329.983 494.184,-335.279"/>
+<polygon fill="#000000" stroke="#000000" points="493.289,-338.685 503.879,-338.998 495.795,-332.149 493.289,-338.685"/>
+</g>
+<!-- module~xdmf_attribute&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge63" class="edge"><title>module~xdmf_attribute&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M458.049,-129.55C461.817,-131.999 465.26,-134.921 468,-138.401 521.165,-205.931 459.186,-255.062 504,-328.401 504.319,-328.923 504.657,-329.438 505.01,-329.944"/>
+<polygon fill="#000000" stroke="#000000" points="502.5,-332.385 511.836,-337.395 507.662,-327.657 502.5,-332.385"/>
+</g>
+<!-- module~xdmf_topology&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge64" class="edge"><title>module~xdmf_topology&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M457.878,-171.689C461.675,-174.114 465.172,-176.992 468,-180.401 511.227,-232.498 467.231,-271.561 504,-328.401 504.333,-328.915 504.682,-329.422 505.047,-329.921"/>
+<polygon fill="#000000" stroke="#000000" points="502.582,-332.409 511.976,-337.307 507.687,-327.619 502.582,-332.409"/>
+</g>
+<!-- module~xdmf_geometry&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge65" class="edge"><title>module~xdmf_geometry&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M452.878,-379.365C465.795,-374.411 480.849,-368.637 494.275,-363.487"/>
+<polygon fill="#000000" stroke="#000000" points="495.626,-366.717 503.709,-359.868 493.119,-360.182 495.626,-366.717"/>
+</g>
+<!-- module~xdmf_information&#45;&gt;module~fox_xdmf -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge66" class="edge"><title>module~xdmf_information&#45;&gt;module~fox_xdmf</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M452.374,-421.362C457.771,-418.731 463.191,-415.725 468,-412.401 485.597,-400.237 502.568,-382.83 514.453,-369.394"/>
+<polygon fill="#000000" stroke="#000000" points="517.274,-371.482 521.156,-361.624 511.974,-366.91 517.274,-371.482"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge9" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M283.133,-129.605C289.906,-164.952 314.046,-268.674 373,-328.401 375.503,-330.936 378.367,-333.193 381.417,-335.197"/>
+<polygon fill="#000000" stroke="#000000" points="379.922,-338.371 390.359,-340.193 383.337,-332.26 379.922,-338.371"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge14" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_xinclude</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M291.768,-129.707C315.828,-157.203 371.938,-221.31 373,-222.401 380.939,-230.555 390.059,-239.144 398.108,-246.484"/>
+<polygon fill="#000000" stroke="#000000" points="395.945,-249.247 405.716,-253.345 400.633,-244.049 395.945,-249.247"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge19" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_dataitem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M310.597,-128.717C319.461,-132.733 328.956,-137.696 337,-143.401 355.715,-156.674 354.216,-167.226 373,-180.401 374.886,-181.723 376.868,-182.994 378.907,-184.209"/>
+<polygon fill="#000000" stroke="#000000" points="377.636,-187.5 388.098,-189.175 380.964,-181.342 377.636,-187.5"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge33" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_time</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M287.759,-129.628C298.321,-148.751 319.355,-186.914 337,-219.401 353.134,-249.106 348.288,-263.334 373,-286.401 375.258,-288.509 377.764,-290.432 380.409,-292.182"/>
+<polygon fill="#000000" stroke="#000000" points="378.771,-295.277 389.191,-297.194 382.241,-289.198 378.771,-295.277"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge38" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_attribute</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M310.712,-117.401C327.904,-117.401 349.985,-117.401 369.757,-117.401"/>
+<polygon fill="#000000" stroke="#000000" points="369.848,-120.901 379.848,-117.401 369.848,-113.901 369.848,-120.901"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge43" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_topology</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M310.712,-126.411C327.983,-131.648 350.188,-138.382 370.029,-144.399"/>
+<polygon fill="#000000" stroke="#000000" points="369.262,-147.823 379.848,-147.376 371.294,-141.125 369.262,-147.823"/>
+</g>
+<!-- module~xdmf_utils&#45;&gt;module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge50" class="edge"><title>module~xdmf_utils&#45;&gt;module~xdmf_geometry</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M282.125,-129.674C286.396,-169.542 304.993,-297.061 373,-370.401 374.016,-371.497 375.101,-372.54 376.24,-373.531"/>
+<polygon fill="#000000" stroke="#000000" points="374.236,-376.401 384.409,-379.361 378.302,-370.703 374.236,-376.401"/>
+</g>
+<!-- FoX_wxml -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node17" class="node"><title>FoX_wxml</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="169.5,-439.401 107.5,-439.401 107.5,-415.401 169.5,-415.401 169.5,-439.401"/>
+<text text-anchor="middle" x="138.5" y="-425.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FoX_wxml</text>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge10" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M169.658,-430.18C198.065,-432.144 241.71,-433.472 279,-427.401"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge15" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_xinclude</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M146.611,-415.136C159.31,-394.289 187.88,-351.925 223,-328.401 267.821,-298.378 327.902,-281.877 369.783,-273.378"/>
+<polygon fill="#000000" stroke="#000000" points="370.606,-276.784 379.752,-271.436 369.267,-269.913 370.606,-276.784"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge20" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_dataitem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M143.944,-415.248C152.497,-391.775 171.752,-338.531 187,-293.401 203.736,-243.866 187.804,-220.067 223,-181.401 241.228,-161.376 253.268,-165.834 279,-157.401"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_domain -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge24" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_domain</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M148.219,-439.701C162.148,-458.597 191.116,-494.933 223,-517.401 245.135,-532.999 254.134,-530.681 279,-541.401"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_file -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge28" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_file</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M149.919,-439.805C159.964,-452.032 175.321,-471.439 187,-489.401 205.215,-517.413 198.622,-532.55 223,-555.401 228.829,-560.864 236.01,-565.35 243.263,-568.965"/>
+<polygon fill="#000000" stroke="#000000" points="241.836,-572.161 252.391,-573.085 244.716,-565.781 241.836,-572.161"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge31" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_character_data</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M151.101,-439.807C161.714,-451.728 177.212,-470.648 187,-489.401 211.391,-536.127 196.178,-557.026 223,-602.401 231.875,-617.415 245.22,-631.674 256.657,-642.412"/>
+<polygon fill="#000000" stroke="#000000" points="254.434,-645.121 264.191,-649.25 259.138,-639.937 254.434,-645.121"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge34" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_time</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M169.851,-420.887C217.968,-410.191 309.161,-388.306 337,-370.401 357.678,-357.101 353.327,-343.146 373,-328.401 375.326,-326.657 377.819,-325.016 380.399,-323.479"/>
+<polygon fill="#000000" stroke="#000000" points="382.228,-326.47 389.387,-318.66 378.92,-320.301 382.228,-326.47"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge39" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_attribute</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M144.835,-415.1C154.716,-391.808 175.869,-339.465 187,-293.401 215.228,-176.582 150.295,-121.095 223,-25.4006 239.381,-3.83938 252.352,-6.20682 279,-1.40062"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge44" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_topology</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M144.632,-415.048C154.174,-391.67 174.785,-339.189 187,-293.401 217.948,-177.392 159.981,-55.222 279,-39.4006"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge49" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_geometry</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M165.672,-439.486C193.287,-451.05 238.353,-466.581 279,-465.401"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_information -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge53" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_information</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M152.489,-439.416C175.771,-459.743 227.049,-499.134 279,-503.401"/>
+</g>
+<!-- FoX_wxml&#45;&gt;module~xdmf_element -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge6" class="edge"><title>FoX_wxml&#45;&gt;module~xdmf_element</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M157.364,-415.386C174.018,-404.401 199.717,-387.994 223,-375.401 229.081,-372.111 235.653,-368.829 242.082,-365.759"/>
+<polygon fill="#000000" stroke="#000000" points="243.749,-368.843 251.325,-361.437 240.784,-362.502 243.749,-368.843"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge11" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M320.318,-349.401C338.99,-349.401 361.257,-349.401 379.958,-349.401"/>
+<polygon fill="#000000" stroke="#000000" points="380.218,-352.901 390.218,-349.401 380.218,-345.901 380.218,-352.901"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge16" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_xinclude</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M296.732,-337.357C314.623,-323.966 344.991,-302.153 373,-286.401 375.693,-284.886 378.515,-283.395 381.381,-281.948"/>
+<polygon fill="#000000" stroke="#000000" points="383.097,-285.006 390.581,-277.506 380.054,-278.702 383.097,-285.006"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge21" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_dataitem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M290.821,-337.387C307.237,-317.494 341.554,-276.701 373,-244.401 380.939,-236.246 390.059,-227.657 398.108,-220.317"/>
+<polygon fill="#000000" stroke="#000000" points="400.633,-222.752 405.716,-213.456 395.945,-217.554 400.633,-222.752"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_domain -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge25" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_domain</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M290.52,-361.429C313.944,-391.026 374.575,-467.636 403.583,-504.288"/>
+<polygon fill="#000000" stroke="#000000" points="400.963,-506.619 409.914,-512.288 406.452,-502.275 400.963,-506.619"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge35" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_time</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M320.318,-337.477C338.893,-331.845 361.025,-325.133 379.665,-319.481"/>
+<polygon fill="#000000" stroke="#000000" points="380.782,-322.799 389.335,-316.548 378.75,-316.101 380.782,-322.799"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge40" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_attribute</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M283.133,-337.196C289.906,-301.849 314.046,-198.127 373,-138.401 374.05,-137.337 375.164,-136.322 376.328,-135.354"/>
+<polygon fill="#000000" stroke="#000000" points="378.372,-138.196 384.611,-129.633 374.393,-132.437 378.372,-138.196"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge45" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_topology</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M284.663,-337.054C294.289,-306.553 323.055,-226.765 373,-180.401 374.25,-179.241 375.574,-178.136 376.956,-177.086"/>
+<polygon fill="#000000" stroke="#000000" points="378.866,-180.018 385.359,-171.646 375.062,-174.142 378.866,-180.018"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge47" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_geometry</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M320.318,-361.324C335.683,-365.983 353.482,-371.381 369.726,-376.307"/>
+<polygon fill="#000000" stroke="#000000" points="369.017,-379.749 379.603,-379.302 371.049,-373.05 369.017,-379.749"/>
+</g>
+<!-- module~xdmf_element&#45;&gt;module~xdmf_information -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge54" class="edge"><title>module~xdmf_element&#45;&gt;module~xdmf_information</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M296.732,-361.445C314.623,-374.835 344.991,-396.648 373,-412.401 375.693,-413.915 378.515,-415.406 381.381,-416.853"/>
+<polygon fill="#000000" stroke="#000000" points="380.054,-420.099 390.581,-421.295 383.097,-413.795 380.054,-420.099"/>
+</g>
+<!-- FoX_dom -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node19" class="node"><title>FoX_dom</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="168,-284.401 109,-284.401 109,-260.401 168,-260.401 168,-284.401"/>
+<text text-anchor="middle" x="138.5" y="-270.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FoX_dom</text>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_grid -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge12" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_grid</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M143.358,-284.553C156.427,-323.173 202.532,-439.851 279,-427.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-427.401C307.726,-423.049 314.253,-418.091 337,-403.401 355.233,-391.625 354.881,-382.351 373,-370.401 375.579,-368.7 378.318,-367.073 381.126,-365.53"/>
+<polygon fill="#000000" stroke="#000000" points="382.888,-368.561 390.217,-360.909 379.716,-362.321 382.888,-368.561"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_xinclude -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge17" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_xinclude</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150.683,-260.143C173.01,-237.154 225.575,-190.31 279,-195.401"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_dataitem -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge22" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_dataitem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M147.962,-260.269C161.759,-241.245 190.813,-204.215 223,-181.401 245.091,-165.742 253.268,-165.834 279,-157.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-157.401C290.491,-154.29 341.232,-171.862 378.561,-185.721"/>
+<polygon fill="#000000" stroke="#000000" points="377.615,-189.104 388.208,-189.33 380.068,-182.548 377.615,-189.104"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_domain -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge26" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_domain</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M143.933,-284.556C152.468,-308.036 171.693,-361.29 187,-406.401 203.665,-455.513 188.038,-479.093 223,-517.401 241.254,-537.401 254.134,-530.681 279,-541.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-541.401C312.641,-555.041 351.875,-548.277 380.499,-539.571"/>
+<polygon fill="#000000" stroke="#000000" points="381.718,-542.855 390.15,-536.441 379.558,-536.196 381.718,-542.855"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_file -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge29" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_file</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M144.249,-284.456C153.323,-307.764 173.43,-360.738 187,-406.401 206.407,-471.706 179.813,-502.71 223,-555.401 228.255,-561.813 235.447,-566.723 242.925,-570.455"/>
+<polygon fill="#000000" stroke="#000000" points="241.859,-573.807 252.426,-574.575 244.644,-567.385 241.859,-573.807"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_time -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge36" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_time</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M168.149,-275.982C218.273,-282.247 321.985,-295.211 379.279,-302.373"/>
+<polygon fill="#000000" stroke="#000000" points="379.057,-305.872 389.414,-303.64 379.925,-298.926 379.057,-305.872"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_attribute -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge41" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_attribute</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M152.042,-260.029C162.998,-248.472 178.451,-230.22 187,-211.401 221.825,-134.739 170.15,-90.9499 223,-25.4006 239.996,-4.32051 252.352,-6.20682 279,-1.40062"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_topology -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge46" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_topology</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M151.134,-260.24C161.771,-248.543 177.285,-229.949 187,-211.401 227.225,-134.605 193.063,-50.8244 279,-39.4006"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_geometry -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge51" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_geometry</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M141.983,-284.655C151.443,-327.519 189.323,-468.004 279,-465.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-465.401C308.067,-464.615 313.796,-455.358 337,-441.401 354.606,-430.811 355.497,-423.16 373,-412.401 375.476,-410.879 378.081,-409.402 380.742,-407.983"/>
+<polygon fill="#000000" stroke="#000000" points="382.516,-411.01 389.894,-403.407 379.385,-404.749 382.516,-411.01"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_information -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge55" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_information</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M143.802,-284.594C158.752,-326.726 208.329,-464.411 223,-479.401 241.941,-498.752 252.013,-501.184 279,-503.401"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M281,-503.401C327.278,-507.202 374.018,-474.158 399.623,-452.157"/>
+<polygon fill="#000000" stroke="#000000" points="402.01,-454.718 407.167,-445.462 397.364,-449.482 402.01,-454.718"/>
+</g>
+<!-- FoX_dom&#45;&gt;module~xdmf_element -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge7" class="edge"><title>FoX_dom&#45;&gt;module~xdmf_element</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.046,-284.568C174.736,-295.314 200.087,-311.135 223,-323.401 229.095,-326.663 235.674,-329.933 242.106,-332.998"/>
+<polygon fill="#000000" stroke="#000000" points="240.809,-336.255 251.35,-337.318 243.773,-329.913 240.809,-336.255"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_node20" class="node"><title>iso_fortran_env</title>
+<g id="a_program~~test_xdmf_character_data~~UsesGraph_node20"><a xlink:href="https://software.intel.com/en-us/node/511041" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="182,-127.401 95,-127.401 95,-103.401 182,-103.401 182,-127.401"/>
+<text text-anchor="middle" x="138.5" y="-113.001" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~xdmf_utils -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge2" class="edge"><title>iso_fortran_env&#45;&gt;module~xdmf_utils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M182.113,-116.012C200.331,-116.273 221.476,-116.576 239.355,-116.832"/>
+<polygon fill="#000000" stroke="#000000" points="239.409,-120.333 249.458,-116.977 239.51,-113.334 239.409,-120.333"/>
+</g>
+<!-- module~xdmf_parameters&#45;&gt;module~xdmf_utils -->
+<g id="program~~test_xdmf_character_data~~UsesGraph_edge3" class="edge"><title>module~xdmf_parameters&#45;&gt;module~xdmf_utils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M181.355,-145.399C199.773,-140.118 221.299,-133.946 239.445,-128.742"/>
+<polygon fill="#000000" stroke="#000000" points="240.49,-132.084 249.138,-125.963 238.561,-125.355 240.49,-132.084"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panprogramtest_xdmf_character_dataUsesGraph = svgPanZoom('#programtest_xdmf_character_dataUsesGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="490pt" height="32pt"
+ viewBox="0.00 0.00 489.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485.5,-28 485.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.5,-24 72.5,-24 72.5,-0 139.5,-0 139.5,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="481.5,-24 384.5,-24 384.5,-0 481.5,-0 481.5,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+
+    <br><br>
+    
+    
+     <h3>Calls</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: program~~test_xdmf_character_data~~CallsGraph Pages: 1 -->
+<svg id="programtest_xdmf_character_dataCallsGraph" width="305pt" height="200pt"
+ viewBox="0.00 0.00 305.00 200.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="program~~test_xdmf_character_data~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 196)">
+<title>program~~test_xdmf_character_data~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-196 301,-196 301,4 -4,4"/>
+<!-- program~test_xdmf_character_data -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node1" class="node"><title>program~test_xdmf_character_data</title>
+<polygon fill="none" stroke="black" points="137,-108 0,-108 0,-84 137,-84 137,-108"/>
+<text text-anchor="middle" x="68.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">test_xdmf_character_data</text>
+</g>
+<!-- getlength -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node2" class="node"><title>getlength</title>
+<polygon fill="#777777" stroke="#777777" points="263.5,-192 206.5,-192 206.5,-168 263.5,-168 263.5,-192"/>
+<text text-anchor="middle" x="235" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">getlength</text>
+</g>
+<!-- program~test_xdmf_character_data&#45;&gt;getlength -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_edge1" class="edge"><title>program~test_xdmf_character_data&#45;&gt;getlength</title>
+<path fill="none" stroke="#000000" d="M86.8014,-108.133C106.847,-121.804 141.204,-144.063 173,-159 180.567,-162.555 188.908,-165.822 196.928,-168.667"/>
+<polygon fill="#000000" stroke="#000000" points="195.883,-172.009 206.478,-171.919 198.14,-165.383 195.883,-172.009"/>
+</g>
+<!-- getelementsbytagname -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node3" class="node"><title>getelementsbytagname</title>
+<polygon fill="#777777" stroke="#777777" points="297,-150 173,-150 173,-126 297,-126 297,-150"/>
+<text text-anchor="middle" x="235" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">getelementsbytagname</text>
+</g>
+<!-- program~test_xdmf_character_data&#45;&gt;getelementsbytagname -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_edge2" class="edge"><title>program~test_xdmf_character_data&#45;&gt;getelementsbytagname</title>
+<path fill="none" stroke="#000000" d="M116.639,-108.036C135.482,-112.846 157.351,-118.43 177.069,-123.464"/>
+<polygon fill="#000000" stroke="#000000" points="176.299,-126.88 186.854,-125.963 178.031,-120.098 176.299,-126.88"/>
+</g>
+<!-- getdocumentelement -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node4" class="node"><title>getdocumentelement</title>
+<polygon fill="#777777" stroke="#777777" points="291.5,-108 178.5,-108 178.5,-84 291.5,-84 291.5,-108"/>
+<text text-anchor="middle" x="235" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">getdocumentelement</text>
+</g>
+<!-- program~test_xdmf_character_data&#45;&gt;getdocumentelement -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_edge3" class="edge"><title>program~test_xdmf_character_data&#45;&gt;getdocumentelement</title>
+<path fill="none" stroke="#000000" d="M137.358,-96C147.58,-96 158.108,-96 168.284,-96"/>
+<polygon fill="#000000" stroke="#000000" points="168.319,-99.5001 178.319,-96 168.319,-92.5001 168.319,-99.5001"/>
+</g>
+<!-- item -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node5" class="node"><title>item</title>
+<polygon fill="#777777" stroke="#777777" points="262,-66 208,-66 208,-42 262,-42 262,-66"/>
+<text text-anchor="middle" x="235" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">item</text>
+</g>
+<!-- program~test_xdmf_character_data&#45;&gt;item -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_edge4" class="edge"><title>program~test_xdmf_character_data&#45;&gt;item</title>
+<path fill="none" stroke="#000000" d="M116.639,-83.9645C142.558,-77.3469 174.203,-69.2673 198.099,-63.1662"/>
+<polygon fill="#000000" stroke="#000000" points="199.003,-66.5477 207.827,-60.6826 197.271,-59.7653 199.003,-66.5477"/>
+</g>
+<!-- haschildnodes -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_node6" class="node"><title>haschildnodes</title>
+<polygon fill="#777777" stroke="#777777" points="275.5,-24 194.5,-24 194.5,-0 275.5,-0 275.5,-24"/>
+<text text-anchor="middle" x="235" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">haschildnodes</text>
+</g>
+<!-- program~test_xdmf_character_data&#45;&gt;haschildnodes -->
+<g id="program~~test_xdmf_character_data~~CallsGraph_edge5" class="edge"><title>program~test_xdmf_character_data&#45;&gt;haschildnodes</title>
+<path fill="none" stroke="#000000" d="M86.8014,-83.867C106.847,-70.1956 141.204,-47.9368 173,-33 176.878,-31.1784 180.958,-29.4324 185.095,-27.78"/>
+<polygon fill="#000000" stroke="#000000" points="186.672,-30.9248 194.778,-24.1027 184.187,-24.3808 186.672,-30.9248"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="560pt" height="32pt"
+ viewBox="0.00 0.00 559.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555.5,-28 555.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.5,-24 154.5,-24 154.5,-0 209.5,-0 209.5,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.5,-24 454.5,-24 454.5,-0 551.5,-0 551.5,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+    <br>
+
+     <section class="visible-xs visible-sm hidden-md">
+       
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-1">Variables</a></h3></div>
+  <div id="vars-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-file%7E4">file</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-dataitem%7E2">dataitem</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-character_data">character_data</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-document_root%7E4">document_root</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-element%7E4">element</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-element_list%7E4">element_list</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html#variable-i%7E4">i</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../program/test_xdmf_character_data.html#src">test_xdmf_character_data</a>
+  </div>
+</div>
+
+
+     </section>
+     <br class="visible-xs visible-sm hidden-md">
+
+     
+
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file%7E4"></span>type(<a href='../type/xdmf_file_t.html'>xdmf_file_t</a>)</td>
+  
+  
+  <td></td><td>::</td>
+  <td><strong>file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dataitem%7E2"></span>type(<a href='../type/xdmf_dataitem_t.html'>xdmf_dataitem_t</a>)</td>
+  
+  
+  <td></td><td>::</td>
+  <td><strong>dataitem</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-character_data"></span>type(<a href='../type/xdmf_character_data_t.html'>xdmf_character_data_t</a>)</td>
+  
+  
+  <td></td><td>::</td>
+  <td><strong>character_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-document_root%7E4"></span>type(Node),</td>
+  
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>document_root</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-element%7E4"></span>type(Node),</td>
+  
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>element</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-element_list%7E4"></span>type(NodeList),</td>
+  
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>element_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i%7E4"></span>integer</td>
+  
+  
+  <td></td><td>::</td>
+  <td><strong>i</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2 id="src">Source Code</h2>
+    <div class="highlight"><pre><span class="k">program </span><span class="n">test_xdmf_character_data</span>
+
+<span class="k">use </span><span class="n">fox_xdmf</span>
+<span class="k">use </span><span class="n">fox_dom</span>
+<span class="k">use </span><span class="n">PENF</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">I4P</span><span class="p">,</span> <span class="n">I8P</span><span class="p">,</span> <span class="n">R4P</span><span class="p">,</span> <span class="n">R8P</span>
+
+<span class="k">implicit none</span>
+
+<span class="k">    type</span><span class="p">(</span><span class="n">xdmf_file_t</span><span class="p">)</span> <span class="kd">::</span> <span class="k">file</span>
+<span class="k">    type</span><span class="p">(</span><span class="n">xdmf_dataitem_t</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dataitem</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">xdmf_character_data_t</span><span class="p">)</span> <span class="kd">::</span> <span class="n">character_data</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">Node</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">document_root</span><span class="p">,</span> <span class="n">element</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">NodeList</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">element_list</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
+
+    <span class="k">call file</span><span class="p">%</span><span class="n">set_filename</span><span class="p">(</span><span class="s1">&#39;test_xdmf_character_data.xmf&#39;</span><span class="p">)</span>
+    <span class="k">call file</span><span class="p">%</span><span class="n">openfile</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;String data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="s1">&#39;String&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I4P data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="mi">1_I4P</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I8P data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="mi">1_I8P</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R4P data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="mf">1.0_R4P</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R8P data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="mf">1.0_R8P</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I4P 1D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="p">(</span><span class="o">/</span><span class="mi">1_I4P</span><span class="p">,</span> <span class="mi">2_I4P</span><span class="o">/</span><span class="p">))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I8P 1D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="p">(</span><span class="o">/</span><span class="mi">1_I8P</span><span class="p">,</span> <span class="mi">3_I8P</span><span class="o">/</span><span class="p">))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R4P 1D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="p">(</span><span class="o">/</span><span class="mf">1.0_R4P</span><span class="p">,</span> <span class="mf">4.0_R4P</span><span class="o">/</span><span class="p">))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R8P 1D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="p">(</span><span class="o">/</span><span class="mf">1.0_R8P</span><span class="p">,</span> <span class="mf">5.0_R8P</span><span class="o">/</span><span class="p">))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I4P 2D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="nb">RESHAPE</span> <span class="p">((</span><span class="o">/</span><span class="mi">1_I4P</span><span class="p">,</span> <span class="mi">2_I4P</span><span class="p">,</span> <span class="mi">3_I4P</span><span class="p">,</span> <span class="mi">4_I4P</span><span class="p">,</span> <span class="mi">5_I4P</span><span class="p">,</span> <span class="mi">6_I4P</span><span class="o">/</span><span class="p">),</span> <span class="p">(</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">/</span><span class="p">)))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;I8P 2D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="nb">RESHAPE</span> <span class="p">((</span><span class="o">/</span><span class="mi">1_I8P</span><span class="p">,</span> <span class="mi">2_I8P</span><span class="p">,</span> <span class="mi">3_I8P</span><span class="p">,</span> <span class="mi">4_I8P</span><span class="p">,</span> <span class="mi">123456789_I8P</span><span class="p">,</span> <span class="mi">6_I8P</span><span class="o">/</span><span class="p">),</span> <span class="p">(</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">/</span><span class="p">)))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R4P 2D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="nb">RESHAPE</span> <span class="p">((</span><span class="o">/</span><span class="mf">1.0_R4P</span><span class="p">,</span> <span class="mf">2.0_R4P</span><span class="p">,</span> <span class="mf">3.0_R4P</span><span class="p">,</span> <span class="mf">4.0_R4P</span><span class="o">/</span><span class="p">),</span> <span class="p">(</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="p">)))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="n">Name</span><span class="o">=</span><span class="s1">&#39;R8P 2D data&#39;</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">character_data</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">,</span> <span class="nb">RESHAPE</span> <span class="p">((</span><span class="o">/</span><span class="mf">1.0_R8P</span><span class="p">,</span> <span class="mf">2.0_R8P</span><span class="p">,</span> <span class="mf">3.0_R8P</span><span class="p">,</span> <span class="mf">4.0_R8P</span><span class="o">/</span><span class="p">),</span> <span class="p">(</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="p">)))</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">close</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">xml_handler</span><span class="p">)</span>
+
+    <span class="k">call file</span><span class="p">%</span><span class="n">closefile</span><span class="p">()</span>
+
+    <span class="k">call file</span><span class="p">%</span><span class="n">parsefile</span><span class="p">()</span>
+    <span class="n">document_root</span> <span class="o">=&gt;</span> <span class="n">getDocumentElement</span><span class="p">(</span><span class="k">file</span><span class="p">%</span><span class="n">get_document_root</span><span class="p">())</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">hasChildNodes</span><span class="p">(</span><span class="n">document_root</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">element_list</span> <span class="o">=&gt;</span> <span class="n">getElementsByTagname</span><span class="p">(</span><span class="n">document_root</span><span class="p">,</span> <span class="s2">&quot;DataItem&quot;</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">getLength</span><span class="p">(</span><span class="n">element_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">item</span><span class="p">(</span><span class="n">element_list</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="n">parse</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="k">print</span><span class="p">()</span>
+        <span class="n">enddo</span>
+    <span class="n">endif</span>
+    <span class="k">call </span><span class="n">dataitem</span><span class="p">%</span><span class="n">free</span><span class="p">()</span>
+
+
+<span class="k">end program </span><span class="n">test_xdmf_character_data</span>
+</pre></div>
+
+    </section>
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprogs-1">All Programs</a></h3></div>
+  <div id="allprogs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/ch_unstructured_hexahedron.html">ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/steps_handler_test.html">steps_handler_test</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_hyperslabs_handler.html">test_hdf5_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_rect_dpp_handler.html">test_hdf5_rect_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_rect_hyperslabs_handler.html">test_hdf5_rect_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_reg_dpp_handler.html">test_hdf5_reg_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_reg_hyperslabs_handler.html">test_hdf5_reg_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_hdf5_uns_hyperslabs_handler.html">test_hdf5_uns_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_mpi_environment.html">test_mpi_environment</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_attribute.html">test_xdmf_attribute</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_character_data.html">test_xdmf_character_data</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_dataitem.html">test_xdmf_dataitem</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_geometry.html">test_xdmf_geometry</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_grid.html">test_xdmf_grid</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_dpp_handler.html">test_xdmf_rect_dpp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_rect_hyperslabs_handler.html">test_xdmf_rect_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_reg_ddp_handler.html">test_xdmf_reg_ddp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_reg_hyperslabs_handler.html">test_xdmf_reg_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_time.html">test_xdmf_time</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_topology.html">test_xdmf_topology</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_uns_ddp_handler.html">test_xdmf_uns_ddp_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_uns_hyperslabs_handler.html">test_xdmf_uns_hyperslabs_handler</a>
+      
+      <a class="list-group-item" href="../program/test_xdmf_xinclude.html">test_xdmf_xinclude</a>
+      
+      <a class="list-group-item" href="../program/try_compile_hdf5_mod.html">try_compile_hdf5_mod</a>
+      
+      <a class="list-group-item" href="../program/try_compile_mpi_mod.html">try_compile_mpi_mod</a>
+      
+      <a class="list-group-item" href="../program/wxml_example.html">wxml_example</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid%7E2.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_rectilinear_grid%7E3.html">xh5for_ch_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E2.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E3.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E4.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_regular_grid%7E5.html">xh5for_ch_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_hexahedron.html">xh5for_ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_hexahedron%7E2.html">xh5for_ch_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_mixedtopology.html">xh5for_ch_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_mixedtopology%7E2.html">xh5for_ch_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_quadrilateral.html">xh5for_ch_unstructured_quadrilateral</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E2.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E3.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E4.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_tetrahedron%7E5.html">xh5for_ch_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_ch_unstructured_triangles.html">xh5for_ch_unstructured_triangles</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid%7E2.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_rectilinear_grid%7E3.html">xh5for_dpp_rectilinear_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_regular_grid.html">xh5for_dpp_regular_grid</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_hexahedron.html">xh5for_dpp_unstructured_hexahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_mixedtopology.html">xh5for_dpp_unstructured_mixedtopology</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_quadrilateral.html">xh5for_dpp_unstructured_quadrilateral</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_tetrahedron.html">xh5for_dpp_unstructured_tetrahedron</a>
+      
+      <a class="list-group-item" href="../program/xh5for_dpp_unstructured_triangles.html">xh5for_dpp_unstructured_triangles</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2016-10-05T10:22:05.247293 
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>
