@@ -497,14 +497,6 @@ contains
         integer(I4P), intent(IN) :: attributeType
         integer(I4P)             :: NumberOfComponents
 
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_SCALAR   = 200
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_VECTOR   = 201
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_TENSOR   = 202
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_MATRIX   = 203
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_TENSOR6  = 204
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_GLOBALID = 205
-    integer(I4P), parameter :: XDMF_ATTRIBUTE_TYPE_NOTYPE   = 206
-
         select case(AttributeType)
             case(XDMF_ATTRIBUTE_TYPE_SCALAR)
                 NumberOfComponents = 1; return
