@@ -69,6 +69,7 @@ private
         procedure, public :: is_root                      => mpi_env_is_root
         procedure, public :: is_parallel                  => mpi_env_is_parallel
         procedure, public :: mpi_wtime                    => mpi_env_wtime
+        procedure, public :: barrier                      => mpi_env_barrier
         generic,   public :: mpi_allgather                => mpi_env_allgather_single_int_value_I4P, &
                                                              mpi_env_allgather_single_int_value_I8P
         generic,   public :: mpi_broadcast                => mpi_env_broadcast_int_I4P,       &
@@ -197,6 +198,23 @@ contains
         size = this%size
     end function mpi_env_get_comm_size
 
+    subroutine mpi_env_barrier(this, mpierror)
+    !-----------------------------------------------------------------
+    !< MPI_barrier interface
+    !----------------------------------------------------------------- 
+        class(mpi_env_t),          intent(IN)  :: this                !< MPI environment
+        integer(I4P), optional,    intent(OUT) :: mpierror            !< MPI error
+        integer(I4P)                           :: mpierr              !< Aux variable for MPI error
+    !----------------------------------------------------------------- 
+        assert(this%State == MPI_ENV_STATE_INIT)
+        mpierr = 0
+#if defined(ENABLE_MPI) && (defined(MPI_MOD) || defined(MPI_H))
+        if(this%parallel) then
+            call MPI_BARRIER(this%comm, mpierr) 
+        endif
+#endif
+        if(present(mpierror)) mpierror = mpierr
+    end subroutine mpi_env_barrier
 
     subroutine mpi_env_allgather_single_int_value_I4P(this, send_data, recv_data, mpierror)
     !-----------------------------------------------------------------

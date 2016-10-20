@@ -3,8 +3,9 @@ module xh5for_utils
 !< XH5For: XDMF parallel partitioned mesh I/O on top of HDF5
 !< XH5For utilities
 !--------------------------------------------------------------------- -----------------------------------------------------------
-use PENF,       only: I4P, R8P, str
-use xdmf_utils, only : warning_message
+use PENF,          only: I4P, R8P, str
+use xdmf_utils,    only: warning_message
+USE iso_c_binding, only: c_int, c_null_char
 use xh5for_parameters
 
 #ifdef MPI_MOD
@@ -16,8 +17,17 @@ include 'mpif.h'
 #endif	
 private
 
+    interface
+        function mkdir_recursive(path) bind(c,name="mkdir_recursive")
+            use iso_c_binding
+            integer(kind=c_int) :: mkdir_recursive
+            character(kind=c_char,len=1), intent(IN) :: path(*)
+        end function mkdir_recursive
+    end interface
+
 public :: Abort
 public :: Wtime
+public :: MkdirFullPath
 public :: GetNumberOfNodesPerElement
 public :: GetXDMFTopologyTypeName
 public :: GetXDMFTopologyTypeFromName
@@ -84,6 +94,17 @@ contains
         time = real(clock_reading,kind=R8P)/real(clock_rate,kind=R8P)
         return
     end function Wtime
+
+
+    function MkdirFullPath(path) result(error)
+    !-----------------------------------------------------------------
+    !< Create a hierarchy of directories
+    !-----------------------------------------------------------------
+        character(len=*),            intent(in)    :: path
+        integer(kind=c_int)                        :: error
+    !-----------------------------------------------------------------
+        error = mkdir_recursive(path//C_NULL_CHAR)
+    end function MkdirFullPath
 
     function GetNumberOfNodesPerElement(TopologyType) result(NodesPerElement)
         integer(I4P), intent(IN) :: TopologyType
