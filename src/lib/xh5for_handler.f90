@@ -312,9 +312,9 @@ contains
     !----------------------------------------------------------------- 
         isGridData = .false.
         if(Present(GridData)) isGridData = GridData
-        if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid() .and. this%StepsHandler%isStaticStep() ) then
+        if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid()) then
             if(this%HeavyData%IsOpen()) then
-                if(.not. this%HeavyData%IsStepFileOpen(XDMF_STATIC_STEP)) call this%HeavyData%OpenFile(this%Action, This%Prefix, This%Path)
+                if(.not. this%HeavyData%IsStepFileOpen(XDMF_STATIC_STEP)) call this%HeavyData%OpenFile(this%Action, This%Prefix, This%Path, XDMF_STATIC_STEP)
             else
                 call this%HeavyData%OpenFile(this%Action, This%Prefix, this%Path, XDMF_STATIC_STEP)
             endif

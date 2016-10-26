@@ -551,12 +551,12 @@ contains
 #ifdef PRINT_IO_TIMES
         start_time = this%MPIEnvironment%mpi_wtime()
 #endif
+        if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
         this%Action = Action
         this%Prefix = trim(adjustl(FilePrefix))
         this%Path   = './'
         if(present(Path)) this%Path   = trim(adjustl(Path))//'/'
         this%Filename = this%GetHDF5FileName(Step=Step)
-        if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)
