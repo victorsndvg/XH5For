@@ -64,6 +64,7 @@ private
     !< HDF5 abstract handler
     !----------------------------------------------------------------- 
         character(len=:),             allocatable :: Prefix                           !< Name prefix of the HDF5 file
+        character(len=:),             allocatable :: Path                             !< Root path
         character(len=:),             allocatable :: FileName                         !< HDF5 file name
         integer(HID_T)                            :: FileID  = XDMF_NO_VALUE          !< File identifier 
         integer(I4P)                              :: Action  = XDMF_NO_VALUE          !< HDF5 action to be perfomed (Read or Write)
@@ -521,27 +522,28 @@ contains
     !----------------------------------------------------------------- 
         assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
         if(present(Step)) then
-            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//HDF5_EXT
+            HDF5Filename = this%Path//this%Prefix//'_'//trim(adjustl(str(no_sign=.true., n=Step)))//HDF5_EXT
         else
-            HDF5Filename = trim(adjustl(this%prefix))//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
+            HDF5Filename = this%Path//this%Prefix//'_'//trim(adjustl(str(no_sign=.true., n=this%StepsHandler%GetCurrentStep())))//HDF5_EXT
         endif
     end function hdf5_handler_GetHDF5Filename
 
 
-    subroutine hdf5_handler_OpenFile(this, Action, FilePrefix, Step)
+    subroutine hdf5_handler_OpenFile(this, Action, FilePrefix, Path, Step)
     !-----------------------------------------------------------------
     !< Open a HDF5 file
     !----------------------------------------------------------------- 
-        class(hdf5_handler_t), intent(INOUT) :: this                  !< HDF5 handler type
-        integer(I4P),          intent(IN)    :: Action                !< Action to be perfomed (Read or Write)
-        character(len=*),      intent(IN)    :: FilePrefix            !< HDF5 file prefix
-        integer(I4P), optional, intent(IN)   :: Step                  !< Force step number
-        integer(I4P)                         :: hdferror              !< HDF5 error code
-        integer(HID_T)                       :: plist_id              !< HDF5 property list identifier 
-        character(len=:), allocatable        :: HDF5FileName          !< Name of the HDF5 file
+        class(hdf5_handler_t),      intent(INOUT) :: this                  !< HDF5 handler type
+        integer(I4P),               intent(IN)    :: Action                !< Action to be perfomed (Read or Write)
+        character(len=*),           intent(IN)    :: FilePrefix            !< HDF5 file prefix
+        character(len=*), optional, intent(IN)    :: Path                  !< Root path with slash
+        integer(I4P),     optional, intent(IN)    :: Step                  !< Force step number
+        integer(I4P)                              :: hdferror              !< HDF5 error code
+        integer(HID_T)                            :: plist_id              !< HDF5 property list identifier 
+        character(len=:), allocatable             :: HDF5FileName          !< Name of the HDF5 file
 #ifdef PRINT_IO_TIMES
-        real(R8P)                            :: start_time
-        real(R8P)                            :: end_time
+        real(R8P)                                 :: start_time
+        real(R8P)                                 :: end_time
     !-----------------------------------------------------------------
 #endif
         assert(this%State > HDF5_HANDLER_STATE_START) ! Was initialized
@@ -549,10 +551,12 @@ contains
 #ifdef PRINT_IO_TIMES
         start_time = this%MPIEnvironment%mpi_wtime()
 #endif
-        this%Action = Action
-        this%Prefix = FilePrefix
-        this%Filename = this%GetHDF5FileName(Step=Step)
         if(this%State == HDF5_HANDLER_STATE_OPEN) call this%CloseFile()
+        this%Action = Action
+        this%Prefix = trim(adjustl(FilePrefix))
+        this%Path   = './'
+        if(present(Path)) this%Path   = trim(adjustl(Path))//'/'
+        this%Filename = this%GetHDF5FileName(Step=Step)
         call H5open_f(error=hdferror) 
         call H5pcreate_f(H5P_FILE_ACCESS_F, prp_id=plist_id, hdferr=hdferror)
 #if defined(ENABLE_MPI) && defined(ENABLE_PARALLEL_HDF5)

@@ -48,7 +48,8 @@ private
     !-----------------------------------------------------------------
     !< XDMF handler abstract type
     !----------------------------------------------------------------- 
-        character(len=:),             allocatable :: prefix                          !< Name prefix of the XDMF file
+        character(len=:),             allocatable :: Prefix                          !< Name prefix of the XDMF file
+        character(len=:),             allocatable :: Path                            !< Root path
         type(xdmf_file_t)                         :: TemporalFile                    !< XDMF file handler for temporal collections
         type(xdmf_file_t)                         :: SpatialFile                     !< XDMF file handler for spatial collections
         integer(I4P)                              :: Action= XDMF_NO_VALUE           !< XDMF purpose (Read or Write)
@@ -176,7 +177,7 @@ public :: xdmf_handler_t
 
 contains
 
-    subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, Fileprefix, Action)
+    subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, Fileprefix, Path, Action)
     !-----------------------------------------------------------------
     !< XDMF file handler initialization procedure
     !----------------------------------------------------------------- 
@@ -186,6 +187,7 @@ contains
         class(uniform_grid_descriptor_t), target, intent(IN)    :: UniformGridDescriptor !< Local grid info
         class(spatial_grid_descriptor_t), target, intent(IN)    :: SpatialGridDescriptor !< Global grid info
         character(len=*), optional,               intent(IN)    :: FilePrefix            !< XDMF filename prefix
+        character(len=*), optional,               intent(IN)    :: Path                  !< Root path
         integer(I4P),     optional,               intent(IN)    :: Action                !< XDMF action to be performed (Read or Write)
     !----------------------------------------------------------------- 
         call this%Free()
@@ -193,7 +195,7 @@ contains
         this%StepsHandler          => StepsHandler
         this%SpatialGridDescriptor => SpatialGridDescriptor
         this%UniformGridDescriptor => UniformGridDescriptor
-        if(present(FilePrefix) .and. Present(Action)) call this%Open(FilePrefix, Action)
+        call this%Open(FilePrefix, Path, Action)
         this%State = XDMF_HANDLER_STATE_INIT
     end subroutine xdmf_handler_Initialize
 
@@ -334,17 +336,20 @@ contains
     end function xdmf_handler_GetSpatialFilename
 
 
-    subroutine xdmf_handler_Open(this, FilePrefix, Action)
+    subroutine xdmf_handler_Open(this, FilePrefix, Path, Action)
     !-----------------------------------------------------------------
     !< Open a XDMF file 
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(INOUT) :: this                  !< XDMF handler
-        character(len=*),      intent(IN)    :: FilePrefix            !< XDMF filename prefix
-        integer(I4P),          intent(IN)    :: Action                !< XDMF action to be performed (Read or Write)
+        class(xdmf_handler_t),      intent(INOUT) :: this             !< XDMF handler
+        character(len=*), optional, intent(IN)    :: FilePrefix       !< XDMF filename prefix
+        character(len=*), optional, intent(IN)    :: Path             !< Root path with slash
+        integer(I4P),     optional, intent(IN)    :: Action           !< XDMF action to be performed (Read or Write)
     !-----------------------------------------------------------------
-        this%Action = action
+        if(present(Action))     this%Action = Action
         if(this%MPIEnvironment%is_root()) then
-            this%Prefix = trim(adjustl(FilePrefix))
+            this%Path   = './'
+            if(present(FilePrefix)) this%Prefix = trim(adjustl(FilePrefix))
+            if(present(Path))       this%Path   = trim(adjustl(Path))//'/'
         endif
     end subroutine xdmf_handler_Open
 
@@ -361,7 +366,7 @@ contains
         if(this%MPIEnvironment%is_root()) then
             assert(this%HasPrefix())
             call this%StepsHandler%SetCurrentFilename(this%GetSpatialFileName())
-            call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
+            call this%SpatialFile%set_filename(this%Path//this%StepsHandler%GetCurrentFilename())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
                     call this%SpatialFile%openfile(write_header=.false.)
@@ -409,7 +414,7 @@ contains
         assert(this%State == XDMF_HANDLER_STATE_INIT .and. this%Action == XDMF_ACTION_READ)
         if(this%MPIEnvironment%is_root()) then
             assert(this%HasPrefix())
-            call this%TemporalFile%set_filename(trim(adjustl(this%Prefix))//XDMF_EXT)
+            call this%TemporalFile%set_filename(this%Path//this%Prefix//XDMF_EXT)
             call this%TemporalFile%ParseFile()
             if(getNodeType(this%TemporalFile%get_document_root())==DOCUMENT_NODE) then
                 DocumentRootNode => getDocumentElement(this%TemporalFile%get_document_root())
@@ -448,7 +453,7 @@ contains
         if(.not. this%TemporalFile%isParsed()) call this%ParseTemporalFile()
         if(.not. this%SpatialFile%isParsed()) then
             if(this%MPIEnvironment%is_root()) then
-                call this%SpatialFile%set_filename(this%StepsHandler%GetCurrentFilename())
+                call this%SpatialFile%set_filename(this%path//this%StepsHandler%GetCurrentFilename())
                 call this%SpatialFile%ParseFile()
                 ! Get Spatial Grid Node
                 SpatialGridNode => getDocumentElement(this%SpatialFile%get_document_root())
@@ -515,7 +520,7 @@ contains
             assert(this%HasPrefix())
             select case(this%action)
                 case(XDMF_ACTION_WRITE)
-                    call this%TemporalFile%set_filename(trim(adjustl(this%Prefix))//XDMF_EXT)
+                    call this%TemporalFile%set_filename(this%Path//this%Prefix//XDMF_EXT)
                     call this%TemporalFile%OpenFile()
                     call this%StepsHandler%Begin()
                     call domain%open(xml_handler = this%TemporalFile%xml_handler)
@@ -530,6 +535,7 @@ contains
                     call grid%close(xml_handler=this%TemporalFile%xml_handler)
                     call domain%close(xml_handler = this%TemporalFile%xml_handler)
                     call this%TemporalFile%CloseFile()
+                    call this%StepsHandler%End()
             end select
         endif
     end subroutine xdmf_handler_SerializeTemporalFile

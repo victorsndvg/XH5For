@@ -84,6 +84,7 @@ private
         integer(I4P)                                  :: Action     = XDMF_ACTION_WRITE
         logical                                       :: StaticGrid = .false.
         character(len=:),                 allocatable :: Prefix
+        character(len=:),                 allocatable :: Path
         type(mpi_env_t)                               :: MPIEnvironment
         type(steps_handler_t)                         :: StepsHandler
         class(uniform_grid_descriptor_t), allocatable :: UniformGridDescriptor
@@ -136,7 +137,7 @@ private
         procedure, public :: Open                  => xh5for_Open
         procedure         :: CheckOpenHeavyDataFile=> xh5for_CheckOpenHeavyDataFile
         procedure, public :: ParseGrid             => xh5for_ParseGrid
-        procedure         :: Serialize             => xh5for_Serialize
+        procedure, public :: Serialize             => xh5for_Serialize
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
@@ -311,47 +312,64 @@ contains
     !----------------------------------------------------------------- 
         isGridData = .false.
         if(Present(GridData)) isGridData = GridData
-        if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid() .and. this%StepsHandler%isStaticStep() ) then
+        if(isGridData .and. this%SpatialGridDescriptor%isStaticGrid()) then
             if(this%HeavyData%IsOpen()) then
-                if(.not. this%HeavyData%IsStepFileOpen(XDMF_STATIC_STEP)) call this%HeavyData%OpenFile(this%Action, This%Prefix)
+                if(.not. this%HeavyData%IsStepFileOpen(XDMF_STATIC_STEP)) call this%HeavyData%OpenFile(this%Action, This%Prefix, This%Path, XDMF_STATIC_STEP)
             else
-                call this%HeavyData%OpenFile(this%Action, This%Prefix, XDMF_STATIC_STEP)
+                call this%HeavyData%OpenFile(this%Action, This%Prefix, this%Path, XDMF_STATIC_STEP)
             endif
         else
             if(this%HeavyData%IsOpen()) then
-                if(.not. this%HeavyData%IsStepFileOpen(this%StepsHandler%GetCurrentStep())) call this%HeavyData%OpenFile(this%Action, This%Prefix)
+                if(.not. this%HeavyData%IsStepFileOpen(this%StepsHandler%GetCurrentStep())) call this%HeavyData%OpenFile(this%Action, This%Prefix, this%Path)
             else
-                call this%HeavyData%OpenFile(this%Action, This%Prefix)
+                call this%HeavyData%OpenFile(this%Action, This%Prefix, this%Path)
             endif
         endif
     end subroutine
 
 
-    subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy, Action, Comm, Info, Root)
+    subroutine xh5for_Open(this, FilePrefix, Path, GridType, StaticGrid, Strategy, Action, Comm, Info, Root)
     !-----------------------------------------------------------------
     !< Open a XDMF (Temporal) file, set the MPI environment and also
     !< initialize the steps handler
     !----------------------------------------------------------------- 
-        class(xh5for_t),        intent(INOUT) :: this                 !< XH5For derived type
-        character(len=*),       intent(IN)    :: FilePrefix           !< XDMF filename prefix
-        integer(I4P), optional, intent(IN)    :: GridType             !< XDMF grid type
-        logical,      optional, intent(IN)    :: StaticGrid           !< Static grid flag
-        integer(I4P), optional, intent(IN)    :: Strategy             !< Data IO management strategy
-        integer(I4P), optional, intent(IN)    :: Action               !< XDMF Open file action (Read or Write)
-        integer,      optional, intent(IN)    :: Comm                 !< MPI communicator
-        integer,      optional, intent(IN)    :: Info                 !< MPI info
-        integer,      optional, intent(IN)    :: Root                 !< MPI root procesor
-        integer                               :: error                !< Error variable
+        class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
+        character(len=*),           intent(IN)    :: FilePrefix       !< XDMF filename prefix
+        character(len=*), optional, intent(IN)    :: Path             !< Root path
+        integer(I4P),     optional, intent(IN)    :: GridType         !< XDMF grid type
+        logical,          optional, intent(IN)    :: StaticGrid       !< Static grid flag
+        integer(I4P),     optional, intent(IN)    :: Strategy         !< Data IO management strategy
+        integer(I4P),     optional, intent(IN)    :: Action           !< XDMF Open file action (Read or Write)
+        integer,          optional, intent(IN)    :: Comm             !< MPI communicator
+        integer,          optional, intent(IN)    :: Info             !< MPI info
+        integer,          optional, intent(IN)    :: Root             !< MPI root procesor
+        integer                                   :: error            !< Error variable
     !-----------------------------------------------------------------
         call this%Free()
-        ! Assign Fileprefix, strategy and action
+
+        ! Assign Fileprefix, path, strategy and action
         this%Prefix = trim(adjustl(FilePrefix))
+        this%Path   = '.'
         if(present(Strategy)) call this%SetStrategy(Strategy)
         if(present(GridType)) call this%SetGridType(GridType)
         if(present(StaticGrid)) this%StaticGrid = StaticGrid
         if(present(Action)) this%Action = Action
+        if(present(Path))   this%Path = trim(adjustl(Path))
+
         ! MPI environment initialization
         call This%MPIEnvironment%Initialize(comm = comm, root = root, mpierror = error)
+        assert(error == 0)
+
+        ! Create output directory if does not exist
+        if(this%Action == XDMF_ACTION_WRITE) then
+            if(This%MPIEnvironment%is_root()) then
+                error = MkdirFullPath(this%Path)
+                assert(error == 0)
+            endif
+        endif
+        call This%MPIEnvironment%Barrier(mpierror = error)
+        assert(error == 0)
+
         ! Steps initialization
         call this%StepsHandler%Initialize(this%MPIEnvironment)
         this%State = XH5FOR_STATE_OPEN
@@ -380,6 +398,7 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor, &
                 FilePrefix            = this%Prefix,                &
+                Path                  = this%Path,                  &
                 Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
@@ -426,6 +445,7 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor, &
                 FilePrefix            = this%Prefix,                &
+                Path                  = this%Path,                  &
                 Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
@@ -472,6 +492,7 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor, &
                 FilePrefix            = this%Prefix,                &
+                Path                  = this%Path,                  &
                 Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
@@ -517,6 +538,7 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor, &
                 FilePrefix            = this%Prefix,                &
+                Path                  = this%Path,                  &
                 Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
@@ -562,6 +584,7 @@ contains
                 UniformGridDescriptor = this%UniformGridDescriptor, &
                 SpatialGridDescriptor = this%SpatialGridDescriptor, &
                 FilePrefix            = this%Prefix,                &
+                Path                  = this%Path,                  &
                 Action                = this%Action)
         ! Heavy data initialization
         call this%HeavyData%Initialize(                             &
@@ -580,8 +603,9 @@ contains
         class(xh5for_t), intent(INOUT) :: this                        !< XH5For derived type
     !-----------------------------------------------------------------
         assert(this%State == XH5FOR_STATE_GRID_IO)
-        if(this%Action == XDMF_ACTION_Write) then
+        if(this%Action == XDMF_ACTION_WRITE) then
             call this%LightData%SerializeSpatialFile()
+            call this%LightData%SerializeTemporalFile()
             if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
         endif
     end subroutine xh5for_Serialize
@@ -609,7 +633,6 @@ contains
         if(this%State == XH5FOR_STATE_GRID_IO .and. this%action == XDMF_ACTION_WRITE) then
             if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
             if(.not. this%StepsHandler%IsStaticStep() .and. .not. this%LightData%IsSpatialFileSerialized()) call this%Serialize()
-            call this%LightData%SerializeTemporalFile()
             call this%LightData%Clean()
         endif
         this%State = XH5FOR_STATE_CLOSE

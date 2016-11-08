@@ -123,7 +123,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 7.0% of total for derived types.</p>Including implementation: 1240 statements,  6.5% of total for derived types.">66 statements</a>
+	  title="<p> 7.1% of total for derived types.</p>Including implementation: 1262 statements,  6.6% of total for derived types.">67 statements</a>
      </li> 
      
      
@@ -181,17 +181,19 @@
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-nextstep">NextStep</a>
       
-      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-getnumberofsteps%7E2">GetNumberOfSteps</a>
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-getnumberofsteps">GetNumberOfSteps</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-setgrid">SetGrid</a>
       
-      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-free%7E3">Free</a>
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-free%7E2">Free</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-clean">Clean</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-open">Open</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-parsegrid">ParseGrid</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-serialize">Serialize</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-close">Close</a>
       
@@ -356,17 +358,19 @@
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-nextstep">NextStep</a>
       
-      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-getnumberofsteps%7E2">GetNumberOfSteps</a>
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-getnumberofsteps">GetNumberOfSteps</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-setgrid">SetGrid</a>
       
-      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-free%7E3">Free</a>
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-free%7E2">Free</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-clean">Clean</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-open">Open</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-parsegrid">ParseGrid</a>
+      
+      <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-serialize">Serialize</a>
       
       <a class="list-group-item" href="../type/xh5for_t.html#boundprocedure-close">Close</a>
       
@@ -560,7 +564,7 @@ private subroutine xh5for_NextStep(this)
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getnumberofsteps%7E2"></span><h3>procedure, public :: <strong>GetNumberOfSteps</strong>  => xh5for_GetNumberOfSteps 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-getnumberofsteps"></span><h3>procedure, public :: <strong>GetNumberOfSteps</strong>  => xh5for_GetNumberOfSteps 
     
   </h3></div>
   
@@ -1021,7 +1025,7 @@ private subroutine xh5for_Set_Structured_Grid_I8P(this, GridShape)
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E3"></span><h3>procedure, public :: <strong>Free</strong>  => xh5for_Free 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E2"></span><h3>procedure, public :: <strong>Free</strong>  => xh5for_Free 
     
   </h3></div>
   
@@ -1164,7 +1168,7 @@ private subroutine xh5for_Clean(this)
          
     
     <h3>
-private subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy, Action, Comm, Info, Root)
+private subroutine xh5for_Open(this, FilePrefix, Path, GridType, StaticGrid, Strategy, Action, Comm, Info, Root)
     
     
 	 
@@ -1216,6 +1220,21 @@ private subroutine xh5for_Open(this, FilePrefix, GridType, StaticGrid, Strategy,
   
   <td></td><td>::</td>
   <td><strong>FilePrefix</strong></td><td><p>XDMF filename prefix</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>Path</strong></td><td><p>Root path</p></td>
   
 </tr>
 
@@ -1361,6 +1380,72 @@ private subroutine xh5for_ParseGrid(this)
 
 
 <p>Parse a XDMF file</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/xh5for_t.html'>xh5for_t</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>XH5For derived type</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-serialize"></span><h3>procedure, public :: <strong>Serialize</strong>  => xh5for_Serialize 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine xh5for_Serialize(this)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Serialize a XDMF file</p>
     
     <h4>Arguments</h4>
     
@@ -4040,6 +4125,7 @@ private subroutine xh5for_ReadAttribute_R8P(this, Name, Type, Center, Values)
         <span class="kt">integer</span><span class="p">(</span><span class="n">I4P</span><span class="p">)</span>                                  <span class="kd">::</span> <span class="n">Action</span>     <span class="o">=</span> <span class="n">XDMF_ACTION_WRITE</span>
         <span class="kt">logical</span>                                       <span class="kd">::</span> <span class="n">StaticGrid</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
         <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span>                 <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">Prefix</span>
+        <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span>                 <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">Path</span>
         <span class="k">type</span><span class="p">(</span><span class="n">mpi_env_t</span><span class="p">)</span>                               <span class="kd">::</span> <span class="n">MPIEnvironment</span>
         <span class="k">type</span><span class="p">(</span><span class="n">steps_handler_t</span><span class="p">)</span>                         <span class="kd">::</span> <span class="n">StepsHandler</span>
         <span class="k">class</span><span class="p">(</span><span class="n">uniform_grid_descriptor_t</span><span class="p">),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">UniformGridDescriptor</span>
@@ -4092,7 +4178,7 @@ private subroutine xh5for_ReadAttribute_R8P(this, Name, Type, Center, Values)
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="k">Open</span>                  <span class="o">=&gt;</span> <span class="n">xh5for_Open</span>
         <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">CheckOpenHeavyDataFile</span><span class="o">=&gt;</span> <span class="n">xh5for_CheckOpenHeavyDataFile</span>
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">ParseGrid</span>             <span class="o">=&gt;</span> <span class="n">xh5for_ParseGrid</span>
-        <span class="k">procedure</span>         <span class="kd">::</span> <span class="n">Serialize</span>             <span class="o">=&gt;</span> <span class="n">xh5for_Serialize</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">Serialize</span>             <span class="o">=&gt;</span> <span class="n">xh5for_Serialize</span>
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="k">Close</span>                 <span class="o">=&gt;</span> <span class="n">xh5for_Close</span>
         <span class="k">generic</span><span class="p">,</span>   <span class="k">public</span> <span class="kd">::</span> <span class="n">WriteTopology</span>         <span class="o">=&gt;</span> <span class="n">xh5for_WriteTopology_I4P</span><span class="p">,</span> <span class="p">&amp;</span>
                                                       <span class="n">xh5for_WriteTopology_I8P</span>
@@ -4235,7 +4321,7 @@ private subroutine xh5for_ReadAttribute_R8P(this, Name, Type, Center, Values)
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/cmacmackin/ford">FORD</a>
-             on 2016-10-05T10:22:05.247293 
+             on 2016-11-08T12:24:53.235950 
           </p>
         </div>
         <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>

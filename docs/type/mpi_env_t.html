@@ -123,7 +123,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 3.3% of total for derived types.</p>Including implementation: 330 statements,  1.7% of total for derived types.">31 statements</a>
+	  title="<p> 3.4% of total for derived types.</p>Including implementation: 342 statements,  1.8% of total for derived types.">32 statements</a>
      </li> 
      
      
@@ -177,9 +177,9 @@
   <div id="boundprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E2">Initialize</a>
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E9">Initialize</a>
       
-      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E4">Free</a>
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E9">Free</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm">get_comm</a>
       
@@ -196,6 +196,8 @@
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_parallel">is_parallel</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_wtime">mpi_wtime</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-barrier">barrier</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_allgather">mpi_allgather</a>
       
@@ -346,9 +348,9 @@
   <div id="boundprocs-1" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E2">Initialize</a>
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-initialize%7E9">Initialize</a>
       
-      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E4">Free</a>
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-free%7E9">Free</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-get_comm">get_comm</a>
       
@@ -365,6 +367,8 @@
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-is_parallel">is_parallel</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_wtime">mpi_wtime</a>
+      
+      <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-barrier">barrier</a>
       
       <a class="list-group-item" href="../type/mpi_env_t.html#boundprocedure-mpi_allgather">mpi_allgather</a>
       
@@ -399,7 +403,7 @@
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-initialize%7E2"></span><h3>procedure, public :: <strong>Initialize</strong>  => mpi_env_initialize 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-initialize%7E9"></span><h3>procedure, public :: <strong>Initialize</strong>  => mpi_env_initialize 
     
   </h3></div>
   
@@ -525,7 +529,7 @@ private subroutine mpi_env_initialize(this, comm, info, root, mpierror)
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E4"></span><h3>procedure, public :: <strong>Free</strong>  => mpi_env_Free 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E9"></span><h3>procedure, public :: <strong>Free</strong>  => mpi_env_Free 
     
   </h3></div>
   
@@ -1180,6 +1184,87 @@ private function mpi_env_wtime(this) result(time)
      <h4>Return Value <small>real(kind=R8P)
   </small></h4>
   <p>MPI_WTime returned time</p>
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-barrier"></span><h3>procedure, public :: <strong>barrier</strong>  => mpi_env_barrier 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine mpi_env_barrier(this, mpierror)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>MPI_barrier interface</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/mpi_env_t.html'>mpi_env_t</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td><p>MPI environment</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=I4P),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>mpierror</strong></td><td><p>MPI error</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
     
 
       
@@ -1882,6 +1967,7 @@ private subroutine mpi_env_broadcast_string(this, send_data, mpierror)
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">is_root</span>                      <span class="o">=&gt;</span> <span class="n">mpi_env_is_root</span>
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">is_parallel</span>                  <span class="o">=&gt;</span> <span class="n">mpi_env_is_parallel</span>
         <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_wtime</span>                    <span class="o">=&gt;</span> <span class="n">mpi_env_wtime</span>
+        <span class="k">procedure</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">barrier</span>                      <span class="o">=&gt;</span> <span class="n">mpi_env_barrier</span>
         <span class="k">generic</span><span class="p">,</span>   <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_allgather</span>                <span class="o">=&gt;</span> <span class="n">mpi_env_allgather_single_int_value_I4P</span><span class="p">,</span> <span class="p">&amp;</span>
                                                              <span class="n">mpi_env_allgather_single_int_value_I8P</span>
         <span class="k">generic</span><span class="p">,</span>   <span class="k">public</span> <span class="kd">::</span> <span class="n">mpi_broadcast</span>                <span class="o">=&gt;</span> <span class="n">mpi_env_broadcast_int_I4P</span><span class="p">,</span>       <span class="p">&amp;</span>
@@ -2006,7 +2092,7 @@ private subroutine mpi_env_broadcast_string(this, send_data, mpierror)
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/cmacmackin/ford">FORD</a>
-             on 2016-10-05T10:22:05.247293 
+             on 2016-11-08T12:24:53.235950 
           </p>
         </div>
         <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>

@@ -123,7 +123,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 1.2% of total for derived types.</p>Including implementation: 683 statements,  3.6% of total for derived types.">11 statements</a>
+	  title="<p> 1.2% of total for derived types.</p>Including implementation: 688 statements,  3.6% of total for derived types.">11 statements</a>
      </li> 
      
      
@@ -187,13 +187,13 @@
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-getspatialgriddescriptor">GetSpatialGridDescriptor</a>
       
-      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-initialize%7E9">Initialize</a>
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-initialize%7E7">Initialize</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-open%7E2">Open</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-clean%7E2">Clean</a>
       
-      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-free%7E9">Free</a>
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-free%7E7">Free</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-gethdf5filename">GetHDF5Filename</a>
       
@@ -475,13 +475,13 @@
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-getspatialgriddescriptor">GetSpatialGridDescriptor</a>
       
-      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-initialize%7E9">Initialize</a>
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-initialize%7E7">Initialize</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-open%7E2">Open</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-clean%7E2">Clean</a>
       
-      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-free%7E9">Free</a>
+      <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-free%7E7">Free</a>
       
       <a class="list-group-item" href="../type/xdmf_unstructured_contiguous_hyperslab_handler_t.html#boundprocedure-gethdf5filename">GetHDF5Filename</a>
       
@@ -917,7 +917,7 @@ private function xdmf_handler_GetSpatialGridDescriptor(this) result(SpatialGridD
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-initialize%7E9"></span><h3>procedure, public :: <strong>Initialize</strong>  => xdmf_handler_Initialize 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-initialize%7E7"></span><h3>procedure, public :: <strong>Initialize</strong>  => xdmf_handler_Initialize 
     
   </h3></div>
   
@@ -928,7 +928,7 @@ private function xdmf_handler_GetSpatialGridDescriptor(this) result(SpatialGridD
          
     
     <h3>
-private subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, FilePrefix, Action)
+private subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, UniformGridDescriptor, SpatialGridDescriptor, FilePrefix, Path, Action)
     
     
 	 
@@ -1048,6 +1048,21 @@ private subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, U
   
 <tr>
   
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>Path</strong></td><td><p>Root path</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" ></span>integer(kind=I4P),</td>
   <td>intent(in),</td>
   <td>optional</td>
@@ -1084,7 +1099,7 @@ private subroutine xdmf_handler_Initialize(this, MPIEnvironment, StepsHandler, U
          
     
     <h3>
-private subroutine xdmf_handler_Open(this, FilePrefix, Action)
+private subroutine xdmf_handler_Open(this, FilePrefix, Path, Action)
     
     
 	 
@@ -1130,8 +1145,8 @@ private subroutine xdmf_handler_Open(this, FilePrefix, Action)
 <tr>
   
   <td><span class="anchor" ></span>character(len=*),</td>
-  <td>intent(in)</td>
-  <td></td>
+  <td>intent(in),</td>
+  <td>optional</td>
   
   <td></td><td>::</td>
   <td><strong>FilePrefix</strong></td><td><p>XDMF filename prefix</p></td>
@@ -1144,9 +1159,24 @@ private subroutine xdmf_handler_Open(this, FilePrefix, Action)
   
 <tr>
   
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>Path</strong></td><td><p>Root path with slash</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" ></span>integer(kind=I4P),</td>
-  <td>intent(in)</td>
-  <td></td>
+  <td>intent(in),</td>
+  <td>optional</td>
   
   <td></td><td>::</td>
   <td><strong>Action</strong></td><td><p>XDMF action to be performed (Read or Write)</p></td>
@@ -1235,7 +1265,7 @@ private subroutine xdmf_handler_Clean(this)
     
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E9"></span><h3>procedure, public :: <strong>Free</strong>  => xdmf_handler_Free 
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-free%7E7"></span><h3>procedure, public :: <strong>Free</strong>  => xdmf_handler_Free 
     
   </h3></div>
   
@@ -3282,7 +3312,7 @@ private subroutine xdmf_handler_AppendAttribute_R8P(this, Name, Type, Center, At
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/cmacmackin/ford">FORD</a>
-             on 2016-10-05T10:22:05.247293 
+             on 2016-11-08T12:24:53.235950 
           </p>
         </div>
         <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> XH5For was developed by Víctor Sande Veiga</p></div>
