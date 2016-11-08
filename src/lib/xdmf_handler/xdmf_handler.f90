@@ -535,6 +535,7 @@ contains
                     call grid%close(xml_handler=this%TemporalFile%xml_handler)
                     call domain%close(xml_handler = this%TemporalFile%xml_handler)
                     call this%TemporalFile%CloseFile()
+                    call this%StepsHandler%End()
             end select
         endif
     end subroutine xdmf_handler_SerializeTemporalFile

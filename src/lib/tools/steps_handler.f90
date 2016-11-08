@@ -427,7 +427,7 @@ contains
     !-----------------------------------------------------------------
         assert(this%State == STEPS_HANDLER_STATE_APPEND .or. this%State == STEPS_HANDLER_STATE_ITER)
         this%StepsCounter = this%NumberOfSteps
-        this%State = STEPS_HANDLER_STATE_ITER
+        this%State = STEPS_HANDLER_STATE_APPEND
     end subroutine steps_handler_End
 
 

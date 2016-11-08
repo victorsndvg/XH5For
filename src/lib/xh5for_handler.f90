@@ -137,7 +137,7 @@ private
         procedure, public :: Open                  => xh5for_Open
         procedure         :: CheckOpenHeavyDataFile=> xh5for_CheckOpenHeavyDataFile
         procedure, public :: ParseGrid             => xh5for_ParseGrid
-        procedure         :: Serialize             => xh5for_Serialize
+        procedure, public :: Serialize             => xh5for_Serialize
         procedure, public :: Close                 => xh5for_Close
         generic,   public :: WriteTopology         => xh5for_WriteTopology_I4P, &
                                                       xh5for_WriteTopology_I8P
@@ -605,6 +605,7 @@ contains
         assert(this%State == XH5FOR_STATE_GRID_IO)
         if(this%Action == XDMF_ACTION_WRITE) then
             call this%LightData%SerializeSpatialFile()
+            call this%LightData%SerializeTemporalFile()
             if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
         endif
     end subroutine xh5for_Serialize
@@ -632,7 +633,6 @@ contains
         if(this%State == XH5FOR_STATE_GRID_IO .and. this%action == XDMF_ACTION_WRITE) then
             if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
             if(.not. this%StepsHandler%IsStaticStep() .and. .not. this%LightData%IsSpatialFileSerialized()) call this%Serialize()
-            call this%LightData%SerializeTemporalFile()
             call this%LightData%Clean()
         endif
         this%State = XH5FOR_STATE_CLOSE

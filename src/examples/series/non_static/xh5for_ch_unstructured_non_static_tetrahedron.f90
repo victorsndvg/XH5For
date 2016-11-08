@@ -56,6 +56,7 @@ use PENF, only: I4P, I8P, R4P, R8P, str
     vectorvelocity = vectorvelocity+rank
 
     !< Write XDMF/HDF5 file
+    call xh5%Serialize()
     call xh5%Open(FilePrefix='xh5for_ch_unstructured_non_static_tetrahedron', Strategy=XDMF_STRATEGY_CONTIGUOUS_HYPERSLAB, Action=XDMF_ACTION_WRITE)
 
     do i=1, num_steps
