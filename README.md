@@ -7,7 +7,7 @@ The Fortran way to easy write parallel partitioned XDMF/HDF5 meshes
 [![Build Status](https://travis-ci.org/victorsndvg/XH5For.svg?branch=master)](https://travis-ci.org/victorsndvg/XH5For)
 [![codecov.io](https://codecov.io/github/victorsndvg/XH5For/coverage.svg?branch=master)](https://codecov.io/github/victorsndvg/XH5For?branch=master)
 
-##License
+## License
 
 [![License](https://img.shields.io/badge/license-GNU%20LESSER%20GENERAL%20PUBLIC%20LICENSE%20v3%2C%20LGPLv3-red.svg)](http://www.gnu.org/licenses/lgpl-3.0.txt)                 
 
@@ -19,7 +19,7 @@ Is a library to read and write parallel partitioned FEM meshes taking advantage 
 * [XDMF Model and Format](http://www.xdmf.org/index.php/XDMF_Model_and_Format) is a standarized way to describe common scientific data. It separates the **Light data** *(XML description of the data model)* and the **Heavy data** *(raw values)* usually saved in HDF5 or binary Files.
 * [HDF5](https://www.hdfgroup.org/HDF5) is a model and data format designed for efficient Collective/Independent I/O and work with big amounts of data.
 
-##How to get XH5For
+## How to get XH5For
 
 ```git clone --recursive https://github.com/victorsndvg/XH5For.git ```
 
@@ -54,7 +54,7 @@ The most important XH5For settings are:
   * ```XH5For_ENABLE_TESTS```: (default *OFF*)
   * ```XH5For_ENABLE_EXAMPLES```: (default *OFF*)
 
-##Getting started with XH5For
+## Getting started with XH5For
 
 The code below writes an hexahedron per MPI task:
 
