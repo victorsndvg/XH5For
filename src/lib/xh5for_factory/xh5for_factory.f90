@@ -35,7 +35,7 @@ private
         procedure :: CreateFactory => xh5for_factory_CreateFactory
     end type xh5for_factory_t
 
-type(xh5for_factory_t), public :: TheXH5ForFactoryCreator
+type(xh5for_factory_t), public, save :: TheXH5ForFactoryCreator
 
 contains
 

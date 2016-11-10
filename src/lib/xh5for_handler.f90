@@ -184,7 +184,7 @@ private
                                                       xh5for_ReadAttribute_R8P
     end type xh5for_t
 
-    class(xh5for_abstract_factory_t), allocatable :: TheFactory
+    class(xh5for_abstract_factory_t), allocatable, save :: TheFactory
 
 public  :: xh5for_t
 private :: uniform_grid_descriptor_t
@@ -289,6 +289,7 @@ contains
         endif
         call this%MPIEnvironment%Free()
         call this%StepsHandler%Free()
+        if(allocated(TheFactory)) deallocate(TheFactory)
         this%State = XH5FOR_STATE_START
     end subroutine xh5for_Free
 
