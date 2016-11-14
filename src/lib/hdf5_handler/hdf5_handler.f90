@@ -452,7 +452,7 @@ contains
         integer(I4P),          intent(IN) :: Step                     !< Step to check
         logical                           :: IsStepFileOpen           !< Check if file state is OPEN
     !----------------------------------------------------------------- 
-        IsStepFileOpen = this%IsOpen()
+        IsStepFileOpen = (allocated(this%Filename) .and. this%IsOpen())
         if(IsStepFileOpen) IsStepFileOpen = (this%FileName == this%GetHDF5FileName(Step))
     end function hdf5_handler_IsStepFileOpen
 

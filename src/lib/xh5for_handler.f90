@@ -652,7 +652,7 @@ contains
     !-----------------------------------------------------------------
         if(this%State == XH5FOR_STATE_GRID_IO .and. this%action == XDMF_ACTION_WRITE) then
             if(this%HeavyData%IsOpen()) call this%HeavyData%CloseFile()
-            if(.not. this%StepsHandler%IsStaticStep() .and. .not. this%LightData%IsSpatialFileSerialized()) call this%Serialize()
+            if(.not. this%LightData%IsSpatialFileSerialized()) call this%Serialize()
             call this%LightData%Clean()
         endif
         this%State = XH5FOR_STATE_CLOSE
