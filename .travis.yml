@@ -13,8 +13,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-5
-      - gfortran-5
+      - gcc-6
+      - gfortran-6
       - cmake
       - cmake-data
 
@@ -25,7 +25,8 @@ before_install:
   - travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
-  - export FC=/usr/bin/gfortran-5
+  - export FC=gfortran-6
+  - export CC=gcc-6
   - $FC --version
   ##################
   ## Install OMPI ##
@@ -34,7 +35,7 @@ install:
   - tar zxf openmpi-1.10.2.tar.gz
   - cd openmpi-1.10.2
   - ./configure --prefix=$TRAVIS_BUILD_DIR/openmpi > /dev/null
-  - travis_wait 20 make -j 4 > /dev/null
+  - travis_wait 20 make -j 8 --silent > /dev/null
   - make install > /dev/null 2>&1
   ##################
   ## Install HDF5 ##
@@ -44,7 +45,7 @@ install:
   - cd hdf5-1.8.17
   - mkdir $TRAVIS_BUILD_DIR/hdf5
   - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-parallel --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules FC=$TRAVIS_BUILD_DIR/openmpi/bin/mpif90 CC=$TRAVIS_BUILD_DIR/openmpi/bin/mpicc > /dev/null
-  - travis_wait 20 make -j 4 > /dev/null
+  - travis_wait 20 make -j 8 --silent > /dev/null
   - make install > /dev/null 2>&1
   ##################
   - export PATH=$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/openmpi/bin:$TRAVIS_BUILD_DIR/openmpi/lib:$TRAVIS_BUILD_DIR/openmpi/include:$TRAVIS_BUILD_DIR/hdf5:$TRAVIS_BUILD_DIR/hdf5/bin:$TRAVIS_BUILD_DIR/hdf5/lib:$TRAVIS_BUILD_DIR/hdf5/include:$PATH
@@ -62,8 +63,8 @@ script:
 
 after_success:
   - find . -name '*.gcno' -print
-  - gcov-5 --version
-  - bash <(curl -s https://codecov.io/bash) -x $(which gcov-5)
+  - gcov-6 --version
+  - bash <(curl -s https://codecov.io/bash) -x $(which gcov-6)
 
 after_script:
   - cd ..
