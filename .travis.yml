@@ -21,7 +21,7 @@ addons:
 before_install:
   - pip install codecov
   - git submodule update --init --recursive
-  - travis_retry wget --quiet https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.17.tar;
+  - travis_retry wget --quiet https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.18.tar;
   - travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.2.tar.gz;
 
 install:
