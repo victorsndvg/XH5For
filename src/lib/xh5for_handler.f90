@@ -796,7 +796,7 @@ contains
     !< Read XY[Z] R4P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R4P), allocatable,     intent(OUT)   :: XYZ(:)           !< R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(INOUT) :: XYZ(:)           !< R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -817,7 +817,7 @@ contains
     !< Read XY[Z] R8P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R8P), allocatable,     intent(OUT)   :: XYZ(:)           !< R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(INOUT) :: XYZ(:)           !< R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -838,9 +838,9 @@ contains
     !< Read X_Y_Z R4P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R4P), allocatable,     intent(OUT)   :: X(:)             !< X R4P grid geometry coordinates
-        real(R4P), allocatable,     intent(OUT)   :: Y(:)             !< Y R4P grid geometry coordinates
-        real(R4P), allocatable,     intent(OUT)   :: Z(:)             !< Z R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(INOUT) :: X(:)             !< X R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(INOUT) :: Y(:)             !< Y R4P grid geometry coordinates
+        real(R4P), allocatable,     intent(INOUT) :: Z(:)             !< Z R4P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_REAd)
@@ -861,9 +861,9 @@ contains
     !< Read X_Y_Z R8P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R8P), allocatable,     intent(OUT)   :: X(:)             !< X R8P grid geometry coordinates
-        real(R8P), allocatable,     intent(OUT)   :: Y(:)             !< Y R8P grid geometry coordinates
-        real(R8P), allocatable,     intent(OUT)   :: Z(:)             !< Z R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(INOUT) :: X(:)             !< X R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(INOUT) :: Y(:)             !< Y R8P grid geometry coordinates
+        real(R8P), allocatable,     intent(INOUT) :: Z(:)             !< Z R8P grid geometry coordinates
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -884,8 +884,8 @@ contains
     !< Read DXDYDZ R4P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R4P), allocatable,     intent(OUT)   :: Origin(:)        !< Origin of the grid coordinates
-        real(R4P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
+        real(R4P), allocatable,     intent(INOUT) :: Origin(:)        !< Origin of the grid coordinates
+        real(R4P), allocatable,     intent(INOUT) :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -906,8 +906,8 @@ contains
     !< Read DXDYDZ R8P Geometry
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this             !< XH5For derived type
-        real(R8P), allocatable,     intent(OUT)   :: Origin(:)        !< Origin of the grid coordinates
-        real(R8P), allocatable,     intent(OUT)   :: DxDyDz(:)        !< Step to the next point of the grid
+        real(R8P), allocatable,     intent(INOUT) :: Origin(:)        !< Origin of the grid coordinates
+        real(R8P), allocatable,     intent(INOUT) :: DxDyDz(:)        !< Step to the next point of the grid
         character(len=*), optional, intent(IN)    :: Name             !< Geometry dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -970,7 +970,7 @@ contains
     !< Read I4P Topology
     !----------------------------------------------------------------- 
         class(xh5for_t),           intent(INOUT) :: this              !< XH5For derived type
-        integer(I4P), allocatable, intent(OUT)   :: Connectivities(:) !< I4P grid topology connectivities
+        integer(I4P), allocatable, intent(INOUT) :: Connectivities(:) !< I4P grid topology connectivities
         character(len=*),optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -992,7 +992,7 @@ contains
     !< Read I8P Topology
     !----------------------------------------------------------------- 
         class(xh5for_t),            intent(INOUT) :: this              !< XH5For derived type
-        integer(I8P), allocatable,  intent(OUT)   :: Connectivities(:) !< I8P grid topology connectivities
+        integer(I8P), allocatable,  intent(INOUT) :: Connectivities(:) !< I8P grid topology connectivities
         character(len=*), optional, intent(IN)    :: Name              !< Topology dataset name
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
@@ -1088,7 +1088,7 @@ contains
         character(len=*),          intent(IN)    :: Name              !< Attribute name
         integer(I4P),              intent(IN)    :: Type              !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
-        integer(I4P), allocatable, intent(OUT)   :: Values(:)         !< I4P grid attribute values
+        integer(I4P), allocatable, intent(INOUT) :: Values(:)         !< I4P grid attribute values
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
@@ -1106,7 +1106,7 @@ contains
         character(len=*),          intent(IN)    :: Name              !< Attribute name
         integer(I4P),              intent(IN)    :: Type              !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),              intent(IN)    :: Center            !< Attribute centered at (Node, Cell, etc.)
-        integer(I8P), allocatable, intent(OUT)   :: Values(:)         !< I8P grid attribute values
+        integer(I8P), allocatable, intent(INOUT) :: Values(:)         !< I8P grid attribute values
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
@@ -1124,7 +1124,7 @@ contains
         character(len=*),       intent(IN)    :: Name                 !< Attribute name
         integer(I4P),           intent(IN)    :: Type                 !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
-        real(R4P), allocatable, intent(OUT)   :: Values(:)            !< R4P grid attribute values
+        real(R4P), allocatable, intent(INOUT) :: Values(:)            !< R4P grid attribute values
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()
@@ -1142,7 +1142,7 @@ contains
         character(len=*),       intent(IN)    :: Name                 !< Attribute name
         integer(I4P),           intent(IN)    :: Type                 !< Attribute type (Scalar, Vector, etc.)
         integer(I4P),           intent(IN)    :: Center               !< Attribute centered at (Node, Cell, etc.)
-        real(R8P), allocatable, intent(OUT)   :: Values(:)            !< R8P grid attribute values
+        real(R8P), allocatable, intent(INOUT) :: Values(:)            !< R8P grid attribute values
     !-----------------------------------------------------------------
         assert((this%State == XH5FOR_STATE_GRID_SET .or. this%State == XH5FOR_STATE_GRID_IO) .and. this%Action == XDMF_ACTION_READ)
         call this%CheckOpenHeavyDataFile()

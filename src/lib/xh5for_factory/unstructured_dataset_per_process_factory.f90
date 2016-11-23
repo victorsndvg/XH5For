@@ -48,9 +48,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an unstructured uniform grid descriptor
     !----------------------------------------------------------------- 
-        class(unstructured_dataset_per_process_factory_t), intent(IN)  :: this                  !< Unstructured grid descriptor factory
-        class(uniform_grid_descriptor_t), allocatable,      intent(OUT) :: UniformGridDescriptor !< Uniform grid descriptor
+        class(unstructured_dataset_per_process_factory_t), intent(IN)    :: this                  !< Unstructured grid descriptor factory
+        class(uniform_grid_descriptor_t), allocatable,     intent(INOUT) :: UniformGridDescriptor !< Uniform grid descriptor
     !----------------------------------------------------------------- 
+        if(allocated(UniformGridDescriptor)) deallocate(UniformGridDescriptor)
         allocate(unstructured_uniform_grid_descriptor_t :: UniformGridDescriptor)
     end subroutine unstructured_dataset_per_process_CreateUniformGridDescriptor
 
@@ -59,9 +60,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an unstructured spatial grid descriptor
     !----------------------------------------------------------------- 
-        class(unstructured_dataset_per_process_factory_t), intent(IN)  :: this                  !< Unstructured grid descriptor factory
-        class(spatial_grid_descriptor_t), allocatable,      intent(OUT) :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(unstructured_dataset_per_process_factory_t), intent(IN)    :: this                  !< Unstructured grid descriptor factory
+        class(spatial_grid_descriptor_t), allocatable,     intent(INOUT) :: SpatialGridDescriptor !< Spatial grid descriptor
     !----------------------------------------------------------------- 
+        if(allocated(SpatialGridDescriptor)) deallocate(SpatialGridDescriptor)
         allocate(unstructured_spatial_grid_descriptor_t :: SpatialGridDescriptor)
     end subroutine unstructured_dataset_per_process_CreateSpatialGridDescriptor
 
@@ -70,9 +72,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an unstructured contiguous hyperslab XDMF handler
     !----------------------------------------------------------------- 
-        class(unstructured_dataset_per_process_factory_t), intent(IN)  :: this        !< Unstructured contiguous hyperslab factory
-        class(xdmf_handler_t), allocatable,                 intent(OUT) :: XDMFHandler !< XDMF handler
+        class(unstructured_dataset_per_process_factory_t), intent(IN)    :: this        !< Unstructured contiguous hyperslab factory
+        class(xdmf_handler_t), allocatable,                intent(INOUT) :: XDMFHandler !< XDMF handler
     !----------------------------------------------------------------- 
+        if(allocated(XDMFHandler)) deallocate(XDMFHandler)
         allocate(xdmf_unstructured_dataset_per_process_handler_t :: XDMFHandler)
     end subroutine unstructured_dataset_per_process_CreateXDMFHandler
 
@@ -81,9 +84,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an unstructured contiguous hyperslab HDF5 handler
     !----------------------------------------------------------------- 
-        class(unstructured_dataset_per_process_factory_t), intent(IN)  :: this        !< Unstructured contiguous hyperslab factory
-        class(hdf5_handler_t), allocatable,                 intent(OUT) :: HDF5Handler !< HDF5 handler
+        class(unstructured_dataset_per_process_factory_t), intent(IN)    :: this        !< Unstructured contiguous hyperslab factory
+        class(hdf5_handler_t), allocatable,                intent(INOUT) :: HDF5Handler !< HDF5 handler
     !----------------------------------------------------------------- 
+        if(allocated(HDF5Handler)) deallocate(HDF5Handler)
         allocate(hdf5_unstructured_dataset_per_process_handler_t :: HDF5Handler)
     end subroutine unstructured_dataset_per_process_CreateHDF5Handler
 

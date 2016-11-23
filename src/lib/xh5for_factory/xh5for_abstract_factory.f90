@@ -39,29 +39,29 @@ private
         subroutine xh5for_factory_CreateUniformGridDescriptor(this, UniformGridDescriptor)
             import xh5for_abstract_factory_t
             import uniform_grid_descriptor_t
-            class(xh5for_abstract_factory_t),                       intent(IN)  :: this
-            class(uniform_grid_descriptor_t), allocatable, intent(OUT) :: UniformGridDescriptor
+            class(xh5for_abstract_factory_t),              intent(IN)    :: this
+            class(uniform_grid_descriptor_t), allocatable, intent(INOUT) :: UniformGridDescriptor
         end subroutine
 
         subroutine xh5for_factory_CreateSpatialGridDescriptor(this, SpatialGridDescriptor)
             import xh5for_abstract_factory_t
             import spatial_grid_descriptor_t
-            class(xh5for_abstract_factory_t),                       intent(IN)  :: this
-            class(spatial_grid_descriptor_t), allocatable, intent(OUT) :: SpatialGridDescriptor
+            class(xh5for_abstract_factory_t),              intent(IN)    :: this
+            class(spatial_grid_descriptor_t), allocatable, intent(INOUT) :: SpatialGridDescriptor
         end subroutine
 
         subroutine xh5for_factory_CreateXDMFHandler(this, XDMFHandler)
             import xh5for_abstract_factory_t
             import xdmf_handler_t
-            class(xh5for_abstract_factory_t),              intent(IN)  :: this
-            class(xdmf_handler_t), allocatable, intent(OUT) :: XDMFHandler
+            class(xh5for_abstract_factory_t),   intent(IN)    :: this
+            class(xdmf_handler_t), allocatable, intent(INOUT) :: XDMFHandler
         end subroutine
 
         subroutine xh5for_factory_CreateHDF5Handler(this, HDF5Handler)
             import xh5for_abstract_factory_t
             import hdf5_handler_t
-            class(xh5for_abstract_factory_t),            intent(IN)  :: this
-            class(hdf5_handler_t), allocatable, intent(OUT) :: HDF5Handler
+            class(xh5for_abstract_factory_t),   intent(IN)    :: this
+            class(hdf5_handler_t), allocatable, intent(INOUT) :: HDF5Handler
         end subroutine
     end interface
 

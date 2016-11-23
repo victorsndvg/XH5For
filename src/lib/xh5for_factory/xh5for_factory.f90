@@ -43,11 +43,12 @@ contains
     !-----------------------------------------------------------------
     !< Return a concrete factory given Strategy and GridType
     !----------------------------------------------------------------- 
-        class(xh5for_factory_t),                       intent(IN)  :: this
-        integer(I4P),                                  intent(IN)  :: GridType
-        integer(I4P),                                  intent(IN)  :: Strategy
-        class(xh5for_abstract_factory_t), allocatable, intent(OUT) :: AbstractFactory
+        class(xh5for_factory_t),                       intent(IN)    :: this
+        integer(I4P),                                  intent(IN)    :: GridType
+        integer(I4P),                                  intent(IN)    :: Strategy
+        class(xh5for_abstract_factory_t), allocatable, intent(INOUT) :: AbstractFactory
     !----------------------------------------------------------------- 
+        if(allocated(AbstractFactory)) deallocate(AbstractFactory)
         select case (GridType)
             case (XDMF_GRID_TYPE_UNSTRUCTURED)
                 select case (Strategy)

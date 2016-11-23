@@ -874,12 +874,12 @@ contains
     !-----------------------------------------------------------------
     !< Calculate hyperslab dimensions
     !----------------------------------------------------------------- 
-        class(xdmf_handler_t), intent(IN)  :: this                    !< xmdf handler
-        integer(I4P),          intent(IN)  :: GridID                  !< Grid ID
-        integer(I4P),          intent(IN)  :: Center                  !< Attribute center at (Node, Cell, etc.)
-        integer(I8P),          intent(OUT) :: GlobalNumberOfData      !< Global number of data
-        integer(I8P),          intent(OUT) :: LocalNumberOfData       !< Local number of data
-        integer(I8P),          intent(OUT) :: DataOffset              !< Data offset for current grid
+        class(xdmf_handler_t), intent(IN)    :: this                  !< xmdf handler
+        integer(I4P),          intent(IN)    :: GridID                !< Grid ID
+        integer(I4P),          intent(IN)    :: Center                !< Attribute center at (Node, Cell, etc.)
+        integer(I8P),          intent(INOUT) :: GlobalNumberOfData    !< Global number of data
+        integer(I8P),          intent(INOUT) :: LocalNumberOfData     !< Local number of data
+        integer(I8P),          intent(INOUT) :: DataOffset            !< Data offset for current grid
     !----------------------------------------------------------------- 
     !< @TODO: face and edge centered attributes
         select case(Center)

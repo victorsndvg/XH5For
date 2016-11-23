@@ -180,10 +180,11 @@ contains
     !-----------------------------------------------------------------
     !< Return the Dimension
     !----------------------------------------------------------------- 
-        class(xh5for_metadata_t),  intent(IN)  :: this                  !< XH5For metadata type
-        integer(I4P), allocatable, intent(OUT) :: ArrayDimensions(:)    !< Returned Dimension
+        class(xh5for_metadata_t),  intent(IN)    :: this              !< XH5For metadata type
+        integer(I4P), allocatable, intent(INOUT) :: ArrayDimensions(:)!< Returned Dimension
     !----------------------------------------------------------------- 
         if(allocated(this%arrayDimensions)) then
+            if(allocated(ArrayDimensions)) deallocate(ArrayDimensions)
             allocate(ArrayDimensions(size(this%ArrayDimensions, dim=1)))
             ArrayDimensions(:) = this%ArrayDimensions(:)
         endif

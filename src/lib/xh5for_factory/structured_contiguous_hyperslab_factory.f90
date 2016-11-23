@@ -48,9 +48,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an structured uniform grid descriptor
     !----------------------------------------------------------------- 
-        class(structured_contiguous_hyperslab_factory_t), intent(IN)  :: this                  !< structured grid descriptor factory
-        class(uniform_grid_descriptor_t), allocatable,    intent(OUT) :: UniformGridDescriptor !< Uniform grid descriptor
+        class(structured_contiguous_hyperslab_factory_t), intent(IN)    :: this                  !< structured grid descriptor factory
+        class(uniform_grid_descriptor_t), allocatable,    intent(INOUT) :: UniformGridDescriptor !< Uniform grid descriptor
     !----------------------------------------------------------------- 
+        if(allocated(UniformGridDescriptor)) deallocate(UniformGridDescriptor)
         allocate(structured_uniform_grid_descriptor_t :: UniformGridDescriptor)
     end subroutine structured_contiguous_hyperslab_CreateUniformGridDescriptor
 
@@ -59,9 +60,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an structured spatial grid descriptor
     !----------------------------------------------------------------- 
-        class(structured_contiguous_hyperslab_factory_t), intent(IN)  :: this                  !< structured grid descriptor factory
-        class(spatial_grid_descriptor_t), allocatable,    intent(OUT) :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(structured_contiguous_hyperslab_factory_t), intent(IN)    :: this                  !< structured grid descriptor factory
+        class(spatial_grid_descriptor_t), allocatable,    intent(INOUT) :: SpatialGridDescriptor !< Spatial grid descriptor
     !----------------------------------------------------------------- 
+        if(allocated(SpatialGridDescriptor)) deallocate(SpatialGridDescriptor)
         allocate(structured_spatial_grid_descriptor_t :: SpatialGridDescriptor)
     end subroutine structured_contiguous_hyperslab_CreateSpatialGridDescriptor
 
@@ -70,9 +72,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an structured contiguous hyperslab XDMF handler
     !----------------------------------------------------------------- 
-        class(structured_contiguous_hyperslab_factory_t), intent(IN)  :: this        !< structured contiguous hyperslab factory
-        class(xdmf_handler_t), allocatable,               intent(OUT) :: XDMFHandler !< XDMF handler
+        class(structured_contiguous_hyperslab_factory_t), intent(IN)    :: this        !< structured contiguous hyperslab factory
+        class(xdmf_handler_t), allocatable,               intent(INOUT) :: XDMFHandler !< XDMF handler
     !----------------------------------------------------------------- 
+        if(allocated(XDMFHandler)) deallocate(XDMFHandler)
         allocate(xdmf_structured_contiguous_hyperslab_handler_t :: XDMFHandler)
     end subroutine structured_contiguous_hyperslab_CreateXDMFHandler
 
@@ -81,9 +84,10 @@ contains
     !-----------------------------------------------------------------
     !< Return an structured contiguous hyperslab HDF5 handler
     !----------------------------------------------------------------- 
-        class(structured_contiguous_hyperslab_factory_t), intent(IN)  :: this        !< structured contiguous hyperslab factory
-        class(hdf5_handler_t), allocatable,               intent(OUT) :: HDF5Handler !< HDF5 handler
+        class(structured_contiguous_hyperslab_factory_t), intent(IN)    :: this        !< structured contiguous hyperslab factory
+        class(hdf5_handler_t), allocatable,               intent(INOUT) :: HDF5Handler !< HDF5 handler
     !----------------------------------------------------------------- 
+        if(allocated(HDF5Handler)) deallocate(HDF5Handler)
         allocate(hdf5_structured_contiguous_hyperslab_handler_t :: HDF5Handler)
     end subroutine structured_contiguous_hyperslab_CreateHDF5Handler
 
