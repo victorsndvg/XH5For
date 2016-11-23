@@ -330,14 +330,14 @@ contains
     !< Read XY[Z] R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R4P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        real(R4P), allocatable,                     intent(INOUT):: XYZ(:)              !< Grid coordinates
+        character(len=*),                           intent(IN)   :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                         :: spacedim            !< Space dimension
+        integer(HSIZE_T)                                         :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                         :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                         :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -364,14 +364,14 @@ contains
     !< Read XY[Z] R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R8P), allocatable,                     intent(OUT):: XYZ(:)              !< Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: spacedim            !< Space dimension
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        real(R8P), allocatable,                     intent(INOUT):: XYZ(:)              !< Grid coordinates
+        character(len=*),                           intent(IN)   :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                         :: spacedim            !< Space dimension
+        integer(HSIZE_T)                                         :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                         :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                         :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -398,15 +398,15 @@ contains
     !< Read R4P X_Y_Z coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R4P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
-        real(R4P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
-        real(R4P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        real(R4P), allocatable,                     intent(INOUT):: X(:)                !< X Grid coordinates
+        real(R4P), allocatable,                     intent(INOUT):: Y(:)                !< Y Grid coordinates
+        real(R4P), allocatable,                     intent(INOUT):: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN)   :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                         :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                         :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                         :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -451,15 +451,15 @@ contains
     !< Read X_Y_Z R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R8P), allocatable,                     intent(OUT):: X(:)                !< X Grid coordinates
-        real(R8P), allocatable,                     intent(OUT):: Y(:)                !< Y Grid coordinates
-        real(R8P), allocatable,                     intent(OUT):: Z(:)                !< Z Grid coordinates
-        character(len=*),                           intent(IN) :: Name                !< Geometry dataset name
-        integer(HSIZE_T)                                       :: globalnumberofnodes !< Global number of nodes
-        integer(HSIZE_T)                                       :: localnumberofnodes  !< Local number of nodes
-        integer(HSIZE_T)                                       :: nodeoffset          !< Node offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        real(R8P), allocatable,                     intent(INOUT):: X(:)                !< X Grid coordinates
+        real(R8P), allocatable,                     intent(INOUT):: Y(:)                !< Y Grid coordinates
+        real(R8P), allocatable,                     intent(INOUT):: Z(:)                !< Z Grid coordinates
+        character(len=*),                           intent(IN)   :: Name                !< Geometry dataset name
+        integer(HSIZE_T)                                         :: globalnumberofnodes !< Global number of nodes
+        integer(HSIZE_T)                                         :: localnumberofnodes  !< Local number of nodes
+        integer(HSIZE_T)                                         :: nodeoffset          !< Node offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -504,9 +504,9 @@ contains
     !< Read R4P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R4P), allocatable,                     intent(OUT) :: Origin(:)          !< Origin coordinates
-        real(R4P), allocatable,                     intent(OUT) :: DxDyDz(:)          !< Coordinates sted to the next point
-        character(len=*),                           intent(IN)  :: Name               !< Geometry dataset name
+        real(R4P), allocatable,                     intent(INOUT) :: Origin(:)          !< Origin coordinates
+        real(R4P), allocatable,                     intent(INOUT) :: DxDyDz(:)          !< Coordinates sted to the next point
+        character(len=*),                           intent(IN)    :: Name               !< Geometry dataset name
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -522,9 +522,9 @@ contains
     !< Read R8P coordinates to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this   !< HDF5 contiguous hyperslab handler for Unstructured grids
-        real(R8P), allocatable,                     intent(OUT) :: Origin(:)          !< Origin coordinates
-        real(R8P), allocatable,                     intent(OUT) :: DxDyDz(:)          !< Coordinates sted to the next point
-        character(len=*),                           intent(IN)  :: Name               !< Geometry dataset name
+        real(R8P), allocatable,                     intent(INOUT) :: Origin(:)          !< Origin coordinates
+        real(R8P), allocatable,                     intent(INOUT) :: DxDyDz(:)          !< Coordinates sted to the next point
+        character(len=*),                           intent(IN)    :: Name               !< Geometry dataset name
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -540,13 +540,13 @@ contains
     !< Read I4P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
-        integer(I4P), allocatable,                  intent(OUT):: Connectivities(:)      !< I4P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        integer(I4P), allocatable,                  intent(INOUT):: Connectivities(:)      !< I4P Grid connectivities
+        character(len=*),                           intent(IN)   :: Name                   !< Topology dataset name
+        integer(HSIZE_T)                                         :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                         :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                         :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -572,13 +572,13 @@ contains
     !< Read I8P connectivities to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
         class(hdf5_unstructured_contiguous_hyperslab_handler_t), intent(IN) :: this      !< HDF5 contiguous hyperslab handler for Unstructured grids
-        integer(I8P), allocatable,                  intent(OUT):: Connectivities(:)      !< I8P Grid connectivities
-        character(len=*),                           intent(IN) :: Name                   !< Topology dataset name
-        integer(HSIZE_T)                                       :: GlobalTopologySize !< Global size of connectivities
-        integer(HSIZE_T)                                       :: LocalTopologySize  !< Local size of connectivities for a particular grid
-        integer(HSIZE_T)                                       :: TopologySizeOffset !< Connectivity Size offset for a particular grid
-        class(mpi_env_t),                 pointer              :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer              :: SpatialGridDescriptor !< Spatial grid descriptor
+        integer(I8P), allocatable,                  intent(INOUT):: Connectivities(:)      !< I8P Grid connectivities
+        character(len=*),                           intent(IN)   :: Name                   !< Topology dataset name
+        integer(HSIZE_T)                                         :: GlobalTopologySize !< Global size of connectivities
+        integer(HSIZE_T)                                         :: LocalTopologySize  !< Local size of connectivities for a particular grid
+        integer(HSIZE_T)                                         :: TopologySizeOffset !< Connectivity Size offset for a particular grid
+        class(mpi_env_t),                 pointer                :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                :: SpatialGridDescriptor !< Spatial grid descriptor
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?

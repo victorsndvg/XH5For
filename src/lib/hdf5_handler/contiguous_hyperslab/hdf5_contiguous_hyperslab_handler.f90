@@ -83,13 +83,13 @@ contains
     !-----------------------------------------------------------------
     !< Calculate hyperslab dimensions for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                  !< HDF5 contiguous hyperslab handler
-        integer(I4P),                               intent(IN)  :: Center                !< Attribute center at (Node, Cell, etc.)
-        integer(HSIZE_T),                           intent(OUT) :: GlobalNumberOfData    !< Global number of data
-        integer(HSIZE_T),                           intent(OUT) :: LocalNumberOfData     !< Local number of data
-        integer(HSIZE_T),                           intent(OUT) :: DataOffset            !< Data offset for current grid
-        class(mpi_env_t),                 pointer               :: MPIEnvironment        !< MPI Environment
-        class(spatial_grid_descriptor_t), pointer               :: SpatialGridDescriptor !< Spatial grid descriptor
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)    :: this                  !< HDF5 contiguous hyperslab handler
+        integer(I4P),                               intent(IN)    :: Center                !< Attribute center at (Node, Cell, etc.)
+        integer(HSIZE_T),                           intent(INOUT) :: GlobalNumberOfData    !< Global number of data
+        integer(HSIZE_T),                           intent(INOUT) :: LocalNumberOfData     !< Local number of data
+        integer(HSIZE_T),                           intent(INOUT) :: DataOffset            !< Data offset for current grid
+        class(mpi_env_t),                 pointer                 :: MPIEnvironment        !< MPI Environment
+        class(spatial_grid_descriptor_t), pointer                 :: SpatialGridDescriptor !< Spatial grid descriptor
     !----------------------------------------------------------------- 
     !< @TODO: face and edge attributes
 #ifdef ENABLE_HDF5
@@ -479,22 +479,22 @@ contains
     !-----------------------------------------------------------------
     !< Read I4P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
-        integer(I4P), allocatable,                  intent(OUT) :: Values(:)          !< I4P Dataset values
-        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                            :: hdferror            !< HDF5 error code
-        integer(I4P)                                            :: rank                !< Hyperslab rank 
-        type(mpi_env_t), pointer                                :: MPIEnvironment
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)    :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)    :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabSize(:)    !< Hyperslab size
+        integer(I4P), allocatable,                  intent(INOUT) :: Values(:)          !< I4P Dataset values
+        integer(HID_T)                                            :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                            :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                            :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                            :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                              :: hdferror            !< HDF5 error code
+        integer(I4P)                                              :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                  :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        real(R8P)                                               :: start_time
-        real(R8P)                                               :: end_time
+        real(R8P)                                                 :: start_time
+        real(R8P)                                                 :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -509,6 +509,7 @@ contains
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
+        if(allocated(Values)) deallocate(Values)
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
         call H5Screate_simple_f(rank = rank,                  &
@@ -566,22 +567,22 @@ contains
     !-----------------------------------------------------------------
     !< Read I8P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
-        integer(I8P), allocatable,                  intent(OUT) :: Values(:)          !< I8P Dataset values
-        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                            :: hdferror            !< HDF5 error code
-        integer(I4P)                                            :: rank                !< Hyperslab rank 
-        type(mpi_env_t), pointer                                :: MPIEnvironment
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)    :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)    :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabSize(:)    !< Hyperslab size
+        integer(I8P), allocatable,                  intent(INOUT) :: Values(:)          !< I8P Dataset values
+        integer(HID_T)                                            :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                            :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                            :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                            :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                              :: hdferror            !< HDF5 error code
+        integer(I4P)                                              :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                  :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        real(R8P)                                               :: start_time
-        real(R8P)                                               :: end_time
+        real(R8P)                                                 :: start_time
+        real(R8P)                                                 :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -596,6 +597,7 @@ contains
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
+        if(allocated(Values)) deallocate(Values)
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
         call H5Screate_simple_f(rank = rank,                  &
@@ -653,22 +655,22 @@ contains
     !-----------------------------------------------------------------
     !< Read R4P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
-        real(R4P), allocatable,                     intent(OUT) :: Values(:)          !< R4P Dataset values
-        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                            :: hdferror            !< HDF5 error code
-        integer(I4P)                                            :: rank                !< Hyperslab rank 
-        type(mpi_env_t), pointer                                :: MPIEnvironment
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)    :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)    :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabSize(:)    !< Hyperslab size
+        real(R4P), allocatable,                     intent(INOUT) :: Values(:)          !< R4P Dataset values
+        integer(HID_T)                                            :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                            :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                            :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                            :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                              :: hdferror            !< HDF5 error code
+        integer(I4P)                                              :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                  :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        real(R8P)                                               :: start_time
-        real(R8P)                                               :: end_time
+        real(R8P)                                                 :: start_time
+        real(R8P)                                                 :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -683,6 +685,7 @@ contains
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
+        if(allocated(Values)) deallocate(Values)
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
         call H5Screate_simple_f(rank = rank,                  &
@@ -740,22 +743,22 @@ contains
     !-----------------------------------------------------------------
     !< read R8P dataset to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)  :: this                !< HDF5 contiguous hyperslab handler
-        character(len=*),                           intent(IN)  :: DatasetName         !< Dataset name
-        integer(HSIZE_T),                           intent(IN)  :: DatasetDims(:)      !< Dataset dimensions
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabOffset(:)  !< Hyperslab offset
-        integer(HSIZE_T),                           intent(IN)  :: HyperSlabSize(:)    !< Hyperslab size
-        real(R8P), allocatable,                     intent(OUT) :: Values(:)          !< R8P Dataset values
-        integer(HID_T)                                          :: filespace           !< HDF5 file Dataspace identifier
-        integer(HID_T)                                          :: memspace            !< HDF5 memory Dataspace identifier
-        integer(HID_T)                                          :: plist_id            !< HDF5 Property list identifier 
-        integer(HID_T)                                          :: dset_id             !< HDF5 Dataset identifier 
-        integer(I4P)                                            :: hdferror            !< HDF5 error code
-        integer(I4P)                                            :: rank                !< Hyperslab rank 
-        type(mpi_env_t), pointer                                :: MPIEnvironment
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)    :: this                !< HDF5 contiguous hyperslab handler
+        character(len=*),                           intent(IN)    :: DatasetName         !< Dataset name
+        integer(HSIZE_T),                           intent(IN)    :: DatasetDims(:)      !< Dataset dimensions
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabOffset(:)  !< Hyperslab offset
+        integer(HSIZE_T),                           intent(IN)    :: HyperSlabSize(:)    !< Hyperslab size
+        real(R8P), allocatable,                     intent(INOUT) :: Values(:)          !< R8P Dataset values
+        integer(HID_T)                                            :: filespace           !< HDF5 file Dataspace identifier
+        integer(HID_T)                                            :: memspace            !< HDF5 memory Dataspace identifier
+        integer(HID_T)                                            :: plist_id            !< HDF5 Property list identifier 
+        integer(HID_T)                                            :: dset_id             !< HDF5 Dataset identifier 
+        integer(I4P)                                              :: hdferror            !< HDF5 error code
+        integer(I4P)                                              :: rank                !< Hyperslab rank 
+        type(mpi_env_t), pointer                                  :: MPIEnvironment
 #ifdef PRINT_IO_TIMES
-        real(R8P)                                               :: start_time
-        real(R8P)                                               :: end_time
+        real(R8P)                                                 :: start_time
+        real(R8P)                                                 :: end_time
 #endif
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
@@ -770,6 +773,7 @@ contains
         start_time = MPIEnvironment%mpi_wtime()
 #endif
         rank = 1
+        if(allocated(Values)) deallocate(Values)
         allocate(Values(HyperSlabSize(rank)))
         ! Create filespace
         call H5Screate_simple_f(rank = rank,                  &
@@ -963,15 +967,15 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
-        character(len=*),                           intent(IN) :: Name                !< Attribute name
-        integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
-        integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
-        integer(I4P), allocatable,                  intent(OUT):: Values(:)           !< I4P Attribute values
-        integer(HSIZE_T)                                       :: GlobalNumberOfData  !< Global number of data
-        integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
-        integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
-        integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)   :: this     !< HDF5 contiguous hyperslab handler for structured grids
+        character(len=*),                           intent(IN)   :: Name                !< Attribute name
+        integer(I4P),                               intent(IN)   :: Type                !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                               intent(IN)   :: Center              !< Attribute center at (Node, Cell, etc.)
+        integer(I4P), allocatable,                  intent(INOUT):: Values(:)           !< I4P Attribute values
+        integer(HSIZE_T)                                         :: GlobalNumberOfData  !< Global number of data
+        integer(HSIZE_T)                                         :: LocalNumberOfData   !< Local number of data
+        integer(HSIZE_T)                                         :: NumberOfComponents  !< Global number of nodes
+        integer(HSIZE_T)                                         :: DataOffset          !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -997,15 +1001,15 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
-        character(len=*),                           intent(IN) :: Name                !< Attribute name
-        integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
-        integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
-        integer(I8P), allocatable,                  intent(OUT):: Values(:)           !< I4P Attribute values
-        integer(HSIZE_T)                                       :: GlobalNumberOfData  !< Global number of data
-        integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
-        integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
-        integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)   :: this     !< HDF5 contiguous hyperslab handler for structured grids
+        character(len=*),                           intent(IN)   :: Name                !< Attribute name
+        integer(I4P),                               intent(IN)   :: Type                !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                               intent(IN)   :: Center              !< Attribute center at (Node, Cell, etc.)
+        integer(I8P), allocatable,                  intent(INOUT):: Values(:)           !< I4P Attribute values
+        integer(HSIZE_T)                                         :: GlobalNumberOfData  !< Global number of data
+        integer(HSIZE_T)                                         :: LocalNumberOfData   !< Local number of data
+        integer(HSIZE_T)                                         :: NumberOfComponents  !< Global number of nodes
+        integer(HSIZE_T)                                         :: DataOffset          !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -1031,15 +1035,15 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
-        character(len=*),                           intent(IN) :: Name                !< Attribute name
-        integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
-        integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
-        real(R4P), allocatable,                     intent(OUT):: Values(:)           !< I4P Attribute values
-        integer(HSIZE_T)                                       :: GlobalNumberOfData  !< Global number of data
-        integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
-        integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
-        integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)   :: this     !< HDF5 contiguous hyperslab handler for structured grids
+        character(len=*),                           intent(IN)   :: Name                !< Attribute name
+        integer(I4P),                               intent(IN)   :: Type                !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                               intent(IN)   :: Center              !< Attribute center at (Node, Cell, etc.)
+        real(R4P), allocatable,                     intent(INOUT):: Values(:)           !< I4P Attribute values
+        integer(HSIZE_T)                                         :: GlobalNumberOfData  !< Global number of data
+        integer(HSIZE_T)                                         :: LocalNumberOfData   !< Local number of data
+        integer(HSIZE_T)                                         :: NumberOfComponents  !< Global number of nodes
+        integer(HSIZE_T)                                         :: DataOffset          !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?
@@ -1065,15 +1069,15 @@ contains
     !-----------------------------------------------------------------
     !< Writes I4P attriburte values to a HDF5 file for the contiguous HyperSlab strategy
     !----------------------------------------------------------------- 
-        class(hdf5_contiguous_hyperslab_handler_t), intent(IN) :: this     !< HDF5 contiguous hyperslab handler for structured grids
-        character(len=*),                           intent(IN) :: Name                !< Attribute name
-        integer(I4P),                               intent(IN) :: Type                !< Attribute type (Scalar, Vector, etc.)
-        integer(I4P),                               intent(IN) :: Center              !< Attribute center at (Node, Cell, etc.)
-        real(R8P), allocatable,                     intent(OUT):: Values(:)           !< I4P Attribute values
-        integer(HSIZE_T)                                       :: GlobalNumberOfData  !< Global number of data
-        integer(HSIZE_T)                                       :: LocalNumberOfData   !< Local number of data
-        integer(HSIZE_T)                                       :: NumberOfComponents  !< Global number of nodes
-        integer(HSIZE_T)                                       :: DataOffset          !< Node offset for a particular grid
+        class(hdf5_contiguous_hyperslab_handler_t), intent(IN)   :: this     !< HDF5 contiguous hyperslab handler for structured grids
+        character(len=*),                           intent(IN)   :: Name                !< Attribute name
+        integer(I4P),                               intent(IN)   :: Type                !< Attribute type (Scalar, Vector, etc.)
+        integer(I4P),                               intent(IN)   :: Center              !< Attribute center at (Node, Cell, etc.)
+        real(R8P), allocatable,                     intent(INOUT):: Values(:)           !< I4P Attribute values
+        integer(HSIZE_T)                                         :: GlobalNumberOfData  !< Global number of data
+        integer(HSIZE_T)                                         :: LocalNumberOfData   !< Local number of data
+        integer(HSIZE_T)                                         :: NumberOfComponents  !< Global number of nodes
+        integer(HSIZE_T)                                        :: DataOffset          !< Node offset for a particular grid
     !-----------------------------------------------------------------
         !< @Note: Fixed rank 1?
         !< @Note: Fixed dataset name?

@@ -110,7 +110,7 @@ contains
         integer(I4P), optional, intent(IN)    :: comm                 !< MPI communicator
         integer(I4P), optional, intent(IN)    :: info                 !< MPI info
         integer(I4P), optional, intent(IN)    :: root                 !< MPI root processor
-        integer(I4P), optional, intent(OUT)   :: mpierror             !< MPI error
+        integer(I4P), optional, intent(INOUT) :: mpierror             !< MPI error
         integer(I4P)                          :: mpierr               !< Aux variable for MPI error checking
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_START)
@@ -221,9 +221,9 @@ contains
     !-----------------------------------------------------------------
     !< MPI_barrier interface
     !----------------------------------------------------------------- 
-        class(mpi_env_t),          intent(IN)  :: this                !< MPI environment
-        integer(I4P), optional,    intent(OUT) :: mpierror            !< MPI error
-        integer(I4P)                           :: mpierr              !< Aux variable for MPI error
+        class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
+        integer(I4P)                             :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_INIT)
         mpierr = 0
@@ -239,12 +239,12 @@ contains
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I4P value per task
     !----------------------------------------------------------------- 
-        class(mpi_env_t),          intent(IN)  :: this                !< MPI environment
-        integer(I4P),              intent(IN)  :: send_data           !< MPI_allgather send data
-        integer(I4P), allocatable, intent(OUT) :: recv_data(:)        !< MPI_allgather receive data
-        integer(I4P), optional,    intent(OUT) :: mpierror            !< MPI error
-        integer(I4P)                           :: mpierr              !< Aux variable for MPI error
-        integer(I4P)                           :: comm_size           !< MPI communicator size aux variable
+        class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
+        integer(I4P),              intent(IN)    :: send_data           !< MPI_allgather send data
+        integer(I4P), allocatable, intent(INOUT) :: recv_data(:)        !< MPI_allgather receive data
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
+        integer(I4P)                             :: mpierr              !< Aux variable for MPI error
+        integer(I4P)                             :: comm_size           !< MPI communicator size aux variable
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
@@ -266,12 +266,12 @@ contains
     !-----------------------------------------------------------------
     !< MPI_allgather interface for a single I8P value per task
     !----------------------------------------------------------------- 
-        class(mpi_env_t),          intent(IN)  :: this                !< MPI environment
-        integer(I8P),              intent(IN)  :: send_data           !< MPI_allgather send data
-        integer(I8P), allocatable, intent(OUT) :: recv_data(:)        !< MPI_allgather receive data
-        integer(I4P), optional,    intent(OUT) :: mpierror            !< MPI error
-        integer(I4P)                           :: mpierr              !< Aux variable for MPI error
-        integer(I4P)                           :: comm_size           !< MPI communicator size aux variable
+        class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
+        integer(I8P),              intent(IN)    :: send_data           !< MPI_allgather send data
+        integer(I8P), allocatable, intent(INOUT) :: recv_data(:)        !< MPI_allgather receive data
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
+        integer(I4P)                             :: mpierr              !< Aux variable for MPI error
+        integer(I4P)                             :: comm_size           !< MPI communicator size aux variable
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_INIT)
         if(present(mpierror)) mpierror = 0
@@ -296,7 +296,7 @@ contains
     !----------------------------------------------------------------- 
         class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
         integer(I4P),              intent(INOUT) :: send_data           !< MPI_broadcast send data
-        integer(I4P), optional,    intent(OUT)   :: mpierror            !< MPI error
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
         integer(I4P)                             :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_INIT)
@@ -314,7 +314,7 @@ contains
     !----------------------------------------------------------------- 
         class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
         integer(I8P),              intent(INOUT) :: send_data           !< MPI_broadcast send data
-        integer(I4P), optional,    intent(OUT)   :: mpierror            !< MPI error
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
         integer(I4P)                             :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 
         assert(this%State == MPI_ENV_STATE_INIT)
@@ -332,7 +332,7 @@ contains
     !----------------------------------------------------------------- 
         class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
         integer(I4P), allocatable, intent(INOUT) :: send_data(:)        !< MPI_broadcast send data
-        integer(I4P), optional,    intent(OUT)   :: mpierror            !< MPI error
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
         integer(I4P)                             :: data_size           !< Send data size
         integer(I4P)                             :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 
@@ -357,7 +357,7 @@ contains
     !----------------------------------------------------------------- 
         class(mpi_env_t),          intent(IN)    :: this                !< MPI environment
         integer(I8P), allocatable, intent(INOUT) :: send_data(:)        !< MPI_broadcast send data
-        integer(I4P), optional,    intent(OUT)   :: mpierror            !< MPI error
+        integer(I4P), optional,    intent(INOUT) :: mpierror            !< MPI error
         integer(I4P)                             :: data_size           !< Send data size
         integer(I4P)                             :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 
@@ -382,7 +382,7 @@ contains
     !----------------------------------------------------------------- 
         class(mpi_env_t),              intent(IN)    :: this                !< MPI environment
         character(len=:), allocatable, intent(INOUT) :: send_data           !< MPI_broadcast send data
-        integer(I4P),     optional,    intent(OUT)   :: mpierror            !< MPI error
+        integer(I4P),     optional,    intent(INOUT) :: mpierror            !< MPI error
         integer(I4P)                                 :: data_size           !< Send data size
         integer(I4P)                                 :: mpierr              !< Aux variable for MPI error
     !----------------------------------------------------------------- 

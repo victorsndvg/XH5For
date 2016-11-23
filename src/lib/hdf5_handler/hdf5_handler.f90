@@ -216,55 +216,55 @@ private
         subroutine hdf5_handler_ReadGeometry_XYZ_R4P(this, XYZ, Name)
             import hdf5_handler_t
             import R4P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R4P), allocatable, intent(OUT) :: XYZ(:)
-            character(len=*),      intent(IN)   :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R4P), allocatable, intent(INOUT) :: XYZ(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_XYZ_R4P
 
         subroutine hdf5_handler_ReadGeometry_XYZ_R8P(this, XYZ, Name)
             import hdf5_handler_t
             import R8P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R8P), allocatable, intent(OUT) :: XYZ(:)
-            character(len=*),       intent(IN)  :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R8P), allocatable, intent(INOUT) :: XYZ(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_XYZ_R8P
 
         subroutine hdf5_handler_ReadGeometry_X_Y_Z_R4P(this, X, Y, Z, Name)
             import hdf5_handler_t
             import R4P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R4P), allocatable, intent(OUT) :: X(:)
-            real(R4P), allocatable, intent(OUT) :: Y(:)
-            real(R4P), allocatable, intent(OUT) :: Z(:)
-            character(len=*),      intent(IN)   :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R4P), allocatable, intent(INOUT) :: X(:)
+            real(R4P), allocatable, intent(INOUT) :: Y(:)
+            real(R4P), allocatable, intent(INOUT) :: Z(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_X_Y_Z_R4P
 
         subroutine hdf5_handler_ReadGeometry_X_Y_Z_R8P(this, X, Y, Z, Name)
             import hdf5_handler_t
             import R8P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R8P), allocatable, intent(OUT) :: X(:)
-            real(R8P), allocatable, intent(OUT) :: Y(:)
-            real(R8P), allocatable, intent(OUT) :: Z(:)
-            character(len=*),       intent(IN)  :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R8P), allocatable, intent(INOUT) :: X(:)
+            real(R8P), allocatable, intent(INOUT) :: Y(:)
+            real(R8P), allocatable, intent(INOUT) :: Z(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_X_Y_Z_R8P
 
         subroutine hdf5_handler_ReadGeometry_DXDYDZ_R4P(this, Origin, DxDyDz, Name)
             import hdf5_handler_t
             import R4P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R4P), allocatable, intent(OUT) :: Origin(:)
-            real(R4P), allocatable, intent(OUT) :: DxDyDz(:)
-            character(len=*),       intent(IN)  :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R4P), allocatable, intent(INOUT) :: Origin(:)
+            real(R4P), allocatable, intent(INOUT) :: DxDyDz(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_DXDYDZ_R4P
 
         subroutine hdf5_handler_ReadGeometry_DXDYDZ_R8P(this, Origin, DxDyDz, Name)
             import hdf5_handler_t
             import R8P
-            class(hdf5_handler_t),  intent(IN)  :: this
-            real(R8P), allocatable, intent(OUT) :: Origin(:)
-            real(R8P), allocatable, intent(OUT) :: DxDyDz(:)
-            character(len=*),       intent(IN)  :: Name
+            class(hdf5_handler_t),  intent(IN)    :: this
+            real(R8P), allocatable, intent(INOUT) :: Origin(:)
+            real(R8P), allocatable, intent(INOUT) :: DxDyDz(:)
+            character(len=*),       intent(IN)    :: Name
         end subroutine hdf5_handler_ReadGeometry_DXDYDZ_R8P
 
         subroutine hdf5_handler_WriteTopology_I4P(this, Connectivities, Name)
@@ -286,17 +286,17 @@ private
         subroutine hdf5_handler_ReadTopology_I4P(this, Connectivities, Name)
             import hdf5_handler_t
             import I4P
-            class(hdf5_handler_t),     intent(IN)  :: this
-            integer(I4P), allocatable, intent(OUT) :: Connectivities(:)
-            character(len=*),          intent(IN)  :: Name
+            class(hdf5_handler_t),     intent(IN)    :: this
+            integer(I4P), allocatable, intent(INOUT) :: Connectivities(:)
+            character(len=*),          intent(IN)    :: Name
         end subroutine hdf5_handler_ReadTopology_I4P
 
         subroutine hdf5_handler_ReadTopology_I8P(this, Connectivities, Name)
             import hdf5_handler_t
             import I8P
-            class(hdf5_handler_t),     intent(IN)  :: this
-            integer(I8P), allocatable, intent(OUT) :: Connectivities(:)
-            character(len=*),          intent(IN)  :: Name
+            class(hdf5_handler_t),     intent(IN)    :: this
+            integer(I8P), allocatable, intent(INOUT) :: Connectivities(:)
+            character(len=*),          intent(IN)    :: Name
         end subroutine hdf5_handler_ReadTopology_I8P
 
         subroutine hdf5_handler_WriteAttribute_I4P(this, Name, Type, Center, Values)
@@ -306,7 +306,7 @@ private
             character(len=*),      intent(IN) :: Name
             integer(I4P),          intent(IN) :: Type
             integer(I4P),          intent(IN) :: Center
-            integer(I4P),          intent(IN) :: values(:)
+            integer(I4P),          intent(IN) :: Values(:)
         end subroutine hdf5_handler_WriteAttribute_I4P
 
         subroutine hdf5_handler_WriteAttribute_I8P(this, Name, Type, Center, Values)
@@ -317,7 +317,7 @@ private
             character(len=*),      intent(IN) :: Name
             integer(I4P),          intent(IN) :: Type
             integer(I4P),          intent(IN) :: Center
-            integer(I8P),          intent(IN) :: values(:)
+            integer(I8P),          intent(IN) :: Values(:)
         end subroutine hdf5_handler_WriteAttribute_I8P
 
         subroutine hdf5_handler_WriteAttribute_R4P(this, Name, Type, Center, Values)
@@ -328,7 +328,7 @@ private
             character(len=*),      intent(IN) :: Name
             integer(I4P),          intent(IN) :: Type
             integer(I4P),          intent(IN) :: Center
-            real(R4P),             intent(IN) :: values(:)
+            real(R4P),             intent(IN) :: Values(:)
         end subroutine hdf5_handler_WriteAttribute_R4P
 
         subroutine hdf5_handler_WriteAttribute_R8P(this, Name, Type, Center, Values)
@@ -339,50 +339,50 @@ private
             character(len=*),      intent(IN) :: Name
             integer(I4P),          intent(IN) :: Type
             integer(I4P),          intent(IN) :: Center
-            real(R8P),             intent(IN) :: values(:)
+            real(R8P),             intent(IN) :: Values(:)
         end subroutine hdf5_handler_WriteAttribute_R8P
 
         subroutine hdf5_handler_ReadAttribute_I4P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I4P
-            class(hdf5_handler_t),    intent(IN) :: this
-            character(len=*),         intent(IN) :: Name
-            integer(I4P),             intent(IN) :: Type
-            integer(I4P),             intent(IN) :: Center
-            integer(I4P), allocatable,intent(OUT):: values(:)
+            class(hdf5_handler_t),    intent(IN)   :: this
+            character(len=*),         intent(IN)   :: Name
+            integer(I4P),             intent(IN)   :: Type
+            integer(I4P),             intent(IN)   :: Center
+            integer(I4P), allocatable,intent(INOUT):: Values(:)
         end subroutine hdf5_handler_ReadAttribute_I4P
 
         subroutine hdf5_handler_ReadAttribute_I8P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I4P
             import I8P
-            class(hdf5_handler_t),  intent(IN) :: this
-            character(len=*),        intent(IN) :: Name
-            integer(I4P),            intent(IN) :: Type
-            integer(I4P),            intent(IN) :: Center
-            integer(I8P),allocatable,intent(OUT):: values(:)
+            class(hdf5_handler_t),   intent(IN)   :: this
+            character(len=*),        intent(IN)   :: Name
+            integer(I4P),            intent(IN)   :: Type
+            integer(I4P),            intent(IN)   :: Center
+            integer(I8P),allocatable,intent(INOUT):: Values(:)
         end subroutine hdf5_handler_ReadAttribute_I8P
 
         subroutine hdf5_handler_ReadAttribute_R4P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I4P
             import R4P
-            class(hdf5_handler_t), intent(IN) :: this
-            character(len=*),      intent(IN) :: Name
-            integer(I4P),          intent(IN) :: Type
-            integer(I4P),          intent(IN) :: Center
-            real(R4P), allocatable,intent(OUT):: values(:)
+            class(hdf5_handler_t), intent(IN)   :: this
+            character(len=*),      intent(IN)   :: Name
+            integer(I4P),          intent(IN)   :: Type
+            integer(I4P),          intent(IN)   :: Center
+            real(R4P), allocatable,intent(INOUT):: Values(:)
         end subroutine hdf5_handler_ReadAttribute_R4P
 
         subroutine hdf5_handler_ReadAttribute_R8P(this, Name, Type, Center, Values)
             import hdf5_handler_t
             import I4P
             import R8P
-            class(hdf5_handler_t), intent(IN) :: this
-            character(len=*),      intent(IN) :: Name
-            integer(I4P),          intent(IN) :: Type
-            integer(I4P),          intent(IN) :: Center
-            real(R8P), allocatable,intent(OUT):: values(:)
+            class(hdf5_handler_t), intent(IN)   :: this
+            character(len=*),      intent(IN)   :: Name
+            integer(I4P),          intent(IN)   :: Type
+            integer(I4P),          intent(IN)   :: Center
+            real(R8P), allocatable,intent(INOUT):: Values(:)
         end subroutine hdf5_handler_ReadAttribute_R8P
 
     end interface
