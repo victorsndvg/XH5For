@@ -41,8 +41,8 @@ install:
   ## Install HDF5 ##
   ##################
   - cd $TRAVIS_BUILD_DIR
-  - tar xf hdf5-1.8.17.tar
-  - cd hdf5-1.8.17
+  - tar xf hdf5-1.8.18.tar
+  - cd hdf5-1.8.18
   - mkdir $TRAVIS_BUILD_DIR/hdf5
   - ./configure --prefix=$TRAVIS_BUILD_DIR/hdf5 -q --enable-parallel --enable-fortran --enable-fortran2003 --with-default-api-version=v18 --enable-silent-rules FC=$TRAVIS_BUILD_DIR/openmpi/bin/mpif90 CC=$TRAVIS_BUILD_DIR/openmpi/bin/mpicc > /dev/null
   - travis_wait 20 make -j 8 --silent > /dev/null
