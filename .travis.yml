@@ -61,7 +61,7 @@ before_script:
   - cmake -DCMAKE_Fortran_COMPILER=$TRAVIS_BUILD_DIR/hdf5/bin/h5pfc -DXH5For_ENABLE_TESTS=ON -DXH5For_ENABLE_EXAMPLES=ON -DCOVERAGE_COMMAND=$GCOV -DXH5For_PRINT_IO_TIMES=ON -DXH5For_FORCE_FLUSH=ON -DMPIEXEC_PREFLAGS=--tag-output ..
 
 script:
-  - ctest -VV -T Start -T Build -T Test -T Coverage
+  - ctest -VV -T Start -T Build -T Test #-T Coverage
 
 after_success:
   - find . -name '*.gcno' -print
