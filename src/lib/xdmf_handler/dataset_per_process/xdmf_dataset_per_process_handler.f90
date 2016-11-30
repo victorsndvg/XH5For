@@ -97,7 +97,7 @@ contains
                         AttributeType = XDMFAttributeTypeName,                                        &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = XMLHandler,                                           &
-                        Dimensions = (/int(LocalNumberOfData,I8P),int(NumberOfComponents,I8P),1_I8P/), &
+                        Dimensions = (/int(LocalNumberOfData,I8P),int(NumberOfComponents,I8P)/), &
                         NumberType = UniformGridDescriptor%GetAttributeDataType(AttributeNumber=indx), &
                         Format     = 'HDF',                                                            &
                         Precision  = UniformGridDescriptor%GetAttributePrecision(AttributeNumber=indx)) 

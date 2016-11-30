@@ -98,7 +98,7 @@ contains
                         AttributeType = XDMFAttributeTypeName,                                        &
                         Center        = XDMFCenterTypeName)
                 call dataitem%open(xml_handler = XMLHandler,                                              &
-                        Dimensions = (/LocalNumberOfData, int(NumberOfComponents,I8P), DimensionsSize/),  &
+                        Dimensions = (/LocalNumberOfData, int(NumberOfComponents,I8P)/),  &
                         ItemType   = 'HyperSlab',                                                         &
                         Format     = 'HDF')
                 call dataitem%open(xml_handler = XMLHandler,            &
